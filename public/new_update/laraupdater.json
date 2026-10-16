@@ -1,0 +1,5 @@
+{
+    "version": "4.0.1",
+    "archive": "RELEASE-4.0.1.zip",
+    "description": "+[Added] Quick Delivery options (15 and 30 minutes)<br/>+ [Added] Food Delivery module<br/>+ [Improved] Category flow<br/>+ [Added] Seller-level Attribute and Custom Field management<br/>+ [Improved] Veg and Non-Veg moved to Custom Fields<br/>+ [Added] Module-wise theme color management<br/>+ [Added] WebP image support in the Admin Panel and Web App<br/>+ [Added] Social media icon management for the Website from the Admin Panel<br/>+ [Added] Seller warning for Global Attributes and Custom Fields before their removal in the next update<br/>+ [Updated] App codebase upgraded to the latest Flutter version (3.47.2) (Customer App, Partner App)<br/>+ [Improved] System performance and overall functionality<br/>+ [Fixed] Minor bugs and other issues"
+}   

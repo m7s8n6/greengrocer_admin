@@ -1,0 +1,50 @@
+Steps to bulk upload of products
+1. Firstly, read Notes carefully.
+2. Add image from media module and copy path from there.
+3. Create excel file for product as explain below:
+
+        Note - * Indicates Mandatory Fields
+
+        Product Name * -> Name of the product.
+        Seller_id * -> Seller id of the product (can be found in seller table).
+        Category ID * -> Category ID of the product (You can find Category ID in Categories section).
+        Indicator * -> Empty - None, Veg - Veg, Non-veg - Non-Veg.
+        Manufacturer -> Manufacturer of the product.
+        Made in -> Product Made In country Id (You can find Country ID in Countries section).
+        Is Returnable? * -> No, Yes.
+        Max Return Days -> Maximum number of days allowed for return.
+        Is cancel-able * -> No, Yes.
+        Till which status -> If Is cancelable than till which status (Payment Pending, Received, Processed, Shipped, Out for Delivery).
+        Description * -> Description about product.
+        Main Image -> Image path of the product (Main image). Required UNLESS every variant below has its own Variant Image filled in - then it falls back to the first variant's image.
+        Other Images -> Comma separated image paths (ex: upload/images/img1.jpg,upload/images/img2.jpg).
+        Product Status (Is approved?) * -> Yes/No.
+        Brand_id -> Brand ID of the product. Leave 0 if no brand.
+        tax_id -> Leave 0 if no tax. You can find tax_id from taxes section.
+        FSSAI Lic. No. -> FSSAI License Number (14 digits).
+        Barcode -> Barcode for the product.
+        Tags * -> Comma separated tags (ex: snacks,biscuit).
+        Stock Limit Type (Limited/Unlimited) * -> Limited (Stock tracks), Unlimited (No stock tracking).
+        Is COD allowed? * -> No, Yes.
+        Total allowed quantity -> Maximum allowed quantity per customer (number).
+        SEO Meta Title -> Meta Title for Search Engines.
+        SEO Meta Keywords -> Meta Keywords (Comma separated).
+        Schema Markup -> JSON Schema Markup.
+        Meta Description -> Brief description for Search Engines.
+
+        -> Add following columns for variants of products in succession (refer to sample file).
+        -> For example, for 3 variants, repeat these columns 3 times.
+
+            Attribute Value IDs * -> Comma-separated list of EXISTING attribute value ids that make up this variant, e.g. "512" for a single attribute, or "512,456" for a combo (Litters=500 AND colors=Black). Use the Variant Combo Generator on the Bulk Upload page to pick a Category, select attribute values, and generate/copy these ids instead of typing them by hand - typing an id that doesn't exist rejects the row (it will NOT silently create a new attribute value).
+            Price * -> Price of the variant (Must be greater than discounted price).
+            Discounted Price * -> Discounted Price of the variant (0 if no discount).
+            Variant Status * -> Availability/Status (Available, Sold Out).
+            Stock * -> Stock available.
+            Variant Image -> Optional. Image path(s) for this specific variant only (copy from Media module, same as Main Image). Comma separated for multiple images (ex: upload/images/img1.jpg,upload/images/img2.jpg), same convention as Other Images. Leave blank to show the Main Image for this variant instead. On Bulk Update, leaving it blank keeps whatever image(s) the variant already has - it is only replaced when you fill in new path(s).
+
+        Note - Each variant is matched to an EXISTING combination of attribute values (same
+        attribute system used in Add/Edit Product) - there is no separate variant Type column
+        anymore (packet/loose has been replaced by attributes), and no free-typed measurement
+        either. Use the Variant Combo Generator to avoid typo/mismatch errors.
+
+        Note - Do not leave fields empty. If you have no value for a specific column, add "0" (zero) or the appropriate default value.

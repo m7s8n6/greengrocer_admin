@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class ModuleTranslation extends Model
+{
+    use HasFactory;
+
+    protected $table = 'module_translations';
+
+    protected $fillable = [
+        'module_id',
+        'language_id',
+        'name',
+        'description',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class, 'module_id');
+    }
+
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'language_id');
+    }
+}
