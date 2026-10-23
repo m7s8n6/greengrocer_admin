@@ -20,7 +20,6 @@ use Composer\Json\JsonFile;
 use Composer\Pcre\Preg;
 use Composer\Util\Bitbucket;
 use Composer\Util\Http\Response;
-use Composer\Util\Url;
 
 /**
  * @author Per Bernhardt <plb@webfactory.de>
@@ -65,7 +64,7 @@ class GitBitbucketDriver extends VcsDriver
     public function initialize(): void
     {
         if (!Preg::isMatchStrictGroups('#^https?://bitbucket\.org/([^/]+)/([^/]+?)(?:\.git|/?)?$#i', $this->url, $match)) {
-            throw new \InvalidArgumentException(sprintf('The Bitbucket repository URL %s is invalid. It must be the HTTPS URL of a Bitbucket repository.', Url::sanitize($this->url)));
+            throw new \InvalidArgumentException(sprintf('The Bitbucket repository URL %s is invalid. It must be the HTTPS URL of a Bitbucket repository.', $this->url));
         }
 
         $this->owner = $match[1];
@@ -148,7 +147,7 @@ class GitBitbucketDriver extends VcsDriver
                 $composer = $this->getBaseComposerInformation($identifier);
 
                 if ($this->shouldCache($identifier)) {
-                    $this->cache->write($identifier, JsonFile::encode($composer, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
+                    $this->cache->write($identifier, json_encode($composer));
                 }
             }
 
@@ -491,7 +490,7 @@ class GitBitbucketDriver extends VcsDriver
 
             if ($this->vcsType !== 'git') {
                 throw new \RuntimeException(
-                    Url::sanitize($this->url).' does not appear to be a git repository, use '.
+                    $this->url.' does not appear to be a git repository, use '.
                     $this->cloneHttpsUrl.' but remember that Bitbucket no longer supports the mercurial repositories. '.
                     'https://bitbucket.org/blog/sunsetting-mercurial-support-in-bitbucket'
                 );
@@ -513,7 +512,7 @@ class GitBitbucketDriver extends VcsDriver
         }
 
         if (!extension_loaded('openssl')) {
-            $io->writeError('Skipping Bitbucket git driver for '.Url::sanitize($url).' because the OpenSSL PHP extension is missing.', true, IOInterface::VERBOSE);
+            $io->writeError('Skipping Bitbucket git driver for '.$url.' because the OpenSSL PHP extension is missing.', true, IOInterface::VERBOSE);
 
             return false;
         }

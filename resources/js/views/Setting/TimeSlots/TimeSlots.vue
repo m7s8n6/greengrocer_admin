@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-heading">
-      <div class="row">
+      <div class="page-title"><div class="row">
         <div class="col-12 col-md-6 order-md-1 order-last">
           <h3>{{ __('manage_time_slots') }}</h3>
         </div>
@@ -11,38 +11,40 @@
               <li class="breadcrumb-item">
                 <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
               </li>
+              <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
               <li class="breadcrumb-item active" aria-current="page">{{ __('manage_time_slots') }}</li>
             </ol>
           </nav>
         </div>
-      </div>
+      </div></div>
 
       <div class="row">
-        <div class="col-12 col-md-12 order-md-1 order-last">
-          <div class="figma-main-section-card">
-            <div class="card-header">
-              <h4 class="card-title">{{ __('time_slot_config') }}</h4>
-            </div>
-
-            <div class="card-body p-4">
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="box-body">
+                <div class="col-12 col-xl-4 timeslot-config-col mb-3 mb-xl-0">
+                  <div class="card mb-0">
+                    <div class="card-header">
+                      <h4 class="card-title float-none">{{ __('time_slot_config') }}</h4>
+                      <p class="text-muted small mb-0 mt-1">{{ tr('time_slot_config_desc', 'Turn delivery time slots on or off and choose how customers pick a delivery time.') }}</p>
+                    </div>
+                  <div class="card-body">
                     <div class="form-group">
                       <label for="time_slots_is_enabled">{{ __('enable') }} / {{ __('disable') }} {{ __('time_slots')
                         }}</label>
+                      <div class="form-check form-switch mt-1">
                       <input type="checkbox" required id="time_slots_is_enabled"
                         v-model="timeSlot_settingsObject.time_slots_is_enabled" class="form-check-input"
                         :true-value="1" :false-value="0">
+                      </div>
                     </div>
                     <template v-if="timeSlot_settingsObject.time_slots_is_enabled == 1">
                       <div class="form-group">
                         <label>{{ __('slot_type') || 'Slot Type' }}</label>
-                        <div class="mt-1">
+                        <div class="mt-1 d-inline-block" v-b-tooltip.hover.bottom
+                          :title="oneSellerCart ? '' : 'Quick Delivery needs One Seller Cart turned on (Settings \u2192 Seller Setting).'">
                           <b-form-radio-group v-model="timeSlot_settingsObject.time_slot_type" :options="[
                             { text: __('fixed_time_window') || 'Fixed Time Window', 'value': 'fixed' },
-                            { text: __('express') || 'Quick Delivery', 'value': 'express' },
-                          ]" buttons button-variant="outline-primary"></b-form-radio-group>
+                            { text: __('express') || 'Quick Delivery', 'value': 'express', disabled: !oneSellerCart },
+                          ]" buttons button-variant="outline-primary" class="slot-type-group"></b-form-radio-group>
+
                         </div>
                       </div>
                       <div class="form-group" v-if="timeSlot_settingsObject.time_slot_type !== 'express'">
@@ -62,13 +64,16 @@
                       </div>
                     </template>
 
-                    <div class="box-footer">
-                      <button type="submit" class="btn btn-primary" @click="addTimeSlotsSettings" :disabled="isLoading">
-                        {{ __('add') }} <b-spinner v-if="isLoading" small label="Spinning"></b-spinner></button>
+                    <div class="d-flex justify-content-end border-top pt-3 mt-2">
+                      <button v-if="$can('delivery_settings')" type="submit" class="btn btn-primary" @click="addTimeSlotsSettings" :disabled="isLoading">
+                        {{ __('save') }} <b-spinner v-if="isLoading" small label="Spinning"></b-spinner></button>
                     </div>
                   </div>
+                  </div>
                 </div>
-                <div class="col-md-8" v-if="timeSlot_settingsObject.time_slots_is_enabled == 1">
+                <div class="col-12 col-xl-8 timeslot-list-col" v-if="timeSlot_settingsObject.time_slots_is_enabled == 1">
+                  <div class="card mb-0">
+                  <div class="card-body">
                   <div
                     class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row mb-3">
                     <div class="flex-grow-1">
@@ -77,16 +82,16 @@
                         <input v-model="filter" type="text" class="figma-search-input" :placeholder="__('search')">
                       </div>
                     </div>
-                    <div class="d-flex gap-2 align-items-center flex-wrap">
-                      <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="edit_record = true"
+                    <div class="d-flex gap-2 align-items-center flex-wrap timeslot-actions">
+                      <button class="btn btn-figma-filter d-flex align-items-center gap-2 timeslot-add-btn" @click="edit_record = true"
                         v-if="$can('time_slot_create')" :disabled="quickDeliverySlotExists"
                         v-b-tooltip.hover
                         :title="quickDeliverySlotExists ? (__('quick_delivery_slot_already_exists') || 'A Quick Delivery slot already exists. Delete it before adding a new one.') : ''">
                         <i class="fa fa-plus"></i>
                         <span>{{ __('add_new_time_slot') }}</span>
                       </button>
-                      <button class="btn btn-figma-filter d-flex align-items-center justify-content-center"
-                        style="width: 42px; height: 42px;" @click="getTimeSlots()" v-b-tooltip.hover
+                      <button class="btn btn-figma-filter d-flex align-items-center justify-content-center timeslot-refresh-btn"
+                        @click="getTimeSlots()" v-b-tooltip.hover
                         :title="__('refresh')">
                         <i class="fa fa-refresh"></i>
                       </button>
@@ -101,10 +106,17 @@
                       stacked="md" show-empty small class="figma-table mb-0"
                       :tbody-tr-class="() => 'figma-tr align-middle'">
                       <template #table-busy>
-                        <div class="text-center text-black my-2">
+                        <div class="text-center text-muted my-2">
                           <b-spinner class="align-middle"></b-spinner>
                           <strong>{{ __('loading') }}...</strong>
                         </div>
+                      </template>
+
+                      <template #empty="scope">
+                        <div class="text-center text-muted py-4"><i class="fa fa-clock-o fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                      </template>
+                      <template #emptyfiltered="scope">
+                        <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
                       </template>
 
                       <template #cell(status)="row">
@@ -145,12 +157,12 @@
                       <template #cell(actions)="row">
                         <div class="d-flex gap-2 justify-content-center">
                           <button class="figma-action-btn" @click="edit_record = row.item"
-                            v-if="$can('time_slot_update')" v-b-tooltip.hover :title="__('edit')">
+                            v-if="$can('time_slot_update')" v-b-tooltip.hover.top.viewport.noninteractive :title="__('edit')">
                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                           </button>
                           <button class="figma-action-btn figma-delete-btn"
                             @click="deleteTimeSlots(row.index, row.item.id)" v-if="$can('time_slot_delete')"
-                            v-b-tooltip.hover :title="__('delete')">
+                            v-b-tooltip.hover.top.viewport.noninteractive :title="__('delete')">
                             <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                           </button>
                         </div>
@@ -158,11 +170,12 @@
                     </b-table>
                   </div>
 
-                  <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                    <div class="showing-results-text small">
-                      {{ __('Showing Result') }} : <span class="showing-bold">{{ showingEnd }}</span> {{ __('of') }} <span
-                        class="showing-bold">{{ totalRows
-                        }}</span>
+                  <div class="figma-table-footer flex-wrap gap-3 mt-4" v-if="timeSlot_settingsObject.time_slot_type !== 'express'">
+                    <div class="d-flex align-items-center gap-2">
+                      <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                      <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                        class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                       <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
@@ -170,11 +183,9 @@
                         next-text=">"></b-pagination>
                     </div>
                   </div>
+                  </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -233,6 +244,7 @@ export default {
         time_slot_type: 'fixed',
       },
       timeSlot_settings: {},
+      oneSellerCart: false,
       validationNoOfDaysError: null,
       validationNoOfEstimateDaysError: null,
       currentLanguageId: null,
@@ -309,9 +321,13 @@ export default {
         this.totalRows = list.length;
         this.currentPage = 1;
       }
+    },
+    perPage() {
+      this.currentPage = 1;
     }
   },
   methods: {
+    tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
     /**
      * List: show store-formatted time from API (*_display). Edit modal still uses raw HH:mm fields on the same row.
      */
@@ -386,8 +402,8 @@ export default {
           cancelButtonText: "Cancel",
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#37a279",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "var(--theme-primary-500)",
+          cancelButtonColor: "var(--theme-error-500)",
         })
         .then((result) => {
           if (result.value) {
@@ -410,6 +426,7 @@ export default {
       axios.get(this.$apiUrl + "/delivery_settings/getTimeSlotsSettings").then((response) => {
         let data = response.data.data;
         this.timeSlot_settingsObject = data.timeSlot_settingsObject;
+        this.oneSellerCart = Number(data.one_seller_cart) === 1;
         // Normalize to 1/0 regardless of how it was saved previously (boolean "true"/"false"
         // strings from an old save, or "1"/"0") - every v-if in this form checks == 1.
         const enabledRaw = this.timeSlot_settingsObject.time_slots_is_enabled;
@@ -451,3 +468,61 @@ export default {
   }
 };
 </script>
+
+<style>
+/* Time slot config card (left) and slot list card (right) */
+.timeslot-refresh-btn {
+  width: 38px;
+  padding: 0 !important; /* global .btn-figma-filter padding is !important */
+}
+
+/* Selected slot type: BootstrapVue marks the checked button with .active (global outline style has no .active state) */
+.slot-type-group > .btn.btn-outline-primary.active {
+  background: var(--theme-primary-500) !important; /* beats global !important outline background */
+  border-color: var(--theme-primary-500) !important;
+  color: var(--theme-neutral-50) !important;
+}
+
+/* Button-style radio group: hide the native radio circles at every width */
+.slot-type-group input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Unscoped on purpose: the toggle buttons are rendered inside BootstrapVue's b-form-radio-group,
+   outside this component's scope. Phones: slot-type toggle fills the row (two equal halves, no stray radio circles), and the
+   "Add New Time Slot" button takes the free width beside a fixed-size refresh button instead
+   of being squeezed into a narrow half-width cell. */
+@media (max-width: 575.98px) {
+  .slot-type-group {
+    display: flex;
+    width: 100%;
+  }
+
+  .slot-type-group > .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+
+  .timeslot-list-col .figma-action-bar-row > .timeslot-actions {
+    display: flex !important;
+    flex-wrap: nowrap;
+    gap: 8px !important;
+  }
+
+  .timeslot-actions > .timeslot-add-btn {
+    flex: 1 1 auto;
+    width: auto;
+  }
+
+  .timeslot-actions > .timeslot-refresh-btn {
+    flex: 0 0 38px;
+  }
+}
+</style>

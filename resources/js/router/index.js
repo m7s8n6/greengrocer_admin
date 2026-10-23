@@ -1,4 +1,5 @@
 import Auth from '../Auth.js';
+import { rememberIntended, loginPathFor } from '../IntendedUrl.js';
 import Router from "vue-router";
 import axios from "axios";
 const Install = () => import("../views/Install");
@@ -26,8 +27,7 @@ const ViewSelfPickupOrder = () => import("../views/Orders/ViewSelfPickupOrder");
 const NotificationPanel = () => import("../views/NotificationPanel.vue");
 
 // Categories
-const ManageCategories = () => import("../views/Category/ManageCategories");
-const CategoriesOrder = () => import("../views/Category/CategoriesOrder");
+const ManageCategories = () => import(/* webpackChunkName: "manage_categories" */ "../views/Category/ManageCategories");
 
 // Products
 const Products = () => import("../views/Product/Products");
@@ -62,6 +62,7 @@ const PromoCode = () => import("../views/PromoCode/PromoCode");
 const TimeSlots = () => import("../views/Setting/TimeSlots/TimeSlots");
 //Setting - Store Settings
 const StoreSettings = () => import("../views/Setting/StoreSettings");
+const SettingsHub = () => import("../views/Setting/SettingsHub");
 //Setting - Theme Settings
 const ThemeSettings = () => import("../views/Setting/ThemeSettings");
 //Setting - Payment Methods
@@ -87,6 +88,9 @@ const PrivacyPolicySeller = () => import("../views/Setting/PrivacyPolicySeller")
 const FirebaseSettings = () => import("../views/Setting/FirebaseSettings");
 const NotificationTemplates = () => import("../views/Setting/NotificationTemplates/NotificationTemplates");
 const SmsSettings = () => import("../views/Setting/SmsSettings");
+const DeeplinkSettings = () => import("../views/Setting/DeeplinkSettings");
+const RealtimeSettings = () => import("../views/Setting/RealtimeSettings");
+const ModuleDeliverySettings = () => import("../views/Setting/ModuleDeliverySettings");
 const SmsTemplates = () => import("../views/Setting/SmsTemplates/SmsTemplates");
 const SeoSettings = () => import("../views/Setting/SeoSettings/SeoSettings");
 
@@ -201,6 +205,9 @@ const SellerProductSalesReports = () => import("../views/Sellers/ProductSalesRep
 const SellerSalesReports = () => import("../views/Sellers/SalesReports");
 const SellerTaxes = () => import("../views/Sellers/Taxes");
 const SellerBrands = () => import("../views/Sellers/Brands");
+const SellerAbandonedCarts = () => import("../views/Sellers/AbandonedCarts");
+const SellerMyDeliveryFleet = () => import("../views/Sellers/MyDeliveryFleet");
+const SellerDeliveryBoyRequests = () => import("../views/Sellers/DeliveryBoyRequests");
 const SellerAddons = () => import("../views/Sellers/Addons");
 
 const SellerProducts = () => import("../views/Product/Products");
@@ -225,6 +232,7 @@ const DeliveryBoyLogin = () => import("../views/DeliveryBoy/DeliveryBoyLogin");
 const DeliveryBoyDashboard = () => import("../views/DeliveryBoy/Dashboard");
 
 const DeliveryBoyOrders = () => import("../views/DeliveryBoy/Orders");
+// const DeliveryBoyRequestedOrders = () => import("../views/DeliveryBoy/RequestedOrders");
 const DeliveryBoyOrder = () => import("../views/Orders/ViewOrder");
 const DeliveryBoyReturnRequests = () => import("../views/ReturnRequests/ReturnRequests");
 const DeliveryBoyWithdrawalRequests = () => import("../views/DeliveryBoy/WithdrawalRequests/WithdrawalRequests");
@@ -346,7 +354,9 @@ router.beforeEach((to, from, next) => {
                 }
 
             } else {
-                router.push('/login').catch(() => { });
+                // remember the requested page (with its query) so login can return here
+                rememberIntended(to.fullPath);
+                router.push(loginPathFor(to.fullPath)).catch(() => { });
             }
         } else {
             next();
@@ -515,14 +525,7 @@ function configRoutes() {
                 },
                 {
                     path: "categories_order",
-                    name: "categories_order",
-                    component: CategoriesOrder,
-                    meta: {
-                        permission: 'order_list',
-                        role: adminRoles,
-                        title: 'Categories Order'
-
-                    },
+                    redirect: "/manage_categories"
                 },
                 {
                     path: "manage_products",
@@ -794,9 +797,20 @@ function configRoutes() {
                     name: "Delivery Settings",
                     component: TimeSlots,
                     meta: {
-                        permission: 'order_list',
+                        permission: 'delivery_settings',
                         role: adminRoles,
                         title: 'Delivery Settings'
+
+                    },
+                },
+                {
+                    path: "system_settings",
+                    name: "System Settings",
+                    component: SettingsHub,
+                    meta: {
+                        permission: 'order_list',
+                        role: adminRoles,
+                        title: 'Settings'
 
                     },
                 },
@@ -816,7 +830,7 @@ function configRoutes() {
                     name: "Theme Settings",
                     component: ThemeSettings,
                     meta: {
-                        permission: 'order_list',
+                        permission: 'theme_settings',
                         role: adminRoles,
                         title: 'Theme Settings'
 
@@ -923,9 +937,39 @@ function configRoutes() {
                     name: "SmsSettings",
                     component: SmsSettings,
                     meta: {
-                        permission: 'order_list',
+                        permission: 'sms_settings',
                         role: adminRoles,
                         title: 'SMS Settings'
+                    },
+                },
+                {
+                    path: "deeplink-settings",
+                    name: "DeeplinkSettings",
+                    component: DeeplinkSettings,
+                    meta: {
+                        permission: 'deeplink_settings',
+                        role: adminRoles,
+                        title: 'Deeplink Settings'
+                    },
+                },
+                {
+                    path: "realtime-settings",
+                    name: "RealtimeSettings",
+                    component: RealtimeSettings,
+                    meta: {
+                        permission: 'realtime_settings',
+                        role: adminRoles,
+                        title: 'Realtime Settings'
+                    },
+                },
+                {
+                    path: "auto-assign-settings",
+                    name: "ModuleDeliverySettings",
+                    component: ModuleDeliverySettings,
+                    meta: {
+                        permission: 'seller_delivery_boys',
+                        role: adminRoles,
+                        title: 'Seller Delivery Boys'
                     },
                 },
                 {
@@ -933,7 +977,7 @@ function configRoutes() {
                     name: "SmsTemplates",
                     component: SmsTemplates,
                     meta: {
-                        permission: 'order_list',
+                        permission: 'sms_templates_list',
                         role: adminRoles,
                         title: 'Sms Templates'
                     },
@@ -944,7 +988,7 @@ function configRoutes() {
                     name: "SeoSettings",
                     component: SeoSettings,
                     meta: {
-                        permission: 'order_list',
+                        permission: 'seo_settings_list',
                         role: adminRoles,
                         title: 'SEO Settings'
                     },
@@ -1754,6 +1798,46 @@ function configRoutes() {
                     },
                 },
                 {
+                    path: "/seller/carts",
+                    name: "seller_carts",
+                    component: SellerAbandonedCarts,
+                    meta: {
+                        permission: 'order_list',
+                        role: sellerRoles,
+                        title: 'Abandoned Carts'
+                    },
+                },
+                {
+                    path: "/seller/delivery_boy_requests",
+                    name: "seller_delivery_boy_requests",
+                    component: SellerDeliveryBoyRequests,
+                    meta: {
+                        permission: 'order_list',
+                        role: sellerRoles,
+                        title: 'Delivery Boy Requests'
+                    },
+                },
+                {
+                    path: "/seller/delivery_boy_salary",
+                    name: "seller_delivery_boy_salary",
+                    component: DeliveryBoySalary,
+                    meta: {
+                        permission: 'order_list',
+                        role: sellerRoles,
+                        title: 'Delivery Boy Salary'
+                    },
+                },
+                {
+                    path: "/seller/my_delivery_fleet",
+                    name: "seller_my_delivery_fleet",
+                    component: SellerMyDeliveryFleet,
+                    meta: {
+                        permission: 'order_list',
+                        role: sellerRoles,
+                        title: 'My Delivery Boys'
+                    },
+                },
+                {
                     path: "/seller/addons",
                     name: "seller_addons",
                     component: SellerAddons,
@@ -1991,6 +2075,17 @@ function configRoutes() {
                         title: 'Orders'
                     },
                 },
+                // Auto-assign delivery boy feature disabled
+                // {
+                //     path: "requested_orders",
+                //     name: "DeliveryBoyRequestedOrders",
+                //     component: DeliveryBoyRequestedOrders,
+                //     meta: {
+                //         permission: 'order_list',
+                //         role: deliveryBoyRoles,
+                //         title: 'Requested Orders'
+                //     },
+                // },
                 {
                     path: "return_requests",
                     name: "DeliveryBoyReturnRequests",

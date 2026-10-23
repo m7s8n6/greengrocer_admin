@@ -271,6 +271,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -470,8 +486,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           var postData = {
@@ -508,7 +524,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.th-width[data-v-696efafb] {\n    width: 170px;\n}\n.variant-thumb[data-v-696efafb] {\n    width: 50px;\n    height: 50px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: 4px;\n}\n.card[data-v-696efafb] {\n    border: 1px solid #EDEDED !important;\n    border-radius: 12px !important;\n    overflow: hidden;\n    margin-bottom: 24px;\n}\n.card-header[data-v-696efafb] {\n    border-bottom: 1px solid #EDEDED !important;\n    background-color: #FFFFFF !important;\n    padding: 1rem 1.25rem !important;\n}\n.card-body[data-v-696efafb] {\n    padding: 1.5rem !important;\n}\n.table-responsive[data-v-696efafb] {\n    border: none !important;\n    background: transparent !important;\n}\n.table[data-v-696efafb] {\n    margin-bottom: 0 !important;\n}\n.table-bordered[data-v-696efafb],\n.table-bordered th[data-v-696efafb],\n.table-bordered td[data-v-696efafb] {\n    border: 1px solid #EDEDED !important;\n}\n.table thead th[data-v-696efafb] {\n    background-color: #F8F9FA !important;\n    border-bottom-width: 1px !important;\n}\n\n/* Dark Mode Styles */\nbody.theme-dark .card[data-v-696efafb] {\n    background-color: #1e293b !important;\n    border-color: #334155 !important;\n}\nbody.theme-dark .card-header[data-v-696efafb] {\n    background-color: #1e293b !important;\n    border-bottom-color: #334155 !important;\n}\nbody.theme-dark .card-header h4[data-v-696efafb] {\n    color: #f1f5f9 !important;\n}\nbody.theme-dark .table-bordered[data-v-696efafb],\nbody.theme-dark .table-bordered th[data-v-696efafb],\nbody.theme-dark .table-bordered td[data-v-696efafb] {\n    border-color: #334155 !important;\n    background-color: #1e293b !important;\n    color: #f1f5f9 !important;\n}\nbody.theme-dark .table thead th[data-v-696efafb] {\n    background-color: #334155 !important;\n    color: #f1f5f9 !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.variant-thumb[data-v-696efafb] {\n    width: 40px;\n    height: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n}\n.product-view .card[data-v-696efafb] {\n    margin-bottom: 20px;\n}\n.product-view .card > .card-body[data-v-696efafb]:not(.p-0) {\n    padding-top: 20px;\n}\n.product-view .card > .card-header h4[data-v-696efafb] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n    margin-bottom: 0;\n}\n\n/* Gallery */\n.product-view-main-image[data-v-696efafb] {\n    aspect-ratio: 1 / 1;\n    width: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    background: var(--ui-surface-muted);\n    overflow: hidden;\n}\n.product-view-main-image img[data-v-696efafb] {\n    width: 100%;\n    height: 100%;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n.product-view-main-image i[data-v-696efafb] {\n    font-size: 40px;\n    color: var(--ui-text-subtle);\n}\n.product-view-thumbs[data-v-696efafb] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-top: 10px;\n}\n.product-view-thumbs img[data-v-696efafb] {\n    width: 56px;\n    height: 56px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    background: var(--ui-surface-muted);\n}\n\n/* Main info */\n.product-view-name[data-v-696efafb] {\n    font-size: 20px;\n    font-weight: 700;\n    color: var(--ui-heading);\n    margin-bottom: 14px;\n    overflow-wrap: anywhere;\n}\n.product-view-dl[data-v-696efafb] {\n    margin: 0;\n}\n.product-view-dl > div[data-v-696efafb] {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    gap: 12px;\n    padding: 10px 0;\n    border-bottom: 1px solid var(--ui-border);\n}\n.product-view-dl > div[data-v-696efafb]:last-child {\n    border-bottom: 0;\n}\n.product-view-dl dt[data-v-696efafb] {\n    flex: 0 0 auto;\n    font-size: 13px;\n    font-weight: 400;\n    color: var(--ui-text-muted);\n}\n.product-view-dl dd[data-v-696efafb] {\n    margin: 0;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-text);\n    text-align: right;\n    overflow-wrap: anywhere;\n}\n.product-view-dl--side > div[data-v-696efafb]:first-child {\n    padding-top: 0;\n}\n.product-view .table th[data-v-696efafb],\n.product-view .table td[data-v-696efafb] {\n    white-space: nowrap;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -734,86 +750,392 @@ var render = function () {
         ]),
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _c("h4", [_vm._v(_vm._s(_vm.__("product_details")))]),
-              _vm._v(" "),
-              _c(
-                "span",
-                { staticClass: "pull-right" },
-                [
-                  _c(
-                    "router-link",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: {
-                        to: _vm.isSellerRoute
-                          ? "/seller/manage_products"
-                          : "/manage_products",
-                      },
-                    },
-                    [_vm._v(_vm._s(_vm.__("manage_products")))]
-                  ),
-                ],
-                1
-              ),
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-md-12 table-responsive" }, [
-                  _c("table", { staticClass: "table table-bordered" }, [
-                    _c("tbody", [
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("name"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm._v(
-                            _vm._s(
-                              _vm.translatedRecord
-                                ? _vm.translatedRecord.name
-                                : ""
-                            )
-                          ),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("seller"))),
-                        ]),
-                        _vm._v(" "),
+      !_vm.record
+        ? _c("div", { staticClass: "card" }, [
+            _c(
+              "div",
+              { staticClass: "card-body text-center text-muted py-5" },
+              [
+                _c("b-spinner", { staticClass: "me-2", attrs: { small: "" } }),
+                _vm._v(_vm._s(_vm.__("loading")) + "...\n            "),
+              ],
+              1
+            ),
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.record
+        ? _c("div", { staticClass: "row product-view" }, [
+            _c("div", { staticClass: "col-12 col-lg-8" }, [
+              _c("div", { staticClass: "card" }, [
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "card-header d-flex justify-content-between align-items-center flex-wrap gap-2",
+                  },
+                  [
+                    _c("h4", [_vm._v(_vm._s(_vm.__("product_details")))]),
+                    _vm._v(" "),
+                    _c(
+                      "span",
+                      [
                         _c(
-                          "td",
-                          [
-                            _vm.translatedRecord && _vm.translatedRecord.seller
-                              ? [
-                                  _vm._v(
-                                    "\n                                                    " +
-                                      _vm._s(_vm.translatedRecord.seller.name) +
-                                      "\n                                                "
-                                  ),
-                                ]
-                              : _vm._e(),
-                          ],
-                          2
+                          "router-link",
+                          {
+                            staticClass: "btn btn-sm btn-outline-secondary",
+                            attrs: {
+                              to: _vm.isSellerRoute
+                                ? "/seller/manage_products"
+                                : "/manage_products",
+                            },
+                          },
+                          [_vm._v(_vm._s(_vm.__("manage_products")))]
+                        ),
+                      ],
+                      1
+                    ),
+                  ]
+                ),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body" }, [
+                  _c("div", { staticClass: "row g-4" }, [
+                    _c("div", { staticClass: "col-12 col-md-5" }, [
+                      _c("div", { staticClass: "product-view-main-image" }, [
+                        _vm.record.image
+                          ? _c("img", {
+                              attrs: {
+                                src: _vm.$storageUrl + _vm.record.image,
+                                alt: "",
+                              },
+                            })
+                          : _c("i", { staticClass: "bi bi-image" }),
+                      ]),
+                      _vm._v(" "),
+                      _vm.other_images && _vm.other_images.length
+                        ? _c(
+                            "div",
+                            { staticClass: "product-view-thumbs" },
+                            [
+                              _vm._l(_vm.other_images, function (image) {
+                                return _vm.other_images
+                                  ? [
+                                      _c("img", {
+                                        attrs: {
+                                          src: _vm.$storageUrl + image.image,
+                                          alt: "",
+                                        },
+                                      }),
+                                    ]
+                                  : _vm._e()
+                              }),
+                            ],
+                            2
+                          )
+                        : _vm._e(),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-12 col-md-7" }, [
+                      _c("h4", { staticClass: "product-view-name" }, [
+                        _vm._v(
+                          _vm._s(
+                            _vm.translatedRecord
+                              ? _vm.translatedRecord.name
+                              : ""
+                          )
                         ),
                       ]),
                       _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("product_id"))),
+                      _c("dl", { staticClass: "product-view-dl" }, [
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("product_id")))]),
+                          _vm._v(" "),
+                          _c("dd", [_vm._v("#" + _vm._s(_vm.record.id))]),
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(_vm.record.id))]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("indicator"))),
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("category")))]),
+                          _vm._v(" "),
+                          _c(
+                            "dd",
+                            [
+                              _vm.translatedRecord &&
+                              _vm.translatedRecord.category
+                                ? [
+                                    _vm._v(
+                                      "\n                                                " +
+                                        _vm._s(
+                                          _vm.translatedRecord.category.name
+                                        ) +
+                                        "\n                                            "
+                                    ),
+                                  ]
+                                : _vm._e(),
+                            ],
+                            2
+                          ),
                         ]),
                         _vm._v(" "),
-                        _c("td", [
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("seller")))]),
+                          _vm._v(" "),
+                          _c(
+                            "dd",
+                            [
+                              _vm.translatedRecord &&
+                              _vm.translatedRecord.seller
+                                ? [
+                                    _vm._v(
+                                      "\n                                                " +
+                                        _vm._s(
+                                          _vm.translatedRecord.seller.name
+                                        ) +
+                                        "\n                                            "
+                                    ),
+                                  ]
+                                : _vm._e(),
+                            ],
+                            2
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("manufacturer")))]),
+                          _vm._v(" "),
+                          _c("dd", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.translatedRecord
+                                  ? _vm.translatedRecord.manufacturer
+                                  : ""
+                              )
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("made_in")))]),
+                          _vm._v(" "),
+                          _c(
+                            "dd",
+                            [
+                              _vm.record.made_in_country
+                                ? [
+                                    _vm._v(
+                                      "\n                                                " +
+                                        _vm._s(
+                                          _vm.record.made_in_country.name
+                                        ) +
+                                        "\n                                            "
+                                    ),
+                                  ]
+                                : _vm._e(),
+                            ],
+                            2
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", [
+                          _c("dt", [_vm._v(_vm._s(_vm.__("tax")))]),
+                          _vm._v(" "),
+                          _c(
+                            "dd",
+                            [
+                              _vm.translatedRecord && _vm.translatedRecord.tax
+                                ? [
+                                    _vm._v(
+                                      "\n                                                " +
+                                        _vm._s(_vm.translatedRecord.tax.title) +
+                                        " " +
+                                        _vm._s(
+                                          _vm.translatedRecord.tax.percentage
+                                        ) +
+                                        "%\n                                            "
+                                    ),
+                                  ]
+                                : _vm._e(),
+                            ],
+                            2
+                          ),
+                        ]),
+                      ]),
+                    ]),
+                  ]),
+                ]),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card" }, [
+                _c("div", { staticClass: "card-header" }, [
+                  _c("h4", [
+                    _vm._v(_vm._s(_vm.__("product_request_description"))),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "card-body" },
+                  [
+                    _c("editor", {
+                      attrs: {
+                        placeholder: _vm.__("enter_product_description"),
+                        value: _vm.translatedRecord
+                          ? _vm.translatedRecord.description
+                          : "",
+                        disabled: true,
+                        init: {
+                          height: 260,
+                          menubar: false,
+                          toolbar: false,
+                          statusbar: false,
+                          readonly: true,
+                        },
+                      },
+                    }),
+                  ],
+                  1
+                ),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card" }, [
+                _c("div", { staticClass: "card-header" }, [
+                  _c("h4", [_vm._v(_vm._s(_vm.__("product_variants")))]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body p-0" }, [
+                  _c("div", { staticClass: "table-responsive" }, [
+                    _c("table", { staticClass: "table mb-0" }, [
+                      _c("thead", [
+                        _c("tr", [
+                          _c("th", [_vm._v(_vm._s(_vm.__("image")))]),
+                          _vm._v(" "),
+                          _c("th", [_vm._v(_vm._s(_vm.__("product_name")))]),
+                          _vm._v(" "),
+                          _c("th", [_vm._v(_vm._s(_vm.__("variant_id")))]),
+                          _vm._v(" "),
+                          _c("th", [_vm._v(_vm._s(_vm.__("variant")))]),
+                          _vm._v(" "),
+                          _c("th", [_vm._v(_vm._s(_vm.__("stock")))]),
+                          _vm._v(" "),
+                          _c("th", [
+                            _vm._v(
+                              _vm._s(_vm.__("price")) +
+                                "(" +
+                                _vm._s(_vm.$currency) +
+                                ")"
+                            ),
+                          ]),
+                          _vm._v(" "),
+                          _c("th", [
+                            _vm._v(
+                              _vm._s(_vm.__("discounted_price")) +
+                                "(" +
+                                _vm._s(_vm.$currency) +
+                                ")"
+                            ),
+                          ]),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        _vm._l(_vm.record.variants, function (variant) {
+                          return _c("tr", { key: variant.id }, [
+                            _c("td", [
+                              variant.images && variant.images.length
+                                ? _c("img", {
+                                    staticClass: "variant-thumb",
+                                    attrs: {
+                                      src: variant.images[0].image_url,
+                                      alt: "",
+                                    },
+                                  })
+                                : _vm.record.image
+                                ? _c("img", {
+                                    staticClass: "variant-thumb",
+                                    attrs: {
+                                      src: _vm.$storageUrl + _vm.record.image,
+                                      alt: "",
+                                    },
+                                  })
+                                : _vm._e(),
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(_vm.record.name))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(variant.id))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(_vm.variantLabel(variant))),
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(variant.stock))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(variant.price))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(variant.discounted_price)),
+                            ]),
+                          ])
+                        }),
+                        0
+                      ),
+                    ]),
+                  ]),
+                ]),
+              ]),
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-12 col-lg-4" }, [
+              _c("div", { staticClass: "card" }, [
+                _c("div", { staticClass: "card-header" }, [
+                  _c("h4", [_vm._v(_vm._s(_vm.__("product_status")))]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-body" }, [
+                  _c(
+                    "dl",
+                    { staticClass: "product-view-dl product-view-dl--side" },
+                    [
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("is_approved")))]),
+                        _vm._v(" "),
+                        _c("dd", [
+                          _vm.record.is_approved === 1
+                            ? _c("span", { staticClass: "badge bg-success" }, [
+                                _vm._v(_vm._s(_vm.__("approved"))),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.record.is_approved === 0
+                            ? _c("span", { staticClass: "badge bg-danger" }, [
+                                _vm._v(_vm._s(_vm.__("not_approved"))),
+                              ])
+                            : _vm._e(),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("status")))]),
+                        _vm._v(" "),
+                        _c("dd", [
+                          _vm.record.status === 1
+                            ? _c("span", { staticClass: "badge bg-success" }, [
+                                _vm._v(_vm._s(_vm.__("active"))),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.record.status === 0
+                            ? _c("span", { staticClass: "badge bg-danger" }, [
+                                _vm._v(_vm._s(_vm.__("deactive"))),
+                              ])
+                            : _vm._e(),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("indicator")))]),
+                        _vm._v(" "),
+                        _c("dd", [
                           _vm.record.status === 0
                             ? _c("span", { staticClass: "badge bg-info" }, [
                                 _vm._v(_vm._s(_vm.__("none"))),
@@ -834,76 +1156,10 @@ var render = function () {
                         ]),
                       ]),
                       _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("tax"))),
-                        ]),
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("return")))]),
                         _vm._v(" "),
-                        _c(
-                          "td",
-                          [
-                            _vm.translatedRecord && _vm.translatedRecord.tax
-                              ? [
-                                  _vm._v(
-                                    "\n                                                    " +
-                                      _vm._s(_vm.translatedRecord.tax.title) +
-                                      " " +
-                                      _vm._s(
-                                        _vm.translatedRecord.tax.percentage
-                                      ) +
-                                      "%\n                                                "
-                                  ),
-                                ]
-                              : _vm._e(),
-                          ],
-                          2
-                        ),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("made_in"))),
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "td",
-                          [
-                            _vm.record.made_in_country
-                              ? [
-                                  _vm._v(
-                                    "\n                                                    " +
-                                      _vm._s(_vm.record.made_in_country.name) +
-                                      "\n                                                "
-                                  ),
-                                ]
-                              : _vm._e(),
-                          ],
-                          2
-                        ),
-                      ]),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("status"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm.record.status === 1
-                            ? _c("span", { staticClass: "badge bg-success" }, [
-                                _vm._v(_vm._s(_vm.__("active"))),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.record.status === 0
-                            ? _c("span", { staticClass: "badge bg-danger" }, [
-                                _vm._v(_vm._s(_vm.__("deactive"))),
-                              ])
-                            : _vm._e(),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("return"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
+                        _c("dd", [
                           _vm.record.return_status === 0
                             ? _c("span", { staticClass: "badge bg-danger" }, [
                                 _vm._v(_vm._s(_vm.__("not_allowed"))),
@@ -918,28 +1174,28 @@ var render = function () {
                         ]),
                       ]),
                       _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("manufacturer"))),
-                        ]),
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("cancellation")))]),
                         _vm._v(" "),
-                        _c("td", [
-                          _vm._v(
-                            "\n                                                " +
-                              _vm._s(
-                                _vm.translatedRecord
-                                  ? _vm.translatedRecord.manufacturer
-                                  : ""
-                              ) +
-                              "\n                                            "
-                          ),
+                        _c("dd", [
+                          _vm.record.cancelable_status === 0
+                            ? _c("span", { staticClass: "badge bg-danger" }, [
+                                _vm._v(_vm._s(_vm.__("not_allowed"))),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.record.cancelable_status === 1
+                            ? _c("span", { staticClass: "badge bg-success" }, [
+                                _vm._v(_vm._s(_vm.__("allowed"))),
+                              ])
+                            : _vm._e(),
                         ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", [
+                        _c("dt", [_vm._v(_vm._s(_vm.__("till_status")))]),
                         _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("till_status"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
+                        _c("dd", [
                           _vm.record.till_status == 0
                             ? _c("span", { staticClass: "badge bg-danger" }, [
                                 _vm._v(_vm._s(_vm.__("not_applicable"))),
@@ -971,241 +1227,13 @@ var render = function () {
                             : _vm._e(),
                         ]),
                       ]),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("is_approved"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm.record.is_approved === 1
-                            ? _c("span", { staticClass: "badge bg-success" }, [
-                                _vm._v(_vm._s(_vm.__("approved"))),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.record.is_approved === 0
-                            ? _c("span", { staticClass: "badge bg-danger" }, [
-                                _vm._v(_vm._s(_vm.__("not_approved"))),
-                              ])
-                            : _vm._e(),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("main_image"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm.record.image
-                            ? _c("img", {
-                                attrs: {
-                                  src: _vm.$storageUrl + _vm.record.image,
-                                  height: "75",
-                                },
-                              })
-                            : _vm._e(),
-                        ]),
-                      ]),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("cancellation"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [
-                          _vm.record.cancelable_status === 0
-                            ? _c("span", { staticClass: "badge bg-danger" }, [
-                                _vm._v(_vm._s(_vm.__("not_allowed"))),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.record.cancelable_status === 1
-                            ? _c("span", { staticClass: "badge bg-success" }, [
-                                _vm._v(_vm._s(_vm.__("allowed"))),
-                              ])
-                            : _vm._e(),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("category"))),
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "td",
-                          [
-                            _vm.translatedRecord &&
-                            _vm.translatedRecord.category
-                              ? [
-                                  _vm._v(
-                                    "\n                                                    " +
-                                      _vm._s(
-                                        _vm.translatedRecord.category.name
-                                      ) +
-                                      "\n                                                "
-                                  ),
-                                ]
-                              : _vm._e(),
-                          ],
-                          2
-                        ),
-                      ]),
-                      _vm._v(" "),
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("other_images"))),
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "td",
-                          { attrs: { colspan: "3" } },
-                          [
-                            _vm._l(_vm.other_images, function (image) {
-                              return _vm.other_images
-                                ? [
-                                    _c("img", {
-                                      staticStyle: { "margin-right": "2px" },
-                                      attrs: {
-                                        src: _vm.$storageUrl + image.image,
-                                        height: "75",
-                                      },
-                                    }),
-                                  ]
-                                : _vm._e()
-                            }),
-                          ],
-                          2
-                        ),
-                      ]),
-                    ]),
-                  ]),
+                    ]
+                  ),
                 ]),
               ]),
             ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _c("h4", [_vm._v(_vm._s(_vm.__("product_request_description")))]),
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c(
-                  "div",
-                  { staticClass: "col-md-12" },
-                  [
-                    _c("editor", {
-                      attrs: {
-                        placeholder: _vm.__("enter_product_description"),
-                        value: _vm.translatedRecord
-                          ? _vm.translatedRecord.description
-                          : "",
-                        disabled: true,
-                        init: {
-                          height: 400,
-                          menubar: false,
-                          toolbar: false,
-                          statusbar: false,
-                          readonly: true,
-                        },
-                      },
-                    }),
-                  ],
-                  1
-                ),
-              ]),
-            ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _c("h4", [_vm._v(_vm._s(_vm.__("product_variants")))]),
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-md-12 table-responsive" }, [
-                  _c("table", { staticClass: "table table-bordered" }, [
-                    _c("thead", [
-                      _c("tr", [
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("image"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("product_name"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("variant_id"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("variant"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(_vm._s(_vm.__("stock"))),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(
-                            _vm._s(_vm.__("price")) +
-                              "(" +
-                              _vm._s(_vm.$currency) +
-                              ")"
-                          ),
-                        ]),
-                        _vm._v(" "),
-                        _c("th", { staticClass: "th-width" }, [
-                          _vm._v(
-                            _vm._s(_vm.__("discounted_price")) +
-                              "(" +
-                              _vm._s(_vm.$currency) +
-                              ")"
-                          ),
-                        ]),
-                      ]),
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "tbody",
-                      _vm._l(_vm.record.variants, function (variant) {
-                        return _c("tr", { key: variant.id }, [
-                          _c("td", [
-                            variant.images && variant.images.length
-                              ? _c("img", {
-                                  staticClass: "variant-thumb",
-                                  attrs: {
-                                    src: variant.images[0].image_url,
-                                    alt: "",
-                                  },
-                                })
-                              : _vm._e(),
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(_vm.record.name))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(variant.id))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(_vm.variantLabel(variant)))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(variant.stock))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(variant.price))]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(variant.discounted_price))]),
-                        ])
-                      }),
-                      0
-                    ),
-                  ]),
-                ]),
-              ]),
-            ]),
-          ]),
-        ]),
-      ]),
+          ])
+        : _vm._e(),
     ]),
   ])
 }

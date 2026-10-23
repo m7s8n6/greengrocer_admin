@@ -19,8 +19,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('cart:notification')->everyMinute();
-        $schedule->command('queue:work --once')->everyMinute();
+        $schedule->command('queue:work --stop-when-empty --max-time=55')->everyMinute()->withoutOverlapping();
         $schedule->command('popup:update-status')->everyMinute();
+        // Auto-assign delivery boy feature disabled
+        // $schedule->command('auto-assign:sweep-timeouts')->everyMinute();
     }
 
     /**

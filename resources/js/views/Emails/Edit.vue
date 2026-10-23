@@ -1,15 +1,15 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop
         no-fade static id="mymodal" no-enforce-focus>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
 
-            <div v-if="emailError" class="alert alert-light-warning color-warning alert-dismissible fade show"
+            <div v-if="emailError" class="alert alert-warning alert-dismissible fade show"
                 role="alert">
                 <strong><i class="bi bi-exclamation-triangle"></i> {{ __('warning') }}</strong>
                 {{ emailErrorMessage }}
@@ -18,7 +18,7 @@
 
             <div class="row">
 
-                <div class="form-group">
+                <div class="form-group col-12 col-md-6">
                     <label for="type">{{ __('type') }}</label>
                     <select name="type" id="type" required v-model="type" class="form-control form-select">
                         <option value=""> {{ __('select_type') }}</option>
@@ -28,24 +28,24 @@
                     </select>
                 </div>
 
-                <div class="form-group" v-if="type === 'user'">
-                    <label> {{ __('customer') }}<small>( Ex : 100,205, 360 <comma separated="">)</comma></small></label>
-                    <Select2 v-model="type_ids" :placeholder="__('select_customer')" :options="users_options"
-                        :settings="{ multiple: 'multiple', width: '100%', dropdownParent: '#mymodal' }" required />
-
-                </div>
-
-                <div class="form-group">
+                <div class="form-group col-12 col-md-6">
                     <label for="title"> {{ __('title') }}</label>
                     <input type="text" name="title" id="title" required v-model="title" class="form-control"
                         :placeholder="__('title')">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group col-12" v-if="type === 'user'">
+                    <label> {{ __('customer') }}<small class="text-muted ml-1">(Ex: 100, 205, 360)</small></label>
+                    <Select2 v-model="type_ids" :placeholder="__('select_customer')" :options="users_options"
+                        :settings="{ multiple: 'multiple', width: '100%', dropdownParent: '#mymodal' }" required />
+
+                </div>
+
+                <div class="form-group col-12">
                     <label for="message"> {{ __('message') }} <code>[Customer Name]</code></label>
-                    <div class="type-list mt-1">
+                    <div class="type-list d-flex flex-wrap gap-2 mb-2">
                         <span v-for="template in email_templates_options" :key="template.id"
-                            :class="['btn', { 'btn-primary': type_ids.includes(template.id), 'btn-outline-primary me-2': !type_ids.includes(template.id) }]"
+                            :class="['btn', { 'btn-primary': type_ids.includes(template.id), 'btn-outline-primary': !type_ids.includes(template.id) }, 'btn-sm']"
                             @click="selectTemplate(template)">
                             {{ template.type }}
                         </span>
@@ -56,12 +56,14 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <input name="include_image" id="include_image" v-model="include_image" type="checkbox"
-                        class="form-check-input">
-                    <label for="include_image">{{ __('include_image') }}</label>
+                <div class="form-group col-12">
+                    <div class="form-check">
+                        <input name="include_image" id="include_image" v-model="include_image" type="checkbox"
+                            class="form-check-input">
+                        <label for="include_image" class="form-check-label">{{ __('include_image') }}</label>
+                    </div>
                 </div>
-                <div class="form-group" v-if="(include_image === true && id) || include_image === true">
+                <div class="form-group col-12" v-if="(include_image === true && id) || include_image === true">
 
                     <input type="file" name="email_image" accept="image/*,application/pdf"
                         v-on:change="handleFileUpload" ref="file_image" class="file-input">
@@ -75,14 +77,14 @@
                             <label>{{ __('drop_files_here_or_click_to_upload') }}</label>
                         </template>
                     </div>
-                    <div class="row" v-if="image_url">
-                        <div class="col-md-2">
+                    <div class="row mt-2" v-if="image_url">
+                        <div class="col-6 col-md-3">
                             <img class="custom-image" :src="image_url" title='Store Logo' alt='Store Logo' />
                         </div>
                     </div>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -102,7 +104,6 @@ export default {
             id: this.record ? this.record.id : null,
             type: this.record ? this.record.type : "",
             type_ids: this.record ? this.record.type_id : [],
-            email_templates: this.record ? this.record.email_templates : [],
             type_id: this.record ? this.record.type_id : 0,
             title: this.record ? this.record.title : "",
             message: this.record ? this.record.message : "",

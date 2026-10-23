@@ -34,10 +34,9 @@ class Slider extends Model
 
     public function getImageUrlAttribute(){
         if($this->image){
-            $image_url = asset('storage/'.$this->image);
-            return $image_url;
+            return asset('storage/'.$this->image);
         }
-        return $this->image;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
 
     protected $hidden = [];

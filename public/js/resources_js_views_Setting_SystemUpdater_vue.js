@@ -72,6 +72,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -100,6 +107,10 @@ __webpack_require__.r(__webpack_exports__);
     this.checkSystemRegister();
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     checkSystemRegister: function checkSystemRegister() {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/store_settings/purchase_code_updater').then(function (response) {
@@ -125,8 +136,8 @@ __webpack_require__.r(__webpack_exports__);
         cancelButtonText: "Cancel",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this3.isLoading = true;
@@ -143,6 +154,15 @@ __webpack_require__.r(__webpack_exports__);
               _this3.showError("Something went wrong! System did not update.");
               _this3.isLoading = false;
             }
+          })["catch"](function () {
+            // The update request can die (timeout / fatal while the vendor folder is being
+            // replaced) after the files are already written. The database still has to be
+            // migrated, and /migration is a new request that runs on the updated code.
+            _this3.isLoading = false;
+            _this3.showError("The update request did not finish cleanly. Finishing the database update...");
+            setTimeout(function () {
+              window.location.href = _this3.$baseUrl + '/migration';
+            }, 5000);
           });
         }
       });
@@ -168,7 +188,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.page-content-wrapper[data-v-2fc7d8ec] {\n  min-height: calc(95vh - 200px);\n  display: flex;\n  flex-direction: column;\n}\n.page-content[data-v-2fc7d8ec] {\n  flex: 1;\n  padding-bottom: 2rem;\n}\n.card[data-v-2fc7d8ec] {\n  margin-bottom: 2rem;\n}\n\n/* Ensure proper spacing for footer */\n@media (min-height: 600px) {\n.page-content-wrapper[data-v-2fc7d8ec] {\n    min-height: calc(95vh - 150px);\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.page-content-wrapper[data-v-2fc7d8ec] {\n  min-height: calc(95vh - 200px);\n  display: flex;\n  flex-direction: column;\n}\n.page-content[data-v-2fc7d8ec] {\n  flex: 1;\n  padding-bottom: 2rem;\n}\n.card[data-v-2fc7d8ec] {\n  margin-bottom: 2rem;\n}\n.card > .card-header[data-v-2fc7d8ec]:last-child {\n  border-bottom: 0 !important; /* header-only card: global .card-header border uses !important */\n  border-radius: var(--ui-radius-lg) !important;\n}\n.card-header[data-v-2fc7d8ec] {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: space-between;\n  gap: 8px;\n}\n\n/* Ensure proper spacing for footer */\n@media (min-height: 600px) {\n.page-content-wrapper[data-v-2fc7d8ec] {\n    min-height: calc(95vh - 150px);\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -304,59 +324,85 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "page-content-wrapper" }, [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-          _c("h3", [_vm._v(_vm._s(_vm.__("system_updater")))]),
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-          _c(
-            "nav",
-            {
-              staticClass: "breadcrumb-header float-start float-lg-end",
-              attrs: { "aria-label": "breadcrumb" },
-            },
-            [
-              _c("ol", { staticClass: "breadcrumb" }, [
-                _c(
-                  "li",
-                  { staticClass: "breadcrumb-item" },
-                  [
-                    _c("router-link", { attrs: { to: "/dashboard" } }, [
-                      _vm._v(_vm._s(_vm.__("dashboard"))),
-                    ]),
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c(
-                  "li",
-                  {
-                    staticClass: "breadcrumb-item active",
-                    attrs: { "aria-current": "page" },
-                  },
-                  [_vm._v(_vm._s(_vm.__("system_updater")))]
-                ),
-              ]),
-            ]
-          ),
+      _c("div", { staticClass: "page-title" }, [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
+            _c("h3", [_vm._v(_vm._s(_vm.__("system_updater")))]),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+            _c(
+              "nav",
+              {
+                staticClass: "breadcrumb-header float-start float-lg-end",
+                attrs: { "aria-label": "breadcrumb" },
+              },
+              [
+                _c("ol", { staticClass: "breadcrumb" }, [
+                  _c(
+                    "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/dashboard" } }, [
+                        _vm._v(_vm._s(_vm.__("dashboard"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
+                    {
+                      staticClass: "breadcrumb-item active",
+                      attrs: { "aria-current": "page" },
+                    },
+                    [_vm._v(_vm._s(_vm.__("system_updater")))]
+                  ),
+                ]),
+              ]
+            ),
+          ]),
         ]),
       ]),
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "page-content" }, [
       _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-6 col-md-6 order-md-1 order-last" }, [
+        _c("div", { staticClass: "col-12 col-lg-8" }, [
           _vm.updaterResult && _vm.updaterResult.description
             ? _c("div", { staticClass: "card" }, [
                 _c("div", { staticClass: "card-header" }, [
-                  _c("h4", [
-                    _vm._v(
-                      _vm._s(_vm.__("change_logs_of_egrocer")) +
-                        " " +
-                        _vm._s("v - " + _vm.updaterResult.version) +
-                        " "
-                    ),
+                  _c("div", [
+                    _c("h4", { staticClass: "card-title float-none" }, [
+                      _vm._v(
+                        _vm._s(_vm.__("change_logs_of_egrocer")) +
+                          " " +
+                          _vm._s("v - " + _vm.updaterResult.version) +
+                          " "
+                      ),
+                    ]),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                      _vm._v(
+                        _vm._s(
+                          _vm.tr(
+                            "system_updater_desc",
+                            "Review the changes in this release, then update the system."
+                          )
+                        )
+                      ),
+                    ]),
                   ]),
                   _vm._v(" "),
                   _c("span", { staticClass: "pull-right" }, [
@@ -384,49 +430,67 @@ var render = function () {
                       innerHTML: _vm._s(_vm.updaterResult.description),
                     },
                   }),
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "card-footer" },
-                  [
-                    _c(
-                      "b-button",
-                      {
-                        attrs: {
-                          type: "button",
-                          variant: "primary",
-                          disabled: _vm.isLoading,
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "d-flex justify-content-end border-top pt-3 mt-2",
+                    },
+                    [
+                      _c(
+                        "b-button",
+                        {
+                          attrs: {
+                            type: "button",
+                            variant: "primary",
+                            disabled: _vm.isLoading,
+                          },
+                          on: { click: _vm.systemUpdate },
                         },
-                        on: { click: _vm.systemUpdate },
-                      },
-                      [
-                        _vm.isLoading
-                          ? _c(
-                              "span",
-                              [
-                                _c("b-spinner", {
-                                  attrs: { small: "", label: "Spinning" },
-                                }),
+                        [
+                          _vm.isLoading
+                            ? _c(
+                                "span",
+                                [
+                                  _c("b-spinner", {
+                                    attrs: { small: "", label: "Spinning" },
+                                  }),
+                                  _vm._v(
+                                    "  " + _vm._s(_vm.__("system_is_updating"))
+                                  ),
+                                ],
+                                1
+                              )
+                            : _c("span", [
                                 _vm._v(
-                                  "  " + _vm._s(_vm.__("system_is_updating"))
+                                  " " + _vm._s(_vm.__("update_the_system"))
                                 ),
-                              ],
-                              1
-                            )
-                          : _c("span", [
-                              _vm._v(" " + _vm._s(_vm.__("update_the_system"))),
-                            ]),
-                      ]
-                    ),
-                  ],
-                  1
-                ),
+                              ]),
+                        ]
+                      ),
+                    ],
+                    1
+                  ),
+                ]),
               ])
             : _c("div", { staticClass: "card" }, [
                 _c("div", { staticClass: "card-header" }, [
-                  _c("h4", [
-                    _vm._v(" " + _vm._s(_vm.__("system_is_up_to_date"))),
+                  _c("div", [
+                    _c("h4", { staticClass: "card-title float-none" }, [
+                      _vm._v(" " + _vm._s(_vm.__("system_is_up_to_date"))),
+                    ]),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                      _vm._v(
+                        _vm._s(
+                          _vm.tr(
+                            "system_up_to_date_desc",
+                            "You are running the latest version. New updates will appear here."
+                          )
+                        )
+                      ),
+                    ]),
                   ]),
                   _vm._v(" "),
                   _c("span", { staticClass: "pull-right" }, [

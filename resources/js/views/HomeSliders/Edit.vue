@@ -1,14 +1,14 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row"> 
-                <div class="form-group">
+                <div class="form-group col-12 col-md-6">
                     <label>{{ __('type') }} <span class="text-danger">*</span></label>
                     <select class="form-control form-select" v-model="type">
                         <option value="default"> {{ __('default') }}</option>
@@ -17,27 +17,27 @@
                         <option value="slider_url"> {{ __('slider_url') }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='category'">
+                <div class="form-group col-12 col-md-6" v-if="type=='category'">
                     <label>{{ __('category') }} <span class="text-danger">*</span></label>
                     <select class="form-control form-select" v-model="type_id" required >
                         <option value="">{{ __('select_category') }}</option>
                         <option v-for="category in categories" :value="category.id">{{ category.name }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='product'">
-                    <label> {{ __('products') }} <span class="text-danger">*</span></label>
+                <div class="form-group col-12 col-md-6" v-if="type=='product'">
+                    <label>{{ __('products') }} <span class="text-danger">*</span></label>
                     <select class="form-control form-select" v-model="type_id" required>
                         <option value="">{{ __('select_product') }}</option>
                         <option v-for="product in products" :value="product.id">{{ product.name }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='slider_url'">
-                    <label> {{ __('link') }} <span class="text-danger">*</span></label>
+                <div class="form-group col-12 col-md-6" v-if="type=='slider_url'">
+                    <label>{{ __('link') }} <span class="text-danger">*</span></label>
                     <input type="url" class="form-control" v-model="slider_url" placeholder="Enter Link" required>
                 </div>
-                <div class="form-group">
-                    <label> {{ __('image') }} <span class="text-danger">*</span></label>
-                    <p class="text-muted"> {{ __('please_choose_square_image_of_larger_than_smaller_than') }}</p>
+                <div class="form-group col-12">
+                    <label>{{ __('image') }} <span class="text-danger">*</span></label>
+                    <p class="text-muted small mb-2"> {{ __('please_choose_square_image_of_larger_than_smaller_than') }}</p>
                     <input type="file" name="slider_image" accept="image/*" v-on:change="handleFileUpload" ref="file_image" class="file-input">
                     <div class="file-input-div bg-gray-100" @click="$refs.file_image.click()" @drop="dropFile" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
 
@@ -50,13 +50,13 @@
                         </template>
 
                     </div>
-                    <div class="row" v-if="image_url">
-                        <div class="col-md-6">
+                    <div class="row mt-3" v-if="image_url">
+                        <div class="col-12 col-md-6">
                             <img class="custom-slider-image" :src="image_url" title='Store Logo' alt='Store Logo'/>
                         </div>
                     </div>
                 </div>
-                <div class="form-group" v-if="id">
+                <div class="form-group col-12" v-if="id">
                     <label>{{ __('status') }}</label>
                     <div class="col-md-9 text-left mt-1">
                         <b-form-radio-group
@@ -153,7 +153,7 @@ export default {
                 }
             }).catch(error => {
                 vm.isLoading = false;
-                if (error.request.statusText) {
+                if (error.request && error.request.statusText) {
                     this.showError(error.request.statusText);
                 }else if (error.message) {
                     this.showError(error.message);
@@ -170,5 +170,14 @@ export default {
 </script>
 
 <style scoped>
-
+.custom-slider-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 670 / 370;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
 </style>

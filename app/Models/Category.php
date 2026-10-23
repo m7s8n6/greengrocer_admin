@@ -27,12 +27,10 @@ class Category extends Model
     protected $hidden = ['created_at','updated_at','deleted_at'];
 
     public function getImageUrlAttribute(){
-
         if($this->image){
-            $image_url = asset('storage/'.$this->image);
-            return $image_url;
+            return asset('storage/'.$this->image);
         }
-        return $this->image;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
 
     public function attributes(){

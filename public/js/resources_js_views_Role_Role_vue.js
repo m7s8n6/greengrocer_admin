@@ -74,6 +74,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -307,6 +313,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -330,8 +339,7 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'name',
         label: __('name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'actions',
         label: __('actions')
@@ -381,8 +389,8 @@ __webpack_require__.r(__webpack_exports__);
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this2.isLoading = true;
@@ -446,7 +454,30 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.switch[data-v-73ac5494] {\n    display: inline-block;\n    height: 34px;\n    position: relative;\n    width: 60px;\n}\n.switch input[data-v-73ac5494] {\n    display: none;\n}\n.slider[data-v-73ac5494] {\n    background-color: #ccc;\n    bottom: 0;\n    cursor: pointer;\n    left: 0;\n    position: absolute;\n    right: 0;\n    top: 0;\n    transition: .4s;\n}\n.slider[data-v-73ac5494]:before {\n    background-color: #fff;\n    bottom: 4px;\n    content: \"\";\n    height: 26px;\n    left: 4px;\n    position: absolute;\n    transition: .4s;\n    width: 26px;\n}\ninput:checked+.slider[data-v-73ac5494] {\n    background-color: #66bb6a;\n}\ninput:checked+.slider[data-v-73ac5494]:before {\n    transform: translateX(26px);\n}\n.slider.round[data-v-73ac5494] {\n    border-radius: 34px;\n}\n.slider.round[data-v-73ac5494]:before {\n    border-radius: 50%;\n}\n.permission-table[data-v-73ac5494] {\n    margin-bottom: 0;\n    border: 1px solid #dee2e6;\n}\n.bg-light-custom[data-v-73ac5494] {\n    background-color: #f8f9fa;\n}\nbody.theme-dark .permission-table[data-v-73ac5494] {\n    border-color: #334155 !important;\n}\nbody.theme-dark .permission-table th[data-v-73ac5494],\nbody.theme-dark .permission-table td[data-v-73ac5494] {\n    border-color: #334155 !important;\n}\nbody.theme-dark .bg-light-custom[data-v-73ac5494] {\n    background-color: #1e293b !important;\n    color: #f8fafc !important;\n}\n.form-check[data-v-73ac5494] {\n    display: flex !important;\n    align-items: center !important;\n    flex-wrap: nowrap;\n    gap: 8px;\n    padding-left: 0 !important;\n    padding-right: 0 !important;\n}\n.form-check-input[data-v-73ac5494] {\n    flex-shrink: 0;\n    margin-top: 0 !important;\n    margin-left: 0 !important;\n    margin-right: 0 !important;\n    min-width: 2em;\n}\n.permission-label[data-v-73ac5494] {\n    word-break: break-word;\n    white-space: normal;\n    line-height: 1.3;\n    flex: 1;\n    min-width: 0;\n    padding: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.switch[data-v-73ac5494] {\n    display: inline-block;\n    height: 34px;\n    position: relative;\n    width: 60px;\n}\n.switch input[data-v-73ac5494] {\n    display: none;\n}\n.slider[data-v-73ac5494] {\n    background-color: var(--theme-neutral-300);\n    bottom: 0;\n    cursor: pointer;\n    left: 0;\n    position: absolute;\n    right: 0;\n    top: 0;\n    transition: .4s;\n}\n.slider[data-v-73ac5494]:before {\n    background-color: var(--ui-surface);\n    bottom: 4px;\n    content: \"\";\n    height: 26px;\n    left: 4px;\n    position: absolute;\n    transition: .4s;\n    width: 26px;\n}\ninput:checked+.slider[data-v-73ac5494] {\n    background-color: var(--theme-success-500);\n}\ninput:checked+.slider[data-v-73ac5494]:before {\n    transform: translateX(26px);\n}\n.slider.round[data-v-73ac5494] {\n    border-radius: 34px;\n}\n.slider.round[data-v-73ac5494]:before {\n    border-radius: 50%;\n}\n.role-form[data-v-73ac5494] {\n    padding: 4px;\n}\n.perm-section-head[data-v-73ac5494] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 4px 0 12px;\n    padding-bottom: 10px;\n    border-bottom: 1px solid var(--ui-border);\n}\n.perm-section-head h6[data-v-73ac5494] {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.perm-card[data-v-73ac5494] {\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    overflow: hidden;\n}\n.perm-card__head[data-v-73ac5494] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 10px 14px;\n    background: var(--ui-surface-muted);\n    border-bottom: 1px solid var(--ui-border);\n}\n.perm-card__title[data-v-73ac5494] {\n    font-size: 13px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.perm-card__count[data-v-73ac5494] {\n    flex-shrink: 0;\n    font-size: 12px;\n    font-weight: 600;\n    color: var(--ui-text-muted);\n}\n.perm-card__body[data-v-73ac5494] {\n    padding: 12px 14px;\n}\n.form-check.perm-check[data-v-73ac5494] {\n    margin: 0;\n    padding: 6px 8px !important;\n    border-radius: var(--ui-radius-sm);\n}\n.perm-check[data-v-73ac5494]:hover {\n    background: var(--ui-primary-soft);\n}\n.perm-check .permission-label[data-v-73ac5494] {\n    font-size: 13px;\n    color: var(--ui-text);\n    cursor: pointer;\n}\n.form-check[data-v-73ac5494] {\n    display: flex !important;\n    align-items: center !important;\n    flex-wrap: nowrap;\n    gap: 8px;\n    padding-left: 0 !important;\n    padding-right: 0 !important;\n}\n.form-check-input[data-v-73ac5494] {\n    flex-shrink: 0;\n    margin-top: 0 !important;\n    margin-left: 0 !important;\n    margin-right: 0 !important;\n}\n.permission-label[data-v-73ac5494] {\n    word-break: break-word;\n    white-space: normal;\n    line-height: 1.3;\n    flex: 1;\n    min-width: 0;\n    padding: 0;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.role-name[data-v-044b5100] {\n    font-weight: 600;\n    color: var(--ui-heading);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -479,6 +510,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_73ac5494_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_style_index_0_id_044b5100_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_style_index_0_id_044b5100_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_style_index_0_id_044b5100_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -532,23 +592,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Role.vue?vue&type=template&id=044b5100 */ "./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100");
+/* harmony import */ var _Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Role.vue?vue&type=template&id=044b5100&scoped=true */ "./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true");
 /* harmony import */ var _Role_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Role.vue?vue&type=script&lang=js */ "./resources/js/views/Role/Role.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Role_vue_vue_type_style_index_0_id_044b5100_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css */ "./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Role_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__.render,
-  _Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "044b5100",
   null
   
 )
@@ -602,6 +664,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_style_index_0_id_044b5100_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=style&index=0&id=044b5100&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/Role/Edit.vue?vue&type=template&id=73ac5494&scoped=true":
 /*!************************************************************************************!*\
   !*** ./resources/js/views/Role/Edit.vue?vue&type=template&id=73ac5494&scoped=true ***!
@@ -618,18 +692,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100":
-/*!************************************************************************!*\
-  !*** ./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100 ***!
-  \************************************************************************/
+/***/ "./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true":
+/*!************************************************************************************!*\
+  !*** ./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true ***!
+  \************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Role.vue?vue&type=template&id=044b5100 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Role_vue_vue_type_template_id_044b5100_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Role.vue?vue&type=template&id=044b5100&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true");
 
 
 /***/ }),
@@ -707,34 +781,58 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass:
+            "d-flex align-items-center justify-content-between flex-wrap gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c("span", { staticClass: "text-muted small" }, [
+            _vm._v(
+              _vm._s(_vm.user_permissions.length) +
+                " " +
+                _vm._s(_vm.__("selected"))
+            ),
+          ]),
+          _vm._v(" "),
           _c(
-            "b-button",
-            {
-              attrs: { variant: "primary", disabled: _vm.isLoading },
-              on: {
-                click: function ($event) {
-                  return _vm.$refs["dummy_submit"].click()
-                },
-              },
-            },
+            "div",
+            { staticClass: "d-flex gap-2 ms-auto" },
             [
-              _vm._v(_vm._s(_vm.__("save")) + "\n            "),
-              _vm.isLoading
-                ? _c("b-spinner", { attrs: { small: "", label: "Spinning" } })
-                : _vm._e(),
+              _c(
+                "b-button",
+                {
+                  attrs: { variant: "outline-secondary" },
+                  on: { click: _vm.hideModal },
+                },
+                [_vm._v(_vm._s(_vm.__("cancel")))]
+              ),
+              _vm._v(" "),
+              _c(
+                "b-button",
+                {
+                  attrs: { variant: "primary", disabled: _vm.isLoading },
+                  on: {
+                    click: function ($event) {
+                      return _vm.$refs["dummy_submit"].click()
+                    },
+                  },
+                },
+                [
+                  _vm._v(_vm._s(_vm.__("save")) + "\n                "),
+                  _vm.isLoading
+                    ? _c("b-spinner", {
+                        attrs: { small: "", label: "Spinning" },
+                      })
+                    : _vm._e(),
+                ],
+                1
+              ),
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
-          ),
-        ],
-        1
+        ]
       ),
       _vm._v(" "),
       _vm._v(" "),
@@ -742,7 +840,7 @@ var render = function () {
         "form",
         {
           ref: "my-form",
-          staticClass: "p-2",
+          staticClass: "role-form",
           on: {
             submit: function ($event) {
               $event.preventDefault()
@@ -751,10 +849,10 @@ var render = function () {
           },
         },
         [
-          _c("div", { staticClass: "row g-3" }, [
-            _c("div", { staticClass: "col-md-12" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-12 col-md-6" }, [
               _c("div", { staticClass: "form-group" }, [
-                _c("label", { staticClass: "form-label fw-bold" }, [
+                _c("label", { staticClass: "form-label" }, [
                   _vm._v(_vm._s(_vm.__("title")) + " "),
                   _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
                 ]),
@@ -786,157 +884,145 @@ var render = function () {
                 }),
               ]),
             ]),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "perm-section-head" }, [
+            _c("h6", { staticClass: "mb-0" }, [
+              _vm._v(_vm._s(_vm.__("permission_access"))),
+            ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-md-12" }, [
-              _c("div", { staticClass: "table-responsive border-0" }, [
-                _c(
-                  "table",
-                  { staticClass: "table table-bordered permission-table" },
-                  [
-                    _c(
-                      "tbody",
-                      _vm._l(_vm.categories, function (category, index) {
-                        return _c("tr", { key: index }, [
-                          _c(
-                            "th",
-                            {
-                              staticClass: "bg-light-custom text-nowrap",
-                              staticStyle: { width: "200px" },
-                            },
-                            [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.formattedName(category.name)) +
-                                  " "
-                              ),
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c("td", [
-                            _c(
-                              "div",
-                              { staticClass: "row g-2" },
-                              _vm._l(
-                                category.permissions,
-                                function (permission) {
-                                  return _c(
-                                    "div",
-                                    {
-                                      key: permission.id,
-                                      staticClass: "col-12 col-md-6 col-lg-4",
-                                    },
-                                    [
-                                      _c(
-                                        "div",
-                                        {
-                                          staticClass:
-                                            "form-check form-switch d-flex align-items-center gap-2 flex-nowrap",
-                                        },
-                                        [
-                                          _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value: _vm.user_permissions,
-                                                expression: "user_permissions",
-                                              },
-                                            ],
-                                            staticClass:
-                                              "form-check-input flex-shrink-0 m-0",
-                                            attrs: {
-                                              type: "checkbox",
-                                              id: "checkbox_" + permission.id,
-                                            },
-                                            domProps: {
-                                              value: permission.id,
-                                              checked:
-                                                _vm.user_permissions.includes(
-                                                  permission.id
-                                                ),
-                                              checked: Array.isArray(
-                                                _vm.user_permissions
-                                              )
-                                                ? _vm._i(
-                                                    _vm.user_permissions,
-                                                    permission.id
-                                                  ) > -1
-                                                : _vm.user_permissions,
-                                            },
-                                            on: {
-                                              change: function ($event) {
-                                                var $$a = _vm.user_permissions,
-                                                  $$el = $event.target,
-                                                  $$c = $$el.checked
-                                                    ? true
-                                                    : false
-                                                if (Array.isArray($$a)) {
-                                                  var $$v = permission.id,
-                                                    $$i = _vm._i($$a, $$v)
-                                                  if ($$el.checked) {
-                                                    $$i < 0 &&
-                                                      (_vm.user_permissions =
-                                                        $$a.concat([$$v]))
-                                                  } else {
-                                                    $$i > -1 &&
-                                                      (_vm.user_permissions =
-                                                        $$a
-                                                          .slice(0, $$i)
-                                                          .concat(
-                                                            $$a.slice($$i + 1)
-                                                          ))
-                                                  }
-                                                } else {
-                                                  _vm.user_permissions = $$c
-                                                }
-                                              },
-                                            },
-                                          }),
-                                          _vm._v(" "),
-                                          _c(
-                                            "label",
-                                            {
-                                              staticClass: "permission-label",
-                                              attrs: {
-                                                for:
-                                                  "checkbox_" + permission.id,
-                                              },
-                                            },
-                                            [
-                                              _vm._v(
-                                                " " +
-                                                  _vm._s(
-                                                    _vm.formattedName(
-                                                      permission.name
-                                                    )
-                                                  ) +
-                                                  " "
-                                              ),
-                                            ]
-                                          ),
-                                        ]
-                                      ),
-                                    ]
-                                  )
-                                }
-                              ),
-                              0
-                            ),
-                          ]),
-                        ])
-                      }),
-                      0
-                    ),
-                  ]
-                ),
-              ]),
+            _c("span", { staticClass: "figma-status-pill bg-primary" }, [
+              _vm._v(
+                _vm._s(_vm.user_permissions.length) +
+                  " " +
+                  _vm._s(_vm.__("selected"))
+              ),
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c(
+            "div",
+            { staticClass: "row g-3" },
+            _vm._l(_vm.categories, function (category, index) {
+              return _c("div", { key: index, staticClass: "col-12 col-lg-6" }, [
+                _c("div", { staticClass: "perm-card h-100" }, [
+                  _c("div", { staticClass: "perm-card__head" }, [
+                    _c("span", { staticClass: "perm-card__title" }, [
+                      _vm._v(_vm._s(_vm.formattedName(category.name))),
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "perm-card__count" }, [
+                      _vm._v(
+                        _vm._s(
+                          category.permissions.filter(function (p) {
+                            return _vm.user_permissions.includes(p.id)
+                          }).length
+                        ) +
+                          "/" +
+                          _vm._s(category.permissions.length)
+                      ),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "perm-card__body" }, [
+                    _c(
+                      "div",
+                      { staticClass: "row g-2" },
+                      _vm._l(category.permissions, function (permission) {
+                        return _c(
+                          "div",
+                          {
+                            key: permission.id,
+                            staticClass: "col-12 col-sm-6",
+                          },
+                          [
+                            _c(
+                              "div",
+                              { staticClass: "form-check perm-check" },
+                              [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.user_permissions,
+                                      expression: "user_permissions",
+                                    },
+                                  ],
+                                  staticClass: "form-check-input",
+                                  attrs: {
+                                    type: "checkbox",
+                                    id: "checkbox_" + permission.id,
+                                  },
+                                  domProps: {
+                                    value: permission.id,
+                                    checked: _vm.user_permissions.includes(
+                                      permission.id
+                                    ),
+                                    checked: Array.isArray(_vm.user_permissions)
+                                      ? _vm._i(
+                                          _vm.user_permissions,
+                                          permission.id
+                                        ) > -1
+                                      : _vm.user_permissions,
+                                  },
+                                  on: {
+                                    change: function ($event) {
+                                      var $$a = _vm.user_permissions,
+                                        $$el = $event.target,
+                                        $$c = $$el.checked ? true : false
+                                      if (Array.isArray($$a)) {
+                                        var $$v = permission.id,
+                                          $$i = _vm._i($$a, $$v)
+                                        if ($$el.checked) {
+                                          $$i < 0 &&
+                                            (_vm.user_permissions = $$a.concat([
+                                              $$v,
+                                            ]))
+                                        } else {
+                                          $$i > -1 &&
+                                            (_vm.user_permissions = $$a
+                                              .slice(0, $$i)
+                                              .concat($$a.slice($$i + 1)))
+                                        }
+                                      } else {
+                                        _vm.user_permissions = $$c
+                                      }
+                                    },
+                                  },
+                                }),
+                                _vm._v(" "),
+                                _c(
+                                  "label",
+                                  {
+                                    staticClass: "permission-label",
+                                    attrs: { for: "checkbox_" + permission.id },
+                                  },
+                                  [
+                                    _vm._v(
+                                      " " +
+                                        _vm._s(
+                                          _vm.formattedName(permission.name)
+                                        ) +
+                                        " "
+                                    ),
+                                  ]
+                                ),
+                              ]
+                            ),
+                          ]
+                        )
+                      }),
+                      0
+                    ),
+                  ]),
+                ]),
+              ])
+            }),
+            0
+          ),
+          _vm._v(" "),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -949,10 +1035,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100":
-/*!***************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100 ***!
-  \***************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Role/Role.vue?vue&type=template&id=044b5100&scoped=true ***!
+  \***************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -969,47 +1055,41 @@ var render = function () {
     [
       _c("div", [
         _c("div", { staticClass: "page-heading" }, [
-          _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "page-title mb-3" }, [
             _c(
               "div",
-              { staticClass: "col-12 col-md-6 order-md-1 order-last" },
-              [_c("h3", [_vm._v(_vm._s(_vm.__("role")))])]
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col-12 col-md-6 order-md-2 order-first" },
+              {
+                staticClass:
+                  "d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2",
+              },
               [
-                _c(
-                  "nav",
-                  {
-                    staticClass: "breadcrumb-header float-start float-lg-end",
-                    attrs: { "aria-label": "breadcrumb" },
-                  },
-                  [
-                    _c("ol", { staticClass: "breadcrumb" }, [
-                      _c(
-                        "li",
-                        { staticClass: "breadcrumb-item" },
-                        [
-                          _c("router-link", { attrs: { to: "/dashboard" } }, [
-                            _vm._v(_vm._s(_vm.__("dashboard"))),
-                          ]),
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "li",
-                        {
-                          staticClass: "breadcrumb-item active",
-                          attrs: { "aria-current": "page" },
-                        },
-                        [_vm._v(_vm._s(_vm.__("role")))]
-                      ),
-                    ]),
-                  ]
-                ),
+                _c("h3", { staticClass: "mb-0" }, [
+                  _vm._v(_vm._s(_vm.__("role"))),
+                ]),
+                _vm._v(" "),
+                _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+                  _c("ol", { staticClass: "breadcrumb mb-0" }, [
+                    _c(
+                      "li",
+                      { staticClass: "breadcrumb-item" },
+                      [
+                        _c("router-link", { attrs: { to: "/dashboard" } }, [
+                          _vm._v(_vm._s(_vm.__("dashboard"))),
+                        ]),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "li",
+                      {
+                        staticClass: "breadcrumb-item active",
+                        attrs: { "aria-current": "page" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("role")))]
+                    ),
+                  ]),
+                ]),
               ]
             ),
           ]),
@@ -1060,24 +1140,6 @@ var render = function () {
                     _c(
                       "button",
                       {
-                        staticClass:
-                          "btn btn-figma-columns d-flex align-items-center gap-2",
-                        on: {
-                          click: function ($event) {
-                            return _vm.openCreateModal()
-                          },
-                        },
-                      },
-                      [
-                        _c("i", { staticClass: "fa fa-plus" }),
-                        _vm._v(" "),
-                        _c("span", [_vm._v(_vm._s(_vm.__("add_new")))]),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
                         directives: [
                           {
                             name: "b-tooltip",
@@ -1086,7 +1148,7 @@ var render = function () {
                           },
                         ],
                         staticClass:
-                          "btn btn-figma-filter d-flex align-items-center gap-2",
+                          "btn btn-figma-columns d-flex align-items-center gap-2",
                         attrs: { title: _vm.__("refresh") },
                         on: {
                           click: function ($event) {
@@ -1100,6 +1162,24 @@ var render = function () {
                         _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
                       ]
                     ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass:
+                          "btn btn-figma-filter d-flex align-items-center gap-2",
+                        on: {
+                          click: function ($event) {
+                            return _vm.openCreateModal()
+                          },
+                        },
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-plus" }),
+                        _vm._v(" "),
+                        _c("span", [_vm._v(_vm._s(_vm.__("add_new")))]),
+                      ]
+                    ),
                   ]),
                 ]
               ),
@@ -1109,7 +1189,7 @@ var render = function () {
                 { staticClass: "table-responsive mb-0" },
                 [
                   _c("b-table", {
-                    staticClass: "figma-table",
+                    staticClass: "figma-table mb-0",
                     attrs: {
                       items: _vm.roles,
                       fields: _vm.fields,
@@ -1160,7 +1240,7 @@ var render = function () {
                           return [
                             _c(
                               "div",
-                              { staticClass: "text-center text-black my-2" },
+                              { staticClass: "text-center text-muted my-2" },
                               [
                                 _c("b-spinner", {
                                   staticClass: "align-middle",
@@ -1177,127 +1257,162 @@ var render = function () {
                         proxy: true,
                       },
                       {
+                        key: "cell(name)",
+                        fn: function (row) {
+                          return [
+                            _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "d-inline-flex align-items-center gap-2",
+                              },
+                              [
+                                _c("span", { staticClass: "role-name" }, [
+                                  _vm._v(_vm._s(row.item.name)),
+                                ]),
+                                _vm._v(" "),
+                                _vm.nonDeleteAbleRoles.includes(row.item.name)
+                                  ? _c(
+                                      "span",
+                                      { staticClass: "badge bg-secondary" },
+                                      [
+                                        _c("i", { staticClass: "fa fa-lock" }),
+                                        _vm._v(
+                                          " " +
+                                            _vm._s(_vm.__("system")) +
+                                            "\n                                    "
+                                        ),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
                         key: "cell(actions)",
                         fn: function (row) {
                           return [
-                            _c("div", { staticClass: "d-flex gap-2" }, [
-                              !_vm.nonDeleteAbleRoles.includes(row.item.name)
-                                ? _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("edit") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.openEditModal(row.item)
-                                        },
-                                      },
-                                    },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "edit icon",
-                                          hoverName: "edit Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
-                                    ],
-                                    1
+                            _vm.nonDeleteAbleRoles.includes(row.item.name)
+                              ? _c("span", { staticClass: "text-muted" }, [
+                                  _vm._v("—"),
+                                ])
+                              : _c("div", { staticClass: "d-flex gap-2" }, [
+                                  !_vm.nonDeleteAbleRoles.includes(
+                                    row.item.name
                                   )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              !_vm.nonDeleteAbleRoles.includes(row.item.name)
-                                ? _c(
-                                    "button",
-                                    {
-                                      directives: [
+                                    ? _c(
+                                        "button",
                                         {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
+                                          directives: [
+                                            {
+                                              name: "b-tooltip",
+                                              rawName: "v-b-tooltip.hover",
+                                              modifiers: { hover: true },
+                                            },
+                                          ],
+                                          staticClass: "figma-action-btn",
+                                          attrs: { title: _vm.__("edit") },
+                                          on: {
+                                            click: function ($event) {
+                                              return _vm.openEditModal(row.item)
+                                            },
+                                          },
                                         },
-                                      ],
-                                      staticClass:
-                                        "figma-action-btn figma-delete-btn",
-                                      attrs: { title: _vm.__("delete") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.deleteRecord(
-                                            row.index,
-                                            row.item.id
-                                          )
-                                        },
-                                      },
-                                    },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "Type=Default",
-                                          hoverName: "Type=Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
-                                    ],
-                                    1
+                                        [
+                                          _c("base-icon", {
+                                            attrs: {
+                                              name: "edit icon",
+                                              hoverName: "edit Hover",
+                                              width: "24",
+                                              height: "24",
+                                            },
+                                          }),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  !_vm.nonDeleteAbleRoles.includes(
+                                    row.item.name
                                   )
-                                : _vm._e(),
-                            ]),
+                                    ? _c(
+                                        "button",
+                                        {
+                                          directives: [
+                                            {
+                                              name: "b-tooltip",
+                                              rawName: "v-b-tooltip.hover",
+                                              modifiers: { hover: true },
+                                            },
+                                          ],
+                                          staticClass:
+                                            "figma-action-btn figma-delete-btn",
+                                          attrs: { title: _vm.__("delete") },
+                                          on: {
+                                            click: function ($event) {
+                                              return _vm.deleteRecord(
+                                                row.index,
+                                                row.item.id
+                                              )
+                                            },
+                                          },
+                                        },
+                                        [
+                                          _c("base-icon", {
+                                            attrs: {
+                                              name: "Type=Default",
+                                              hoverName: "Type=Hover",
+                                              width: "24",
+                                              height: "24",
+                                            },
+                                          }),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                ]),
                           ]
                         },
                       },
                     ]),
                   }),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "figma-table-footer flex-wrap gap-3" },
+                [
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
+                    },
+                  }),
                   _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "figma-table-footer" },
-                    [
-                      _c("div", { staticClass: "showing-results-text" }, [
-                        _vm._v(
-                          "\n                                " +
-                            _vm._s(_vm.__("Showing Result")) +
-                            " : "
-                        ),
-                        _c("span", { staticClass: "showing-bold" }, [
-                          _vm._v(_vm._s(_vm.pageEnd)),
-                        ]),
-                        _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                        _c("span", { staticClass: "showing-bold" }, [
-                          _vm._v(_vm._s(_vm.totalRows)),
-                        ]),
-                      ]),
-                      _vm._v(" "),
-                      _c("b-pagination", {
-                        staticClass: "figma-pagination mb-0",
-                        attrs: {
-                          "total-rows": _vm.totalRows,
-                          "per-page": _vm.perPage,
-                          align: "right",
-                          "hide-goto-end-buttons": "",
-                          "hide-ellipsis": "",
-                          "prev-text": "<",
-                          "next-text": ">",
-                        },
-                        model: {
-                          value: _vm.currentPage,
-                          callback: function ($$v) {
-                            _vm.currentPage = $$v
-                          },
-                          expression: "currentPage",
-                        },
-                      }),
-                    ],
-                    1
-                  ),
+                  _c("b-pagination", {
+                    staticClass: "figma-pagination mb-0",
+                    attrs: {
+                      "total-rows": _vm.totalRows,
+                      "per-page": _vm.perPage,
+                      align: "right",
+                      "hide-goto-end-buttons": "",
+                      "hide-ellipsis": "",
+                      "prev-text": "<",
+                      "next-text": ">",
+                    },
+                    model: {
+                      value: _vm.currentPage,
+                      callback: function ($$v) {
+                        _vm.currentPage = $$v
+                      },
+                      expression: "currentPage",
+                    },
+                  }),
                 ],
                 1
               ),

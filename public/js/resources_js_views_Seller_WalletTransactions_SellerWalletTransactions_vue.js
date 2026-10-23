@@ -99,6 +99,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -469,6 +473,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -486,58 +496,43 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, {
         key: 'seller_id',
         label: __('seller_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'name',
         label: __('seller_name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'module_name',
         label: __('module'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'order_id',
         label: __('order_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'order_item_id',
         label: __('order_item_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'product_name',
         label: __('product_name'),
-        sortable: true,
-        "class": 'text-center'
-      }, {
-        key: 'variant_name',
-        label: __('measurement'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'type',
         label: __('type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'amount',
         label: __('amount'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'status',
         label: __('status'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'created_at',
         label: __('date'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'actions',
         label: __('actions'),
@@ -596,6 +591,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.fetchActiveLanguages().then(function () {
       _this.getWalletTransactions();
     });
+  },
+  watch: {
+    perPage: function perPage() {
+      // the page buttons already reload on change (@input) - only reload here when the page stays 1
+      if (this.currentPage !== 1) {
+        this.currentPage = 1;
+      } else {
+        this.getWalletTransactions();
+      }
+    }
   },
   methods: {
     fetchActiveLanguages: function fetchActiveLanguages() {
@@ -722,7 +727,31 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Selected seller details: compact summary tile */\n.seller-summary[data-v-1d77285a] {\n    padding: 10px 12px;\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    font-size: 13px;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Expanded transaction details inside the table */\n.txn-details[data-v-3bb33ac6] {\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    box-shadow: none;\n    text-align: start;\n}\n.txn-details label[data-v-3bb33ac6] {\n    font-size: 11px;\n    letter-spacing: 0.04em;\n}\n.txn-details .fs-6[data-v-3bb33ac6] {\n    font-size: 13px !important; /* compact detail values (Bootstrap .fs-6 is !important) */\n}\n.txn-message[data-v-3bb33ac6] {\n    padding: 12px 14px;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -783,6 +812,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_style_index_0_id_3bb33ac6_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_style_index_0_id_3bb33ac6_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_style_index_0_id_3bb33ac6_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Seller/WalletTransactions/Edit.vue":
 /*!***************************************************************!*\
   !*** ./resources/js/views/Seller/WalletTransactions/Edit.vue ***!
@@ -835,23 +894,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6 */ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6");
+/* harmony import */ var _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true */ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true");
 /* harmony import */ var _SellerWalletTransactions_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SellerWalletTransactions.vue?vue&type=script&lang=js */ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _SellerWalletTransactions_vue_vue_type_style_index_0_id_3bb33ac6_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css */ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _SellerWalletTransactions_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__.render,
-  _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "3bb33ac6",
   null
   
 )
@@ -908,6 +969,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************!*\
+  !*** ./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_style_index_0_id_3bb33ac6_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=style&index=0&id=3bb33ac6&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/Seller/WalletTransactions/Edit.vue?vue&type=template&id=1d77285a&scoped=true":
 /*!*********************************************************************************************************!*\
   !*** ./resources/js/views/Seller/WalletTransactions/Edit.vue?vue&type=template&id=1d77285a&scoped=true ***!
@@ -925,19 +999,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6":
-/*!*****************************************************************************************************************!*\
-  !*** ./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6 ***!
-  \*****************************************************************************************************************/
+/***/ "./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true":
+/*!*****************************************************************************************************************************!*\
+  !*** ./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true ***!
+  \*****************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_SellerWalletTransactions_vue_vue_type_template_id_3bb33ac6_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true");
 
 
 /***/ }),
@@ -978,8 +1052,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex flex-wrap justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1001,12 +1088,6 @@ var render = function () {
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
-          ),
         ],
         1
       ),
@@ -1026,7 +1107,7 @@ var render = function () {
           _c("div", { staticClass: "row" }, [
             _c(
               "div",
-              { staticClass: "form-group" },
+              { staticClass: "form-group col-12" },
               [
                 _c("label", [_vm._v(_vm._s(_vm.__("seller")))]),
                 _vm._v(" "),
@@ -1093,82 +1174,77 @@ var render = function () {
                 _vm.walletTransaction.seller
                   ? _c(
                       "div",
-                      { staticClass: "border border-grey rounded p-2 mt-2" },
+                      { staticClass: "seller-summary row g-2 mx-0 mt-2" },
                       [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left mb-1",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("name")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " + _vm._s(_vm.walletTransaction.seller.name)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("mobile")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.walletTransaction.seller.mobile)
-                              ),
-                            ]),
-                          ]
-                        ),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("name")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.seller.name)
+                            ),
+                          ]),
+                        ]),
                         _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left mb-1",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("id")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " + _vm._s(_vm.walletTransaction.seller.id)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("module")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(
-                                    _vm.walletTransaction.seller.module
-                                      ? _vm.walletTransaction.seller.module.name
-                                      : ""
-                                  )
-                              ),
-                            ]),
-                          ]
-                        ),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("mobile")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.seller.mobile)
+                            ),
+                          ]),
+                        ]),
                         _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left",
-                          },
-                          [
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("balance")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.walletTransaction.seller.balance)
-                              ),
-                            ]),
-                          ]
-                        ),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("id")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.seller.id)
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("module")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " +
+                                _vm._s(
+                                  _vm.walletTransaction.seller.module
+                                    ? _vm.walletTransaction.seller.module.name
+                                    : ""
+                                )
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("balance")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.seller.balance)
+                            ),
+                          ]),
+                        ]),
                       ]
                     )
                   : _vm._e(),
@@ -1176,7 +1252,7 @@ var render = function () {
               1
             ),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 col-sm-6" }, [
               _c("label", { attrs: { for: "type" } }, [
                 _vm._v(_vm._s(_vm.__("type"))),
               ]),
@@ -1233,7 +1309,7 @@ var render = function () {
               ),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 col-sm-6" }, [
               _c("label", { attrs: { for: "amount" } }, [
                 _vm._v(_vm._s(_vm.__("amount"))),
               ]),
@@ -1292,7 +1368,7 @@ var render = function () {
                 : _vm._e(),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 mb-0" }, [
               _c("label", { attrs: { for: "message" } }, [
                 _vm._v(_vm._s(_vm.__("message"))),
               ]),
@@ -1330,10 +1406,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -1346,10 +1419,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6":
-/*!********************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6 ***!
-  \********************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true":
+/*!********************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Seller/WalletTransactions/SellerWalletTransactions.vue?vue&type=template&id=3bb33ac6&scoped=true ***!
+  \********************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1399,7 +1472,8 @@ var render = function () {
                 },
                 [
                   _vm._v(
-                    _vm._s(_vm.__("wallet_transactions")) + "\n                "
+                    _vm._s(_vm.__("wallet_transactions")) +
+                      "\n                    "
                   ),
                 ]
               ),
@@ -1455,6 +1529,32 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "d-flex gap-2" }, [
+                  _c(
+                    "button",
+                    {
+                      directives: [
+                        {
+                          name: "b-tooltip",
+                          rawName: "v-b-tooltip.hover",
+                          modifiers: { hover: true },
+                        },
+                      ],
+                      staticClass:
+                        "btn btn-figma-filter d-flex align-items-center gap-2",
+                      attrs: { title: _vm.__("refresh") },
+                      on: {
+                        click: function ($event) {
+                          return _vm.getWalletTransactions()
+                        },
+                      },
+                    },
+                    [
+                      _c("i", { staticClass: "fa fa-refresh" }),
+                      _vm._v(" "),
+                      _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                    ]
+                  ),
+                  _vm._v(" "),
                   _vm.login_user &&
                   _vm.login_user.role &&
                   (_vm.login_user.role.name === "Super Admin" ||
@@ -1479,28 +1579,6 @@ var render = function () {
                         ]
                       )
                     : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      directives: [
-                        {
-                          name: "b-tooltip",
-                          rawName: "v-b-tooltip.hover",
-                          modifiers: { hover: true },
-                        },
-                      ],
-                      staticClass:
-                        "btn btn-figma-filter d-flex align-items-center gap-2",
-                      attrs: { title: _vm.__("refresh") },
-                      on: {
-                        click: function ($event) {
-                          return _vm.getWalletTransactions()
-                        },
-                      },
-                    },
-                    [_c("i", { staticClass: "fa fa-refresh" })]
-                  ),
                 ]),
               ]
             ),
@@ -1543,12 +1621,46 @@ var render = function () {
                   },
                   scopedSlots: _vm._u([
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "table-busy",
                       fn: function () {
                         return [
                           _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "text-center text-muted my-3" },
                             [
                               _c("b-spinner", { staticClass: "align-middle" }),
                               _vm._v(" "),
@@ -1574,9 +1686,9 @@ var render = function () {
                             },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(row.item.type) +
-                                  "\n                            "
+                                  "\n                                "
                               ),
                             ]
                           ),
@@ -1598,9 +1710,9 @@ var render = function () {
                             },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(row.item.module_name || "Grocery") +
-                                  "\n                            "
+                                  "\n                                "
                               ),
                             ]
                           ),
@@ -1619,13 +1731,13 @@ var render = function () {
                             },
                             [
                               _vm._v(
-                                "\n                                " +
+                                "\n                                    " +
                                   _vm._s(
                                     row.item.status === 1
                                       ? _vm.__("active")
                                       : _vm.__("deactive")
                                   ) +
-                                  "\n                            "
+                                  "\n                                "
                               ),
                             ]
                           ),
@@ -1637,9 +1749,9 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(row.item.created_at) +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1649,9 +1761,9 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(row.item.amount) +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1660,43 +1772,50 @@ var render = function () {
                       key: "cell(actions)",
                       fn: function (row) {
                         return [
-                          _c("div", { staticClass: "d-flex gap-2" }, [
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
+                          _c(
+                            "div",
+                            {
+                              staticClass:
+                                "d-flex gap-2 justify-content-center",
+                            },
+                            [
+                              _c(
+                                "button",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass: "figma-action-btn",
+                                  attrs: { title: _vm.__("view") },
+                                  on: { click: row.toggleDetails },
+                                },
+                                [
+                                  row.detailsShowing
+                                    ? _c("base-icon", {
+                                        attrs: {
+                                          name: "Eye",
+                                          hoverName: "Type=Hover (1)",
+                                          width: "24",
+                                          height: "24",
+                                        },
+                                      })
+                                    : _c("base-icon", {
+                                        attrs: {
+                                          name: "Eye",
+                                          hoverName: "Type=Hover (1)",
+                                          width: "24",
+                                          height: "24",
+                                        },
+                                      }),
                                 ],
-                                staticClass: "figma-action-btn",
-                                attrs: { title: _vm.__("view") },
-                                on: { click: row.toggleDetails },
-                              },
-                              [
-                                row.detailsShowing
-                                  ? _c("base-icon", {
-                                      attrs: {
-                                        name: "Eye",
-                                        hoverName: "Type=Hover (1)",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    })
-                                  : _c("base-icon", {
-                                      attrs: {
-                                        name: "Eye",
-                                        hoverName: "Type=Hover (1)",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    }),
-                              ],
-                              1
-                            ),
-                          ]),
+                                1
+                              ),
+                            ]
+                          ),
                         ]
                       },
                     },
@@ -1707,22 +1826,24 @@ var render = function () {
                           _c(
                             "b-card",
                             {
-                              staticClass: "p-4 bg-white shadow-sm",
+                              staticClass: "p-3 p-md-4 txn-details mb-0",
                               attrs: { "no-body": "" },
                             },
                             [
                               _c(
                                 "div",
                                 {
-                                  staticClass: "d-flex align-items-center mb-3",
+                                  staticClass:
+                                    "d-flex align-items-center mb-3 pb-2 border-bottom",
                                 },
                                 [
                                   _c(
-                                    "h5",
-                                    { staticClass: "text-primary mb-0 me-3" },
+                                    "h6",
+                                    { staticClass: "mb-0 font-weight-bold" },
                                     [
                                       _c("i", {
-                                        staticClass: "fa fa-receipt me-1",
+                                        staticClass:
+                                          "fa fa-file-text-o me-1 text-primary",
                                       }),
                                       _vm._v(
                                         " " +
@@ -1730,11 +1851,6 @@ var render = function () {
                                       ),
                                     ]
                                   ),
-                                  _vm._v(" "),
-                                  _c("div", {
-                                    staticClass: "h-line flex-grow-1 bg-light",
-                                    staticStyle: { height: "1px" },
-                                  }),
                                 ]
                               ),
                               _vm._v(" "),
@@ -1806,7 +1922,7 @@ var render = function () {
                                 ]),
                                 _vm._v(" "),
                                 _c("div", { staticClass: "col-md-5" }, [
-                                  _c("div", { staticClass: "mb-3" }, [
+                                  _c("div", { staticClass: "mb-0" }, [
                                     _c(
                                       "label",
                                       {
@@ -1818,21 +1934,6 @@ var render = function () {
                                     _vm._v(" "),
                                     _c("span", { staticClass: "fs-6" }, [
                                       _vm._v(_vm._s(row.item.product_name)),
-                                    ]),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("div", { staticClass: "mb-0" }, [
-                                    _c(
-                                      "label",
-                                      {
-                                        staticClass:
-                                          "text-muted small text-uppercase fw-bold d-block",
-                                      },
-                                      [_vm._v(_vm._s(_vm.__("measurement")))]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("span", { staticClass: "fs-6" }, [
-                                      _vm._v(_vm._s(row.item.variant_name)),
                                     ]),
                                   ]),
                                 ]),
@@ -1894,13 +1995,8 @@ var render = function () {
                                   ]),
                                 ]),
                                 _vm._v(" "),
-                                _c(
-                                  "div",
-                                  {
-                                    staticClass:
-                                      "col-12 mt-3 p-3 bg-light rounded shadow-sm border-start border-4 border-primary",
-                                  },
-                                  [
+                                _c("div", { staticClass: "col-12 mt-3" }, [
+                                  _c("div", { staticClass: "txn-message" }, [
                                     _c(
                                       "label",
                                       {
@@ -1919,12 +2015,12 @@ var render = function () {
                                       [
                                         _vm._v(
                                           _vm._s(row.item.message) +
-                                            "\n                                        "
+                                            "\n                                            "
                                         ),
                                       ]
                                     ),
-                                  ]
-                                ),
+                                  ]),
+                                ]),
                               ]),
                             ]
                           ),
@@ -1939,22 +2035,38 @@ var render = function () {
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "figma-table-footer" },
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-2" },
+                  [
+                    _c("label", { staticClass: "showing-results-text mb-0" }, [
+                      _vm._v(_vm._s(_vm.__("per_page"))),
+                    ]),
+                    _vm._v(" "),
+                    _c("b-form-select", {
+                      staticClass: "w-auto",
+                      attrs: { options: _vm.pageOptions, size: "sm" },
+                      model: {
+                        value: _vm.perPage,
+                        callback: function ($$v) {
+                          _vm.perPage = $$v
+                        },
+                        expression: "perPage",
+                      },
+                    }),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",
@@ -1962,6 +2074,10 @@ var render = function () {
                     "total-rows": _vm.totalRows,
                     "per-page": _vm.perPage,
                     align: "right",
+                    "hide-goto-end-buttons": "",
+                    "hide-ellipsis": "",
+                    "prev-text": "<",
+                    "next-text": ">",
                   },
                   on: {
                     input: function ($event) {

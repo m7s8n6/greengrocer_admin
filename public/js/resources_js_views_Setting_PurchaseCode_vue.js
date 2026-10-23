@@ -89,6 +89,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -105,6 +107,10 @@ __webpack_require__.r(__webpack_exports__);
     this.getRecord();
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     getRecord: function getRecord() {
       var _this = this;
       var url = this.$apiUrl + '/store_settings/purchase_code';
@@ -272,6 +278,17 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
                     {
                       staticClass: "breadcrumb-item active",
                       attrs: { "aria-current": "page" },
@@ -304,9 +321,20 @@ var render = function () {
           [
             _c("div", { staticClass: "card" }, [
               _c("div", { staticClass: "card-header" }, [
-                _c("h4", { staticClass: "card-title" }, [
+                _c("h4", { staticClass: "card-title float-none" }, [
                   _vm._v(
                     _vm._s(_vm.__("validate_the_authentic_purchase_of_egrocer"))
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.tr(
+                        "purchase_code_desc",
+                        "Register this installation with your purchase code to unlock updates and support."
+                      )
+                    )
                   ),
                 ]),
               ]),
@@ -316,7 +344,7 @@ var render = function () {
                   ? _c("div", { staticClass: "row" }, [
                       _c(
                         "div",
-                        { staticClass: "text-center" },
+                        { staticClass: "col-12 text-center py-3" },
                         [_c("b-spinner", { attrs: { label: "Spinning" } })],
                         1
                       ),
@@ -361,49 +389,14 @@ var render = function () {
                           }),
                         ]),
                         _vm._v(" "),
-                        !_vm.hasValid
-                          ? _c("div", { staticClass: "form-group" }, [
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-primary",
-                                  attrs: {
-                                    type: "submit",
-                                    name: "btnValidate",
-                                    disabled: _vm.isValidation,
-                                  },
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                        " +
-                                      _vm._s(_vm.__("validate_now")) +
-                                      "\n                                        "
-                                  ),
-                                  _vm.isValidation
-                                    ? _c("b-spinner", {
-                                        attrs: { small: "", label: "Spinning" },
-                                      })
-                                    : _vm._e(),
-                                ],
-                                1
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "button",
-                                {
-                                  staticClass: "btn-warning btn",
-                                  attrs: { type: "reset" },
-                                },
-                                [_vm._v(_vm._s(_vm.__("clear")))]
-                              ),
-                            ])
-                          : _vm._e(),
-                        _vm._v(" "),
                         _vm.hasValid
                           ? _c("div", [
                               _c(
                                 "label",
-                                { staticClass: "alert alert-success" },
+                                {
+                                  staticClass:
+                                    "alert alert-success d-block mb-0",
+                                },
                                 [
                                   _vm._v(
                                     "\n                                        " +
@@ -420,6 +413,51 @@ var render = function () {
                           : _vm._e(),
                       ]),
                     ])
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.isLoading && !_vm.hasValid
+                  ? _c(
+                      "div",
+                      {
+                        staticClass:
+                          "d-flex justify-content-end border-top pt-3 mt-2",
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-outline-secondary",
+                            attrs: { type: "reset" },
+                          },
+                          [_vm._v(_vm._s(_vm.__("clear")))]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary ml-2",
+                            attrs: {
+                              type: "submit",
+                              name: "btnValidate",
+                              disabled: _vm.isValidation,
+                            },
+                          },
+                          [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(_vm.__("validate_now")) +
+                                "\n                                "
+                            ),
+                            _vm.isValidation
+                              ? _c("b-spinner", {
+                                  attrs: { small: "", label: "Spinning" },
+                                })
+                              : _vm._e(),
+                          ],
+                          1
+                        ),
+                      ]
+                    )
                   : _vm._e(),
               ]),
             ]),

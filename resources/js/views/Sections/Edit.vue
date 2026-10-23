@@ -1,11 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="xxl" scrollable
         no-close-on-backdrop no-fade static id="mymodal">
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
 
@@ -42,22 +42,20 @@
                     <div v-if="translations[lang.id]">
 
                         <div class="form-group">
-                            <label>{{ __('title_for_section') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                            <label>{{ __('title_for_section') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="text" class="form-control" :required="lang.is_default ? true : undefined"
                                 v-model="translations[lang.id].title" :placeholder="__('enter_title_for_section')">
                         </div>
 
                         <!-- SHORT DESCRIPTION -->
                         <div class="form-group">
-                            <label>{{ __('short_descrption') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                            <label>{{ __('short_descrption') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="text" class="form-control" :required="lang.is_default ? true : undefined"
                                 v-model="translations[lang.id].short_description" :placeholder="__('enter_short_description')">
                         </div>
                         <div class="row">
 
-                            <div class="form-group">
+                            <div class="form-group col-12">
                                 <label>{{ __('category_ids') }}</label>
 
                                 <Select2 v-model="section.category_ids" :placeholder="__('select_categories')"
@@ -65,8 +63,8 @@
                                     :disabled="section.product_type === 'recently_visited_products'"
                                     :settings="{ multiple: 'multiple', width: '100%', dropdownParent: '#mymodal' }" />
                             </div>
-                            <div class="form-group col-md-3">
-                                <label for='product_type'> {{ __('product_types') }}</label><i class="text-danger">*</i>
+                            <div class="form-group col-12 col-sm-6 col-lg-3">
+                                <label for='product_type'>{{ __('product_types') }} <i class="text-danger">*</i></label>
                                 <select name='product_type' id='product_type' v-model="section.product_type"
                                     class='form-control form-select'>
                                     <option value=""> {{ __('select_product_type') }}</option>
@@ -79,8 +77,8 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-3">
-                                <label for='position'> {{ __('position') }}</label><i class="text-danger">*</i>
+                            <div class="form-group col-12 col-sm-6 col-lg-3">
+                                <label for='position'>{{ __('position') }} <i class="text-danger">*</i></label>
                                 <select name='position' id='position' v-model="section.position"
                                     class='form-control form-select'>
                                     <option value=""> {{ __('select_position') }}</option>
@@ -94,29 +92,29 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-12 col-sm-6 col-lg-3">
                                 <label for="background color (Light theme)">{{ __('background_color_for_light_theme')
-                                    }}</label>
-                                <div class="d-flex w-100 mb-2" style="gap: 10px;">
+                                    }} <i class="text-danger">*</i></label>
+                                <div class="color-field d-flex w-100">
                                     <input type="text" v-model="section.background_color_for_light_theme"
                                         class="form-control" placeholder="#ffffff">
                                     <input type="color" id="color_light" name='color_light'
                                         v-model="section.background_color_for_light_theme"
-                                        class="form-control cursor-pointer">
+                                        class="form-control cursor-pointer color-swatch">
                                 </div>
                             </div>
-                            <div class="form-group col-md-3">
+                            <div class="form-group col-12 col-sm-6 col-lg-3">
                                 <label for="background color (Dark theme)">{{ __('background_color_for_dark_theme')
-                                    }}</label>
-                                <div class="d-flex w-100 mb-2" style="gap: 10px;">
+                                    }} <i class="text-danger">*</i></label>
+                                <div class="color-field d-flex w-100">
                                     <input type="text" v-model="section.background_color_for_dark_theme"
                                         class="form-control" placeholder="#000000">
                                     <input type="color" id="color_dark" name='color_dark'
                                         v-model="section.background_color_for_dark_theme"
-                                        class="form-control cursor-pointer">
+                                        class="form-control cursor-pointer color-swatch">
                                 </div>
                             </div>
-                            <div class="form-group" v-if="section.product_type === 'custom_products'">
+                            <div class="form-group col-12" v-if="section.product_type === 'custom_products'">
                                 <label>{{ __('products') }}</label>
 
                                 <Select2 v-model="section.product_ids" placeholder="Select Products"
@@ -124,15 +122,14 @@
                                     :settings="{ multiple: 'multiple', width: '100%', dropdownParent: '#mymodal' }" />
 
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-12 col-lg-6 form-group">
                                 <div class="form-group row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label class="required">{{ __('select_style_for_app_section') }}</label><i
-                                            class="text-danger">*</i>
+                                        <label class="section-style-label mb-0">{{ __('select_style_for_app_section') }} <i class="text-danger">*</i></label>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_1" v-model="section.style_app" required
                                                 class="form-control">
@@ -140,21 +137,21 @@
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_2" v-model="section.style_app">
                                             <img :src="$baseUrl + '/images/app_style/App_Style_2.jpg'" alt="style_2"
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_3" v-model="section.style_app">
                                             <img :src="$baseUrl + '/images/app_style/App_Style_3.jpg'" alt="style_3"
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_4" v-model="section.style_app">
                                             <img :src="$baseUrl + '/images/app_style/App_Style_4.jpg'" alt="style_4"
@@ -165,7 +162,7 @@
 
                                 <!-- Show file upload input if style_4 is selected -->
                                 <div class="form-group" v-if="section.style_app === 'style_4'">
-                                    <label for="banner_app">{{ __('banner_image') }}<i class="text-danger">*</i></label>
+                                    <label for="banner_app">{{ __('banner_image') }} <i class="text-danger">*</i></label>
 
                                     <span v-if="section.error" class="error">{{ section.error }}</span>
                                     <input type="file" name="banner_app" accept="image/*" id="banner_app"
@@ -175,7 +172,7 @@
                                     <div class="file-input-div bg-gray-100" @click="triggerBannerAppUpload(lang.id)"
                                         @drop="dropFile" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
                                         <template v-if="section.banner_app && section.banner_app.name !== ''">
-                                            <label> {{ __('selected_file_name') }} {{ section.banner_app.name }}</label>
+                                            <label>{{ __('selected_file_name') }} {{ section.banner_app.name }}</label>
                                         </template>
                                         <template v-else>
                                             <label><i class="fa fa-cloud-upload-alt fa-2x"></i></label>
@@ -183,23 +180,22 @@
                                         </template>
                                     </div>
 
-                                    <div class="row" v-if="section.banner_app_url">
-                                        <div class="col-md-2">
+                                    <div class="row mt-2" v-if="section.banner_app_url">
+                                        <div class="col-12 col-md-6">
                                             <img class="custom-image" :src="section.banner_app_url" title="Offer Image"
                                                 alt="Offer Image" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-12 col-lg-6 form-group">
                                 <div class="form-group row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label class="required">{{ __('select_style_for_web_section') }}</label><i
-                                            class="text-danger">*</i>
+                                        <label class="section-style-label mb-0">{{ __('select_style_for_web_section') }} <i class="text-danger">*</i></label>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_1" required="" class="form-control"
                                                 v-model="section.style_web">
@@ -207,21 +203,21 @@
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_2" v-model="section.style_web">
                                             <img :src="$baseUrl + '/images/web_style/Web_Style_2.jpg'" alt="style_2"
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_3" v-model="section.style_web">
                                             <img :src="$baseUrl + '/images/web_style/Web_Style_3.jpg'" alt="style_3"
                                                 class="style_image">
                                         </label>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-6 col-sm-3 mb-2">
                                         <label class="radio-img">
                                             <input type="radio" value="style_4" v-model="section.style_web">
                                             <img :src="$baseUrl + '/images/web_style/Web_Style_4.jpg'" alt="style_4"
@@ -233,7 +229,7 @@
                                 <!-- Show file upload input if style_4 is selected -->
                                 <div class="form-group row" v-if="section.style_web === 'style_4'">
                                     <div class="col-md-12">
-                                        <label for="banner_web"> {{ __('banner_image') }}<i
+                                        <label for="banner_web">{{ __('banner_image') }}<i
                                                 class="text-danger">*</i></label>
                                         <span v-if="section.error_web" class="error">{{ section.error_web }}</span>
                                         <input type="file" name="banner_web" accept="image/*" id="banner_web"
@@ -244,7 +240,7 @@
                                             @click="triggerBannerWebUpload(lang.id)" @drop="dropFileWeb"
                                             @dragover="$dragoverFile" @dragleave="$dragleaveFile">
                                             <template v-if="section.banner_web && section.banner_web.name !== ''">
-                                                <label> {{ __('selected_file_name') }} {{ section.banner_web.name
+                                                <label>{{ __('selected_file_name') }} {{ section.banner_web.name
                                                     }}</label>
                                             </template>
                                             <template v-else>
@@ -254,7 +250,7 @@
                                         </div>
 
                                         <div class="row mt-2" v-if="section.banner_web_url">
-                                            <div class="col-md-2">
+                                            <div class="col-12 col-md-6">
                                                 <img class="custom-image" :src="section.banner_web_url"
                                                     title="Banner Web Image" alt="Banner Web Image" />
                                             </div>
@@ -278,16 +274,14 @@
                     <div v-if="translations[lang.id]">
                         <!-- Title (Translatable) -->
                         <div class="form-group">
-                            <label>{{ __('title_for_section') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                            <label>{{ __('title_for_section') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="text" class="form-control" :required="lang.is_default ? true : undefined"
                                 v-model="translations[lang.id].title">
                         </div>
 
                         <!-- Short Description (Translatable) -->
                         <div class="form-group">
-                            <label>{{ __('short_descrption') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                            <label>{{ __('short_descrption') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="text" class="form-control" :required="lang.is_default ? true : undefined"
                                 v-model="translations[lang.id].short_description">
                         </div>
@@ -651,7 +645,7 @@ export default {
                     this.categories = response.data.data;
                 }).catch(error => {
                     this.isLoading = false;
-                    if (error.request.statusText) {
+                    if (error.request && error.request.statusText) {
                         this.showError(error.request.statusText);
                     } else if (error.message) {
                         this.showError(error.message);
@@ -668,7 +662,7 @@ export default {
                     this.products = response.data.data;
                 }).catch(error => {
                     this.isLoading = false;
-                    if (error.request.statusText) {
+                    if (error.request && error.request.statusText) {
                         this.showError(error.request.statusText);
                     } else if (error.message) {
                         this.showError(error.message);
@@ -859,7 +853,68 @@ export default {
 
 
 <style scoped>
+.section-style-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+
 .select2-search__field input[type=search] {
     width: 5000px !important;
+}
+
+/* Style pickers: image cards with a selected ring (radio stays in the DOM for validation) */
+.radio-img {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+
+.radio-img input[type="radio"] {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 16px;
+    height: 16px;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-img .style_image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: contain;
+    padding: 4px;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface-muted);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.radio-img:hover .style_image {
+    border-color: var(--theme-primary-300);
+}
+
+.radio-img input[type="radio"]:checked + .style_image {
+    border-color: var(--theme-primary-500);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary-500) 20%, transparent);
+}
+
+.custom-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
 }
 </style>

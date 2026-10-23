@@ -19,7 +19,7 @@ class RatingImages extends Model
             $image_url = asset('storage/'.$this->image);
             return $image_url;
         }
-        return $this->image;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
 
     public function productRating()

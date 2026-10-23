@@ -25,13 +25,13 @@
                                 <base-icon name="Funnel" width="24" height="24" useCurrentColor />
                                 <span>{{ __('filters') || 'Filters' }}</span>
                             </button>
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="create_new = true" v-if="$can('salary_create')">
-                                <i class="fa fa-plus"></i>
-                                <span>{{ __('add_salary') }}</span>
-                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getSalaries()" v-b-tooltip.hover :title="__('refresh')">
                                 <i class="fa fa-refresh"></i>
                                 <span>{{ __('refresh') }}</span>
+                            </button>
+                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="create_new = true" v-if="isSellerRoute || $can('salary_create')">
+                                <i class="fa fa-plus"></i>
+                                <span>{{ __('add_salary') }}</span>
                             </button>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                                             <date-range-picker :single-date-picker="'range'" :autoApply="false"
                                                 :showDropdowns="true" v-model="dateRange" :maxDate="maxDate"
                                                 @update="getSalaries" opens="right" append-to-body></date-range-picker>
-                                            <button class="btn btn-sm btn-danger"
+                                            <button class="btn btn-sm btn-outline-secondary text-nowrap"
                                                 @click="dateRange.startDate = null; dateRange.endDate = null; getSalaries()">
                                                 {{ __('clear') }}
                                             </button>
@@ -62,8 +62,15 @@
                             :filter="filter" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
                             :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                             :busy="isLoading" stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-2">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -76,11 +83,11 @@
                             </template>
                             <template #cell(actions)="row">
                                 <div class="d-flex gap-2 justify-content-center">
-                                    <button v-if="$can('salary_update')"
+                                    <button v-if="isSellerRoute || $can('salary_update')"
                                         @click="editRecord(row.item)" class="figma-action-btn" v-b-tooltip.hover :title="__('edit')">
                                         <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                     </button>
-                                    <button v-if="$can('salary_delete')"
+                                    <button v-if="isSellerRoute || $can('salary_delete')"
                                         @click="deleteRecord(row.item.id)" class="figma-action-btn figma-delete-btn" v-b-tooltip.hover :title="__('delete')">
                                         <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                                     </button>
@@ -90,9 +97,13 @@
                     </div>
 
                     <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') || 'of' }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" 
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -121,10 +132,10 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'delivery_boy_name', label: __('delivery_boy'), sortable: true, class: 'text-center' },
-                { key: 'amount', label: __('salary'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center' },
-                { key: 'paid_on', label: __('date'), sortable: true, class: 'text-center' },
+                { key: 'delivery_boy_name', label: __('delivery_boy'), sortable: true },
+                { key: 'amount', label: __('salary'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'paid_on', label: __('date'), sortable: true },
                 { key: 'actions', label: __('actions'), class: 'text-center' }
             ],
             dateRange: { startDate: null, endDate: null },
@@ -194,7 +205,7 @@ export default {
                 delivery_boy_id: this.deliveryBoy
             };
 
-            axios.get(this.$apiUrl + '/delivery_boy_salary', {
+            axios.get(this.isSellerRoute ? this.$sellerApiUrl + '/delivery_fleet/salary' : this.$apiUrl + '/delivery_boy_salary', {
                 params: param
             }).then((response) => {
                 this.salaries = response.data.data.salaries;
@@ -214,13 +225,13 @@ export default {
                 text: __('you_wont_be_able_to_revert_this'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: 'var(--theme-error-500)',
+                cancelButtonColor: 'var(--theme-primary-500)',
                 confirmButtonText: __('yes_delete_it'),
                 cancelButtonText: __('cancel'),
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post(this.$apiUrl + '/delivery_boy_salary/delete', { id: id })
+                    axios.post(this.isSellerRoute ? this.$sellerApiUrl + '/delivery_fleet/salary/delete' : this.$apiUrl + '/delivery_boy_salary/delete', { id: id })
                         .then((response) => {
                             if (response.data.status === 1) {
                                 this.showMessage("success", response.data.message);

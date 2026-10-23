@@ -327,12 +327,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 
@@ -681,7 +675,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         _this11.categories = response.data.data;
       })["catch"](function (error) {
         _this11.isLoading = false;
-        if (error.request.statusText) {
+        if (error.request && error.request.statusText) {
           _this11.showError(error.request.statusText);
         } else if (error.message) {
           _this11.showError(error.message);
@@ -698,7 +692,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         _this12.products = response.data.data;
       })["catch"](function (error) {
         _this12.isLoading = false;
-        if (error.request.statusText) {
+        if (error.request && error.request.statusText) {
           _this12.showError(error.request.statusText);
         } else if (error.message) {
           _this12.showError(error.message);
@@ -940,6 +934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Edit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Edit */ "./resources/js/views/Sections/Edit.vue");
 /* harmony import */ var fslightbox_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fslightbox-vue */ "./node_modules/fslightbox-vue/index.js");
 /* harmony import */ var fslightbox_vue__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fslightbox_vue__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -1103,10 +1098,77 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_2__["default"]],
   components: {
     'app-edit-record': _Edit__WEBPACK_IMPORTED_MODULE_0__["default"],
     FsLightbox: (fslightbox_vue__WEBPACK_IMPORTED_MODULE_1___default())
@@ -1177,6 +1239,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     };
   },
   computed: {
+    // Grid view rows: translatedSections with the list view's search + sort applied
+    gridSections: function gridSections() {
+      return this.gridFilterSort(this.translatedSections, this.filterOn);
+    },
     translatedSections: function translatedSections() {
       var _this = this;
       if (!this.currentLanguageId || this.sections.length === 0) {
@@ -1237,6 +1303,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   watch: {
     $route: function $route(to, from) {
       this.showCreateModal();
+    },
+    perPage: function perPage() {
+      this.currentPage = 1;
     }
   },
   created: function created() {
@@ -1275,6 +1344,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       })["catch"](function (error) {
         console.error('Error loading languages:', error);
       });
+    },
+    // Grid view: same client-side search (b-table :filter / :filter-included-fields) and sort as the list view.
+    // Style preview image (same files the list view shows); null for unknown styles
+    styleImage: function styleImage(kind, style) {
+      if (!['style_1', 'style_2', 'style_3', 'style_4'].includes(style)) return null;
+      var n = style.replace('style_', '');
+      return kind === 'web' ? this.$baseUrl + '/images/web_style/Web_Style_' + n + '.jpg' : this.$baseUrl + '/images/app_style/App_Style_' + n + '.jpg';
+    },
+    // Category text as shown in the list view's category_ids column
+    sectionCategories: function sectionCategories(section) {
+      if (Array.isArray(section.category_names) && section.category_names.length > 0) return section.category_names.join(', ');
+      if (Array.isArray(section.category_ids)) return section.category_ids.join(', ');
+      return section.category_ids || '';
     },
     openLightbox: function openLightbox(image) {
       this.lightboxSources = [image];
@@ -1317,8 +1399,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this5.isLoading = true;
@@ -1665,6 +1747,125 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Edit.vue?vue&type=style&index=0&id=3572115c&scoped=true&lang=css":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Edit.vue?vue&type=style&index=0&id=3572115c&scoped=true&lang=css ***!
@@ -1682,7 +1883,31 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.select2-search__field input[type=search][data-v-3572115c] {\n    width: 5000px !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.section-style-label[data-v-3572115c] {\n    display: block;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-heading);\n}\n.select2-search__field input[type=search][data-v-3572115c] {\n    width: 5000px !important;\n}\n\n/* Style pickers: image cards with a selected ring (radio stays in the DOM for validation) */\n.radio-img[data-v-3572115c] {\n    position: relative;\n    display: block;\n    width: 100%;\n    margin: 0;\n    cursor: pointer;\n}\n.radio-img input[type=\"radio\"][data-v-3572115c] {\n    position: absolute;\n    top: 8px;\n    left: 8px;\n    width: 16px;\n    height: 16px;\n    min-height: 0;\n    padding: 0;\n    margin: 0;\n    opacity: 0;\n    pointer-events: none;\n}\n.radio-img .style_image[data-v-3572115c] {\n    display: block;\n    width: 100%;\n    aspect-ratio: 3 / 4;\n    -o-object-fit: contain;\n       object-fit: contain;\n    padding: 4px;\n    border: 1px solid var(--ui-border-strong);\n    border-radius: var(--ui-radius);\n    background: var(--ui-surface-muted);\n    transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.radio-img:hover .style_image[data-v-3572115c] {\n    border-color: var(--theme-primary-300);\n}\n.radio-img input[type=\"radio\"]:checked + .style_image[data-v-3572115c] {\n    border-color: var(--theme-primary-500);\n    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary-500) 20%, transparent);\n}\n.custom-image[data-v-3572115c] {\n    display: block;\n    width: 100%;\n    aspect-ratio: 16 / 9;\n    height: auto;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius-lg);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.section-card-title[data-v-490e3b00] {\n    font-size: 16px !important;\n    font-weight: 700 !important;\n    color: var(--ui-heading) !important;\n}\n.style-thumb[data-v-490e3b00] {\n    width: 64px;\n    aspect-ratio: 1 / 1;\n    height: auto;\n    -o-object-fit: contain;\n       object-fit: contain;\n    padding: 4px;\n    cursor: pointer;\n    border-radius: var(--ui-radius) !important;\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n}\n.style-thumb-web[data-v-490e3b00] {\n    width: 88px;\n    aspect-ratio: 16 / 10;\n}\n\n/* Grid view: app + web style previews in the card media area */\n.section-card-styles[data-v-490e3b00] {\n    aspect-ratio: auto;\n    display: grid;\n    grid-template-columns: 2fr 3fr;\n    gap: 10px;\n    padding: 12px;\n    align-items: end;\n}\n.section-card-style[data-v-490e3b00] {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 6px;\n    min-width: 0;\n}\n.item-card-media img.section-card-style-img[data-v-490e3b00] {\n    width: 100%;\n    height: auto;\n    aspect-ratio: 1 / 1;\n    max-height: 110px;\n    -o-object-fit: contain;\n       object-fit: contain;\n    padding: 4px;\n    cursor: pointer;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface);\n}\n.item-card-media .section-card-style--web img.section-card-style-img[data-v-490e3b00] {\n    aspect-ratio: 16 / 10;\n}\n.section-card-style-label[data-v-490e3b00] {\n    font-size: 11px;\n    font-weight: 600;\n    color: var(--ui-text-muted);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1716,6 +1941,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_3572115c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_style_index_0_id_490e3b00_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_style_index_0_id_490e3b00_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_style_index_0_id_490e3b00_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -1771,23 +2026,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Sections.vue?vue&type=template&id=490e3b00 */ "./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00");
+/* harmony import */ var _Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Sections.vue?vue&type=template&id=490e3b00&scoped=true */ "./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true");
 /* harmony import */ var _Sections_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Sections.vue?vue&type=script&lang=js */ "./resources/js/views/Sections/Sections.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Sections_vue_vue_type_style_index_0_id_490e3b00_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css */ "./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Sections_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__.render,
-  _Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "490e3b00",
   null
   
 )
@@ -1844,6 +2101,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css":
+/*!**********************************************************************************************************!*\
+  !*** ./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css ***!
+  \**********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_style_index_0_id_490e3b00_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=style&index=0&id=490e3b00&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/Sections/Edit.vue?vue&type=template&id=3572115c&scoped=true":
 /*!****************************************************************************************!*\
   !*** ./resources/js/views/Sections/Edit.vue?vue&type=template&id=3572115c&scoped=true ***!
@@ -1861,19 +2131,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00":
-/*!********************************************************************************!*\
-  !*** ./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00 ***!
-  \********************************************************************************/
+/***/ "./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true ***!
+  \********************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Sections.vue?vue&type=template&id=490e3b00 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Sections_vue_vue_type_template_id_490e3b00_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Sections.vue?vue&type=template&id=490e3b00&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true");
 
 
 /***/ }),
@@ -1916,8 +2186,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end flex-wrap gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1935,12 +2218,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -2111,17 +2388,17 @@ var render = function () {
                                   _c("div", { staticClass: "form-group" }, [
                                     _c("label", [
                                       _vm._v(
-                                        _vm._s(_vm.__("title_for_section"))
+                                        _vm._s(_vm.__("title_for_section")) +
+                                          " "
                                       ),
+                                      lang.is_default
+                                        ? _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          )
+                                        : _vm._e(),
                                     ]),
-                                    _vm._v(" "),
-                                    lang.is_default
-                                      ? _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        )
-                                      : _vm._e(),
                                     _vm._v(" "),
                                     _c("input", {
                                       directives: [
@@ -2165,17 +2442,16 @@ var render = function () {
                                   _c("div", { staticClass: "form-group" }, [
                                     _c("label", [
                                       _vm._v(
-                                        _vm._s(_vm.__("short_descrption"))
+                                        _vm._s(_vm.__("short_descrption")) + " "
                                       ),
+                                      lang.is_default
+                                        ? _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          )
+                                        : _vm._e(),
                                     ]),
-                                    _vm._v(" "),
-                                    lang.is_default
-                                      ? _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        )
-                                      : _vm._e(),
                                     _vm._v(" "),
                                     _c("input", {
                                       directives: [
@@ -2222,7 +2498,7 @@ var render = function () {
                                   _c("div", { staticClass: "row" }, [
                                     _c(
                                       "div",
-                                      { staticClass: "form-group" },
+                                      { staticClass: "form-group col-12" },
                                       [
                                         _c("label", [
                                           _vm._v(
@@ -2262,22 +2538,25 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "form-group col-md-3" },
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-sm-6 col-lg-3",
+                                      },
                                       [
                                         _c(
                                           "label",
                                           { attrs: { for: "product_type" } },
                                           [
                                             _vm._v(
-                                              " " +
-                                                _vm._s(_vm.__("product_types"))
+                                              _vm._s(_vm.__("product_types")) +
+                                                " "
+                                            ),
+                                            _c(
+                                              "i",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
                                             ),
                                           ]
-                                        ),
-                                        _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
                                         ),
                                         _vm._v(" "),
                                         _c(
@@ -2457,21 +2736,24 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "form-group col-md-3" },
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-sm-6 col-lg-3",
+                                      },
                                       [
                                         _c(
                                           "label",
                                           { attrs: { for: "position" } },
                                           [
                                             _vm._v(
-                                              " " + _vm._s(_vm.__("position"))
+                                              _vm._s(_vm.__("position")) + " "
+                                            ),
+                                            _c(
+                                              "i",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
                                             ),
                                           ]
-                                        ),
-                                        _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
                                         ),
                                         _vm._v(" "),
                                         _c(
@@ -2641,7 +2923,10 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "form-group col-md-3" },
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-sm-6 col-lg-3",
+                                      },
                                       [
                                         _c(
                                           "label",
@@ -2656,7 +2941,12 @@ var render = function () {
                                                 _vm.__(
                                                   "background_color_for_light_theme"
                                                 )
-                                              )
+                                              ) + " "
+                                            ),
+                                            _c(
+                                              "i",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
                                             ),
                                           ]
                                         ),
@@ -2664,8 +2954,8 @@ var render = function () {
                                         _c(
                                           "div",
                                           {
-                                            staticClass: "d-flex w-100 mb-2",
-                                            staticStyle: { gap: "10px" },
+                                            staticClass:
+                                              "color-field d-flex w-100",
                                           },
                                           [
                                             _c("input", {
@@ -2717,7 +3007,7 @@ var render = function () {
                                                 },
                                               ],
                                               staticClass:
-                                                "form-control cursor-pointer",
+                                                "form-control cursor-pointer color-swatch",
                                               attrs: {
                                                 type: "color",
                                                 id: "color_light",
@@ -2748,7 +3038,10 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "form-group col-md-3" },
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-sm-6 col-lg-3",
+                                      },
                                       [
                                         _c(
                                           "label",
@@ -2763,7 +3056,12 @@ var render = function () {
                                                 _vm.__(
                                                   "background_color_for_dark_theme"
                                                 )
-                                              )
+                                              ) + " "
+                                            ),
+                                            _c(
+                                              "i",
+                                              { staticClass: "text-danger" },
+                                              [_vm._v("*")]
                                             ),
                                           ]
                                         ),
@@ -2771,8 +3069,8 @@ var render = function () {
                                         _c(
                                           "div",
                                           {
-                                            staticClass: "d-flex w-100 mb-2",
-                                            staticStyle: { gap: "10px" },
+                                            staticClass:
+                                              "color-field d-flex w-100",
                                           },
                                           [
                                             _c("input", {
@@ -2824,7 +3122,7 @@ var render = function () {
                                                 },
                                               ],
                                               staticClass:
-                                                "form-control cursor-pointer",
+                                                "form-control cursor-pointer color-swatch",
                                               attrs: {
                                                 type: "color",
                                                 id: "color_dark",
@@ -2857,7 +3155,7 @@ var render = function () {
                                     "custom_products"
                                       ? _c(
                                           "div",
-                                          { staticClass: "form-group" },
+                                          { staticClass: "form-group col-12" },
                                           [
                                             _c("label", [
                                               _vm._v(
@@ -2895,7 +3193,10 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "col-md-6 form-group" },
+                                      {
+                                        staticClass:
+                                          "col-12 col-lg-6 form-group",
+                                      },
                                       [
                                         _c(
                                           "div",
@@ -2910,23 +3211,27 @@ var render = function () {
                                               [
                                                 _c(
                                                   "label",
-                                                  { staticClass: "required" },
+                                                  {
+                                                    staticClass:
+                                                      "section-style-label mb-0",
+                                                  },
                                                   [
                                                     _vm._v(
                                                       _vm._s(
                                                         _vm.__(
                                                           "select_style_for_app_section"
                                                         )
-                                                      )
+                                                      ) + " "
+                                                    ),
+                                                    _c(
+                                                      "i",
+                                                      {
+                                                        staticClass:
+                                                          "text-danger",
+                                                      },
+                                                      [_vm._v("*")]
                                                     ),
                                                   ]
-                                                ),
-                                                _c(
-                                                  "i",
-                                                  {
-                                                    staticClass: "text-danger",
-                                                  },
-                                                  [_vm._v("*")]
                                                 ),
                                               ]
                                             ),
@@ -2941,7 +3246,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3005,7 +3310,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3066,7 +3371,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3127,7 +3432,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3202,7 +3507,7 @@ var render = function () {
                                                     _vm._v(
                                                       _vm._s(
                                                         _vm.__("banner_image")
-                                                      )
+                                                      ) + " "
                                                     ),
                                                     _c(
                                                       "i",
@@ -3272,12 +3577,11 @@ var render = function () {
                                                       ? [
                                                           _c("label", [
                                                             _vm._v(
-                                                              " " +
-                                                                _vm._s(
-                                                                  _vm.__(
-                                                                    "selected_file_name"
-                                                                  )
-                                                                ) +
+                                                              _vm._s(
+                                                                _vm.__(
+                                                                  "selected_file_name"
+                                                                )
+                                                              ) +
                                                                 " " +
                                                                 _vm._s(
                                                                   _vm.section
@@ -3312,13 +3616,15 @@ var render = function () {
                                                 _vm.section.banner_app_url
                                                   ? _c(
                                                       "div",
-                                                      { staticClass: "row" },
+                                                      {
+                                                        staticClass: "row mt-2",
+                                                      },
                                                       [
                                                         _c(
                                                           "div",
                                                           {
                                                             staticClass:
-                                                              "col-md-2",
+                                                              "col-12 col-md-6",
                                                           },
                                                           [
                                                             _c("img", {
@@ -3345,7 +3651,10 @@ var render = function () {
                                     _vm._v(" "),
                                     _c(
                                       "div",
-                                      { staticClass: "col-md-6 form-group" },
+                                      {
+                                        staticClass:
+                                          "col-12 col-lg-6 form-group",
+                                      },
                                       [
                                         _c(
                                           "div",
@@ -3360,23 +3669,27 @@ var render = function () {
                                               [
                                                 _c(
                                                   "label",
-                                                  { staticClass: "required" },
+                                                  {
+                                                    staticClass:
+                                                      "section-style-label mb-0",
+                                                  },
                                                   [
                                                     _vm._v(
                                                       _vm._s(
                                                         _vm.__(
                                                           "select_style_for_web_section"
                                                         )
-                                                      )
+                                                      ) + " "
+                                                    ),
+                                                    _c(
+                                                      "i",
+                                                      {
+                                                        staticClass:
+                                                          "text-danger",
+                                                      },
+                                                      [_vm._v("*")]
                                                     ),
                                                   ]
-                                                ),
-                                                _c(
-                                                  "i",
-                                                  {
-                                                    staticClass: "text-danger",
-                                                  },
-                                                  [_vm._v("*")]
                                                 ),
                                               ]
                                             ),
@@ -3391,7 +3704,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3455,7 +3768,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3516,7 +3829,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3577,7 +3890,7 @@ var render = function () {
                                               "div",
                                               {
                                                 staticClass:
-                                                  "col-md-3 col-sm-3",
+                                                  "col-6 col-sm-3 mb-2",
                                               },
                                               [
                                                 _c(
@@ -3654,12 +3967,11 @@ var render = function () {
                                                       },
                                                       [
                                                         _vm._v(
-                                                          " " +
-                                                            _vm._s(
-                                                              _vm.__(
-                                                                "banner_image"
-                                                              )
+                                                          _vm._s(
+                                                            _vm.__(
+                                                              "banner_image"
                                                             )
+                                                          )
                                                         ),
                                                         _c(
                                                           "i",
@@ -3736,12 +4048,11 @@ var render = function () {
                                                           ? [
                                                               _c("label", [
                                                                 _vm._v(
-                                                                  " " +
-                                                                    _vm._s(
-                                                                      _vm.__(
-                                                                        "selected_file_name"
-                                                                      )
-                                                                    ) +
+                                                                  _vm._s(
+                                                                    _vm.__(
+                                                                      "selected_file_name"
+                                                                    )
+                                                                  ) +
                                                                     " " +
                                                                     _vm._s(
                                                                       _vm
@@ -3786,7 +4097,7 @@ var render = function () {
                                                               "div",
                                                               {
                                                                 staticClass:
-                                                                  "col-md-2",
+                                                                  "col-12 col-md-6",
                                                               },
                                                               [
                                                                 _c("img", {
@@ -3856,17 +4167,17 @@ var render = function () {
                                   _c("div", { staticClass: "form-group" }, [
                                     _c("label", [
                                       _vm._v(
-                                        _vm._s(_vm.__("title_for_section"))
+                                        _vm._s(_vm.__("title_for_section")) +
+                                          " "
                                       ),
+                                      lang.is_default
+                                        ? _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          )
+                                        : _vm._e(),
                                     ]),
-                                    _vm._v(" "),
-                                    lang.is_default
-                                      ? _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        )
-                                      : _vm._e(),
                                     _vm._v(" "),
                                     _c("input", {
                                       directives: [
@@ -3907,17 +4218,16 @@ var render = function () {
                                   _c("div", { staticClass: "form-group" }, [
                                     _c("label", [
                                       _vm._v(
-                                        _vm._s(_vm.__("short_descrption"))
+                                        _vm._s(_vm.__("short_descrption")) + " "
                                       ),
+                                      lang.is_default
+                                        ? _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          )
+                                        : _vm._e(),
                                     ]),
-                                    _vm._v(" "),
-                                    lang.is_default
-                                      ? _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        )
-                                      : _vm._e(),
                                     _vm._v(" "),
                                     _c("input", {
                                       directives: [
@@ -3986,10 +4296,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00":
-/*!***********************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00 ***!
-  \***********************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Sections/Sections.vue?vue&type=template&id=490e3b00&scoped=true ***!
+  \***********************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4009,7 +4319,7 @@ var render = function () {
         "div",
         {
           staticClass:
-            "page-heading d-flex justify-content-between align-items-center mb-4",
+            "page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
         },
         [
           _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -4051,16 +4361,17 @@ var render = function () {
       ),
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card" }, [
-          _c(
-            "div",
-            { staticClass: "card-header border-0 bg-transparent py-3" },
-            [
-              _c("h4", { staticClass: "card-title mb-0 figma-card-title" }, [
-                _vm._v(_vm._s(_vm.__("featured_sections_of_app"))),
-              ]),
-            ]
-          ),
+        _c("div", { staticClass: "card figma-main-section-card" }, [
+          _c("div", { staticClass: "card-header bg-transparent" }, [
+            _c(
+              "h4",
+              {
+                staticClass:
+                  "card-title mb-0 figma-card-title section-card-title",
+              },
+              [_vm._v(_vm._s(_vm.__("featured_sections_of_app")))]
+            ),
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "card-body p-0" }, [
             _c(
@@ -4106,7 +4417,86 @@ var render = function () {
                   ]),
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "d-flex gap-2" }, [
+                _c("div", { staticClass: "d-flex flex-wrap gap-2" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "view-toggle",
+                      attrs: { role: "group", "aria-label": _vm.__("view") },
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass: "view-toggle-btn",
+                          class: { active: _vm.viewMode === "grid" },
+                          attrs: { type: "button", title: _vm.__("grid_view") },
+                          on: {
+                            click: function ($event) {
+                              return _vm.setViewMode("grid")
+                            },
+                          },
+                        },
+                        [_c("i", { staticClass: "bi bi-grid-3x3-gap-fill" })]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass: "view-toggle-btn",
+                          class: { active: _vm.viewMode === "list" },
+                          attrs: { type: "button", title: _vm.__("list_view") },
+                          on: {
+                            click: function ($event) {
+                              return _vm.setViewMode("list")
+                            },
+                          },
+                        },
+                        [_c("i", { staticClass: "bi bi-list-ul" })]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      directives: [
+                        {
+                          name: "b-tooltip",
+                          rawName: "v-b-tooltip.hover",
+                          modifiers: { hover: true },
+                        },
+                      ],
+                      staticClass:
+                        "btn btn-figma-columns d-flex align-items-center gap-2",
+                      attrs: { title: _vm.__("refresh") },
+                      on: {
+                        click: function ($event) {
+                          return _vm.getSections()
+                        },
+                      },
+                    },
+                    [
+                      _c("i", { staticClass: "fa fa-refresh" }),
+                      _vm._v(" "),
+                      _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                    ]
+                  ),
+                  _vm._v(" "),
                   _vm.$can("featured_section_create")
                     ? _c(
                         "button",
@@ -4126,444 +4516,821 @@ var render = function () {
                         ]
                       )
                     : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      directives: [
-                        {
-                          name: "b-tooltip",
-                          rawName: "v-b-tooltip.hover",
-                          modifiers: { hover: true },
-                        },
-                      ],
-                      staticClass:
-                        "btn btn-figma-filter d-flex align-items-center gap-2",
-                      attrs: { title: _vm.__("refresh") },
-                      on: {
-                        click: function ($event) {
-                          return _vm.getSections()
-                        },
-                      },
-                    },
-                    [
-                      _c("i", { staticClass: "fa fa-refresh" }),
-                      _vm._v(" "),
-                      _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                    ]
-                  ),
                 ]),
               ]
             ),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "table-responsive" },
-              [
-                _c("b-table", {
-                  staticClass: "figma-order-table mb-0",
-                  attrs: {
-                    items: _vm.translatedSections,
-                    fields: _vm.fields,
-                    "current-page": _vm.currentPage,
-                    "per-page": _vm.perPage,
-                    filter: _vm.filter,
-                    "filter-included-fields": _vm.filterOn,
-                    "sort-by": _vm.sortBy,
-                    "sort-desc": _vm.sortDesc,
-                    "sort-direction": _vm.sortDirection,
-                    bordered: false,
-                    busy: _vm.isLoading,
-                    stacked: "md",
-                    "show-empty": "",
-                    "tbody-tr-class": function () {
-                      return "figma-tr align-middle"
-                    },
-                    small: "",
-                  },
-                  on: {
-                    "update:sortBy": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sort-by": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sortDesc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                    "update:sort-desc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "table-busy",
-                      fn: function () {
-                        return [
-                          _c(
-                            "div",
-                            { staticClass: "text-center text-black my-2" },
-                            [
-                              _c("b-spinner", { staticClass: "align-middle" }),
-                              _vm._v(" "),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                              ]),
-                            ],
-                            1
-                          ),
-                        ]
+            _vm.viewMode === "grid"
+              ? _c("div", [
+                  _vm.isLoading
+                    ? _c("div", { staticClass: "item-grid-state" }, [
+                        _c("i", { staticClass: "bi bi-hourglass-split" }),
+                        _vm._v(
+                          _vm._s(_vm.__("loading")) +
+                            "...\n                    "
+                        ),
+                      ])
+                    : !_vm.gridSections.length
+                    ? _c(
+                        "div",
+                        { staticClass: "item-grid-state" },
+                        [
+                          _vm.filter && _vm.translatedSections.length
+                            ? [
+                                _c("i", { staticClass: "bi bi-search" }),
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.__("no_records_matching_your_request")
+                                  )
+                                ),
+                              ]
+                            : [
+                                _c("i", { staticClass: "bi bi-inbox" }),
+                                _vm._v(_vm._s(_vm.__("no_records_to_show"))),
+                              ],
+                        ],
+                        2
+                      )
+                    : _c(
+                        "div",
+                        { staticClass: "item-grid item-grid--wide" },
+                        _vm._l(
+                          _vm.pagedItems(_vm.gridSections),
+                          function (section) {
+                            return _c(
+                              "div",
+                              { key: section.id, staticClass: "item-card" },
+                              [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass:
+                                      "item-card-media section-card-styles",
+                                  },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "section-card-style" },
+                                      [
+                                        _vm.styleImage("app", section.style_app)
+                                          ? _c("img", {
+                                              staticClass:
+                                                "section-card-style-img",
+                                              attrs: {
+                                                src: _vm.styleImage(
+                                                  "app",
+                                                  section.style_app
+                                                ),
+                                                alt: "App Style",
+                                                role: "button",
+                                              },
+                                              on: {
+                                                click: function ($event) {
+                                                  _vm.openLightbox(
+                                                    _vm.styleImage(
+                                                      "app",
+                                                      section.style_app
+                                                    )
+                                                  )
+                                                },
+                                              },
+                                            })
+                                          : _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger small",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    section.style_app ||
+                                                      "Style Unknown"
+                                                  )
+                                                ),
+                                              ]
+                                            ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          {
+                                            staticClass:
+                                              "section-card-style-label",
+                                          },
+                                          [_vm._v(_vm._s(_vm.__("App Style:")))]
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "section-card-style section-card-style--web",
+                                      },
+                                      [
+                                        _vm.styleImage("web", section.style_web)
+                                          ? _c("img", {
+                                              staticClass:
+                                                "section-card-style-img",
+                                              attrs: {
+                                                src: _vm.styleImage(
+                                                  "web",
+                                                  section.style_web
+                                                ),
+                                                alt: "Web Style",
+                                                role: "button",
+                                              },
+                                              on: {
+                                                click: function ($event) {
+                                                  _vm.openLightbox(
+                                                    _vm.styleImage(
+                                                      "web",
+                                                      section.style_web
+                                                    )
+                                                  )
+                                                },
+                                              },
+                                            })
+                                          : _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger small",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    section.style_web ||
+                                                      "Style Unknown"
+                                                  )
+                                                ),
+                                              ]
+                                            ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          {
+                                            staticClass:
+                                              "section-card-style-label",
+                                          },
+                                          [_vm._v(_vm._s(_vm.__("Web Style:")))]
+                                        ),
+                                      ]
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("div", { staticClass: "item-card-body" }, [
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-title" },
+                                    [_vm._v(_vm._s(section.title))]
+                                  ),
+                                  _vm._v(" "),
+                                  section.short_description
+                                    ? _c(
+                                        "div",
+                                        {
+                                          staticClass: "item-card-meta",
+                                          attrs: {
+                                            title: section.short_description,
+                                          },
+                                        },
+                                        [
+                                          _vm._v(
+                                            _vm._s(section.short_description)
+                                          ),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _vm.sectionCategories(section)
+                                    ? _c(
+                                        "div",
+                                        {
+                                          staticClass: "item-card-meta",
+                                          attrs: {
+                                            title:
+                                              _vm.sectionCategories(section),
+                                          },
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass: "bi bi-tags",
+                                          }),
+                                          _vm._v(
+                                            " " +
+                                              _vm._s(
+                                                _vm.sectionCategories(section)
+                                              ) +
+                                              "\n                                "
+                                          ),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-stats" },
+                                    [
+                                      section.product_type
+                                        ? _c(
+                                            "span",
+                                            { staticClass: "item-card-chip" },
+                                            [
+                                              _c("i", {
+                                                staticClass: "bi bi-box-seam",
+                                              }),
+                                              _vm._v(
+                                                _vm._s(
+                                                  _vm.__(section.product_type)
+                                                )
+                                              ),
+                                            ]
+                                          )
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      section.position
+                                        ? _c(
+                                            "span",
+                                            { staticClass: "item-card-chip" },
+                                            [
+                                              _c("i", {
+                                                staticClass:
+                                                  "bi bi-layout-text-window",
+                                              }),
+                                              _vm._v(
+                                                _vm._s(
+                                                  _vm.__(
+                                                    section.position ===
+                                                      "custom_below_shop_by_brands"
+                                                      ? "below_shop_by_brands"
+                                                      : section.position
+                                                  )
+                                                )
+                                              ),
+                                            ]
+                                          )
+                                        : _vm._e(),
+                                    ]
+                                  ),
+                                ]),
+                                _vm._v(" "),
+                                _c("div", { staticClass: "item-card-footer" }, [
+                                  _c(
+                                    "span",
+                                    { staticClass: "item-card-meta" },
+                                    [_vm._v("#" + _vm._s(section.id))]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-actions" },
+                                    [
+                                      _vm.$can("featured_section_update")
+                                        ? _c(
+                                            "button",
+                                            {
+                                              directives: [
+                                                {
+                                                  name: "b-tooltip",
+                                                  rawName: "v-b-tooltip.hover",
+                                                  modifiers: { hover: true },
+                                                },
+                                              ],
+                                              staticClass: "figma-action-btn",
+                                              attrs: { title: _vm.__("edit") },
+                                              on: {
+                                                click: function ($event) {
+                                                  _vm.edit_record = section
+                                                },
+                                              },
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass:
+                                                  "bi bi-pencil-square",
+                                              }),
+                                            ]
+                                          )
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm.$can("featured_section_delete")
+                                        ? _c(
+                                            "button",
+                                            {
+                                              directives: [
+                                                {
+                                                  name: "b-tooltip",
+                                                  rawName: "v-b-tooltip.hover",
+                                                  modifiers: { hover: true },
+                                                },
+                                              ],
+                                              staticClass:
+                                                "figma-action-btn figma-delete-btn",
+                                              attrs: {
+                                                title: _vm.__("delete"),
+                                              },
+                                              on: {
+                                                click: function ($event) {
+                                                  _vm.deleteSection(
+                                                    _vm.translatedSections.indexOf(
+                                                      section
+                                                    ),
+                                                    section.id
+                                                  )
+                                                },
+                                              },
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "bi bi-trash",
+                                              }),
+                                            ]
+                                          )
+                                        : _vm._e(),
+                                    ]
+                                  ),
+                                ]),
+                              ]
+                            )
+                          }
+                        ),
+                        0
+                      ),
+                ])
+              : _c(
+                  "div",
+                  { staticClass: "table-responsive" },
+                  [
+                    _c("b-table", {
+                      staticClass: "figma-order-table mb-0",
+                      attrs: {
+                        items: _vm.translatedSections,
+                        fields: _vm.fields,
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        filter: _vm.filter,
+                        "filter-included-fields": _vm.filterOn,
+                        "sort-by": _vm.sortBy,
+                        "sort-desc": _vm.sortDesc,
+                        "sort-direction": _vm.sortDirection,
+                        bordered: false,
+                        busy: _vm.isLoading,
+                        stacked: "md",
+                        "show-empty": "",
+                        "tbody-tr-class": function () {
+                          return "figma-tr align-middle"
+                        },
+                        small: "",
                       },
-                      proxy: true,
-                    },
-                    {
-                      key: "cell(title)",
-                      fn: function (row) {
-                        return [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(row.item.title) +
-                              "\n                        "
-                          ),
-                        ]
+                      on: {
+                        "update:sortBy": function ($event) {
+                          _vm.sortBy = $event
+                        },
+                        "update:sort-by": function ($event) {
+                          _vm.sortBy = $event
+                        },
+                        "update:sortDesc": function ($event) {
+                          _vm.sortDesc = $event
+                        },
+                        "update:sort-desc": function ($event) {
+                          _vm.sortDesc = $event
+                        },
                       },
-                    },
-                    {
-                      key: "cell(short_description)",
-                      fn: function (row) {
-                        return [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(row.item.short_description) +
-                              "\n                        "
-                          ),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(style)",
-                      fn: function (row) {
-                        return [
-                          _c(
-                            "div",
-                            {
-                              staticClass:
-                                "d-flex flex-column align-items-center gap-1 py-1",
-                            },
-                            [
+                      scopedSlots: _vm._u([
+                        {
+                          key: "table-busy",
+                          fn: function () {
+                            return [
                               _c(
-                                "span",
-                                { staticClass: "d-block text-muted small" },
+                                "div",
+                                { staticClass: "text-center text-black my-2" },
                                 [
+                                  _c("b-spinner", {
+                                    staticClass: "align-middle",
+                                  }),
+                                  _vm._v(" "),
                                   _c("strong", [
-                                    _vm._v(_vm._s(_vm.__("App Style:"))),
+                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
                                   ]),
+                                ],
+                                1
+                              ),
+                            ]
+                          },
+                          proxy: true,
+                        },
+                        {
+                          key: "empty",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-inbox fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyText)),
                                 ]
                               ),
-                              _vm._v(" "),
-                              [
-                                "style_1",
-                                "style_2",
-                                "style_3",
-                                "style_4",
-                              ].includes(row.item.style_app)
-                                ? [
-                                    _c("img", {
-                                      staticClass: "img-thumbnail my-1",
-                                      staticStyle: {
-                                        "max-width": "60px",
-                                        "max-height": "60px",
-                                        "object-fit": "contain",
-                                        cursor: "pointer",
-                                      },
-                                      attrs: {
-                                        src:
-                                          _vm.$baseUrl +
-                                          "/images/app_style/App_Style_" +
-                                          row.item.style_app.replace(
-                                            "style_",
-                                            ""
-                                          ) +
-                                          ".jpg",
-                                        alt: "App Style",
-                                      },
-                                      on: {
-                                        click: function ($event) {
-                                          _vm.openLightbox(
-                                            _vm.$baseUrl +
+                            ]
+                          },
+                        },
+                        {
+                          key: "emptyfiltered",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-search fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyFilteredText)),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(title)",
+                          fn: function (row) {
+                            return [
+                              _vm._v(
+                                "\n                            " +
+                                  _vm._s(row.item.title) +
+                                  "\n                        "
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(short_description)",
+                          fn: function (row) {
+                            return [
+                              _vm._v(
+                                "\n                            " +
+                                  _vm._s(row.item.short_description) +
+                                  "\n                        "
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(style)",
+                          fn: function (row) {
+                            return [
+                              _c(
+                                "div",
+                                {
+                                  staticClass:
+                                    "d-flex flex-column align-items-center gap-1 py-1",
+                                },
+                                [
+                                  _c(
+                                    "span",
+                                    { staticClass: "d-block text-muted small" },
+                                    [
+                                      _c("strong", [
+                                        _vm._v(_vm._s(_vm.__("App Style:"))),
+                                      ]),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  [
+                                    "style_1",
+                                    "style_2",
+                                    "style_3",
+                                    "style_4",
+                                  ].includes(row.item.style_app)
+                                    ? [
+                                        _c("img", {
+                                          staticClass: "style-thumb my-1",
+                                          attrs: {
+                                            src:
+                                              _vm.$baseUrl +
                                               "/images/app_style/App_Style_" +
                                               row.item.style_app.replace(
                                                 "style_",
                                                 ""
                                               ) +
-                                              ".jpg"
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ]
-                                : [
-                                    _c(
-                                      "span",
-                                      { staticClass: "text-danger small" },
-                                      [
-                                        _vm._v(
-                                          _vm._s(
-                                            row.item.style_app ||
-                                              "Style Unknown"
-                                          )
-                                        ),
+                                              ".jpg",
+                                            alt: "App Style",
+                                          },
+                                          on: {
+                                            click: function ($event) {
+                                              _vm.openLightbox(
+                                                _vm.$baseUrl +
+                                                  "/images/app_style/App_Style_" +
+                                                  row.item.style_app.replace(
+                                                    "style_",
+                                                    ""
+                                                  ) +
+                                                  ".jpg"
+                                              )
+                                            },
+                                          },
+                                        }),
                                       ]
-                                    ),
-                                  ],
-                              _vm._v(" "),
-                              _c(
-                                "span",
-                                {
-                                  staticClass: "d-block text-muted small mt-2",
-                                },
-                                [
-                                  _c("strong", [
-                                    _vm._v(_vm._s(_vm.__("Web Style:"))),
-                                  ]),
-                                ]
-                              ),
-                              _vm._v(" "),
-                              [
-                                "style_1",
-                                "style_2",
-                                "style_3",
-                                "style_4",
-                              ].includes(row.item.style_web)
-                                ? [
-                                    _c("img", {
-                                      staticClass: "img-thumbnail my-1",
-                                      staticStyle: {
-                                        "max-width": "80px",
-                                        "max-height": "80px",
-                                        "object-fit": "contain",
-                                        cursor: "pointer",
-                                      },
-                                      attrs: {
-                                        src:
-                                          _vm.$baseUrl +
-                                          "/images/web_style/Web_Style_" +
-                                          row.item.style_web.replace(
-                                            "style_",
-                                            ""
-                                          ) +
-                                          ".jpg",
-                                        alt: "Web Style",
-                                      },
-                                      on: {
-                                        click: function ($event) {
-                                          _vm.openLightbox(
-                                            _vm.$baseUrl +
+                                    : [
+                                        _c(
+                                          "span",
+                                          { staticClass: "text-danger small" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                row.item.style_app ||
+                                                  "Style Unknown"
+                                              )
+                                            ),
+                                          ]
+                                        ),
+                                      ],
+                                  _vm._v(" "),
+                                  _c(
+                                    "span",
+                                    {
+                                      staticClass:
+                                        "d-block text-muted small mt-2",
+                                    },
+                                    [
+                                      _c("strong", [
+                                        _vm._v(_vm._s(_vm.__("Web Style:"))),
+                                      ]),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  [
+                                    "style_1",
+                                    "style_2",
+                                    "style_3",
+                                    "style_4",
+                                  ].includes(row.item.style_web)
+                                    ? [
+                                        _c("img", {
+                                          staticClass:
+                                            "style-thumb style-thumb-web my-1",
+                                          attrs: {
+                                            src:
+                                              _vm.$baseUrl +
                                               "/images/web_style/Web_Style_" +
                                               row.item.style_web.replace(
                                                 "style_",
                                                 ""
                                               ) +
-                                              ".jpg"
-                                          )
+                                              ".jpg",
+                                            alt: "Web Style",
+                                          },
+                                          on: {
+                                            click: function ($event) {
+                                              _vm.openLightbox(
+                                                _vm.$baseUrl +
+                                                  "/images/web_style/Web_Style_" +
+                                                  row.item.style_web.replace(
+                                                    "style_",
+                                                    ""
+                                                  ) +
+                                                  ".jpg"
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    : [
+                                        _c(
+                                          "span",
+                                          { staticClass: "text-danger small" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                row.item.style_web ||
+                                                  "Style Unknown"
+                                              )
+                                            ),
+                                          ]
+                                        ),
+                                      ],
+                                ],
+                                2
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(product_type)",
+                          fn: function (row) {
+                            return [
+                              row.item.product_type === "all_products"
+                                ? [_vm._v(_vm._s(_vm.__("all_products")))]
+                                : row.item.product_type === "new_added_products"
+                                ? [_vm._v(_vm._s(_vm.__("new_added_products")))]
+                                : row.item.product_type === "on_sale_products"
+                                ? [_vm._v(_vm._s(_vm.__("on_sale_products")))]
+                                : row.item.product_type ===
+                                  "recently_visited_products"
+                                ? [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm.__("recently_visited_products")
+                                      )
+                                    ),
+                                  ]
+                                : row.item.product_type ===
+                                  "most_selling_products"
+                                ? [
+                                    _vm._v(
+                                      _vm._s(_vm.__("most_selling_products"))
+                                    ),
+                                  ]
+                                : row.item.product_type === "custom_products"
+                                ? [_vm._v(_vm._s(_vm.__("custom_products")))]
+                                : [_vm._v(_vm._s(row.item.product_type))],
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(category_ids)",
+                          fn: function (row) {
+                            return [
+                              _vm._v(
+                                "\n                            " +
+                                  _vm._s(
+                                    Array.isArray(row.item.category_names) &&
+                                      row.item.category_names.length > 0
+                                      ? row.item.category_names.join(", ")
+                                      : Array.isArray(row.item.category_ids)
+                                      ? row.item.category_ids.join(", ")
+                                      : row.item.category_ids
+                                  ) +
+                                  "\n                        "
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(position)",
+                          fn: function (row) {
+                            return [
+                              row.item.position === "top"
+                                ? [_vm._v(_vm._s(_vm.__("top")))]
+                                : row.item.position === "below_slider"
+                                ? [_vm._v(_vm._s(_vm.__("below_slider")))]
+                                : row.item.position === "below_category"
+                                ? [_vm._v(_vm._s(_vm.__("below_category")))]
+                                : row.item.position === "below_shop_by_seller"
+                                ? [
+                                    _vm._v(
+                                      _vm._s(_vm.__("below_shop_by_seller"))
+                                    ),
+                                  ]
+                                : row.item.position ===
+                                  "below_shop_by_country_of_origin"
+                                ? [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm.__(
+                                          "below_shop_by_country_of_origin"
+                                        )
+                                      )
+                                    ),
+                                  ]
+                                : row.item.position ===
+                                  "custom_below_shop_by_brands"
+                                ? [
+                                    _vm._v(
+                                      _vm._s(_vm.__("below_shop_by_brands"))
+                                    ),
+                                  ]
+                                : [_vm._v(_vm._s(row.item.position))],
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(actions)",
+                          fn: function (row) {
+                            return [
+                              _c("div", { staticClass: "d-flex gap-2" }, [
+                                _vm.$can("featured_section_update")
+                                  ? _c(
+                                      "button",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass: "figma-action-btn",
+                                        attrs: { title: _vm.__("edit") },
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.edit_record = row.item
+                                          },
                                         },
                                       },
-                                    }),
-                                  ]
-                                : [
-                                    _c(
-                                      "span",
-                                      { staticClass: "text-danger small" },
                                       [
-                                        _vm._v(
-                                          _vm._s(
-                                            row.item.style_web ||
-                                              "Style Unknown"
-                                          )
-                                        ),
-                                      ]
-                                    ),
-                                  ],
-                            ],
-                            2
-                          ),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(product_type)",
-                      fn: function (row) {
-                        return [
-                          row.item.product_type === "all_products"
-                            ? [_vm._v(_vm._s(_vm.__("all_products")))]
-                            : row.item.product_type === "new_added_products"
-                            ? [_vm._v(_vm._s(_vm.__("new_added_products")))]
-                            : row.item.product_type === "on_sale_products"
-                            ? [_vm._v(_vm._s(_vm.__("on_sale_products")))]
-                            : row.item.product_type ===
-                              "recently_visited_products"
-                            ? [
-                                _vm._v(
-                                  _vm._s(_vm.__("recently_visited_products"))
-                                ),
-                              ]
-                            : row.item.product_type === "most_selling_products"
-                            ? [_vm._v(_vm._s(_vm.__("most_selling_products")))]
-                            : row.item.product_type === "custom_products"
-                            ? [_vm._v(_vm._s(_vm.__("custom_products")))]
-                            : [_vm._v(_vm._s(row.item.product_type))],
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(category_ids)",
-                      fn: function (row) {
-                        return [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(
-                                Array.isArray(row.item.category_names) &&
-                                  row.item.category_names.length > 0
-                                  ? row.item.category_names.join(", ")
-                                  : Array.isArray(row.item.category_ids)
-                                  ? row.item.category_ids.join(", ")
-                                  : row.item.category_ids
-                              ) +
-                              "\n                        "
-                          ),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(position)",
-                      fn: function (row) {
-                        return [
-                          row.item.position === "top"
-                            ? [_vm._v(_vm._s(_vm.__("top")))]
-                            : row.item.position === "below_slider"
-                            ? [_vm._v(_vm._s(_vm.__("below_slider")))]
-                            : row.item.position === "below_category"
-                            ? [_vm._v(_vm._s(_vm.__("below_category")))]
-                            : row.item.position === "below_shop_by_seller"
-                            ? [_vm._v(_vm._s(_vm.__("below_shop_by_seller")))]
-                            : row.item.position ===
-                              "below_shop_by_country_of_origin"
-                            ? [
-                                _vm._v(
-                                  _vm._s(
-                                    _vm.__("below_shop_by_country_of_origin")
-                                  )
-                                ),
-                              ]
-                            : row.item.position ===
-                              "custom_below_shop_by_brands"
-                            ? [_vm._v(_vm._s(_vm.__("below_shop_by_brands")))]
-                            : [_vm._v(_vm._s(row.item.position))],
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(actions)",
-                      fn: function (row) {
-                        return [
-                          _c("div", { staticClass: "d-flex gap-2" }, [
-                            _vm.$can("featured_section_update")
-                              ? _c(
-                                  "button",
-                                  {
-                                    directives: [
+                                        _c("base-icon", {
+                                          attrs: {
+                                            name: "edit icon",
+                                            hoverName: "edit Hover",
+                                            width: "24",
+                                            height: "24",
+                                          },
+                                        }),
+                                      ],
+                                      1
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.$can("featured_section_delete")
+                                  ? _c(
+                                      "button",
                                       {
-                                        name: "b-tooltip",
-                                        rawName: "v-b-tooltip.hover",
-                                        modifiers: { hover: true },
+                                        directives: [
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass:
+                                          "figma-action-btn figma-delete-btn",
+                                        attrs: { title: _vm.__("delete") },
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.deleteSection(
+                                              _vm.translatedSections.indexOf(
+                                                row.item
+                                              ),
+                                              row.item.id
+                                            )
+                                          },
+                                        },
                                       },
-                                    ],
-                                    staticClass: "figma-action-btn",
-                                    attrs: { title: _vm.__("edit") },
-                                    on: {
-                                      click: function ($event) {
-                                        _vm.edit_record = row.item
-                                      },
-                                    },
-                                  },
-                                  [
-                                    _c("base-icon", {
-                                      attrs: {
-                                        name: "edit icon",
-                                        hoverName: "edit Hover",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    }),
-                                  ],
-                                  1
-                                )
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _vm.$can("featured_section_delete")
-                              ? _c(
-                                  "button",
-                                  {
-                                    directives: [
-                                      {
-                                        name: "b-tooltip",
-                                        rawName: "v-b-tooltip.hover",
-                                        modifiers: { hover: true },
-                                      },
-                                    ],
-                                    staticClass:
-                                      "figma-action-btn figma-delete-btn",
-                                    attrs: { title: _vm.__("delete") },
-                                    on: {
-                                      click: function ($event) {
-                                        return _vm.deleteSection(
-                                          row.index,
-                                          row.item.id
-                                        )
-                                      },
-                                    },
-                                  },
-                                  [
-                                    _c("base-icon", {
-                                      attrs: {
-                                        name: "Type=Default",
-                                        hoverName: "Type=Hover",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    }),
-                                  ],
-                                  1
-                                )
-                              : _vm._e(),
-                          ]),
-                        ]
-                      },
-                    },
-                  ]),
-                }),
-              ],
-              1
-            ),
+                                      [
+                                        _c("base-icon", {
+                                          attrs: {
+                                            name: "Type=Default",
+                                            hoverName: "Type=Hover",
+                                            width: "24",
+                                            height: "24",
+                                          },
+                                        }),
+                                      ],
+                                      1
+                                    )
+                                  : _vm._e(),
+                              ]),
+                            ]
+                          },
+                        },
+                      ]),
+                    }),
+                  ],
+                  1
+                ),
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "figma-table-footer" },
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-2" },
+                  [
+                    _c("label", { staticClass: "showing-results-text mb-0" }, [
+                      _vm._v(_vm._s(_vm.__("per_page"))),
+                    ]),
+                    _vm._v(" "),
+                    _c("b-form-select", {
+                      staticClass: "w-auto",
+                      attrs: { options: _vm.pageOptions, size: "sm" },
+                      model: {
+                        value: _vm.perPage,
+                        callback: function ($$v) {
+                          _vm.perPage = $$v
+                        },
+                        expression: "perPage",
+                      },
+                    }),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",
@@ -4571,6 +5338,10 @@ var render = function () {
                     "total-rows": _vm.totalRows,
                     "per-page": _vm.perPage,
                     align: "right",
+                    "hide-goto-end-buttons": "",
+                    "hide-ellipsis": "",
+                    "prev-text": "<",
+                    "next-text": ">",
                   },
                   model: {
                     value: _vm.currentPage,

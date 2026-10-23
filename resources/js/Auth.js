@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { clearIntended } from './IntendedUrl.js';
+import { loadTheme } from './ThemePalette';
 
 class Auth {
     constructor () {
@@ -26,6 +28,10 @@ class Auth {
 
         window.UserPermissions = JSON.stringify(user.allPermissions); //Fix Login Issue for Permission
         window.Role = user.role.name; //Fix Login Issue for Permission
+
+        // The theme was painted on the login page, before the user's module was known (a seller's
+        // module is seeded just above). Repaint with the right palette now, not only after a refresh.
+        loadTheme(window.baseUrl);
         this.validate();
     }
 
@@ -40,6 +46,7 @@ class Auth {
         window.localStorage.removeItem('user');
         window.localStorage.removeItem('loginCheck');
         window.localStorage.removeItem('active_module_id');
+        clearIntended(); // a deliberate logout should not bounce back to the last page
 
         if (role_id === 3) {
             window.location.replace('/seller/login');
@@ -56,7 +63,7 @@ class Auth {
         if(currentRoute) {
             currentPathName = currentRoute;
         }
-        var ignoreRoutes = ["/install","/purchase_code","/login","/seller/login","/delivery_boy/login","/seller/register","/delivery_boy/register","/forgot-password"];
+        var ignoreRoutes = ["/purchase_code","/login","/seller/login","/delivery_boy/login","/seller/register","/delivery_boy/register","/forgot-password"];
         
         if(!purchase_code && !ignoreRoutes.includes(currentPathName)){
             window.location.href = '/purchase_code';

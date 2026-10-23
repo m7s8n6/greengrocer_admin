@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('taxes') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -14,7 +14,7 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="card figma-main-section-card">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                             <div class="flex-grow-1">
@@ -25,7 +25,7 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
                                 </button>
@@ -66,29 +66,28 @@
                                 </template>
 
                                 <template #cell(status)="row">
-                                    <span v-if="row.item.status == 1" class="badge bg-success">{{__('activate')}}</span>
-                                    <span v-else class="badge bg-danger">{{__('deactivate')}}</span>
+                                    <span v-if="row.item.status == 1" class="badge bg-success">{{ __('active') }}</span>
+                                    <span v-else class="badge bg-danger">{{ __('deactive') }}</span>
                                 </template>
 
                                 <template #cell(actions)="row">
-                                    <button class="btn btn-sm btn-primary border-0 bg-transparent p-0" @click="edit_record = row.item" v-b-tooltip.hover :title="__('edit')" >
-                                        <base-icon name="edit icon" hoverName="edit Hover" width="32" height="32" />
-                                    </button>
-                                    <button class="btn btn-sm btn-danger border-0 bg-transparent p-0" @click="deleteRecord(row.index,row.item.id)" v-b-tooltip.hover :title="__('delete')">
-                                        <base-icon name="Type=Default" hoverName="Type=Hover" width="32" height="32" />
-                                    </button>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <button class="figma-action-btn" @click="edit_record = row.item" v-b-tooltip.hover :title="__('edit')">
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        </button>
+                                        <button class="figma-action-btn" @click="deleteRecord(row.index,row.item.id)" v-b-tooltip.hover :title="__('delete')">
+                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
+                                        </button>
+                                    </div>
                                 </template>
                             </b-table>
+                        </div>
                             <div class="figma-table-footer flex-wrap gap-3">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageStart }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                                 </div>
                             </div>
-
-                        </div>
                     </div>
                 </div>
             </section>

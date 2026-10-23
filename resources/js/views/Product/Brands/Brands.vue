@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <h3 class="modern-page-title mb-0">{{ __('brands') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -15,18 +15,18 @@
         </div>
 
         <!-- Global Background Colors Section -->
-        <section class="section mb-4">
-            <div class="figma-main-section-card mb-0">
-                <div class="card-header d-flex justify-content-between align-items-center">
+        <section class="section mb-3">
+            <div class="card figma-main-section-card bg-colors-card mb-0">
+                <div class="card-header d-flex justify-content-between align-items-center gap-2">
                     <h4 class="card-title mb-0">{{ __('items_background_colors') || 'Items Background Colors' }}</h4>
                     <b-button size="sm" variant="primary" @click="saveGlobalColors" :disabled="isSavingGlobal">
                         {{ __('save') }}
                         <b-spinner v-if="isSavingGlobal" small class="ml-1"></b-spinner>
                     </b-button>
                 </div>
-                <div class="card-body" style="padding: 24px !important;">
-                    <div class="row mb-3">
-                        <div class="col-md-12">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4 form-group mb-3 mb-lg-0">
                             <label class="form-label d-block">{{ __('items_background_color_mode') || 'Items Background Colour' }}</label>
                             <div class="form-check form-check-inline d-inline-block">
                                 <input class="form-check-input" type="radio" id="colorModeGlobal" value="global" v-model="globalSettings.brand_background_color_mode">
@@ -37,35 +37,35 @@
                                 <label class="form-check-label ms-1" for="colorModeItemWise">{{ __('item_wise') || 'Item Wise' }}</label>
                             </div>
                         </div>
-                    </div>
-                    <div class="row" v-if="globalSettings.brand_background_color_mode === 'global'">
-                        <div class="col-md-6 form-group mb-0">
+                        <template v-if="globalSettings.brand_background_color_mode === 'global'">
+                        <div class="col-md-6 col-lg-4 form-group mb-3 mb-lg-0">
                             <label>{{ __('brand_light_theme_background') || 'Brand Light Theme Background' }}</label>
-                            <div class="d-flex w-100 mt-1" style="gap: 10px; align-items: center;">
+                            <div class="color-field d-flex w-100 mt-1">
                                 <input type="text" v-model="globalSettings.brand_background_color_light_theme" class="form-control">
-                                <input type="color" :value="(globalSettings.brand_background_color_light_theme && globalSettings.brand_background_color_light_theme.startsWith('#') && (globalSettings.brand_background_color_light_theme.length === 4 || globalSettings.brand_background_color_light_theme.length === 7 || globalSettings.brand_background_color_light_theme.length === 9)) ? globalSettings.brand_background_color_light_theme.substring(0, 7) : '#ffffff'" @input="globalSettings.brand_background_color_light_theme = $event.target.value" class="form-control cursor-pointer" style="max-width: 100px;">
+                                <input type="color" :value="(globalSettings.brand_background_color_light_theme && globalSettings.brand_background_color_light_theme.startsWith('#') && (globalSettings.brand_background_color_light_theme.length === 4 || globalSettings.brand_background_color_light_theme.length === 7 || globalSettings.brand_background_color_light_theme.length === 9)) ? globalSettings.brand_background_color_light_theme.substring(0, 7) : '#ffffff'" @input="globalSettings.brand_background_color_light_theme = $event.target.value" class="form-control cursor-pointer color-swatch">
                                 <b-button size="sm" variant="outline-secondary" @click="globalSettings.brand_background_color_light_theme = '#ffffff00'">
                                     {{ __('transparent') || 'Transparent' }}
                                 </b-button>
                             </div>
                         </div>
-                        <div class="col-md-6 form-group mb-0">
+                        <div class="col-md-6 col-lg-4 form-group mb-0">
                             <label>{{ __('brand_dark_theme_background') || 'Brand Dark Theme Background' }}</label>
-                            <div class="d-flex w-100 mt-1" style="gap: 10px; align-items: center;">
+                            <div class="color-field d-flex w-100 mt-1">
                                 <input type="text" v-model="globalSettings.brand_background_color_dark_theme" class="form-control">
-                                <input type="color" :value="(globalSettings.brand_background_color_dark_theme && globalSettings.brand_background_color_dark_theme.startsWith('#') && (globalSettings.brand_background_color_dark_theme.length === 4 || globalSettings.brand_background_color_dark_theme.length === 7 || globalSettings.brand_background_color_dark_theme.length === 9)) ? globalSettings.brand_background_color_dark_theme.substring(0, 7) : '#000000'" @input="globalSettings.brand_background_color_dark_theme = $event.target.value" class="form-control cursor-pointer" style="max-width: 100px;">
+                                <input type="color" :value="(globalSettings.brand_background_color_dark_theme && globalSettings.brand_background_color_dark_theme.startsWith('#') && (globalSettings.brand_background_color_dark_theme.length === 4 || globalSettings.brand_background_color_dark_theme.length === 7 || globalSettings.brand_background_color_dark_theme.length === 9)) ? globalSettings.brand_background_color_dark_theme.substring(0, 7) : '#000000'" @input="globalSettings.brand_background_color_dark_theme = $event.target.value" class="form-control cursor-pointer color-swatch">
                                 <b-button size="sm" variant="outline-secondary" @click="globalSettings.brand_background_color_dark_theme = '#00000000'">
                                     {{ __('transparent') || 'Transparent' }}
                                 </b-button>
                             </div>
                         </div>
+                        </template>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <div class="figma-main-section-card">
+            <div class="card figma-main-section-card">
                 <div class="card-body p-0">
                     <!-- Modern Filter Action Bar -->
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -76,23 +76,64 @@
                                     :placeholder="__('search') || 'Search...'" @input="getRecords()">
                             </div>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="view-toggle" role="group" :aria-label="__('view')">
+                                <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                            </div>
+                            <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getRecords()"
+                                v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') || 'Refresh' }}</span>
+                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="edit_record = true">
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('add_brand') }}</span>
                             </button>
-
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getRecords()"
-                                v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
-                                <span>{{ __('refresh') || 'Refresh' }}</span>
-                            </button>
                         </div>
                     </div>
-                    <b-table :items="translatedBrands" :fields="fields" :sort-by.sync="sortBy"
+
+                    <!-- Grid view (same rows / handlers as the table list view; API pages on the server) -->
+                    <div v-if="viewMode === 'grid'">
+                        <div v-if="isLoading" class="item-grid-state">
+                            <i class="bi bi-hourglass-split"></i>
+                            <span>{{ __('loading') }}...</span>
+                        </div>
+                        <div v-else-if="!translatedBrands.length" class="item-grid-state">
+                            <i class="bi bi-inbox"></i>
+                            <span>{{ __('no_records_to_show') }}</span>
+                        </div>
+                        <div v-else class="item-grid">
+                            <div v-for="brand in pagedItems(translatedBrands)" :key="brand.id" class="item-card">
+                                <div class="item-card-media">
+                                    <img :src="brand.image ? ($storageUrl + brand.image) : $placeholderImage" :alt="brand.name" />
+                                </div>
+                                <div class="item-card-body">
+                                    <div class="item-card-title" :title="brand.name">{{ brand.name }}</div>
+                                    <div class="item-card-meta">#{{ brand.id }}</div>
+                                </div>
+                                <div class="item-card-footer">
+                                    <span v-if="brand.status == 1" class="badge bg-success">{{ __('active') }}</span>
+                                    <span v-else class="badge bg-danger">{{ __('deactive') }}</span>
+                                    <div class="item-card-actions">
+                                        <button class="figma-action-btn" @click="edit_record = brand"
+                                            v-b-tooltip.hover :title="__('edit')">
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="20" height="20" />
+                                        </button>
+                                        <button class="figma-action-btn" @click="deleteRecord(translatedBrands.indexOf(brand), brand.id)"
+                                            v-b-tooltip.hover :title="__('delete')">
+                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="20" height="20" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <b-table v-else :items="translatedBrands" :fields="fields" :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false" :busy="isLoading"
-                        stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small
+                        stacked="md" show-empty responsive :tbody-tr-class="() => 'figma-tr align-middle'" small
                         class="figma-order-table mb-0">
                         <template #table-busy>
                             <div class="text-center text-black my-2">
@@ -106,8 +147,7 @@
                         </template>
 
                         <template #cell(image)="row">
-                            <p v-if="row.item.image === ''">{{ __('no_image') }}</p>
-                            <img :src="$storageUrl + row.item.image" height="50" v-else />
+                            <img :src="row.item.image ? ($storageUrl + row.item.image) : $placeholderImage" height="50" class="brand-thumb" />
                         </template>
 
                         <template #cell(status)="row">
@@ -133,7 +173,8 @@
                     <div class="d-flex align-items-center gap-2">
                         <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                         <b-form-select v-model="perPage" :options="pageOptions" size="sm"
-                            style="width: auto;"></b-form-select>
+                            class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
@@ -153,8 +194,10 @@
 <script>
 import { VuejsDatatableFactory } from 'vuejs-datatable';
 import EditRecord from './Edit.vue';
+import ViewModeMixin from '../../../mixins/ViewModeMixin';
 
 export default {
+    mixins: [ViewModeMixin],
     components: {
         VuejsDatatableFactory,
         'app-edit-record': EditRecord,
@@ -180,6 +223,8 @@ export default {
             sortDesc: false,
             sortDirection: 'asc',
             filter: null,
+            // API returns one page (page/per_page): grid shows the array as is
+            serverPagination: true,
             filterOn: ['id', 'name', 'status'],
             isLoading: false,
             brands: [],
@@ -320,8 +365,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true;
@@ -339,3 +384,9 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.bg-colors-card .form-check-inline {
+    margin-right: 16px;
+}
+</style>

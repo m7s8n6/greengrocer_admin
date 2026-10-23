@@ -28,53 +28,59 @@
                 </div>
             </div>
             <section class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 v-if="type === 'sold_out'" class="card-title">{{ __('sold_out_products_list') }}</h4>
-                        <h4 v-if="type === 'low_stock'" class="card-title">{{ __('low_stock_products_list') }}</h4>
-                        <h4 v-if="type === 'packet_products'" class="card-title">{{ __('packet_stock_products_list') }}
+                <div class="card figma-main-section-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 v-if="type === 'sold_out'" class="card-title mb-0">{{ __('sold_out_products_list') }}</h4>
+                        <h4 v-if="type === 'low_stock'" class="card-title mb-0">{{ __('low_stock_products_list') }}</h4>
+                        <h4 v-if="type === 'packet_products'" class="card-title mb-0">{{ __('packet_stock_products_list') }}
                         </h4>
-                        <h4 v-if="type === 'loose_products'" class="card-title">{{ __('loose_stock_products_list') }}
+                        <h4 v-if="type === 'loose_products'" class="card-title mb-0">{{ __('loose_stock_products_list') }}
                         </h4>
-                        <span class="pull-right" v-if="$can('product_create')">
-                            <router-link to="/manage_products/create" class="btn btn-primary">{{ __('add_product')
-                                }}</router-link>
-                        </span>
+                        <router-link v-if="$can('product_create')" to="/manage_products/create"
+                            class="btn btn-figma-filter d-flex align-items-center gap-2">
+                            <i class="fa fa-plus"></i>
+                            <span>{{ __('add_product') }}</span>
+                        </router-link>
                     </div>
-                    <div class="card-body">
-                        <b-row class="mb-2">
-
-                            <b-col md="3">
-                                <div class="form-group">
-                                    <h6 class="box-title" for="category">{{ __('category') }}</h6>
-                                    <select name="category" id="category" v-model="category" @change="getProducts()"
-                                        class="form-control form-select">
-                                        <option value="">{{ __('all_categories') }}</option>
-                                        <option v-for="category in categories" :value="category.id">
-                                            {{ category.name }}
-                                        </option>
-                                    </select>
+                    <div class="card-body p-0">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
+                                <div class="figma-search-container flex-grow-1">
+                                    <i class="fa fa-search text-muted"></i>
+                                    <input id="filter-input" v-model="filter" type="search" class="figma-search-input"
+                                        :placeholder="__('search')">
                                 </div>
-                            </b-col>
-                            <b-col md="3" offset-md="5">
-                                <h6 class="box-title">{{ __('search') }}</h6>
-                                <b-form-input id="filter-input" v-model="filter" type="search"
-                                    :placeholder="__('search')"></b-form-input>
-                            </b-col>
-                            <b-col md="1" class="text-center">
-                                <button class="btn btn-primary btn_refresh" v-b-tooltip.hover :title="__('refresh')"
-                                    @click="getProducts()">
+                                <select name="category" id="category" v-model="category" @change="getProducts()"
+                                    class="form-control form-select category-filter" :aria-label="__('category')">
+                                    <option value="">{{ __('all_categories') }}</option>
+                                    <option v-for="category in categories" :value="category.id">
+                                        {{ category.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center">
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2 btn_refresh" v-b-tooltip.hover
+                                    :title="__('refresh')" @click="getProducts()">
                                     <i class="fa fa-refresh" aria-hidden="true"></i>
+                                    <span>{{ __('refresh') }}</span>
                                 </button>
-                            </b-col>
-                        </b-row>
+                            </div>
+                        </div>
                         <div class="table-responsive">
                             <b-table :items="products" :fields="fields" :current-page="currentPage" :per-page="perPage"
                                 :filter="filter" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
-                                :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="true"
-                                :busy="isLoading" stacked="md" show-empty small>
+                                :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
+                                :busy="isLoading" stacked="md" show-empty small class="figma-table mb-0"
+                                :tbody-tr-class="() => 'figma-tr align-middle'">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -83,47 +89,45 @@
                                     {{ row.item.seller_name }}
                                 </template>
                                 <template #cell(image)="row">
-                                    <img :src="$storageUrl + row.item.image" height="50" v-if="row.item.image" />
+                                    <img :src="$storageUrl + row.item.image" height="44" width="44" v-if="row.item.image" />
                                 </template>
                                 <template #cell(actions)="row">
-                                    <div style="width: 120px">
+                                    <div class="d-flex gap-2 justify-content-center">
                                         <router-link
                                             :to="{ name: 'ViewProduct', params: { id: row.item.id, record: row.item } }"
                                             v-b-tooltip.hover :title="__('view')"
-                                            class="btn btn-primary btn-sm border-0 bg-transparent p-0">
-                                            <base-icon name="Eye" hoverName="Type=Hover (1)" width="32" height="32" />
+                                            class="figma-action-btn">
+                                            <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
                                         </router-link>
                                         <router-link
                                             :to="{ name: 'EditProduct', params: { id: row.item.id, record: row.item } }"
                                             v-b-tooltip.hover :title="__('edit')"
-                                            class="btn btn-success btn-sm border-0 bg-transparent p-0"
+                                            class="figma-action-btn"
                                             v-if="$can('product_update')">
-                                            <base-icon name="edit icon" hoverName="edit Hover" width="32" height="32" />
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </router-link>
-                                        <button class="btn btn-danger btn-sm border-0 bg-transparent p-0"
+                                        <button class="figma-action-btn figma-delete-btn"
                                             v-b-tooltip.hover :title="__('delete')"
                                             @click="deleteRecord(row.index, row.item.product_variant_id)"
                                             v-if="$can('product_delete')">
-                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="32"
-                                                height="32" />
+                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
+                                                height="24" />
                                         </button>
                                     </div>
                                 </template>
                             </b-table>
                         </div>
-                        <b-row>
-                            <b-col md="2" class="my-1">
-                                <b-form-group :label="__('per_page')" label-for="per-page-select" label-align-sm="right"
-                                    label-size="sm" class="mb-0">
-                                    <b-form-select id="per-page-select" v-model="perPage" :options="pageOptions"
-                                        size="sm" class="form-control form-select"></b-form-select>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" class="my-1" offset-md="6">
-                                <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                                    align="right" class="figma-pagination mb-0"></b-pagination>
-                            </b-col>
-                        </b-row>
+                        <div class="figma-table-footer flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="per-page-select" class="showing-results-text small mb-0">{{ __('per_page') }}</label>
+                                <b-form-select id="per-page-select" v-model="perPage" :options="pageOptions"
+                                    size="sm" class="form-select w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+                            </div>
+                            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+                                align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
+                                prev-text="<" next-text=">"></b-pagination>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -140,11 +144,11 @@ export default {
             fields: [
                 { key: 'product_variant_id', label: __('id'), sortable: true, sortDirection: 'desc' },
                 { key: 'product_id', label: __('product_id'), sortable: true, sortDirection: 'desc' },
-                { key: 'seller_name', label: __('seller_name'), class: 'text-center', sortable: true },
-                { key: 'name', label: __('name'), sortable: true, class: 'text-center' },
+                { key: 'seller_name', label: __('seller_name'), sortable: true },
+                { key: 'name', label: __('name'), sortable: true },
                 { key: 'image', label: __('image'), class: 'text-center' },
-                { key: 'price', label: __('price'), class: 'text-center', sortable: true },
-                { key: 'discounted_price', label: __('discounted_price'), class: 'text-center', sortable: true },
+                { key: 'price', label: __('price'), sortable: true },
+                { key: 'discounted_price', label: __('discounted_price'), sortable: true },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,
@@ -199,8 +203,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -221,4 +225,20 @@ export default {
     }
 };
 </script>
-<style scoped></style>
+<style scoped>
+/* Category filter sits next to the search field in the list toolbar */
+.category-filter {
+    width: auto;
+    min-width: 180px;
+    max-width: 260px;
+    height: 38px;
+    font-size: 13px;
+}
+
+@media (max-width: 575.98px) {
+    .category-filter {
+        max-width: none;
+        width: 100%;
+    }
+}
+</style>

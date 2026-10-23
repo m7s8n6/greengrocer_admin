@@ -178,7 +178,6 @@ class SellerApiController extends Controller
             $record->name = $request->name;
             $record->email = $request->email;
             $record->mobile = $request->mobile;
-            $record->store_url = $request->store_url;
             $record->store_name = $request->store_name;
             $record->street = $request->street;
             $record->pincode_id = ($request->pincode_id) ?? 0;
@@ -224,6 +223,9 @@ class SellerApiController extends Controller
             $record->pickup_longitude = $request->pickup_longitude;
             $record->pickup_store_timings = $request->pickup_store_timings;
             $record->door_step_mode = $request->door_step_mode ?? 1;
+            // Admin-only field (plan §2b) - a seller can never set/change this themselves,
+            // only via an admin creating/editing them here.
+            $record->delivery_boy_source = $request->delivery_boy_source ?: 'shared';
 
             $record->status = Seller::$statusActive;
             if ($record->status == Seller::$statusActive || $record->status == Seller::$statusRegistered) {
@@ -370,7 +372,6 @@ class SellerApiController extends Controller
                     $record->store_description = $request->store_description;
                 }
 
-                $record->store_url = $request->store_url;
                 $record->street = $request->street;
                 $record->pincode_id = ($request->pincode_id) ?? 0;
                 $record->city_id = $request->city_id;
@@ -392,6 +393,13 @@ class SellerApiController extends Controller
                 $record->pickup_longitude = $request->pickup_longitude;
                 $record->pickup_store_timings = $request->pickup_store_timings;
                 $record->door_step_mode = $request->door_step_mode ?? 1;
+                // Admin-only field (plan §2b) - this update() endpoint is admin-authenticated
+                // only, so this is exactly the "only admin can change it afterward" path.
+                // Sellers edit their own profile through this same endpoint, so the role is checked
+                // here too - the disabled radio in the UI alone could be bypassed with a raw request.
+                if ($request->filled('delivery_boy_source') && auth()->user()->role_id != Role::$roleSeller) {
+                    $record->delivery_boy_source = $request->delivery_boy_source;
+                }
 
                 $record->status = $request->status;
                 if ($request->status == Seller::$statusActive || $request->status == Seller::$statusRegistered) {

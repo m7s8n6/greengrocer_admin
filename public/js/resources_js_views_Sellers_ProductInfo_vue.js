@@ -118,6 +118,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -138,13 +150,11 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'seller_name',
         label: __('seller_name'),
-        "class": 'text-center',
         sortable: true
       }, {
         key: 'name',
         label: __('name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'image',
         label: __('image'),
@@ -152,12 +162,10 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'price',
         label: __('price'),
-        "class": 'text-center',
         sortable: true
       }, {
         key: 'discounted_price',
         label: __('discounted_price'),
-        "class": 'text-center',
         sortable: true
       }, {
         key: 'actions',
@@ -221,8 +229,8 @@ __webpack_require__.r(__webpack_exports__);
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this2.isLoading = true;
@@ -465,7 +473,7 @@ var render = function () {
                       "router-link",
                       {
                         staticClass:
-                          "btn btn-figma-columns d-flex align-items-center gap-2",
+                          "btn btn-figma-filter d-flex align-items-center gap-2",
                         attrs: { to: "/manage_products/create" },
                       },
                       [
@@ -485,7 +493,7 @@ var render = function () {
               { staticClass: "table-responsive mb-0" },
               [
                 _c("b-table", {
-                  staticClass: "mb-0",
+                  staticClass: "figma-table mb-0",
                   attrs: {
                     items: _vm.products,
                     fields: _vm.fields,
@@ -501,6 +509,9 @@ var render = function () {
                     stacked: "md",
                     "show-empty": "",
                     small: "",
+                    "tbody-tr-class": function () {
+                      return "figma-tr align-middle"
+                    },
                   },
                   on: {
                     "update:sortBy": function ($event) {
@@ -518,12 +529,46 @@ var render = function () {
                   },
                   scopedSlots: _vm._u([
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "table-busy",
                       fn: function () {
                         return [
                           _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "text-center text-muted my-3" },
                             [
                               _c("b-spinner", { staticClass: "align-middle" }),
                               _vm._v(" "),
@@ -542,9 +587,9 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                                " +
+                            "\n                                    " +
                               _vm._s(row.item.seller_name) +
-                              "\n                            "
+                              "\n                                "
                           ),
                         ]
                       },
@@ -557,7 +602,8 @@ var render = function () {
                             ? _c("img", {
                                 attrs: {
                                   src: _vm.$storageUrl + row.item.image,
-                                  height: "50",
+                                  height: "44",
+                                  width: "44",
                                 },
                               })
                             : _vm._e(),
@@ -570,7 +616,10 @@ var render = function () {
                         return [
                           _c(
                             "div",
-                            { staticStyle: { width: "120px" } },
+                            {
+                              staticClass:
+                                "d-flex gap-2 justify-content-center",
+                            },
                             [
                               _c(
                                 "router-link",
@@ -652,7 +701,8 @@ var render = function () {
                                       modifiers: { hover: true },
                                     },
                                   ],
-                                  staticClass: "figma-action-btn",
+                                  staticClass:
+                                    "figma-action-btn figma-delete-btn",
                                   attrs: { title: _vm.__("delete") },
                                   on: {
                                     click: function ($event) {
@@ -688,20 +738,45 @@ var render = function () {
             ),
             _vm._v(" "),
             _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
-              _c("div", { staticClass: "showing-results-text small" }, [
-                _vm._v(
-                  "\n                            " +
-                    _vm._s(_vm.__("Showing Result")) +
-                    " : "
-                ),
-                _c("span", { staticClass: "showing-bold" }, [
-                  _vm._v(_vm._s(_vm.pageStart)),
-                ]),
-                _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                _c("span", { staticClass: "showing-bold" }, [
-                  _vm._v(_vm._s(_vm.totalRows)),
-                ]),
-              ]),
+              _c(
+                "div",
+                { staticClass: "d-flex align-items-center gap-3 flex-wrap" },
+                [
+                  _c(
+                    "div",
+                    { staticClass: "d-flex align-items-center gap-2" },
+                    [
+                      _c(
+                        "label",
+                        { staticClass: "showing-results-text mb-0" },
+                        [_vm._v(_vm._s(_vm.__("per_page")))]
+                      ),
+                      _vm._v(" "),
+                      _c("b-form-select", {
+                        staticClass: "w-auto",
+                        attrs: { options: _vm.pageOptions, size: "sm" },
+                        model: {
+                          value: _vm.perPage,
+                          callback: function ($$v) {
+                            _vm.perPage = $$v
+                          },
+                          expression: "perPage",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
+                    },
+                  }),
+                ],
+                1
+              ),
               _vm._v(" "),
               _c(
                 "div",

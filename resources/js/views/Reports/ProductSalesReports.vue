@@ -36,9 +36,10 @@
                                 <span>{{ __('filters') || 'Filters' }}</span>
                                 <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                             </button>
-                            <button class="btn btn-figma-filter" @click="getProductSalesReports()" v-b-tooltip.hover
-                                :title="__('refresh')">
+                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                @click="getProductSalesReports()">
                                 <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') }}</span>
                             </button>
                         </div>
                     </div>
@@ -56,11 +57,7 @@
                                                 :maxDate="maxDate" @update="getProductSalesReports"
                                                 :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
                                                 :append-to-body="true" opens="right" class="w-100"></date-range-picker>
-                                            <button v-if="dateRange.startDate" type="button"
-                                                class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                @click.stop="clearDate()"
-                                                v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                            <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                 <i class="fa fa-times-circle text-muted"></i>
                                             </button>
                                             <base-icon name="CalendarDots" width="24" height="24"
@@ -76,7 +73,7 @@
                         <b-table :items="productSalesReports" :fields="fields" :current-page="currentPage"
                             :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                             :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
-                            :bordered="false" :busy="isLoading" stacked="md" show-empty small
+                            :bordered="false" :busy="isLoading" stacked="md" show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')" small
                             :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table">
                             <template #table-busy>
                                 <div class="text-center text-black my-2">
@@ -90,10 +87,7 @@
                         </b-table>
                     </div>
                     <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }}
-                            <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<"
                             next-text=">"></b-pagination>

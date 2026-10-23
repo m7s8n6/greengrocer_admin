@@ -1,11 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
         static size="xl">
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
 
         <!-- Loading overlay while fetching translation data -->
@@ -25,8 +25,8 @@
                     </template>
 
                     <!-- Translate buttons -->
-                    <div class="mb-3" v-if="language.is_default && languages.length > 1">
-                        <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(language)"
+                    <div class="d-flex flex-wrap gap-2 mb-3" v-if="language.is_default && languages.length > 1">
+                        <b-button size="sm" variant="outline-primary" @click="translateEmpty(language)"
                             v-b-tooltip.hover
                             :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                             :disabled="loadingEmpty">
@@ -46,39 +46,36 @@
 
                     <div class="row">
                         <!-- Parent Category (only show in default language tab) -->
-                        <div class="form-group" v-if="language.is_default">
+                        <div class="form-group col-md-6" v-if="language.is_default">
                             <label>{{ __("parent_category") }}</label>
                             <select v-model="parent_id" class="form-control form-select"
                                 v-html="parent_categories"></select>
                         </div>
 
-                        <div class="form-group" :class="{ required: language.is_default }">
-                            <label>{{ __('category_name') }}</label>
-                            <i class="text-danger" v-if="language.is_default">*</i>
+                        <div class="form-group col-md-6" :class="{ required: language.is_default }">
+                            <label>{{ __('category_name') }} <i class="text-danger" v-if="language.is_default">*</i></label>
                             <input type="text" class="form-control"
                                 v-model="translations[language.id].name" :placeholder="__('enter_category_name')"
                                 @keyup="language.is_default ? createSlug() : null">
                         </div>
 
                         <!-- Slug (only show for default language) -->
-                        <div class="form-group" v-if="language.is_default">
-                            <label>{{ __('slug') }}</label>
-                            <i class="text-danger">*</i>
+                        <div class="form-group col-md-6" v-if="language.is_default">
+                            <label>{{ __('slug') }} <i class="text-danger">*</i></label>
                             <input type="text" class="form-control" :placeholder="__('enter_slug')"
                                 v-model="slug">
                         </div>
 
-                        <div class="form-group" :class="{ required: language.is_default }">
-                            <label>{{ __('category_subtitle') }}</label>
-                            <i class="text-danger" v-if="language.is_default">*</i>
+                        <div class="form-group col-md-6" :class="{ required: language.is_default }">
+                            <label>{{ __('category_subtitle') }} <i class="text-danger" v-if="language.is_default">*</i></label>
                             <input type="text" class="form-control"
                                 v-model="translations[language.id].subtitle"
                                 :placeholder="__('enter_category_subtitle')">
                         </div>
 
-                        <div class="form-group" v-if="language.is_default">
-                            <label>{{ __('image') }}</label><i class="text-danger">*</i>
-                            <p class="text-muted">{{ __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px') }}</p>
+                        <div class="form-group col-12" v-if="language.is_default">
+                            <label class="mb-1">{{ __('image') }} <i class="text-danger">*</i></label>
+                            <p class="text-muted small mb-2">{{ __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px').replace(/&amp;/g, '&') }}</p>
                             <span v-if="error" class="error">{{ error }}</span>
 
                             <input type="file" name="category_image" accept="image/*" v-on:change="handleFileUpload"
@@ -101,22 +98,22 @@
                             </div>
                         </div>
 
-                        <div class="form-group" v-if="language.is_default && globalColors && globalColors.category_background_color_mode === 'item-wise'">
+                        <div class="form-group col-md-6" v-if="language.is_default && globalColors && globalColors.category_background_color_mode === 'item-wise'">
                             <label>{{ __('background_color_for_light_theme') }}</label>
-                            <div class="d-flex" style="gap: 10px; align-items: center; max-width: 500px;">
+                            <div class="color-field d-flex">
                                 <input type="text" class="form-control" v-model="background_color_for_light_theme">
-                                <input type="color" class="form-control cursor-pointer" style="max-width: 100px;" :value="(background_color_for_light_theme && background_color_for_light_theme.startsWith('#') && (background_color_for_light_theme.length === 4 || background_color_for_light_theme.length === 7 || background_color_for_light_theme.length === 9)) ? background_color_for_light_theme.substring(0, 7) : '#ffffff'" @input="background_color_for_light_theme = $event.target.value">
+                                <input type="color" class="form-control cursor-pointer color-swatch" :value="(background_color_for_light_theme && background_color_for_light_theme.startsWith('#') && (background_color_for_light_theme.length === 4 || background_color_for_light_theme.length === 7 || background_color_for_light_theme.length === 9)) ? background_color_for_light_theme.substring(0, 7) : '#ffffff'" @input="background_color_for_light_theme = $event.target.value">
                                 <b-button size="sm" variant="outline-secondary" @click="background_color_for_light_theme = '#ffffff00'">
                                     {{ __('transparent') || 'Transparent' }}
                                 </b-button>
                             </div>
                             <small class="text-muted d-block mt-1">Note: Plain bg and bg less that's bg set perfectly category wise. That selected bg set in app and web cat image bg colur.</small>
                         </div>
-                        <div class="form-group" v-if="language.is_default && globalColors && globalColors.category_background_color_mode === 'item-wise'">
+                        <div class="form-group col-md-6" v-if="language.is_default && globalColors && globalColors.category_background_color_mode === 'item-wise'">
                             <label>{{ __('background_color_for_dark_theme') }}</label>
-                            <div class="d-flex" style="gap: 10px; align-items: center; max-width: 500px;">
+                            <div class="color-field d-flex">
                                 <input type="text" class="form-control" v-model="background_color_for_dark_theme">
-                                <input type="color" class="form-control cursor-pointer" style="max-width: 100px;" :value="(background_color_for_dark_theme && background_color_for_dark_theme.startsWith('#') && (background_color_for_dark_theme.length === 4 || background_color_for_dark_theme.length === 7 || background_color_for_dark_theme.length === 9)) ? background_color_for_dark_theme.substring(0, 7) : '#000000'" @input="background_color_for_dark_theme = $event.target.value">
+                                <input type="color" class="form-control cursor-pointer color-swatch" :value="(background_color_for_dark_theme && background_color_for_dark_theme.startsWith('#') && (background_color_for_dark_theme.length === 4 || background_color_for_dark_theme.length === 7 || background_color_for_dark_theme.length === 9)) ? background_color_for_dark_theme.substring(0, 7) : '#000000'" @input="background_color_for_dark_theme = $event.target.value">
                                 <b-button size="sm" variant="outline-secondary" @click="background_color_for_dark_theme = '#00000000'">
                                     {{ __('transparent') || 'Transparent' }}
                                 </b-button>
@@ -125,30 +122,28 @@
                         </div>
 
                         <!-- Meta Title (Translatable - Optional) -->
-                        <div class="form-group">
+                        <div class="form-group col-md-6">
                             <label>{{ __('meta_title') }}</label>
                             <input type="text" class="form-control" v-model="translations[language.id].meta_title"
                                 :placeholder="__('enter_meta_title')">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group col-md-6">
                             <label>{{ __('meta_keywords') }}</label>
                             <input type="text" class="form-control" v-model="translations[language.id].meta_keywords"
                                 :placeholder="__('enter_meta_keywords')">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group col-12">
                             <label>{{ __('schema_markup') }}
-                                <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
-                                    v-b-tooltip.hover="{ html: true, title: schemaMarkupHelpHtml, boundary: 'window' }">
-                                    <i class="fa fa-info-circle"></i>
-                                </small>
+                                <i class="fa fa-info-circle text-muted ml-1 cursor-pointer"
+                                    v-b-tooltip.hover="{ html: true, title: schemaMarkupHelpHtml, boundary: 'window' }"></i>
                             </label>
                             <input type="text" class="form-control" v-model="translations[language.id].schema_markup"
                                 :placeholder="__('enter_schema_markup')">
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group col-12">
                             <label>{{ __('meta_description') }}</label>
                             <textarea type="text" class="form-control"
                                 v-model="translations[language.id].meta_description"
@@ -156,7 +151,7 @@
                         </div>
 
                     <!-- Attributes that apply to this category -->
-                        <div class="form-group attr-section" v-if="language.is_default">
+                        <div class="form-group col-12 attr-section" v-if="language.is_default">
                             <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
                                 <div>
                                     <label class="mb-0 d-inline-flex align-items-center">
@@ -165,7 +160,7 @@
                                             {{ attribute_ids.length }}
                                         </span>
                                     </label>
-                                    <p class="text-muted small mb-0">
+                                    <p class="text-muted small mb-0 text-break">
                                         {{ __('select_attributes_that_apply_to_this_category') }} ({{ __('optional') }} - {{ __('sellers_can_assign_their_own_attribute_to_this_category_later') || 'sellers can assign their own attribute to this category later' }})
                                     </p>
                                 </div>
@@ -219,9 +214,9 @@
                             </div>
                         </div>
 
-                        <div class="form-group" v-if="id && language.is_default">
-                            <label>{{ __('status') }}</label>
-                            <div class="col-md-9 text-left mt-1">
+                        <div class="form-group col-12 mb-0" v-if="id && language.is_default">
+                            <label class="d-block">{{ __('status') }}</label>
+                            <div class="text-left mt-1">
                                 <b-form-radio-group v-model="status" :options="[
                                     { text: __('deactivate'), 'value': 0 },
                                     { text: __('activate'), 'value': 1 },
@@ -804,7 +799,7 @@ export default {
 
 /* ---- Attributes section ---- */
 .attr-section {
-    border-top: 1px solid rgba(128, 128, 128, 0.2);
+    border-top: 1px solid color-mix(in srgb, var(--theme-neutral-500) 20%, transparent);
     padding-top: 16px;
     margin-top: 8px;
 }
@@ -818,8 +813,8 @@ export default {
     line-height: 16px;
     text-align: center;
     border-radius: 10px;
-    color: #fff;
-    background: var(--primary, #37a279);
+    color: var(--theme-neutral-50);
+    background: var(--theme-primary-500);
 }
 
 .attr-actions {
@@ -836,24 +831,24 @@ export default {
     text-decoration: none;
     padding: 2px 6px !important;
     border-radius: 4px;
-    color: var(--primary, #37a279);
+    color: var(--primary, var(--theme-primary-500));
     transition: background-color .15s ease, color .15s ease;
 }
 
 .attr-actions .btn-link:hover:not(:disabled),
 .attr-actions .btn-link:focus:not(:disabled) {
     text-decoration: none;
-    background-color: rgba(55, 162, 121, 0.14);
-    color: var(--primary, #37a279);
+    background-color: color-mix(in srgb, var(--theme-primary-500) 14%, transparent);
+    color: var(--primary, var(--theme-primary-500));
 }
 
 .attr-actions .btn-link.text-danger {
-    color: #e5566d !important;
+    color: var(--theme-error-500) !important;
 }
 
 .attr-actions .btn-link.text-danger:hover:not(:disabled),
 .attr-actions .btn-link.text-danger:focus:not(:disabled) {
-    background-color: rgba(229, 86, 109, 0.14);
+    background-color: color-mix(in srgb, var(--theme-error-400) 14%, transparent);
 }
 
 .attr-actions .btn-link:disabled {
@@ -882,7 +877,7 @@ export default {
     align-items: center;
     padding: 10px 14px;
     margin-bottom: 10px;
-    border: 1px solid rgba(128, 128, 128, 0.28);
+    border: 1px solid color-mix(in srgb, var(--theme-neutral-500) 28%, transparent);
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
@@ -890,18 +885,18 @@ export default {
 }
 
 .attr-card:hover {
-    border-color: var(--primary, #37a279);
-    background-color: rgba(55, 162, 121, 0.06);
+    border-color: var(--primary, var(--theme-primary-500));
+    background-color: color-mix(in srgb, var(--theme-primary-500) 6%, transparent);
 }
 
 .attr-card:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(55, 162, 121, 0.25);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-primary-500) 25%, transparent);
 }
 
 .attr-card.is-selected {
-    border-color: var(--primary, #37a279);
-    background-color: rgba(55, 162, 121, 0.1);
+    border-color: var(--primary, var(--theme-primary-500));
+    background-color: color-mix(in srgb, var(--theme-primary-500) 10%, transparent);
 }
 
 .attr-check {
@@ -912,7 +907,7 @@ export default {
     /* the card handles the click; the box is purely a visual indicator */
     pointer-events: none;
     cursor: pointer;
-    accent-color: var(--primary, #37a279);
+    accent-color: var(--primary, var(--theme-primary-500));
 }
 
 .attr-body {
@@ -944,10 +939,10 @@ export default {
 .attr-badge {
     flex: 0 0 auto;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     padding: 2px 8px;
     border-radius: 10px;
-    border: 1px solid rgba(128, 128, 128, 0.3);
+    border: 1px solid color-mix(in srgb, var(--theme-neutral-500) 30%, transparent);
     opacity: 0.85;
     white-space: nowrap;
 }
@@ -955,7 +950,7 @@ export default {
 .attr-empty {
     text-align: center;
     padding: 20px 12px;
-    border: 1px dashed rgba(128, 128, 128, 0.35);
+    border: 1px dashed color-mix(in srgb, var(--theme-neutral-500) 35%, transparent);
     border-radius: 8px;
 }
 

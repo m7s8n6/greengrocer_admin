@@ -10,6 +10,7 @@
                         <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('purchase_code') }}</li>
                             </ol>
                         </nav>
@@ -20,11 +21,12 @@
                 <form id="api_key_form" method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">{{ __('validate_the_authentic_purchase_of_egrocer') }}</h4>
+                            <h4 class="card-title float-none">{{ __('validate_the_authentic_purchase_of_egrocer') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('purchase_code_desc', 'Register this installation with your purchase code to unlock updates and support.') }}</p>
                         </div>
                         <div class="card-body">
                             <div class="row" v-if="isLoading">
-                                <div class="text-center">
+                                <div class="col-12 text-center py-3">
                                     <b-spinner label="Spinning"></b-spinner>
                                 </div>
                             </div>
@@ -34,19 +36,19 @@
                                         <label for="purchase_code">{{ __('enter_the_purchase_code') }}</label>
                                         <input type="text" name="purchase_code" id="purchase_code" v-model="purchase_code" required placeholder="Enter the purchase code here" class="form-control" :disabled="hasValid">
                                     </div>
-                                    <div class="form-group" v-if="!hasValid">
-                                        <button type="submit" class="btn btn-primary" name="btnValidate" :disabled="isValidation">
-                                            {{ __('validate_now') }}
-                                            <b-spinner small label="Spinning" v-if="isValidation"></b-spinner>
-                                        </button>
-                                        <button type="reset" class="btn-warning btn">{{ __('clear') }}</button>
-                                    </div>
                                     <div v-if="hasValid">
-                                        <label class="alert alert-success">
+                                        <label class="alert alert-success d-block mb-0">
                                             {{ __('purchase_code_verified_successfully') }}!
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="d-flex justify-content-end border-top pt-3 mt-2" v-if="!isLoading && !hasValid">
+                                <button type="reset" class="btn btn-outline-secondary">{{ __('clear') }}</button>
+                                <button type="submit" class="btn btn-primary ml-2" name="btnValidate" :disabled="isValidation">
+                                    {{ __('validate_now') }}
+                                    <b-spinner small label="Spinning" v-if="isValidation"></b-spinner>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -71,6 +73,7 @@ export default {
         this.getRecord();
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
 
         getRecord: function(){
             let url = this.$apiUrl +'/store_settings/purchase_code';

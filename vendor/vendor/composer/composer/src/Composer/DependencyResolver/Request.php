@@ -44,11 +44,11 @@ class Request
     protected $lockedRepository;
     /** @var array<string, ConstraintInterface> */
     protected $requires = [];
-    /** @var array<int, BasePackage> */
+    /** @var array<string, BasePackage> */
     protected $fixedPackages = [];
-    /** @var array<int, BasePackage> */
+    /** @var array<string, BasePackage> */
     protected $lockedPackages = [];
-    /** @var array<int, BasePackage> */
+    /** @var array<string, BasePackage> */
     protected $fixedLockedPackages = [];
     /** @var array<string> */
     protected $updateAllowList = [];
@@ -83,7 +83,7 @@ class Request
      */
     public function fixPackage(BasePackage $package): void
     {
-        $this->fixedPackages[spl_object_id($package)] = $package;
+        $this->fixedPackages[spl_object_hash($package)] = $package;
     }
 
     /**
@@ -98,7 +98,7 @@ class Request
      */
     public function lockPackage(BasePackage $package): void
     {
-        $this->lockedPackages[spl_object_id($package)] = $package;
+        $this->lockedPackages[spl_object_hash($package)] = $package;
     }
 
     /**
@@ -110,13 +110,13 @@ class Request
      */
     public function fixLockedPackage(BasePackage $package): void
     {
-        $this->fixedPackages[spl_object_id($package)] = $package;
-        $this->fixedLockedPackages[spl_object_id($package)] = $package;
+        $this->fixedPackages[spl_object_hash($package)] = $package;
+        $this->fixedLockedPackages[spl_object_hash($package)] = $package;
     }
 
     public function unlockPackage(BasePackage $package): void
     {
-        unset($this->lockedPackages[spl_object_id($package)]);
+        unset($this->lockedPackages[spl_object_hash($package)]);
     }
 
     /**
@@ -156,7 +156,7 @@ class Request
     }
 
     /**
-     * @return array<int, BasePackage>
+     * @return array<string, BasePackage>
      */
     public function getFixedPackages(): array
     {
@@ -165,24 +165,24 @@ class Request
 
     public function isFixedPackage(BasePackage $package): bool
     {
-        return isset($this->fixedPackages[spl_object_id($package)]);
+        return isset($this->fixedPackages[spl_object_hash($package)]);
     }
 
     /**
-     * @return array<int, BasePackage>
+     * @return array<string, BasePackage>
      */
     public function getLockedPackages(): array
     {
-        return array_merge($this->lockedPackages, $this->fixedLockedPackages);
+        return $this->lockedPackages;
     }
 
     public function isLockedPackage(PackageInterface $package): bool
     {
-        return isset($this->lockedPackages[spl_object_id($package)]) || isset($this->fixedLockedPackages[spl_object_id($package)]);
+        return isset($this->lockedPackages[spl_object_hash($package)]) || isset($this->fixedLockedPackages[spl_object_hash($package)]);
     }
 
     /**
-     * @return array<int, BasePackage>
+     * @return array<string, BasePackage>
      */
     public function getFixedOrLockedPackages(): array
     {
@@ -190,7 +190,7 @@ class Request
     }
 
     /**
-     * @return array<int, BasePackage>
+     * @return ($packageIds is true ? array<int, BasePackage> : array<string, BasePackage>)
      *
      * @TODO look into removing the packageIds option, the only place true is used
      *       is for the installed map in the solver problems.
@@ -203,12 +203,12 @@ class Request
 
         if ($this->lockedRepository !== null) {
             foreach ($this->lockedRepository->getPackages() as $package) {
-                $presentMap[$packageIds ? $package->getId() : spl_object_id($package)] = $package;
+                $presentMap[$packageIds ? $package->getId() : spl_object_hash($package)] = $package;
             }
         }
 
         foreach ($this->fixedPackages as $package) {
-            $presentMap[$packageIds ? $package->getId() : spl_object_id($package)] = $package;
+            $presentMap[$packageIds ? $package->getId() : spl_object_hash($package)] = $package;
         }
 
         return $presentMap;
@@ -228,6 +228,9 @@ class Request
         return $fixedPackagesMap;
     }
 
+    /**
+     * @return ?LockArrayRepository
+     */
     public function getLockedRepository(): ?LockArrayRepository
     {
         return $this->lockedRepository;

@@ -7,10 +7,10 @@
         cursore: pointer;
 
         .switch-path {
-            background-color: #ccc;
+            background-color: var(--theme-neutral-300);
 
             .switch-handle {
-                background-color: #999;
+                background-color: var(--theme-neutral-400);
                 width: 20px;
                 height: 20px;
                 border-radius: 50%;
@@ -18,13 +18,28 @@
             }
         } &.active {
             .switch-path {
-                background-color: #555;
+                background-color: var(--theme-neutral-600);
             }
             .switch-handle {
-              background-color: #7bbb5e;
+              background-color: var(--theme-success-500);
               transform: translateX(20px);
             }
         }
 
     }
+}
+
+/* Sortable table headers (bootstrap-vue b-table): the built-in sort arrows are black SVGs, which
+   disappear on dark table headers. Same shapes with white fill so the arrows stay visible. */
+body.theme-dark .table.b-table > thead > tr > [aria-sort=none],
+body.theme-dark .table.b-table > tfoot > tr > [aria-sort=none] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.4' d='M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+}
+body.theme-dark .table.b-table > thead > tr > [aria-sort=ascending],
+body.theme-dark .table.b-table > tfoot > tr > [aria-sort=ascending] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' opacity='.4' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
+}
+body.theme-dark .table.b-table > thead > tr > [aria-sort=descending],
+body.theme-dark .table.b-table > tfoot > tr > [aria-sort=descending] {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='101' height='101' view-box='0 0 101 101' preserveAspectRatio='none'%3e%3cpath fill='white' opacity='.4' d='M51 1l25 23 24 22H1l25-22z'/%3e%3cpath fill='white' d='M51 101l25-23 24-22H1l25 22z'/%3e%3c/svg%3e");
 }

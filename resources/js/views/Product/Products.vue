@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="products-page">
         <div class="page-heading">
             <div class="page-title mb-2">
                 <div class="d-flex justify-content-between align-items-center">
@@ -21,7 +21,7 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="figma-main-section-card products-list-card">
                     <div class="card-body p-0">
                         <div
                             class="d-flex justify-content-between align-items-center flex-wrap gap-3 figma-action-bar-row p-3">
@@ -35,23 +35,35 @@
                             <div class="d-flex gap-2 align-items-center flex-wrap flex-shrink-0">
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                     <span>{{ __('filters') }}</span>
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
 
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2 text-danger"
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2 products-bulk-delete"
                                     @click="multipleDelete" :disabled="selectedItems.length === 0">
-                                    <base-icon name="Type=Default" hoverName="Type=Hover" width="20" height="20" />
+                                    <i class="bi bi-trash"></i>
                                     <span>{{ __('bulk_delete') }}</span>
                                 </button>
+
+                                <label v-if="viewMode === 'grid'"
+                                    class="btn btn-figma-filter d-flex align-items-center gap-2 mb-0 products-select-all">
+                                    <input type="checkbox" v-model="all_select" @click="allSelectCheckBox"
+                                        class="form-check-input m-0">
+                                    <span>{{ __('select_all') }}</span>
+                                </label>
+
+                                <div class="view-toggle" role="group" :aria-label="__('view')">
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                </div>
 
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
                                 </button>
-                                <b-dropdown variant="figma-columns" no-caret
+                                <b-dropdown v-if="viewMode === 'list'" variant="figma-columns" no-caret
                                     toggle-class="btn-figma-columns d-flex align-items-center gap-2" v-b-tooltip.hover
                                     :title="__('columns')">
                                     <template #button-content>
@@ -72,14 +84,14 @@
                                 </b-dropdown>
                                 <template v-if="$roleSeller == login_user.role.name">
                                     <router-link to="/seller/manage_products/create"
-                                        class="btn btn-figma-columns d-flex align-items-center gap-2">
+                                        class="btn btn-figma-filter d-flex align-items-center gap-2">
                                         <i class="fa fa-plus"></i>
                                         <span>{{ __('add_product') }}</span>
                                     </router-link>
                                 </template>
                                 <template v-else>
                                     <router-link to="/manage_products/create"
-                                        class="btn btn-figma-columns d-flex align-items-center gap-2">
+                                        class="btn btn-figma-filter d-flex align-items-center gap-2">
                                         <i class="fa fa-plus"></i>
                                         <span>{{ __('add_product') }}</span>
                                     </router-link>
@@ -130,14 +142,132 @@
                             </div>
                         </b-collapse>
 
-                        <div class="table-responsive mb-0">
-                            <b-table :items="translatedProducts" :fields="visibleFields" :filter="filter"
+                        <div v-if="viewMode === 'grid'">
+                            <div v-if="isLoading" class="item-grid-state">
+                                <i class="fa fa-spinner fa-spin"></i>{{ __('loading') }}...
+                            </div>
+                            <div v-else-if="gridProducts.length === 0" class="item-grid-state">
+                                <i class="fa" :class="filter ? 'fa-search' : 'fa-inbox'"></i>
+                                {{ filter ? __('no_records_matching_your_request') : __('no_records_to_show') }}
+                            </div>
+                            <div v-else class="item-grid">
+                                <div v-for="item in gridProducts" :key="item.product_variant_id" class="item-card"
+                                    :class="{ 'is-selected': selectedItems.includes(item.product_variant_id) }">
+                                    <label class="item-card-select mb-0">
+                                        <input type="checkbox" v-model="selectedItems" @change="selectCheckBox"
+                                            :value="item.product_variant_id" :aria-label="item.name">
+                                    </label>
+                                    <div class="item-card-media">
+                                        <img :src="item.image ? ($storageUrl + item.image) : $placeholderImage" :alt="item.name"
+                                            class="products-card-img" @click="openLightbox(item.image ? ($storageUrl + item.image) : $placeholderImage)" />
+                                        <div class="item-card-badges">
+                                            <span class="badge bg-success" v-if="item.is_approved == 1">{{ __('approved') }}</span>
+                                            <span class="badge bg-danger" v-if="item.is_approved == 0">{{ __('not_approved') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-body">
+                                        <div class="item-card-title" :title="item.name">{{ item.name }}</div>
+                                        <div class="item-card-meta" v-if="$roleSeller != login_user.role.name && item.seller_name"
+                                            :title="item.seller_name">
+                                            <i class="bi bi-shop"></i> {{ item.seller_name }}
+                                        </div>
+                                        <div class="item-card-meta">
+                                            {{ __('id') }}: #{{ item.product_variant_id }} &middot; {{ __('product_id') }}: #{{ item.product_id }}
+                                        </div>
+                                        <div class="item-card-price">
+                                            <template v-if="hasDiscount(item)">
+                                                <span>{{ $currency }}{{ item.discounted_price }}</span>
+                                                <del>{{ $currency }}{{ item.price }}</del>
+                                            </template>
+                                            <span v-else>{{ $currency }}{{ item.price }}</span>
+                                        </div>
+                                        <div class="item-card-stats" v-if="item.return_status == 1 || item.cancelable_status == 1">
+                                            <span class="item-card-chip" v-if="item.return_status == 1">
+                                                <i class="bi bi-arrow-counterclockwise"></i>{{ __('return') }}
+                                            </span>
+                                            <span class="item-card-chip" v-if="item.cancelable_status == 1">
+                                                <i class="bi bi-x-circle"></i>{{ __('cancellation') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-footer">
+                                        <div class="item-card-actions">
+
+                                                <template v-if="$roleSeller == login_user.role.name">
+                                                    <router-link
+                                                        :to="{ name: 'SellerViewProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'SellerEditProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('edit')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'SellerProductRatings', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('view_ratings')">
+                                                        <i class="bi bi-star"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'SellerCloneProduct', params: { id: item.id, record: item, clone: true } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('clone_product')">
+                                                        <i class="bi bi-files"></i>
+                                                    </router-link>
+                                                </template>
+                                                <template v-else>
+                                                    <router-link
+                                                        :to="{ name: 'ViewProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'EditProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('edit')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'ProductRatings', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('view_ratings')">
+                                                        <i class="bi bi-star"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'CloneProduct', params: { id: item.id, record: item, clone: true } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('clone_product')">
+                                                        <i class="bi bi-files"></i>
+                                                    </router-link>
+                                                </template>
+
+                                                <button class="figma-action-btn figma-delete-btn"
+                                                    @click="deleteRecord(productIndex(item), item.product_variant_id)"
+                                                    v-if="$can('product_delete')" v-b-tooltip.hover :title="__('delete')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="table-responsive mb-0">
+                            <b-table class="products-table mb-0" :items="translatedProducts" :fields="visibleFields" :filter="filter"
                                 :filter-included-fields="filterOn" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                                 :sort-direction="sortDirection" :bordered="false" :busy="isLoading" stacked="md"
-                                show-empty small class="mb-0">
+                                show-empty small>
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
 
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -157,8 +287,9 @@
                                 </template>
 
                                 <template #cell(image)="row">
-                                    <img :src="$storageUrl + row.item.image"
-                                        @click="openLightbox($storageUrl + row.item.image)" alt="Image" height="50" style="cursor: pointer;" />
+                                    <img :src="row.item.image ? ($storageUrl + row.item.image) : $placeholderImage"
+                                        @click="openLightbox(row.item.image ? ($storageUrl + row.item.image) : $placeholderImage)" alt="Image"
+                                        class="product-thumb" />
                                 </template>
 
                                 <template #cell(is_approved)="row">
@@ -181,68 +312,63 @@
                                 </template>
 
                                 <template #cell(actions)="row">
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex gap-1 product-row-actions">
 
                                         <template v-if="$roleSeller == login_user.role.name">
                                             <router-link
                                                 :to="{ name: 'SellerViewProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
-                                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-eye"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'SellerEditProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-pencil"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'SellerProductRatings', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('view_ratings')">
-                                                <base-icon name="star" hoverName="star hover" width="24" height="24" />
+                                                <i class="bi bi-star"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'SellerCloneProduct', params: { id: row.item.id, record: row.item, clone: true } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('clone_product')">
-                                                <base-icon name="copy" width="24" height="24" />
+                                                <i class="bi bi-files"></i>
                                             </router-link>
                                         </template>
                                         <template v-else>
                                             <router-link
                                                 :to="{ name: 'ViewProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
-                                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-eye"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'EditProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-pencil"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'ProductRatings', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('view_ratings')">
-                                                <base-icon name="star" hoverName="star hover" width="24" height="24" />
+                                                <i class="bi bi-star"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'CloneProduct', params: { id: row.item.id, record: row.item, clone: true } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('clone_product')">
-                                                <base-icon name="copy" width="24" height="24" />
+                                                <i class="bi bi-files"></i>
                                             </router-link>
                                         </template>
 
-                                        <button class="figma-action-btn"
-                                            @click="deleteRecord(row.index, row.item.product_variant_id)"
+                                        <button class="figma-action-btn figma-delete-btn"
+                                            @click="deleteRecord(productIndex(row.item), row.item.product_variant_id)"
                                             v-if="$can('product_delete')" v-b-tooltip.hover :title="__('delete')">
-                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
-                                                height="24" />
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </template>
@@ -254,6 +380,7 @@
                                 <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                                 <b-form-select v-model="perPage" :options="pageOptions" size="sm"
                                     style="width: auto;"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
@@ -274,7 +401,9 @@
 import axios from "axios";
 import Auth from '../../Auth.js';
 import FsLightbox from "fslightbox-vue";
+import ViewModeMixin from '../../mixins/ViewModeMixin';
 export default {
+    mixins: [ViewModeMixin],
     components: {
         FsLightbox,
     },
@@ -323,7 +452,9 @@ export default {
             showFilters: false,
 
             currentLanguageId: null,
-            activeLanguages: []
+            activeLanguages: [],
+            // The API returns one page at a time (grid view shows the array as is)
+            serverPagination: true,
         }
     },
     computed: {
@@ -336,6 +467,10 @@ export default {
         },
         visibleFields() {
             return this.fields.filter(field => field.visible)
+        },
+        // Grid view cards: same records, search and order as the b-table
+        gridProducts() {
+            return this.pagedItems(this.gridFilterSort(this.translatedProducts));
         },
         isSellerRoute() {
             // Use this.$route to access the current route
@@ -494,6 +629,15 @@ export default {
         },
     },
     methods: {
+        // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
+        productIndex(item) {
+            return this.products.findIndex(product => product.product_variant_id === item.product_variant_id);
+        },
+        hasDiscount(item) {
+            const price = parseFloat(item.price);
+            const discounted = parseFloat(item.discounted_price);
+            return !isNaN(discounted) && discounted > 0 && (isNaN(price) || discounted < price);
+        },
         fetchActiveLanguages() {
             return axios.get(this.$apiUrl + '/active_languages')
                 .then(response => {
@@ -550,6 +694,8 @@ export default {
                 this.sellers = response.data.data.sellers;
                 this.products = response.data.data.products;
                 this.totalRows = response.data.total
+                // Page changed: re-derive "Select All" from the new page's rows
+                this.selectCheckBox();
 
             });
         },
@@ -562,8 +708,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -626,8 +772,8 @@ export default {
                     cancelButtonText: __('cancel'),
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#37a279',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: 'var(--theme-primary-500)',
+                    cancelButtonColor: 'var(--theme-error-500)',
                 }).then(result => {
                     if (result.value) {
                         let ids = uniqueSelectedItems.toString();
@@ -654,3 +800,104 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* Thumbnail: 40px rounded square */
+.products-page ::v-deep .product-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    cursor: pointer;
+}
+
+/* Checkbox column stays narrow */
+.products-page ::v-deep .products-table thead th:first-child,
+.products-page ::v-deep .products-table tbody td:first-child {
+    width: 44px;
+    padding-left: 16px !important;
+    padding-right: 8px !important;
+}
+
+.products-page ::v-deep .products-table .form-check-input {
+    position: static;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+/* Row actions: compact 32px icon buttons. !important needed: the legacy global
+   .figma-action-btn rule (custom-egrocer.scss) forces 40px with !important. */
+.products-page ::v-deep .product-row-actions {
+    flex-wrap: nowrap;
+}
+
+.products-page ::v-deep .product-row-actions .figma-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    padding: 0 !important;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.products-page ::v-deep .products-table td:last-child,
+.products-page ::v-deep .products-table th:last-child {
+    white-space: nowrap;
+}
+
+.products-page .products-bulk-delete:not(:disabled) {
+    color: var(--theme-error-600) !important;
+    border-color: color-mix(in srgb, var(--theme-error-500) 40%, transparent) !important;
+}
+
+.products-page .products-bulk-delete:not(:disabled) i {
+    color: var(--theme-error-600) !important;
+}
+
+.products-page .item-card-actions {
+    margin-left: auto;
+}
+
+.products-page .products-card-img {
+    cursor: zoom-in;
+}
+
+.products-page .products-select-all {
+    cursor: pointer;
+    user-select: none;
+}
+
+.products-page .products-select-all .form-check-input {
+    position: static !important;
+    opacity: 1 !important;
+    clip: auto !important;
+    pointer-events: auto !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+}
+
+.products-page .products-bulk-delete:disabled {
+    opacity: 0.55;
+}
+
+/* Phones: stacked rows, actions left-aligned and wrapping */
+@media (max-width: 767.98px) {
+    .products-page ::v-deep .products-table tbody td:first-child {
+        width: auto;
+    }
+
+    .products-page ::v-deep .product-row-actions {
+        flex-wrap: wrap;
+    }
+
+    .products-page ::v-deep .products-table td:last-child {
+        white-space: normal;
+    }
+}
+</style>

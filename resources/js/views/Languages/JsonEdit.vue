@@ -1,18 +1,26 @@
 <template>
     <b-modal ref="json-edit-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
-                <div class="form-group col-md-12"> 
-                    <label for="json_data">{{ system_type ? system_type.name : '' }} <span class="text-danger">*</span></label>
-                    
+                <div class="form-group col-md-12 mb-0">
+                    <div class="json-editor" :class="{ 'json-editor--invalid': error }">
+                    <div class="json-editor__head">
+                        <label for="json_data" class="mb-0">{{ system_type ? system_type.name : '' }} <span class="text-danger">*</span></label>
+                        <span v-if="!error && json_data" class="badge bg-success">
+                            <i class="fa fa-check-circle"></i> {{ __('valid_json_format') }}
+                        </span>
+                        <span v-else-if="error" class="badge bg-danger">
+                            <i class="fa fa-exclamation-circle"></i> {{ __('invalid_json_format') }}
+                        </span>
+                    </div>
                     <textarea 
-                        class="form-control" 
+                        class="form-control json-editor__input" 
                         rows="20"
                         spellcheck="false"
                         v-model="json_data"
@@ -22,13 +30,11 @@
                         @input="validateJson"
                         placeholder='{"key": "value"}'>
                     </textarea>
-                    
-                    <small v-if="!error && json_data" class="text-success d-block mt-1">
-                        <i class="fa fa-check-circle"></i> {{ __('valid_json_format') }}
-                    </small>
+                    </div>
+                    <small v-if="error" class="text-danger d-block mt-2">{{ error }}</small>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -154,6 +160,48 @@ export default {
 <style scoped>
 .image_preview {
     margin-top: 5px;
+}
+
+.json-editor {
+    border: 1px solid var(--ui-border-strong);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-surface);
+    overflow: hidden;
+}
+
+.json-editor--invalid {
+    border-color: var(--theme-error-500);
+}
+
+.json-editor__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--ui-surface-muted);
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.json-editor__head label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+
+.json-editor__input,
+.json-editor__input:focus,
+.json-editor__input.is-invalid {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 360px;
+    resize: vertical;
+    background: var(--ui-surface);
+    color: var(--ui-text);
 }
 </style>
 

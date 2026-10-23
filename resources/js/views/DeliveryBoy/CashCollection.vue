@@ -1,58 +1,43 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('cash_collection') }}</h3>
-                    </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                    <router-link to="/delivery_boy/dashboard">{{ __('dashboard') }}</router-link>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">{{ __('cash_collection') }}</li>
-                            </ol>
-                        </nav>
-                    </div>
+            <div class="page-title mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="modern-page-title mb-0">{{ __('cash_collection') }}</h3>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item">
+                                <router-link to="/delivery_boy/dashboard" class="text-muted">{{ __('dashboard') }}</router-link>
+                            </li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('cash_collection') }}</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
             <section class="section">
-                <div class="row">
-                    <div class="col-6 col-lg-3 col-md-6 col-xl-8 col-xxl-4">
-                        <div class="card figma-card-white">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <div class="figma-stat-icon-box"
-                                            style="background: rgba(131, 106, 249, 0.1); color: #836AF9;">
-                                            <i class="fa fa-handshake-o"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <h5 class="text-muted font-semibold mb-1">{{ __('cash_in_hand') }}</h5>
-                                        <h3 class="font-extrabold mb-0">{{ $currency + " " + cash_in_hand }}</h3>
-                                    </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-md-4 kpi-col-full-phone">
+                        <div class="figma-kpi-card-v2 w-100 h-100">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="figma-stat-icon-box bg-stat-purple flex-shrink-0">
+                                    <i class="fa fa-handshake-o"></i>
+                                </div>
+                                <div class="d-flex flex-column overflow-hidden text-start">
+                                    <span class="figma-stat-label mb-0 text-truncate">{{ __('cash_in_hand') }}</span>
+                                    <h4 class="figma-stat-value mb-0 text-truncate">{{ $currency + " " + cash_in_hand }}</h4>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-lg-3 col-md-6 col-xl-8 col-xxl-4">
-                        <div class="card figma-card-white">
-                            <div class="card-body px-3 py-4-5">
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <div class="figma-stat-icon-box"
-                                            style="background: rgba(40, 199, 111, 0.1); color: #28C76F;">
-                                            <i class="fa fa-money"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <h5 class="text-muted font-semibold mb-1">{{ __('cash_collected') }}</h5>
-                                        <h3 class="font-extrabold mb-0">{{ $currency + " " + Math.abs(cash_collected) }}
-                                        </h3>
-                                    </div>
+                    <div class="col-12 col-sm-6 col-md-4 kpi-col-full-phone">
+                        <div class="figma-kpi-card-v2 w-100 h-100">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="figma-stat-icon-box bg-stat-green flex-shrink-0">
+                                    <i class="fa fa-money"></i>
+                                </div>
+                                <div class="d-flex flex-column overflow-hidden text-start">
+                                    <span class="figma-stat-label mb-0 text-truncate">{{ __('cash_collected') }}</span>
+                                    <h4 class="figma-stat-value mb-0 text-truncate">{{ $currency + " " + Math.abs(cash_collected) }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -74,13 +59,14 @@
                             <div class="d-flex gap-2">
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                     <span>{{ __('filters') || 'Filters' }}</span>
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2" v-b-tooltip.hover
                                     :title="__('refresh')" @click="getTransactions()">
                                     <i class="fa fa-refresh" aria-hidden="true"></i>
+                                    <span>{{ __('refresh') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -92,15 +78,14 @@
                                     <div class="col-md-4">
                                         <div class="figma-filter-group position-relative">
                                             <label class="figma-filter-label">{{ __('from_and_to_date') }}</label>
-                                            <div class="modern-datepicker-container">
+                                            <div class="modern-datepicker-container position-relative">
                                                 <date-range-picker :append-to-body="true" :single-date-picker="'range'"
                                                     :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
                                                     :autoApply="false" :showDropdowns="true" v-model="dateRange"
                                                     :maxDate="maxDate" @update="getTransactions"
                                                     class="w-100"></date-range-picker>
                                                 <button v-if="dateRange.startDate"
-                                                    class="btn btn-sm btn-light-danger ms-2 position-absolute"
-                                                    style="right: 15px; top: 32px; padding: 4px 8px;"
+                                                    class="btn btn-sm btn-outline-secondary db-date-clear"
                                                     @click="dateRange.startDate = null; dateRange.endDate = null; getTransactions()">
                                                     {{ __('clear') }}
                                                 </button>
@@ -117,15 +102,22 @@
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                 :bordered="false" :busy="isLoading" stacked="md" show-empty
                                 :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-order-table mb-0" small>
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
                                     <div class="text-center py-4">
-                                        <b-spinner class="align-middle" variant="dark"></b-spinner>
+                                        <b-spinner class="align-middle text-muted"></b-spinner>
                                     </div>
                                 </template>
                                 <template #cell(amount)="row">
                                     <span v-if="row.item.type === __('delivery_boy_cash_collection')"
-                                        class="figma-amount-bold text-dark">{{ row.item.collected_amount }}</span>
-                                    <span v-else class="figma-amount-bold text-dark">{{ row.item.amount }}</span>
+                                        class="figma-amount-bold">{{ row.item.collected_amount }}</span>
+                                    <span v-else class="figma-amount-bold">{{ row.item.amount }}</span>
                                 </template>
                                 <template #head(amount)="row">
                                     {{ __('amount') }}{{ ' (' + $currency + ')' }}
@@ -148,12 +140,15 @@
 
                         <!-- Footer: Totals + Pagination -->
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="d-flex align-items-center gap-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }}
-                                    <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
-                                <div class="d-flex gap-3 text-success small border-start ps-4">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
+                                <div class="d-flex gap-3 text-success small border-start ps-3">
                                     <span>{{ __('total_amount') }}: <strong>{{ $currency }} {{ total_amount
                                             }}</strong></span>
                                 </div>
@@ -184,11 +179,11 @@ export default {
             maxDate: new Date(),
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'order_id', label: __('order_id'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center' },
-                { key: 'transaction_date', label: __('date_time'), sortable: true, class: 'text-center' }
+                { key: 'order_id', label: __('order_id'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'amount', label: __('amount'), sortable: true },
+                { key: 'status', label: __('status'), sortable: true },
+                { key: 'transaction_date', label: __('date_time'), sortable: true }
             ],
             totalRows: 1,
             currentPage: 1,
@@ -283,5 +278,16 @@ export default {
     .vue-daterange-picker[data-v-1ebd09d2] {
         min-width: 90%;
     }
+}
+
+/* Delivery boy cash collection: date-range "clear" sits inside the picker field */
+.db-date-clear {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title mb-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                 <h3 class="modern-page-title mb-0">{{ __('custom_fields') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -16,7 +16,7 @@
             <section class="section">
                 <div class="figma-main-section-card">
                     <div class="card-body p-0">
-                        <b-tabs v-if="!isSeller" v-model="activeTab" class="px-3 pt-2">
+                        <b-tabs v-if="!isSeller" v-model="activeTab" class="px-3 pt-2 custom-fields-tabs">
                             <b-tab>
                                 <template #title>
                                     {{ __('sellers') }}
@@ -47,6 +47,11 @@
                             </b-tab>
                         </b-tabs>
 
+                        <b-tabs v-else v-model="activeTab" class="px-3 pt-2 custom-fields-tabs">
+                            <b-tab :title="__('products')"></b-tab>
+                            <b-tab :title="__('delivery_boys')"></b-tab>
+                        </b-tabs>
+
                         <div
                             class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                             <div class="flex-grow-1">
@@ -57,30 +62,36 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                    @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>{{ __('refresh') || 'Refresh' }}</span>
+                                </button>
                                 <button v-if="isSeller || $can('custom_field_create')"
                                     class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="openAddModal">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_field') }}</span>
                                 </button>
-
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                    @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
-                                    <i class="fa fa-refresh"></i>
-                                    <span>{{ __('refresh') || 'Refresh' }}</span>
-                                </button>
                             </div>
                         </div>
 
-                        <b-table :items="customFields" :fields="visibleFields" :filter="filter"
+                        <b-table :items="translatedCustomFields" :fields="visibleFields" :filter="filter"
                             :filter-included-fields="filterOn" :bordered="false" :busy="isLoading" stacked="md"
                             show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small
-                            class="figma-order-table mb-0">
+                            class="figma-order-table custom-fields-table mb-0">
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-3">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
+                            </template>
+
+                            <template #empty="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                            </template>
+                            <template #emptyfiltered="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
                             </template>
 
                             <template #cell(id)="row">
@@ -106,8 +117,8 @@
                             </template>
 
                             <template #cell(status)="row">
-                                <div class="form-check form-switch d-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" style="cursor: pointer"
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox"
                                         :disabled="!canEdit(row.item)" :true-value="true"
                                         :false-value="false" v-model="row.item.status"
                                         @change="toggleStatus(row.item)">
@@ -115,12 +126,12 @@
                             </template>
 
                             <template #cell(actions)="row">
-                                <div v-if="canEdit(row.item) || canDelete(row.item)" class="d-flex gap-2 justify-content-center">
+                                <div v-if="canEdit(row.item) || canDelete(row.item)" class="d-flex gap-2">
                                     <button v-if="canEdit(row.item)" class="figma-action-btn"
                                         @click="openEditModal(row.item)" v-b-tooltip.hover :title="__('edit')">
                                         <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                     </button>
-                                    <button v-if="canDelete(row.item)" class="figma-action-btn"
+                                    <button v-if="canDelete(row.item)" class="figma-action-btn figma-delete-btn"
                                         @click="deleteRecord(row.item.id)" v-b-tooltip.hover :title="__('delete')">
                                         <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                                     </button>
@@ -132,7 +143,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                                 <b-form-select v-model="perPage" :options="pageOptions" size="sm"
-                                    style="width: auto;"></b-form-select>
+                                    class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
@@ -150,11 +162,13 @@
             :title="isEditing ? __('edit') + ' ' + __('field_name') : __('add_field')" no-close-on-backdrop no-fade
             static scrollable>
             <template #modal-footer>
-                <b-button variant="primary" @click="saveRecord" :disabled="isSaving">
-                    {{ __('save') }}
-                    <b-spinner v-if="isSaving" small label="Saving"></b-spinner>
-                </b-button>
-                <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+                <div class="d-flex justify-content-end gap-2 w-100">
+                    <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+                    <b-button variant="primary" @click="saveRecord" :disabled="isSaving">
+                        {{ __('save') }}
+                        <b-spinner v-if="isSaving" small label="Saving"></b-spinner>
+                    </b-button>
+                </div>
             </template>
 
             <form @submit.prevent="saveRecord">
@@ -163,8 +177,8 @@
                     <b-tab v-for="lang in languages" :key="lang.id" :title="lang.name" :active="lang.is_default == 1">
 
                         <!-- Translate buttons (field name only) -->
-                        <div class="mb-3" v-if="lang.is_default && languages.length > 1">
-                            <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(lang)"
+                        <div class="mb-3 d-flex flex-wrap gap-2" v-if="lang.is_default && languages.length > 1">
+                            <b-button size="sm" variant="outline-primary" @click="translateEmpty(lang)"
                                 v-b-tooltip.hover
                                 :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                                 :disabled="loadingEmpty">
@@ -181,15 +195,15 @@
                             </b-button>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">{{ __('field_name') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                        <div class="row">
+                        <div class="form-group mb-3" :class="lang.is_default ? 'col-md-6' : 'col-12'">
+                            <label class="form-label">{{ __('field_name') }} <span class="text-danger" v-if="lang.is_default">*</span></label>
                             <input type="text" class="form-control" v-model="form[lang.id].name"
                                 :placeholder="__('field_name')" :required="lang.is_default ? true : undefined">
                         </div>
 
                         <!-- Type (not translatable; applies to the whole field) -->
-                        <div class="form-group mb-3" v-if="lang.is_default">
+                        <div class="form-group mb-3 col-md-6" v-if="lang.is_default">
                             <label class="form-label">{{ __('field_type') }} <span class="text-danger">*</span></label>
                             <select class="form-control form-select" v-model="type">
                                 <option value="text">{{ __('text') }}</option>
@@ -197,22 +211,22 @@
                                 <option value="dropdown">{{ __('dropdown') }}</option>
                                 <option value="file">{{ __('file') }}</option>
                                 <option value="textarea">{{ __('textarea') }}</option>
+                                <option value="date">{{ __('date') }}</option>
                             </select>
+                        </div>
                         </div>
 
                         <!-- Dropdown options - translatable per language -->
                         <div class="form-group mb-3" v-if="type === 'dropdown'">
-                            <label class="form-label">{{ __('options') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                            <label class="form-label">{{ __('options') }} <span class="text-danger" v-if="lang.is_default">*</span></label>
                             <div class="figma-chip-input form-control h-auto d-flex flex-wrap align-items-center gap-1"
                                 @click="focusOptionInput(lang.id)">
                                 <span class="badge bg-primary d-flex align-items-center gap-1"
                                     v-for="(option, index) in form[lang.id].options" :key="index">
                                     {{ option }}
-                                    <i class="fa fa-times" style="cursor:pointer" @click.stop="removeOption(lang.id, index)"></i>
+                                    <i class="fa fa-times chip-remove" @click.stop="removeOption(lang.id, index)"></i>
                                 </span>
                                 <input type="text" :ref="'optionInput_' + lang.id" class="chip-input-field border-0 flex-grow-1"
-                                    style="outline:none;min-width:120px"
                                     v-model="optionInputText[lang.id]"
                                     :placeholder="form[lang.id].options.length ? '' : __('options')"
                                     @keydown.enter.prevent="addOption(lang.id)"
@@ -270,6 +284,7 @@ export default {
             status: true,
             languages: [],
             defaultLanguageId: null,
+            currentLanguageId: null,
             form: {},
             optionInputText: {},
             tabsKey: 0,
@@ -280,18 +295,21 @@ export default {
             loadingOverwrite: false,
 
             fields: [
-                { key: 'id', label: __('id'), class: 'text-center' },
-                { key: 'name', label: __('field_name'), class: 'text-center' },
-                { key: 'type', label: __('field_type'), class: 'text-center' },
-                { key: 'is_required', label: __('required'), class: 'text-center' },
-                { key: 'owner', label: __('owner') || 'Owner', class: 'text-center' },
-                { key: 'status', label: __('status'), class: 'text-center' },
-                { key: 'actions', label: __('actions'), class: 'text-center' },
+                { key: 'id', label: __('id') },
+                { key: 'name', label: __('field_name') },
+                { key: 'type', label: __('field_type') },
+                { key: 'is_required', label: __('required') },
+                { key: 'owner', label: __('owner') || 'Owner' },
+                { key: 'status', label: __('status') },
+                { key: 'actions', label: __('actions') },
             ],
         };
     },
     computed: {
         module() {
+            if (this.isSeller) {
+                return this.activeTab === 1 ? 'delivery_boy' : 'product';
+            }
             const map = { 0: 'seller', 1: 'delivery_boy', 2: 'customer', 3: 'product' };
             return map[this.activeTab] || 'seller';
         },
@@ -300,6 +318,26 @@ export default {
         },
         currentSellerId() {
             return this.isSeller ? Auth.user.seller.id : null;
+        },
+        // Fields shown in the current app locale, falling back to the default-language name/options.
+        translatedCustomFields() {
+            const list = Array.isArray(this.customFields) ? this.customFields : [];
+            if (!this.currentLanguageId || list.length === 0) {
+                return list;
+            }
+            return list.map(field => {
+                const translated = { ...field };
+                const translation = Array.isArray(field.translations)
+                    ? field.translations.find(t => t.language_id === this.currentLanguageId)
+                    : null;
+                if (translation && translation.name && translation.name.trim() !== '') {
+                    translated.name = translation.name;
+                }
+                if (translation && Array.isArray(translation.options) && translation.options.length > 0) {
+                    translated.options = translation.options;
+                }
+                return translated;
+            });
         },
         visibleFields() {
             if (this.module !== 'product') {
@@ -326,6 +364,7 @@ export default {
         '$route.params.module': {
             immediate: true,
             handler(value) {
+                if (this.isSeller) return;
                 const map = { delivery_boy: 1, customer: 2, product: 3 };
                 this.activeTab = map[value] !== undefined ? map[value] : 0;
             },
@@ -333,7 +372,7 @@ export default {
     },
     created() {
         if (this.isSeller) {
-            this.activeTab = 3;
+            this.activeTab = 0;
         }
         this.loadLanguages().then(() => this.getRecords());
     },
@@ -360,6 +399,7 @@ export default {
                 dropdown: __('dropdown'),
                 file: __('file'),
                 textarea: __('textarea'),
+                date: __('date'),
             };
             return map[type] || type;
         },
@@ -369,6 +409,10 @@ export default {
                     this.languages = res.data.data || [];
                     const defaultLang = this.languages.find(l => l.is_default);
                     this.defaultLanguageId = defaultLang ? defaultLang.id : null;
+
+                    const appLocale = window.appLocale || 'en';
+                    const currentLang = this.languages.find(l => l.code === appLocale) || defaultLang;
+                    this.currentLanguageId = currentLang ? currentLang.id : null;
                     this.initializeForm();
                 });
         },
@@ -555,8 +599,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     axios.post(this.$apiUrl + '/custom_fields/delete', { id: id })
@@ -586,3 +630,52 @@ export default {
     },
 };
 </script>
+
+<style>
+#customFieldModal .figma-chip-input {
+    min-height: 40px;
+    padding: 6px 10px;
+    cursor: text;
+}
+
+#customFieldModal .chip-input-field {
+    min-width: 120px;
+    outline: none;
+    background: transparent;
+    font-size: 13px;
+    color: var(--ui-text);
+}
+
+#customFieldModal .chip-remove {
+    cursor: pointer;
+}
+
+.custom-fields-table .form-switch .form-check-input {
+    cursor: pointer;
+}
+
+/* Phones: the tabs (Sellers / Delivery Boys / Customers / Products) piled up in a column.
+   Keep them in one horizontal row that scrolls sideways if it has to, labels on one line. */
+@media (max-width: 575.98px) {
+    .custom-fields-tabs .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .custom-fields-tabs .nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .custom-fields-tabs .nav-tabs .nav-item {
+        flex: 0 0 auto;
+    }
+
+    .custom-fields-tabs .nav-tabs .nav-link {
+        white-space: nowrap;
+        padding: 0.5rem 0.75rem;
+    }
+}
+</style>

@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('fund_transfers') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -27,12 +27,14 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-primary d-flex align-items-center gap-2" @click="create_new=true"
-                                        v-if="$can('fund_transfers_create')">
-                                    <i class="fa fa-plus"></i> {{ __('add_fund_transfers') }}
-                                </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2" v-b-tooltip.hover :title="__('refresh')" @click="getFundTransfers()">
                                     <i class="fa fa-refresh" aria-hidden="true"></i>
+                                    <span>{{ __('refresh') }}</span>
+                                </button>
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="create_new=true"
+                                        v-if="$can('fund_transfers_create')">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{{ __('add_fund_transfers') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -56,9 +58,16 @@
                                 :tbody-tr-class="() => 'figma-tr align-middle'"
                                 class="figma-order-table mb-0"
                                 small>
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
                                     <div class="text-center py-4">
-                                        <b-spinner class="align-middle" variant="dark"></b-spinner>
+                                        <b-spinner class="align-middle text-muted"></b-spinner>
                                     </div>
                                 </template>
                                 <template #head(opening_balance)="row">
@@ -93,9 +102,13 @@
                         <!-- Footer: Totals + Pagination -->
                         <div class="figma-table-footer flex-wrap gap-3">
                             <div class="d-flex align-items-center gap-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination
@@ -122,13 +135,13 @@ export default {
         return {
             fields: [
                 {key: 'id', label: __('id'), sortable: true, sortDirection: 'desc'},
-                {key: 'opening_balance', label: __('opening_balance'), sortable: true, class: 'text-center'},
-                {key: 'closing_balance', label: __('closing_balance'), sortable: true, class: 'text-center'},
-                {key: 'amount', label: __('amount'), sortable: true, class: 'text-center'},
-                {key: 'type', label: __('type'), sortable: true, class: 'text-center'},
-                {key: 'message', label: __('message'), sortable: true, class: 'text-center'},
-                {key: 'status', label: __('status'), sortable: true, class: 'text-center'},
-                {key: 'created_at', label: __('date_created'), sortable: true, class: 'text-center'}
+                {key: 'opening_balance', label: __('opening_balance'), sortable: true},
+                {key: 'closing_balance', label: __('closing_balance'), sortable: true},
+                {key: 'amount', label: __('amount'), sortable: true},
+                {key: 'type', label: __('type'), sortable: true},
+                {key: 'message', label: __('message'), sortable: true},
+                {key: 'status', label: __('status'), sortable: true},
+                {key: 'created_at', label: __('date_created'), sortable: true}
             ],
             totalRows: 1,
             currentPage: 1,

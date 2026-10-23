@@ -93,7 +93,7 @@ class Blog extends Model
         if ($this->image) {
             return asset('storage/' . $this->image);
         }
-        return null;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
 
     protected $translationAttributes = [

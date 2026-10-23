@@ -798,7 +798,12 @@ class CustomerAuthController extends Controller
                 ->orderBy('sort_order')
                 ->get(['id', 'name', 'type', 'options', 'is_required'])
                 ->map(function ($field) use ($savedValues) {
-                    $field->value = $savedValues[$field->id] ?? null;
+                    $value = $savedValues[$field->id] ?? null;
+                    // File values are stored as a storage-relative path; return a full URL.
+                    if ($field->type === 'file' && is_string($value) && $value !== '' && !preg_match('#^https?://#i', $value)) {
+                        $value = asset('storage/' . ltrim($value, '/'));
+                    }
+                    $field->value = $value;
                     return $field;
                 });
             $user->makeHidden('custom_field_values');

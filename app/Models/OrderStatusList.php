@@ -39,6 +39,9 @@ class OrderStatusList extends Model
     public static $orderSelfPickupReady = "Ready for Pickup";
     public static $orderSelfPickupPicked = "Picked Up";
 
+    /** orders.slot_type value for orders placed under Quick Delivery. */
+    public static $slotTypeExpress = 'express';
+
     public static function getTranslationKey(int $statusId): string
     {
         $statusKeys = [

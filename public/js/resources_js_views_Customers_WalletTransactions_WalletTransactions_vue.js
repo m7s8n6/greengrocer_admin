@@ -76,6 +76,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -283,6 +287,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -299,48 +314,39 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'user_id',
         label: __('user_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'name',
         label: __('user_name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'type',
         label: __('type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'payment_type',
         label: __('payment_type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'txn_id',
         label: __('txn_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'amount',
         label: __('amount'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'message',
         label: __('message'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'transaction_date',
         label: __('transaction_date'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'updated_at',
         label: __('last_updated'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }],
       totalRows: 1,
       currentPage: 1,
@@ -432,7 +438,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Selected customer details: compact 2x2 summary tile */\n.customer-summary[data-v-14e59a42] {\n    padding: 10px 12px;\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    font-size: 13px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -682,8 +688,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex flex-wrap justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -705,12 +724,6 @@ var render = function () {
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
-          ),
         ],
         1
       ),
@@ -730,7 +743,7 @@ var render = function () {
           _c("div", { staticClass: "row" }, [
             _c(
               "div",
-              { staticClass: "form-group" },
+              { staticClass: "form-group col-12" },
               [
                 _c("label", [_vm._v(_vm._s(_vm.__("customer")))]),
                 _vm._v(" "),
@@ -789,60 +802,61 @@ var render = function () {
                 _vm.walletTransaction.customer
                   ? _c(
                       "div",
-                      { staticClass: "border border-grey rounded p-2 mt-2" },
+                      { staticClass: "customer-summary row g-2 mx-0 mt-2" },
                       [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("name")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.walletTransaction.customer.name)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("mobile")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.walletTransaction.customer.mobile)
-                              ),
-                            ]),
-                          ]
-                        ),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("name")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.customer.name)
+                            ),
+                          ]),
+                        ]),
                         _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("id")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " + _vm._s(_vm.walletTransaction.customer.id)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("balance")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.walletTransaction.customer.balance)
-                              ),
-                            ]),
-                          ]
-                        ),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("mobile")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " +
+                                _vm._s(_vm.walletTransaction.customer.mobile)
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("id")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " + _vm._s(_vm.walletTransaction.customer.id)
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-6" }, [
+                          _c(
+                            "span",
+                            { staticClass: "d-block small text-muted" },
+                            [_vm._v(_vm._s(_vm.__("balance")))]
+                          ),
+                          _c("span", { staticClass: "font-weight-bold" }, [
+                            _vm._v(
+                              " " +
+                                _vm._s(_vm.walletTransaction.customer.balance)
+                            ),
+                          ]),
+                        ]),
                       ]
                     )
                   : _vm._e(),
@@ -850,7 +864,7 @@ var render = function () {
               1
             ),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 col-sm-6" }, [
               _c("label", { attrs: { for: "type" } }, [
                 _vm._v(_vm._s(_vm.__("type"))),
               ]),
@@ -885,7 +899,7 @@ var render = function () {
               }),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 col-sm-6" }, [
               _c("label", { attrs: { for: "amount" } }, [
                 _vm._v(_vm._s(_vm.__("amount"))),
               ]),
@@ -945,7 +959,7 @@ var render = function () {
                 : _vm._e(),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 mb-0" }, [
               _c("label", { attrs: { for: "message" } }, [
                 _vm._v(_vm._s(_vm.__("message"))),
               ]),
@@ -984,10 +998,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -1084,41 +1095,34 @@ var render = function () {
                         "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
                     },
                     [
-                      _c(
-                        "div",
-                        {
-                          staticClass: "figma-search-container",
-                          staticStyle: { "min-width": "250px" },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-search text-muted" }),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.filter,
-                                expression: "filter",
-                              },
-                            ],
-                            staticClass: "figma-search-input",
-                            attrs: {
-                              type: "text",
-                              placeholder: _vm.__("search"),
+                      _c("div", { staticClass: "figma-search-container" }, [
+                        _c("i", { staticClass: "fa fa-search text-muted" }),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.filter,
+                              expression: "filter",
                             },
-                            domProps: { value: _vm.filter },
-                            on: {
-                              input: function ($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.filter = $event.target.value
-                              },
+                          ],
+                          staticClass: "figma-search-input",
+                          attrs: {
+                            type: "text",
+                            placeholder: _vm.__("search"),
+                          },
+                          domProps: { value: _vm.filter },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.filter = $event.target.value
                             },
-                          }),
-                        ]
-                      ),
+                          },
+                        }),
+                      ]),
                     ]
                   ),
                   _vm._v(" "),
@@ -1128,26 +1132,6 @@ var render = function () {
                       staticClass: "d-flex gap-2 align-items-center flex-wrap",
                     },
                     [
-                      _c(
-                        "button",
-                        {
-                          staticClass:
-                            "btn btn-figma-filter d-flex align-items-center gap-2",
-                          on: {
-                            click: function ($event) {
-                              _vm.create_new = true
-                            },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-plus" }),
-                          _vm._v(" "),
-                          _c("span", [
-                            _vm._v(_vm._s(_vm.__("add_transactions"))),
-                          ]),
-                        ]
-                      ),
-                      _vm._v(" "),
                       _c(
                         "button",
                         {
@@ -1171,6 +1155,26 @@ var render = function () {
                           _c("i", { staticClass: "fa fa-refresh" }),
                           _vm._v(" "),
                           _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn btn-figma-filter d-flex align-items-center gap-2",
+                          on: {
+                            click: function ($event) {
+                              _vm.create_new = true
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-plus" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("add_transactions"))),
+                          ]),
                         ]
                       ),
                     ]
@@ -1219,12 +1223,47 @@ var render = function () {
                     },
                     scopedSlots: _vm._u([
                       {
+                        key: "empty",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyText)),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "emptyfiltered",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass:
+                                    "fa fa-search fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyFilteredText)),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
                         key: "table-busy",
                         fn: function () {
                           return [
                             _c(
                               "div",
-                              { staticClass: "text-center text-black my-2" },
+                              { staticClass: "text-center text-muted my-3" },
                               [
                                 _c("b-spinner", {
                                   staticClass: "align-middle",
@@ -1245,11 +1284,11 @@ var render = function () {
                         fn: function (row) {
                           return [
                             _vm._v(
-                              "\n                                " +
+                              "\n                                    " +
                                 _vm._s(_vm.__("amount")) +
                                 " (" +
                                 _vm._s(_vm.$currency) +
-                                ")\n                            "
+                                ")\n                                "
                             ),
                           ]
                         },
@@ -1259,9 +1298,9 @@ var render = function () {
                         fn: function (row) {
                           return [
                             _vm._v(
-                              "\n                                " +
+                              "\n                                    " +
                                 _vm._s(_vm.$formatAmount(row.item.amount)) +
-                                "\n                            "
+                                "\n                                "
                             ),
                           ]
                         },
@@ -1273,12 +1312,18 @@ var render = function () {
                             row.item.type === "credit"
                               ? _c(
                                   "span",
-                                  { staticClass: "badge bg-success" },
+                                  {
+                                    staticClass: "figma-status-pill bg-success",
+                                  },
                                   [_vm._v(_vm._s(_vm.__("credit")))]
                                 )
-                              : _c("span", { staticClass: "badge bg-danger" }, [
-                                  _vm._v(_vm._s(_vm.__("debit"))),
-                                ]),
+                              : _c(
+                                  "span",
+                                  {
+                                    staticClass: "figma-status-pill bg-danger",
+                                  },
+                                  [_vm._v(_vm._s(_vm.__("debit")))]
+                                ),
                           ]
                         },
                       },
@@ -1287,9 +1332,9 @@ var render = function () {
                         fn: function (row) {
                           return [
                             _vm._v(
-                              "\n                                " +
+                              "\n                                    " +
                                 _vm._s(row.item.transaction_date) +
-                                "\n                            "
+                                "\n                                "
                             ),
                           ]
                         },
@@ -1299,9 +1344,9 @@ var render = function () {
                         fn: function (row) {
                           return [
                             _vm._v(
-                              "\n                                " +
+                              "\n                                    " +
                                 _vm._s(row.item.updated_at) +
-                                "\n                            "
+                                "\n                                "
                             ),
                           ]
                         },
@@ -1312,53 +1357,74 @@ var render = function () {
                 1
               ),
               _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
-                [
-                  _c("div", { staticClass: "showing-results-text small" }, [
-                    _vm._v(
-                      "\n                            " +
-                        _vm._s(_vm.__("Showing Result")) +
-                        " : "
-                    ),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.pageEnd)),
-                    ]),
-                    _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.totalRows)),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "d-flex align-items-center gap-3" },
-                    [
-                      _c("b-pagination", {
-                        staticClass: "figma-pagination mb-0",
-                        attrs: {
-                          "total-rows": _vm.totalRows,
-                          "per-page": _vm.perPage,
-                          align: "right",
-                          "hide-goto-end-buttons": "",
-                          "hide-ellipsis": "",
-                          "prev-text": "<",
-                          "next-text": ">",
-                        },
-                        model: {
-                          value: _vm.currentPage,
-                          callback: function ($$v) {
-                            _vm.currentPage = $$v
+              _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-3 flex-wrap" },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "d-flex align-items-center gap-2" },
+                      [
+                        _c(
+                          "label",
+                          { staticClass: "showing-results-text mb-0" },
+                          [_vm._v(_vm._s(_vm.__("per_page")))]
+                        ),
+                        _vm._v(" "),
+                        _c("b-form-select", {
+                          staticClass: "w-auto",
+                          attrs: { options: _vm.pageOptions, size: "sm" },
+                          model: {
+                            value: _vm.perPage,
+                            callback: function ($$v) {
+                              _vm.perPage = $$v
+                            },
+                            expression: "perPage",
                           },
-                          expression: "currentPage",
+                        }),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-3" },
+                  [
+                    _c("b-pagination", {
+                      staticClass: "figma-pagination mb-0",
+                      attrs: {
+                        "total-rows": _vm.totalRows,
+                        "per-page": _vm.perPage,
+                        align: "right",
+                        "hide-goto-end-buttons": "",
+                        "hide-ellipsis": "",
+                        "prev-text": "<",
+                        "next-text": ">",
+                      },
+                      model: {
+                        value: _vm.currentPage,
+                        callback: function ($$v) {
+                          _vm.currentPage = $$v
                         },
-                      }),
-                    ],
-                    1
-                  ),
-                ]
-              ),
+                        expression: "currentPage",
+                      },
+                    }),
+                  ],
+                  1
+                ),
+              ]),
             ]),
           ]),
         ]),

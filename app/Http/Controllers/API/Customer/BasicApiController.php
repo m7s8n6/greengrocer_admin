@@ -94,6 +94,10 @@ class BasicApiController extends Controller
 
         if (isset($category_slug) && !empty($category_slug)) {
             $category = Category::where('status', 1)->where('module_id', $moduleId)->where('slug', $category_slug)->first();
+            if (!$category) {
+                // Unknown, inactive or other-module slug (stale link, wrong module) - not a server error.
+                return CommonHelper::responseError(__('no_category_found'));
+            }
 
             $categories = Category::where('status', 1)->where('module_id', $moduleId)->where('parent_id', $category->id);
         } else {
@@ -1164,8 +1168,10 @@ class BasicApiController extends Controller
             $limit = (int) $request->input('limit', 50);
             $offset = (int) $request->input('offset', 0);
             $search = $request->input('search');
+            $moduleId = $request->header('X-Module-Id') ?: 1;
 
             $query = BlogCategory::where('status', 1)
+                ->where('module_id', $moduleId)
                 ->withCount(['activeBlogs'])
                 ->orderByDesc('id');
 
@@ -1185,9 +1191,11 @@ class BasicApiController extends Controller
     public function getBlogs(Request $request)
     {
         try {
+            $moduleId = $request->header('X-Module-Id') ?: 1;
             $limit = (int) $request->input('limit', 10);
-            $page = (int) $request->input('page', 1);
-            $offset = ($page - 1) * $limit;
+            $offset = $request->has('offset')
+                ? max(0, (int) $request->input('offset'))
+                : (max(1, (int) $request->input('page', 1)) - 1) * $limit;
             $search = $request->input('search');
             $categoryId = $request->input('category_id');
             $slug = $request->input('slug');
@@ -1195,7 +1203,7 @@ class BasicApiController extends Controller
 
             $query = Blog::with(['category'])
                 ->where('status', 1)
-                ->whereHas('category', fn($q) => $q->where('status', 1));
+                ->whereHas('category', fn($q) => $q->where('status', 1)->where('module_id', $moduleId));
 
             if ($search && trim($search) !== '') {
                 $query->search($search);

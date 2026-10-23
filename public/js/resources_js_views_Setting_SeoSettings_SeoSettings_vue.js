@@ -149,6 +149,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -222,9 +228,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     };
   },
   computed: {
-    schemaMarkupHelpHtml: function schemaMarkupHelpHtml() {
-      return '<p>' + __('schema_markup_helps_search_engines_understand_your_content') + ' ' + '<a href="https://www.rankranger.com/schema-markup-generator" target="_blank">' + __('this_tool') + '</a>.</p>';
-    },
     modal_title: function modal_title() {
       return this.id ? __('edit_seo_setting') : __('add_seo_setting');
     }
@@ -666,6 +669,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -677,33 +686,33 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       fields: [{
         key: 'id',
         label: __('id'),
-        "class": 'text-center',
+        "class": 'text-left',
         sortable: true,
         sortDirection: 'asc'
       }, {
         key: 'page_type',
         label: __('page_type'),
-        "class": 'text-center',
+        "class": 'text-left',
         sortable: true,
         sortDirection: 'desc'
       }, {
         key: 'meta_title',
         label: __('meta_title'),
-        "class": 'text-center',
+        "class": 'text-left',
         sortable: true
       }, {
         key: 'meta_keyword',
         label: __('meta_keywords'),
-        "class": 'text-center',
+        "class": 'text-left',
         sortable: true
       }, {
         key: 'schema_markup',
         label: __('schema_markup'),
-        "class": 'text-center'
+        "class": 'text-left'
       }, {
         key: 'meta_description',
         label: __('meta_description'),
-        "class": 'text-center'
+        "class": 'text-left'
       }, {
         key: 'og_image',
         label: __('og_image'),
@@ -845,8 +854,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this5.isLoading = true;
@@ -1420,6 +1429,7 @@ var render = function () {
         "no-close-on-backdrop": "",
         "no-fade": "",
         static: "",
+        size: "lg",
       },
       on: {
         hidden: function ($event) {
@@ -1430,8 +1440,22 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              staticClass: "mr-2",
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1449,12 +1473,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -1685,7 +1703,7 @@ var render = function () {
                             ])
                           : _vm._e(),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-12" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("label", [_vm._v(_vm._s(_vm.__("meta_title")))]),
                           _vm._v(" "),
                           language.is_default
@@ -1729,7 +1747,7 @@ var render = function () {
                           }),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-12" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("label", [_vm._v(_vm._s(_vm.__("meta_keyword")))]),
                           _vm._v(" "),
                           language.is_default
@@ -1775,35 +1793,54 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         _c("div", { staticClass: "form-group col-md-12" }, [
-                          _c("label", [
-                            _vm._v(
-                              "\n              " +
-                                _vm._s(_vm.__("schema_markup")) +
-                                "\n              "
-                            ),
-                            _c(
-                              "small",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    value: {
-                                      html: true,
-                                      title: _vm.schemaMarkupHelpHtml,
-                                      boundary: "window",
-                                    },
-                                    expression:
-                                      "{ html: true, title: schemaMarkupHelpHtml, boundary: 'window' }",
-                                    modifiers: { hover: true },
+                          _c(
+                            "label",
+                            [
+                              _vm._v(
+                                "\n              " +
+                                  _vm._s(_vm.__("schema_markup")) +
+                                  "\n              "
+                              ),
+                              _c(
+                                "small",
+                                {
+                                  staticClass: "d-inline-flex ml-1 text-muted",
+                                  attrs: { id: "schema_markup" },
+                                },
+                                [_c("i", { staticClass: "fa fa-info-circle" })]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "b-popover",
+                                {
+                                  attrs: {
+                                    target: "schema_markup",
+                                    triggers: "hover",
+                                    placement: "left",
                                   },
-                                ],
-                                staticClass:
-                                  "d-inline-flex px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary rounded-2",
-                              },
-                              [_c("i", { staticClass: "fa fa-info-circle" })]
-                            ),
-                          ]),
+                                },
+                                [
+                                  _c("p", [
+                                    _vm._v(
+                                      "Schema markup helps search engines understand your content. Generate markup using\n                  "
+                                    ),
+                                    _c(
+                                      "a",
+                                      {
+                                        attrs: {
+                                          href: "https://www.rankranger.com/schema-markup-generator",
+                                          target: "_blank",
+                                        },
+                                      },
+                                      [_vm._v("this\n                    tool")]
+                                    ),
+                                    _vm._v(".\n                "),
+                                  ]),
+                                ]
+                              ),
+                            ],
+                            1
+                          ),
                           _vm._v(" "),
                           language.is_default
                             ? _c("i", { staticClass: "text-danger" }, [
@@ -1898,21 +1935,25 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         language.is_default
-                          ? _c("div", { staticClass: "form-group" }, [
+                          ? _c("div", { staticClass: "form-group col-12" }, [
                               _c("label", [_vm._v(_vm._s(_vm.__("og_image")))]),
                               _c("i", { staticClass: "text-danger" }, [
                                 _vm._v("*"),
                               ]),
                               _vm._v(" "),
-                              _c("p", { staticClass: "text-muted" }, [
-                                _vm._v(
-                                  _vm._s(
-                                    _vm.__(
-                                      "please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px"
+                              _c(
+                                "p",
+                                { staticClass: "text-muted small mb-2" },
+                                [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__(
+                                        "please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px"
+                                      )
                                     )
-                                  )
-                                ),
-                              ]),
+                                  ),
+                                ]
+                              ),
                               _vm._v(" "),
                               _vm.error
                                 ? _c("span", { staticClass: "error" }, [
@@ -2002,10 +2043,7 @@ var render = function () {
               )
             : _vm._e(),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ],
         1
       ),
@@ -2038,40 +2076,61 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("seo_settings")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+        _c("div", { staticClass: "page-title" }, [
+          _c("div", { staticClass: "row" }, [
             _c(
-              "nav",
-              {
-                staticClass: "breadcrumb-header float-start float-lg-end",
-                attrs: { "aria-label": "breadcrumb" },
-              },
+              "div",
+              { staticClass: "col-12 col-md-6 order-md-1 order-last" },
+              [_c("h3", [_vm._v(_vm._s(_vm.__("seo_settings")))])]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "col-12 col-md-6 order-md-2 order-first" },
               [
-                _c("ol", { staticClass: "breadcrumb" }, [
-                  _c(
-                    "li",
-                    { staticClass: "breadcrumb-item" },
-                    [
-                      _c("router-link", { attrs: { to: "/dashboard" } }, [
-                        _vm._v(_vm._s(_vm.__("dashboard"))),
-                      ]),
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "li",
-                    {
-                      staticClass: "breadcrumb-item active",
-                      attrs: { "aria-current": "page" },
-                    },
-                    [_vm._v(_vm._s(_vm.__("seo_settings")))]
-                  ),
-                ]),
+                _c(
+                  "nav",
+                  {
+                    staticClass: "breadcrumb-header float-start float-lg-end",
+                    attrs: { "aria-label": "breadcrumb" },
+                  },
+                  [
+                    _c("ol", { staticClass: "breadcrumb" }, [
+                      _c(
+                        "li",
+                        { staticClass: "breadcrumb-item" },
+                        [
+                          _c("router-link", { attrs: { to: "/dashboard" } }, [
+                            _vm._v(_vm._s(_vm.__("dashboard"))),
+                          ]),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "li",
+                        { staticClass: "breadcrumb-item" },
+                        [
+                          _c(
+                            "router-link",
+                            { attrs: { to: "/system_settings" } },
+                            [_vm._v(_vm._s(_vm.__("settings")))]
+                          ),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "li",
+                        {
+                          staticClass: "breadcrumb-item active",
+                          attrs: { "aria-current": "page" },
+                        },
+                        [_vm._v(_vm._s(_vm.__("seo_settings")))]
+                      ),
+                    ]),
+                  ]
+                ),
               ]
             ),
           ]),
@@ -2126,7 +2185,7 @@ var render = function () {
                           "d-flex gap-2 align-items-center flex-wrap",
                       },
                       [
-                        _vm.$can("category_create")
+                        _vm.$can("seo_settings_create")
                           ? _c(
                               "button",
                               {
@@ -2222,7 +2281,7 @@ var render = function () {
                             return [
                               _c(
                                 "div",
-                                { staticClass: "text-center text-black my-2" },
+                                { staticClass: "text-center text-muted my-2" },
                                 [
                                   _c("b-spinner", {
                                     staticClass: "align-middle",
@@ -2237,6 +2296,42 @@ var render = function () {
                             ]
                           },
                           proxy: true,
+                        },
+                        {
+                          key: "empty",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-inbox fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyText)),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "emptyfiltered",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-search fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyFilteredText)),
+                                ]
+                              ),
+                            ]
+                          },
                         },
                         {
                           key: "cell(schema_markup)",
@@ -2258,7 +2353,7 @@ var render = function () {
                                           _c(
                                             "a",
                                             {
-                                              staticClass: "text-info",
+                                              staticClass: "text-primary small",
                                               attrs: { href: "#" },
                                               on: {
                                                 click: function ($event) {
@@ -2281,7 +2376,7 @@ var render = function () {
                                           _c(
                                             "a",
                                             {
-                                              staticClass: "text-info",
+                                              staticClass: "text-primary small",
                                               attrs: { href: "#" },
                                               on: {
                                                 click: function ($event) {
@@ -2322,7 +2417,7 @@ var render = function () {
                                           _c(
                                             "a",
                                             {
-                                              staticClass: "text-info",
+                                              staticClass: "text-primary small",
                                               attrs: { href: "#" },
                                               on: {
                                                 click: function ($event) {
@@ -2347,7 +2442,7 @@ var render = function () {
                                           _c(
                                             "a",
                                             {
-                                              staticClass: "text-info",
+                                              staticClass: "text-primary small",
                                               attrs: { href: "#" },
                                               on: {
                                                 click: function ($event) {
@@ -2372,12 +2467,17 @@ var render = function () {
                           key: "cell(og_image)",
                           fn: function (row) {
                             return [
-                              _c("img", {
-                                attrs: {
-                                  src: row.item.og_image_url,
-                                  height: "50",
-                                },
-                              }),
+                              row.item.og_image_url
+                                ? _c("img", {
+                                    attrs: {
+                                      src: row.item.og_image_url,
+                                      height: "50",
+                                      alt: "",
+                                    },
+                                  })
+                                : _c("span", { staticClass: "text-muted" }, [
+                                    _vm._v("—"),
+                                  ]),
                             ]
                           },
                         },
@@ -2392,7 +2492,7 @@ var render = function () {
                                     "d-flex gap-2 justify-content-center",
                                 },
                                 [
-                                  _vm.$can("category_update")
+                                  _vm.$can("seo_settings_update")
                                     ? _c(
                                         "button",
                                         {
@@ -2425,7 +2525,7 @@ var render = function () {
                                       )
                                     : _vm._e(),
                                   _vm._v(" "),
-                                  _vm.$can("category_delete")
+                                  _vm.$can("seo_settings_delete")
                                     ? _c(
                                         "button",
                                         {
@@ -2476,20 +2576,13 @@ var render = function () {
                   "div",
                   { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
                   [
-                    _c("div", { staticClass: "showing-results-text small" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(_vm.__("Showing Result")) +
-                          " : "
-                      ),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.pageEnd)),
-                      ]),
-                      _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.totalRows)),
-                      ]),
-                    ]),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -2517,7 +2610,8 @@ var render = function () {
                       ],
                       1
                     ),
-                  ]
+                  ],
+                  1
                 ),
               ]),
             ]),

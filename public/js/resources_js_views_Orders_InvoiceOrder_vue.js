@@ -72,18 +72,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -176,7 +164,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n@page {\n    size: auto;\n    margin: 0mm;\n}\n.borderless td[data-v-c6971f48],\n.heading th[data-v-c6971f48] {\n    border: none !important;\n    padding: 0px !important;\n}\naddress[data-v-c6971f48] {\n    margin-bottom: 1px;\n    font-style: normal;\n    line-height: 1.42857143;\n}\np[data-v-c6971f48] {\n    margin: 0 0 0px;\n}\n.invoice[data-v-c6971f48] {\n    position: relative;\n    background: #fff;\n    border: 1px solid #f4f4f4;\n    padding: 20px;\n    margin: 10px 25px\n}\n.invoice-title[data-v-c6971f48] {\n    margin-top: 0\n}\n.well[data-v-c6971f48] {\n    min-height: 20px;\n    padding: 19px;\n    margin-bottom: 20px;\n    background-color: #f5f5f5;\n    border: 1px solid #e3e3e3;\n    border-radius: 4px;\n    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05)\n}\n.well blockquote[data-v-c6971f48] {\n    border-color: #ddd;\n    border-color: rgba(0, 0, 0, .15)\n}\n.well-lg[data-v-c6971f48] {\n    padding: 24px;\n    border-radius: 6px\n}\n.well-sm[data-v-c6971f48] {\n    padding: 9px;\n    border-radius: 3px\n}\n\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n@page {\n    size: auto;\n    margin: 0mm;\n}\n.borderless td[data-v-c6971f48],\n.heading th[data-v-c6971f48] {\n    border: none !important;\n    padding: 0px !important;\n}\naddress[data-v-c6971f48] {\n    margin-bottom: 1px;\n    font-style: normal;\n    line-height: 1.42857143;\n}\np[data-v-c6971f48] {\n    margin: 0 0 0px;\n}\n\n/* ===== Invoice card ===== */\n.invoice-card[data-v-c6971f48] {\n    border: 1px solid var(--ui-border, var(--ui-border));\n    border-radius: var(--ui-radius-lg, 12px);\n    box-shadow: var(--ui-shadow);\n    overflow: hidden;\n}\n.invoice-card-header[data-v-c6971f48] {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    justify-content: space-between;\n    gap: 12px;\n    padding: 12px 20px;\n    border-bottom: 1px solid var(--ui-border, var(--ui-border));\n}\n.invoice-card-title[data-v-c6971f48] {\n    font-family: var(--ui-font);\n    font-weight: 700;\n    font-size: 15px;\n    color: var(--ui-heading, var(--theme-neutral-900));\n}\n.invoice-print-btn[data-v-c6971f48] {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    height: 38px;\n    padding: 0 16px;\n    font-size: 13px;\n    font-weight: 600;\n    border-radius: var(--ui-radius, 8px);\n}\n.invoice-card-body[data-v-c6971f48] {\n    padding: 20px;\n}\n.invoice[data-v-c6971f48] {\n    position: relative;\n    max-width: 920px;\n    margin: 0 auto;\n    padding: 0;\n    background: var(--ui-surface);\n    border: none;\n    font-family: var(--ui-font);\n    font-size: 13px;\n    line-height: 20px;\n    color: var(--ui-text, var(--theme-neutral-800));\n}\n\n/* The invoice markup comes from the server (v-html), so it is styled with ::v-deep */\n.invoice[data-v-c6971f48]  .invoice {\n    margin: 0 !important;\n    padding: 24px !important;\n    border: 1px solid var(--ui-border, var(--ui-border)) !important;\n    border-radius: var(--ui-radius-lg, 12px);\n    background: var(--ui-surface) !important;\n}\n.invoice[data-v-c6971f48]  .page-header {\n    margin: 0;\n    font-weight: 700;\n    font-size: 18px;\n    line-height: 26px;\n    color: var(--ui-heading, var(--theme-neutral-900));\n}\n.invoice[data-v-c6971f48]  hr {\n    margin: 16px 0;\n    border-color: var(--ui-border, var(--ui-border));\n    opacity: 1;\n}\n.invoice[data-v-c6971f48]  .d-flex {\n    flex-wrap: wrap;\n    gap: 12px 24px;\n    align-items: flex-start !important;\n}\n.invoice[data-v-c6971f48]  .invoice-col {\n    flex: 1 1 200px;\n    text-align: start;\n}\n.invoice[data-v-c6971f48]  .invoice-col > b,\n.invoice[data-v-c6971f48]  .col-md-4 > b,\n.invoice[data-v-c6971f48]  .h6 {\n    display: block;\n    margin-bottom: 4px;\n    font-weight: 700;\n    font-size: 12px;\n    text-transform: uppercase;\n    letter-spacing: .03em;\n    color: var(--ui-text-muted, var(--theme-neutral-500));\n}\n.invoice[data-v-c6971f48]  address,\n.invoice[data-v-c6971f48]  p {\n    margin-bottom: 2px;\n    font-size: 13px;\n    line-height: 20px;\n}\n.invoice[data-v-c6971f48]  .row {\n    margin-left: 0;\n    margin-right: 0;\n}\n.invoice[data-v-c6971f48]  .col-md-4,\n.invoice[data-v-c6971f48]  .col-md-3 {\n    padding-left: 0;\n    padding-right: 0;\n    text-align: start;\n}\n.invoice[data-v-c6971f48]  .table-responsive {\n    width: 100%;\n    padding: 0;\n    overflow-x: auto;\n    border: none;\n}\n.invoice[data-v-c6971f48]  table.table {\n    display: table;\n    width: 100%;\n    margin-bottom: 0;\n    border: 1px solid var(--ui-border, var(--ui-border));\n}\n.invoice[data-v-c6971f48]  table.table thead th {\n    padding: 10px 12px;\n    background: var(--ui-surface-muted, var(--theme-neutral-100));\n    border-bottom: 1px solid var(--ui-border, var(--ui-border));\n    font-weight: 600;\n    font-size: 12px;\n    text-transform: uppercase;\n    color: var(--ui-text-muted, var(--theme-neutral-500));\n    white-space: nowrap;\n}\n.invoice[data-v-c6971f48]  table.table td,\n.invoice[data-v-c6971f48]  table.table tfoot th {\n    padding: 10px 12px;\n    font-size: 13px;\n    border-color: var(--ui-border, var(--ui-border));\n}\n.invoice[data-v-c6971f48]  table.table tfoot th,\n.invoice[data-v-c6971f48]  table.table tfoot td {\n    font-weight: 700;\n    background: var(--ui-surface-muted, var(--theme-neutral-100));\n}\n\n/* Totals block (second table, no .table class) */\n.invoice[data-v-c6971f48]  table:not(.table) {\n    min-width: 280px;\n    margin-left: auto;\n    border-collapse: collapse;\n}\n.invoice[data-v-c6971f48]  table:not(.table) tr {\n    height: auto !important; /* global table row heights (52px) would stretch the totals list */\n}\n.invoice[data-v-c6971f48]  table:not(.table) th,\n.invoice[data-v-c6971f48]  table:not(.table) td {\n    height: auto !important;\n    padding: 6px 0 !important; /* beats global table cell padding */\n    font-size: 13px;\n    border-bottom: 1px solid var(--ui-border, var(--ui-border));\n}\n.invoice[data-v-c6971f48]  table:not(.table) th {\n    font-weight: 400;\n    color: var(--ui-text-muted, var(--theme-neutral-600));\n    padding-right: 24px;\n}\n.invoice[data-v-c6971f48]  table:not(.table) td {\n    text-align: right;\n    font-weight: 600;\n    color: var(--ui-heading, var(--theme-neutral-900));\n}\n.invoice[data-v-c6971f48]  table:not(.table) tr:last-child th,\n.invoice[data-v-c6971f48]  table:not(.table) tr:last-child td {\n    padding-top: 10px;\n    border-bottom: none;\n    font-weight: 700;\n    font-size: 15px;\n    color: var(--ui-heading, var(--theme-neutral-900));\n}\n@media (max-width: 575.98px) {\n.invoice-card-body[data-v-c6971f48] {\n        padding: 12px;\n}\n.invoice[data-v-c6971f48]  .invoice {\n        padding: 16px !important;\n}\n.invoice[data-v-c6971f48]  table:not(.table) {\n        min-width: 0;\n        width: 100%;\n}\n.invoice[data-v-c6971f48]  .table-responsive {\n        flex: 1 1 100%;\n}\n}\n@media print {\n.invoice[data-v-c6971f48]  .invoice {\n        border: none !important;\n        padding: 0 !important;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -317,19 +305,24 @@ var render = function () {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "row" }, [
-        _vm._m(0),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+    _c("div", { staticClass: "invoice-page" }, [
+      _c(
+        "div",
+        {
+          staticClass:
+            "page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4",
+        },
+        [
+          _c("h3", { staticClass: "mb-0" }, [_vm._v("Invoice")]),
+          _vm._v(" "),
           _c(
             "nav",
             {
-              staticClass: "breadcrumb-header float-start float-lg-end",
+              staticClass: "breadcrumb-header",
               attrs: { "aria-label": "breadcrumb" },
             },
             [
-              _c("ol", { staticClass: "breadcrumb" }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
                 _vm.isSellerRoute
                   ? _c(
                       "li",
@@ -454,63 +447,51 @@ var render = function () {
               ]),
             ]
           ),
-        ]),
-      ]),
+        ]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-md-12" }, [
-                  _c("section", {
-                    staticClass: "invoice",
-                    attrs: { id: "printMe" },
-                    domProps: { innerHTML: _vm._s(_vm.invoice) },
-                  }),
-                ]),
-              ]),
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-footer" }, [
-              _c(
-                "button",
-                {
-                  directives: [
-                    {
-                      name: "print",
-                      rawName: "v-print",
-                      value: "#printMe",
-                      expression: "'#printMe'",
-                    },
-                    {
-                      name: "b-tooltip",
-                      rawName: "v-b-tooltip.hover",
-                      modifiers: { hover: true },
-                    },
-                  ],
-                  staticClass: "btn btn-sm btn-secondary",
-                  attrs: { type: "button", title: "Print" },
-                },
-                [_c("i", { staticClass: "fa fa-print" }), _vm._v(" Print")]
-              ),
-            ]),
+      _c("div", { staticClass: "card invoice-card" }, [
+        _c("div", { staticClass: "invoice-card-header" }, [
+          _c("h5", { staticClass: "invoice-card-title mb-0" }, [
+            _vm._v("Invoice "),
+            _vm.id ? _c("span", [_vm._v("#" + _vm._s(_vm.id))]) : _vm._e(),
           ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              directives: [
+                {
+                  name: "print",
+                  rawName: "v-print",
+                  value: "#printMe",
+                  expression: "'#printMe'",
+                },
+                {
+                  name: "b-tooltip",
+                  rawName: "v-b-tooltip.hover",
+                  modifiers: { hover: true },
+                },
+              ],
+              staticClass: "btn btn-outline-primary invoice-print-btn",
+              attrs: { type: "button", title: "Print" },
+            },
+            [_c("i", { staticClass: "fa fa-print" }), _vm._v(" Print")]
+          ),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body invoice-card-body" }, [
+          _c("section", {
+            staticClass: "invoice",
+            attrs: { id: "printMe" },
+            domProps: { innerHTML: _vm._s(_vm.invoice) },
+          }),
         ]),
       ]),
     ]),
   ])
 }
-var staticRenderFns = [
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-      _c("h3", [_vm._v("Invoice")]),
-    ])
-  },
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

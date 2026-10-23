@@ -1,13 +1,13 @@
 <template>
   <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop
     no-fade static>
-    <div slot="modal-footer">
+    <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+      <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
       <b-button variant="primary" @click="$refs['dummy_submit'].click()"
         :disabled="isLoading || (discount_type === 'amount' && Number(this.minimum_order_amount) < Number(this.discount)) || !!validationMaxOrderAmountError">
         {{ __('save') }}
         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
       </b-button>
-      <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
     </div>
     <form ref="my-form" @submit.prevent="saveRecord">
 
@@ -53,7 +53,7 @@
 
               <!-- Translatable Field: Message (shown in all language tabs) -->
               <div class="form-group col-md-6 mt-0">
-                <label> {{ __('message') }} <i class="text-danger" v-if="language.is_default">*</i></label>
+                <label>{{ __('message') }} <i class="text-danger" v-if="language.is_default">*</i></label>
                 <input type="text" class="form-control" :required="language.is_default == 1 ? true : undefined"
                   v-model="translations[language.id].message"
                   :placeholder="__('message', { language: language.name })" />
@@ -62,32 +62,32 @@
               <!-- Non-translatable Fields (only shown in default language tab) -->
               <template v-if="language.is_default">
                 <div class="form-group col-md-6">
-                  <label> {{ __('promo_code') }}<i class="text-danger">*</i></label>
-                  <input type="text" class="form-control" v-model="promo_code" :placeholder="__('promo_code')" />
+                  <label>{{ __('promo_code') }} <i class="text-danger">*</i></label>
+                  <input type="text" class="form-control promo-code-input" v-model="promo_code" :placeholder="__('promo_code')" />
                 </div>
 
                 <div class="form-group col-md-6">
-                  <label>{{ __('start_date') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('start_date') }} <i class="text-danger">*</i></label>
                   <input type="date" required class="form-control" v-model="start_date" :placeholder="__('start_date')"
                     @input="validateStartDate" />
                   <span v-if="validationStartDateError" class="error">{{ validationStartDateError }}</span>
                 </div>
                 <div class="form-group col-md-6">
-                  <label> {{ __('end_date') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('end_date') }} <i class="text-danger">*</i></label>
                   <input type="date" required class="form-control" v-model="end_date" :placeholder="__('end_date')"
                     @input="validateEndDate" />
                   <span v-if="validationEndDateError" class="error">{{ validationEndDateError }}</span>
                 </div>
 
                 <div class="form-group col-md-6">
-                  <label> {{ __('user_limit_type') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('user_limit_type') }} <i class="text-danger">*</i></label>
                   <select class="form-control form-select" v-model="user_limit_type">
                     <option value="limited">{{ __('limited') }}</option>
                     <option value="unlimited">{{ __('unlimited') }}</option>
                   </select>
                   <div class="row" v-if="user_limit_type === 'limited'">
                     <div class="form-group col-md-12 mt-3 mb-0">
-                      <label>{{ __('no_of_users') }}<i class="text-danger">*</i></label>
+                      <label>{{ __('no_of_users') }} <i class="text-danger">*</i></label>
                       <input type="number" step="1" class="form-control" v-model="no_of_users"
                         :placeholder="__('no_of_users')" @input="validateNoOfUsers" />
                       <span v-if="validationNoOfUsersError" class="error">{{ validationNoOfUsersError }}</span>
@@ -95,12 +95,12 @@
                   </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label>{{ __('minimum_order_amount') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('minimum_order_amount') }} <i class="text-danger">*</i></label>
                   <input type="number" min="0" step="0.01" class="form-control" v-model="minimum_order_amount"
                     :placeholder="__('minimum_order_amount')" />
                 </div>
                 <div class="form-group col-md-6">
-                  <label> {{ __('discount_type') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('discount_type') }} <i class="text-danger">*</i></label>
                   <select class="form-control form-select" v-model="discount_type">
                     <option value="">{{ __('select_discount_type') }}</option>
                     <option value="percentage"> {{ __('percentage') }}</option>
@@ -109,7 +109,7 @@
                 </div>
 
                 <div class="form-group col-md-6" v-if="discount_type != ''">
-                  <label> {{ __('discount') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('discount') }} <i class="text-danger">*</i></label>
                   <input type="number" required min="0.01" max="100" step="0.01" class="form-control"
                     v-if="discount_type == 'percentage'" v-model="discount" :placeholder="__('discount_percentage')"
                     @input="validateDiscountPercentage" />
@@ -119,14 +119,14 @@
                 </div>
 
                 <div class="form-group col-md-6" v-if="discount_type == 'percentage'">
-                  <label> {{ __('max_discount_amount') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('max_discount_amount') }} <i class="text-danger">*</i></label>
                   <input type="number" class="form-control" v-model="max_discount_amount"
                     :placeholder="__('max_discount_amount')" @input="validateMaxDiscountAmount" />
                   <span v-if="validationMaxDiscountAmountError" class="error">{{ validationMaxDiscountAmountError
                     }}</span>
                 </div>
                 <div class="form-group col-md-6">
-                  <label> {{ __('repeat_usage') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('repeat_usage') }} <i class="text-danger">*</i></label>
                   <select class="form-control form-select" v-model="repeat_usage">
                     <option value=""> {{ __('select') }}</option>
                     <option value="1">{{ __('allowed') }}</option>
@@ -135,15 +135,15 @@
                 </div>
 
                 <div class="form-group col-md-6" v-if="repeat_usage === 1 || repeat_usage === '1'">
-                  <label> {{ __('no_of_repeat_usage') }}<i class="text-danger">*</i></label>
+                  <label>{{ __('no_of_repeat_usage') }} <i class="text-danger">*</i></label>
                   <input type="number" min="0" step="1" class="form-control" required v-model="no_of_repeat_usage"
                     :placeholder="__('no_of_repeat_usage')" />
                   <span class="text text-primary font-size-13">{{ __('set_0_if_you_want_ro_remove_limit') }}</span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12">
                   <label>{{ __('image') }}</label>
-                  <p class="text-muted">{{
-                    __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px') }}</p>
+                  <p class="text-muted small mb-2">{{
+                    __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px').replace(/&amp;/g, '&') }}</p>
                   <span v-if="error" class="error">{{ error }}</span>
                   <input type="file" accept="image/*" name="image" v-on:change="handleFileUpload" ref="file_image"
                     class="file-input">
@@ -157,8 +157,8 @@
                       <label>{{ __('drop_files_here_or_click_to_upload') }}</label>
                     </template>
                   </div>
-                  <div class="row" v-if="image_url">
-                    <div class="col-md-4">
+                  <div class="row mt-3" v-if="image_url">
+                    <div class="col-6 col-md-3">
                       <img class="custom-image" :src="image_url" title='Promo code image' alt='Promo code image' />
                     </div>
                   </div>
@@ -199,6 +199,7 @@ export default {
     return {
       isLoading: false,
       isLoadingLanguages: false,
+      validationMaxOrderAmountError: null,
       id: this.record ? this.record.id : "",
       promo_code: this.record ? this.record.promo_code : "",
       message: this.record ? this.record.message : "",
@@ -545,7 +546,7 @@ export default {
           }
         }).catch((error) => {
           vm.isLoading = false;
-          if (error.request.statusText) {
+          if (error.request && error.request.statusText) {
             this.showError(error.request.statusText);
           } else if (error.message) {
             this.showError(error.message);
@@ -595,4 +596,25 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.promo-code-input {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.promo-code-input::placeholder {
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+.custom-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
+</style>

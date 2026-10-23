@@ -18,6 +18,53 @@
                 </div>
             </div>
             <section class="section">
+                <div class="row g-3 mb-3 report-kpis justify-content-start">
+                    <div class="col-6 col-md-4 col-xl">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-blue"><i class="bi bi-cash-stack"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_amount') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ final_total_sum.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl" v-if="salesReports.length > 0">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-green"><i class="bi bi-graph-up"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_revenue') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ total_revenue.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl" v-if="salesReports.length > 0">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-orange"><i class="bi bi-box-seam"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_cost') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ total_cost.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl" v-if="salesReports.length > 0">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2" :class="total_margin >= 0 ? 'bg-stat-green' : 'bg-stat-red'"><i class="bi bi-wallet2"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_margin') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ total_margin.toFixed(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-xl" v-if="salesReports.length > 0">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2" :class="overall_margin_pct >= 0 ? 'bg-stat-green' : 'bg-stat-red'"><i class="bi bi-percent"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('overall_margin_pct') }}</span>
+                                <span class="figma-kpi-value-v2">{{ overall_margin_pct }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="figma-main-section-card">
                     <div class="card-body p-0">
                         <!-- Modern Filter Action Bar -->
@@ -59,13 +106,6 @@
                                                     :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
                                                     :append-to-body="true" opens="right"
                                                     class="w-100"></date-range-picker>
-                                                <button v-if="dateRange.startDate" type="button"
-                                                    class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                    style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                    @click.stop="clearDate()"
-                                                    v-b-tooltip.hover :title="__('clear') || 'Clear'">
-                                                    <i class="fa fa-times-circle text-muted"></i>
-                                                </button>
                                                 <base-icon name="CalendarDots" width="24" height="24"
                                                     class="figma-filter-icon-right" useCurrentColor />
                                             </div>
@@ -127,7 +167,7 @@
                             <b-table :items="salesReports" :fields="fields" :current-page="currentPage"
                                 :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
-                                :bordered="false" :busy="isLoading" stacked="md" show-empty small
+                                :bordered="false" :busy="isLoading" stacked="md" show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')" small
                                 :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table">
                                 <template #head()="data">
                                     <span class="figma-th">{{ data.label }}</span>
@@ -167,49 +207,8 @@
                             </b-table>
                         </div>
 
-                        <!-- Summary Stats Bar -->
-                        <div class="row g-3 my-3" v-if="salesReports.length > 0">
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 rounded border text-center bg-light">
-                                    <div class="text-muted small mb-1">{{ __('total_revenue') }}</div>
-                                    <div class="h6 mb-0 text-primary fw-bold">{{ $currency }} {{
-                                        total_revenue.toFixed(2) }}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 rounded border text-center bg-light">
-                                    <div class="text-muted small mb-1">{{ __('total_cost') }}</div>
-                                    <div class="h6 mb-0 text-secondary fw-bold">{{ $currency }} {{ total_cost.toFixed(2)
-                                        }}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 rounded border text-center bg-light">
-                                    <div class="text-muted small mb-1">{{ __('total_margin') }}</div>
-                                    <div class="h6 mb-0 fw-bold"
-                                        :class="total_margin >= 0 ? 'text-success' : 'text-danger'">{{ $currency }} {{
-                                        total_margin.toFixed(2) }}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 rounded border text-center bg-light">
-                                    <div class="text-muted small mb-1">{{ __('overall_margin_pct') }}</div>
-                                    <div class="h6 mb-0 fw-bold"
-                                        :class="overall_margin_pct >= 0 ? 'text-success' : 'text-danger'">{{
-                                        overall_margin_pct }}%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <b-row>
-                            <div class="col-md-4 text-success h6">{{ __('total_amount') }} :- {{ $currency }} {{
-                                final_total_sum.toFixed(2) }}
-                            </div>
-                        </b-row>
                         <div class="figma-table-footer">
-                            <div class="showing-results-text">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of')
-                                }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                 align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
                                 prev-text="<" next-text=">"></b-pagination>
@@ -298,11 +297,6 @@ export default {
         this.getSalesReports();
     },
     methods: {
-        clearDate() {
-            this.dateRange.startDate = null;
-            this.dateRange.endDate = null;
-            this.getSalesReports();
-        },
         getSalesReports() {
             this.isLoading = true;
             let param = {
@@ -345,4 +339,5 @@ export default {
         min-width: 90%;
     }
 }
+
 </style>

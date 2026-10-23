@@ -53,8 +53,8 @@ class CartApiController extends Controller
         $validationRules = [];
         if (!$is_self_pickup) {
             $validationRules = [
-                'latitude' => 'required',
-                'longitude' => 'required',
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
             ];
         }
 
@@ -66,6 +66,8 @@ class CartApiController extends Controller
             return CommonHelper::responseError($validator->errors()->first());
         }
 
+        $hasLocation = true; // lat/long are validated above for delivery requests
+
         HasTranslations::setOnlyIdAndTranslationsFor(['Product', 'Unit']);
 
         $type = $request->get('type', '');
@@ -74,6 +76,7 @@ class CartApiController extends Controller
         $variant_ids = explode(",", $request->variant_ids);
 
         if (ProductHelper::isItemAvailableInUserCart($user_id)) {
+            $favoriteProductIds = \App\Models\Favorite::where('user_id', $user_id)->pluck('product_id')->toArray();
 
             $res = Cart::select(
                 'carts.*',
@@ -115,6 +118,8 @@ class CartApiController extends Controller
                 if (isset($row->city_id) && $row->city_id != 0 && $row->city_id != "") {
                     if ($is_self_pickup) {
                         $row['is_deliverable'] = 1; // Self-pickup is always "deliverable"
+                    } elseif (!$hasLocation) {
+                        $row['is_deliverable'] = 0;
                     } else {
                         if (CommonHelper::isDeliverable($row->city_id, $request->latitude, $request->longitude)) {
                             $row['is_deliverable'] = 1;
@@ -166,8 +171,18 @@ class CartApiController extends Controller
                 $res[$key]->status = $item->status;
 
                 $res[$key]->product = Product::find($item->product_id);
+                $res[$key]->other_variants_count = \App\Models\ProductVariant::where('product_id', $item->product_id)
+                    ->where('id', '!=', $item->id)
+                    ->where('status', \App\Models\ProductVariant::$statusAvailable)
+                    ->where(function($q) use ($res, $key) {
+                        if (!$res[$key]->product->is_unlimited_stock) {
+                            $q->where('stock', '>', 0);
+                        }
+                    })
+                    ->count();
                 $res[$key]->attribute_values = $item->attributeValues;
                 $res[$key]->cart_id = $row->id;
+                $res[$key]->is_favorite = in_array($item->product_id, $favoriteProductIds) ? 1 : 0;
                 $res[$key]->selected_addons = collect($row->selected_addon_ids ?? [])
                     ->map(fn($id) => $addonOptionsById->get($id))
                     ->filter()
@@ -175,91 +190,103 @@ class CartApiController extends Controller
             }
 
             /*Save for Later*/
-            if ($request->is_checkout != 1) {
-                $result = Cart::with('images')->select(
-                    'carts.*',
-                    'products.cod_allowed',
-                    'products.image',
-                    'products.is_unlimited_stock',
-                    'sellers.longitude',
-                    'sellers.latitude'
-                )
-                    ->Join('products', 'carts.product_id', '=', 'products.id')
-                    ->Join('product_variants', 'carts.product_variant_id', '=', 'product_variants.id')
-                    ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
-                    ->where('carts.save_for_later', 1)
-                    ->where('products.module_id', $moduleId)
-                    ->where('user_id', '=', $user_id)
-                    ->orderBy('created_at', 'DESC')
-                    ->get();
+            $result = Cart::with('images')->select(
+                'carts.*',
+                'products.cod_allowed',
+                'products.image',
+                'products.is_unlimited_stock',
+                'sellers.longitude',
+                'sellers.latitude',
+                'sellers.city_id'
+            )
+                ->Join('products', 'carts.product_id', '=', 'products.id')
+                ->Join('product_variants', 'carts.product_variant_id', '=', 'product_variants.id')
+                ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+                ->where('carts.save_for_later', 1)
+                ->where('products.module_id', $moduleId)
+                ->where('user_id', '=', $user_id)
+                ->orderBy('created_at', 'DESC')
+                ->get();
 
-                $result = $result->makeHidden(['user_id', 'id', 'save_for_later', 'type', 'short_code', 'image', 'created_at', 'updated_at', 'boundary_points', 'selected_addon_ids']);
-                $saveForLaterAddonOptionsById = $this->resolveAddonOptions($result);
-                foreach ($result as $key => $rows) {
+            $result = $result->makeHidden(['user_id', 'id', 'save_for_later', 'type', 'short_code', 'image', 'created_at', 'updated_at', 'boundary_points', 'selected_addon_ids']);
+            $saveForLaterAddonOptionsById = $this->resolveAddonOptions($result);
+            foreach ($result as $key => $rows) {
 
-                    if (isset($rows->max_deliverable_distance) && $rows->max_deliverable_distance != 0 && $rows->max_deliverable_distance != "") {
-                        if ($is_self_pickup) {
+                if (isset($rows->city_id) && $rows->city_id != 0 && $rows->city_id != "") {
+                    if ($is_self_pickup) {
+                        $rows['is_deliverable'] = 1;
+                    } elseif (!$hasLocation) {
+                        $rows['is_deliverable'] = 0;
+                    } else {
+                        if (CommonHelper::isDeliverable($rows->city_id, $request->latitude, $request->longitude)) {
                             $rows['is_deliverable'] = 1;
                         } else {
-                            if (CommonHelper::isDeliverable($rows->max_deliverable_distance, $rows->longitude, $rows->latitude, $request->longitude, $request->latitude)) {
-                                $rows['is_deliverable'] = 1;
-                            } else {
-                                $rows['is_deliverable'] = 0;
-                            }
+                            $rows['is_deliverable'] = 0;
                         }
-                    } else {
-                        $rows['is_deliverable'] = 0;
                     }
-
-                    $item = ProductVariant::select(
-                        'product_variants.*',
-                        'products.cod_allowed',
-                        'products.seller_id as seller_id',
-                        'products.name',
-                        'products.type as d_type',
-                        'products.cod_allowed',
-                        'products.slug',
-                        'products.image',
-                        'products.total_allowed_quantity',
-                        DB::raw('(CASE WHEN taxes.percentage != "0" THEN taxes.percentage ELSE "0" END) AS tax_percentage'),
-                        DB::raw('(CASE WHEN taxes.title != "" THEN taxes.title ELSE "" END) AS tax_title'),
-                        'product_variants.measurement',
-                        DB::raw('(select short_code from attribute_values where attribute_values.attribute_id = product_variants.stock_unit_id limit 1) AS short_code')
-                    )
-                        ->leftJoin('products', 'product_variants.product_id', '=', 'products.id')
-                        ->leftJoin('taxes', 'products.tax_id', '=', 'taxes.id')
-                        ->where('product_variants.id', '=', $rows->product_variant_id)
-                        ->groupBy('product_variants.id')
-                        ->orderBy('created_at', 'DESC')
-                        ->first();
-                    $item = $item->makeHidden(['image', 'created_at', 'updated_at']);
-
-                    $result[$key]->type = $item->type;
-                    $result[$key]->measurement = $item->measurement;
-
-                    $taxed = ProductHelper::getTaxableAmount($item->id);
-
-                    $result[$key]->discounted_price =  CommonHelper::doubleNumber($taxed->taxable_discounted_price ?? $item->discounted_price);
-                    $result[$key]->price = CommonHelper::doubleNumber($taxed->taxable_price ?? $item->price);
-                    $result[$key]->taxable_amount = CommonHelper::doubleNumber($taxed->taxable_amount);
-
-                    $result[$key]->stock = $item->stock;
-                    $result[$key]->images = CommonHelper::getImages($rows->product_id, $rows->product_variant_id);
-                    $result[$key]->total_allowed_quantity = $item->total_allowed_quantity;
-                    $result[$key]->name = $item->name;
-                    $result[$key]->attribute_values = $item->attributeValues;
-                    $result[$key]->short_code = $item->short_code;
-                    $result[$key]->status = $item->status;
-
-                    $result[$key]->product = Product::find($item->product_id);
-                    $result[$key]->cart_id = $rows->id;
-                    $result[$key]->selected_addons = collect($rows->selected_addon_ids ?? [])
-                        ->map(fn($id) => $saveForLaterAddonOptionsById->get($id))
-                        ->filter()
-                        ->values();
+                } else {
+                    $rows['is_deliverable'] = 0;
                 }
+
+                $item = ProductVariant::select(
+                    'product_variants.*',
+                    'products.cod_allowed',
+                    'products.seller_id as seller_id',
+                    'products.name',
+                    'products.type as d_type',
+                    'products.cod_allowed',
+                    'products.slug',
+                    'products.image',
+                    'products.total_allowed_quantity',
+                    DB::raw('(CASE WHEN taxes.percentage != "0" THEN taxes.percentage ELSE "0" END) AS tax_percentage'),
+                    DB::raw('(CASE WHEN taxes.title != "" THEN taxes.title ELSE "" END) AS tax_title'),
+                    'product_variants.measurement',
+                    DB::raw('(select short_code from attribute_values where attribute_values.attribute_id = product_variants.stock_unit_id limit 1) AS short_code')
+                )
+                    ->leftJoin('products', 'product_variants.product_id', '=', 'products.id')
+                    ->leftJoin('taxes', 'products.tax_id', '=', 'taxes.id')
+                    ->where('product_variants.id', '=', $rows->product_variant_id)
+                    ->groupBy('product_variants.id')
+                    ->orderBy('created_at', 'DESC')
+                    ->first();
+                $item = $item->makeHidden(['image', 'created_at', 'updated_at']);
+
+                $result[$key]->type = $item->type;
+                $result[$key]->measurement = $item->measurement;
+
+                $taxed = ProductHelper::getTaxableAmount($item->id);
+
+                $result[$key]->discounted_price =  CommonHelper::doubleNumber($taxed->taxable_discounted_price ?? $item->discounted_price);
+                $result[$key]->price = CommonHelper::doubleNumber($taxed->taxable_price ?? $item->price);
+                $result[$key]->taxable_amount = CommonHelper::doubleNumber($taxed->taxable_amount);
+
+                $result[$key]->stock = $item->stock;
+                $result[$key]->images = CommonHelper::getImages($rows->product_id, $rows->product_variant_id);
+                $result[$key]->total_allowed_quantity = $item->total_allowed_quantity;
+                $result[$key]->name = $item->name;
+                $result[$key]->attribute_values = $item->attributeValues;
+                $result[$key]->short_code = $item->short_code;
+                $result[$key]->status = $item->status;
+
+                $result[$key]->product = Product::find($item->product_id);
+                $result[$key]->other_variants_count = \App\Models\ProductVariant::where('product_id', $item->product_id)
+                    ->where('id', '!=', $item->id)
+                    ->where('status', \App\Models\ProductVariant::$statusAvailable)
+                    ->where(function($q) use ($result, $key) {
+                        if (!$result[$key]->product->is_unlimited_stock) {
+                            $q->where('stock', '>', 0);
+                        }
+                    })
+                    ->count();
+                $result[$key]->cart_id = $rows->id;
+                $result[$key]->is_favorite = in_array($item->product_id, $favoriteProductIds) ? 1 : 0;
+                $result[$key]->selected_addons = collect($rows->selected_addon_ids ?? [])
+                    ->map(fn($id) => $saveForLaterAddonOptionsById->get($id))
+                    ->filter()
+                    ->values();
             }
 
+            $outOfZone = false;
             if ($res->isNotEmpty() || (isset($result) && $result->isNotEmpty())) {
 
                 $total = CommonHelper::getCartCount($user_id);
@@ -268,7 +295,8 @@ class CartApiController extends Controller
                 $saved_amount =  $total->save_price -  $total->total_amount;
                 $saved_amount = ($saved_amount <= 0) ? 0 : $saved_amount;
 
-                if (isset($request->is_checkout) && $request->is_checkout == 1) {
+                // Delivery charge, promo, COD etc. only make sense with active (non save-for-later) items.
+                if ($res->isNotEmpty()) {
 
                     $cod_payment_method = Setting::get_value('cod_payment_method');
                     if ($cod_payment_method == 1) {
@@ -296,7 +324,7 @@ class CartApiController extends Controller
 
                     $is_self_pickup_enabled = (isset($request->is_self_pickup) && $request->is_self_pickup == 1) ? true : false;
 
-                    if ($is_self_pickup_enabled) {
+                    if ($is_self_pickup_enabled || !$hasLocation) {
                         $data = [
                             'status' => 1,
                             'data' => [
@@ -308,15 +336,30 @@ class CartApiController extends Controller
                             ]
                         ];
                     } else {
-                        // For non-self-pickup orders, latitude and longitude are required
-                        if (!isset($request->latitude) || !isset($request->longitude)) {
-                            return CommonHelper::responseError('latitude and longitude are required for delivery orders');
-                        }
                         $data = CommonHelper::getAllDeliveryCharge($request->latitude, $request->longitude, $seller_ids, $sub_total);
                     }
 
+                    // Out-of-zone is not an error: return the cart with is_deliverable = 0
+                    // and no delivery charge. Real failures (e.g. distance API) still error out.
                     if ($data['status'] == 0) {
-                        return CommonHelper::responseError('sorry_we_are_not_delivering_on_selected_address');
+                        $failure = $data['message'] ?? '';
+                        if ($failure === '' || stripos($failure, 'not delivering') !== false) {
+                            $outOfZone = true;
+                            $data = [
+                                'status' => 1,
+                                'data' => [
+                                    'total_delivery_charge' => 0,
+                                    'delivery_charge' => 0,
+                                    'is_delivery_charge_refundable' => intval(Setting::get_value('is_delivery_charge_refundable') ?? 0),
+                                    'is_delivery_charges_refundable' => intval(Setting::get_value('is_delivery_charge_refundable') ?? 0),
+                                    'delivery_charge_details' => []
+                                ]
+                            ];
+                        }
+                    }
+
+                    if ($data['status'] == 0) {
+                        return CommonHelper::responseError($data['message']);
                     } else {
 
                         $free_delivery = $request->get('is_free_delivery', 0);
@@ -448,45 +491,46 @@ class CartApiController extends Controller
 
                 $response['user_balance'] = $user_balance;
                 $response['sub_total'] = $sub_total;
+                // Cart-level flag: 1 when the address is inside a delivery zone (or self-pickup), else 0.
+                // Disabled for now - per-item is_deliverable in cart[] / save_for_later[] is what the app reads.
+                // $response['is_deliverable'] = ($is_self_pickup || ($hasLocation && !$outOfZone)) ? 1 : 0;
                 $response['saved_amount'] = $saved_amount;
 
-                if ($request->is_checkout != 1) {
-                    $response['cart'] = $res;
-                    $response['save_for_later'] = $result;
+                $response['cart'] = $res;
+                $response['save_for_later'] = $result;
 
-                    $global_self_pickup_mode = Setting::where('variable', 'self_pickup_mode')->value('value') ?? 0;
+                $global_self_pickup_mode = Setting::where('variable', 'self_pickup_mode')->value('value') ?? 0;
 
-                    $seller_self_pickup_mode = 0;
-                    $seller_door_step_mode = 1;
-                    if (!empty($res)) {
-                        $cartItems = Cart::select('carts.*', 'products.seller_id', 'sellers.self_pickup_mode', 'sellers.door_step_mode')
-                            ->join('products', 'carts.product_id', '=', 'products.id')
-                            ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
-                            ->where('carts.save_for_later', '=', 0)
-                            ->where('products.module_id', $moduleId)
-                            ->where('user_id', '=', $user_id)
-                            ->first();
+                $seller_self_pickup_mode = 0;
+                $seller_door_step_mode = 1;
+                if (!empty($res)) {
+                    $cartItems = Cart::select('carts.*', 'products.seller_id', 'sellers.self_pickup_mode', 'sellers.door_step_mode')
+                        ->join('products', 'carts.product_id', '=', 'products.id')
+                        ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+                        ->where('carts.save_for_later', '=', 0)
+                        ->where('products.module_id', $moduleId)
+                        ->where('user_id', '=', $user_id)
+                        ->first();
 
-                        if ($cartItems) {
-                            $seller_self_pickup_mode = $cartItems->self_pickup_mode ?? 0;
-                            $seller_door_step_mode = $cartItems->door_step_mode ?? 1;
-                        }
-                    }
-
-                    $response['self_pickup_mode'] = ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 1) ? 1 : 0;
-
-                    $response['doorstep_delivery_mode'] = 0;
-
-                    if ($global_self_pickup_mode == 0) {
-                        $response['doorstep_delivery_mode'] = 1;
-                    } elseif ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 0 && $seller_door_step_mode == 1) {
-                        $response['doorstep_delivery_mode'] = 1;
-                    } elseif ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 1 && $seller_door_step_mode == 1) {
-                        $response['doorstep_delivery_mode'] = 1;
+                    if ($cartItems) {
+                        $seller_self_pickup_mode = $cartItems->self_pickup_mode ?? 0;
+                        $seller_door_step_mode = $cartItems->door_step_mode ?? 1;
                     }
                 }
 
-                if (isset($request->is_checkout) && $request->is_checkout == 1) {
+                $response['self_pickup_mode'] = ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 1) ? 1 : 0;
+
+                $response['doorstep_delivery_mode'] = 0;
+
+                if ($global_self_pickup_mode == 0) {
+                    $response['doorstep_delivery_mode'] = 1;
+                } elseif ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 0 && $seller_door_step_mode == 1) {
+                    $response['doorstep_delivery_mode'] = 1;
+                } elseif ($global_self_pickup_mode == 1 && $seller_self_pickup_mode == 1 && $seller_door_step_mode == 1) {
+                    $response['doorstep_delivery_mode'] = 1;
+                }
+
+                if ($res->isNotEmpty()) {
                     $applicableType = $is_self_pickup ? 'self_pickup' : 'order';
                     $charges = AdditionalCharge::withTranslation()
                         ->where('is_active', true)
@@ -515,6 +559,10 @@ class CartApiController extends Controller
                         $response['total_amount'] += $additional_charges_total;
                     }
                     $response['additional_charges'] = $additional_charges;
+
+                    // Delivery time slots, so checkout needs no separate time_slots call.
+                    $timeSlotsData = app(SettingApiController::class)->buildTimeSlotsData();
+                    $response['time_slots_data'] = $timeSlotsData ?? ['time_slots_is_enabled' => 0];
                 } else {
                     $response['additional_charges'] = [];
                 }
@@ -1015,6 +1063,15 @@ class CartApiController extends Controller
                 $row->images = CommonHelper::getImages($row->product_id, $row->id);
 
                 $row->product = Product::find($row->product_id);
+                $row->other_variants_count = ProductVariant::where('product_id', $row->product_id)
+                    ->where('id', '!=', $row->id)
+                    ->where('status', ProductVariant::$statusAvailable)
+                    ->where(function($q) use ($row) {
+                        if (!$row->product->is_unlimited_stock) {
+                            $q->where('stock', '>', 0);
+                        }
+                    })
+                    ->count();
                 $row->attribute_values = $row->attributeValues;
 
                 // Map the quantity to the variant
@@ -1067,10 +1124,7 @@ class CartApiController extends Controller
                 $reqPresArray = array_values(array_unique(array_column($res->toArray(), 'require_prescription')));
                 $response['require_prescription'] = in_array(1, $reqPresArray) ? 1 : 0;
 
-                if ($request->is_checkout != 1) {
-                    $response['cart'] = $res;
-                    //$response['save_for_later'] = $result;
-                }
+                $response['cart'] = $res;
                 return CommonHelper::responseWithData($response, $total['cart_items_count']);
             } else {
                 return CommonHelper::responseError('no_items_found_in_users_cart');
@@ -1243,6 +1297,53 @@ class CartApiController extends Controller
             ]);
         }
     }
+    /**
+     * Remove every cart line that can no longer be bought: inactive/unapproved product or variant,
+     * inactive seller, or out of stock. Backs the "Clear All" button of the checkout's
+     * unavailable-items block.
+     */
+    public function clearUnavailable(Request $request)
+    {
+        $user_id = auth()->user()->id;
+        $moduleId = request()->header('X-Module-Id') ?: 1;
+
+        $cartIds = Cart::select('carts.id')
+            ->join('products', 'carts.product_id', '=', 'products.id')
+            ->join('product_variants', 'carts.product_variant_id', '=', 'product_variants.id')
+            ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+            ->where('carts.user_id', $user_id)
+            ->where('carts.save_for_later', 0)
+            ->where('products.module_id', $moduleId)
+            ->where(function ($q) {
+                $q->where('products.status', '!=', 1)
+                    ->orWhere('products.is_approved', '!=', 1)
+                    ->orWhere('product_variants.status', '!=', 1)
+                    ->orWhere('sellers.status', '!=', 1)
+                    ->orWhere(function ($q) {
+                        $q->where('products.is_unlimited_stock', 0)
+                            ->where('product_variants.stock', '<=', 0);
+                    });
+            })
+            ->pluck('carts.id');
+
+        if ($cartIds->isNotEmpty()) {
+            Cart::whereIn('id', $cartIds)->delete();
+        }
+
+        $total = CommonHelper::getCartCount($user_id);
+        $saved_amount = max(0, $total->save_price - $total->total_amount);
+
+        return Response::json([
+            'status' => 1,
+            'message' => 'unavailable_items_removed_from_users_cart_successfully',
+            'removed_count' => $cartIds->count(),
+            'cart_items_count' => $total->cart_items_count,
+            'cart_total_qty' => $total->cart_total_qty,
+            'sub_total' => $total->total_amount,
+            'saved_amount' => $saved_amount,
+        ]);
+    }
+
     public function getCartCount()
     {
         $userId = auth()->id(); // Example for logged-in user

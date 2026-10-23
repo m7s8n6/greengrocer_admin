@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
                 <h3 class="modern-page-title mb-0">{{ __('seller_requests') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -27,6 +27,10 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
+                                <div class="view-toggle" role="group" :aria-label="__('view')">
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                </div>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
@@ -34,14 +38,76 @@
                                 </button>
                             </div>
                         </div>
-                        <b-row class="table-responsive">
+                        <!-- Grid view -->
+                        <div v-if="viewMode === 'grid'">
+                            <div v-if="isLoading" class="item-grid-state">
+                                <i class="bi bi-hourglass-split"></i>{{ __('loading') }}...
+                            </div>
+                            <div v-else-if="!gridRecords.length" class="item-grid-state">
+                                <i class="bi bi-inbox"></i>{{ __('no_records_to_show') }}
+                            </div>
+                            <div v-else class="item-grid item-grid--single-xs">
+                                <div v-for="item in pagedItems(gridRecords)" :key="item.id" class="item-card">
+                                    <div class="item-card-media item-card-media--avatar">
+                                        <img v-if="item.logo" :src="$storageUrl + item.logo" :alt="item.store_name || item.name" />
+                                        <span v-else class="item-card-avatar">{{ initial(item.name) }}</span>
+                                    </div>
+                                    <div class="item-card-body">
+                                        <div class="item-card-title">{{ item.name }}</div>
+                                        <div class="item-card-meta" v-if="item.store_name"><i class="bi bi-shop me-1"></i>{{ item.store_name }}</div>
+                                        <div class="item-card-meta"><i class="bi bi-envelope me-1"></i>{{ item.email | emailMask }}</div>
+                                        <div class="item-card-meta"><i class="bi bi-telephone me-1"></i>{{ item.mobile | mobileMask }}</div>
+                                        <div class="item-card-meta" v-if="item.city && item.city.formatted_address"><i class="bi bi-geo-alt me-1"></i>{{ item.city.formatted_address }}</div>
+                                        <div>
+                                            <label v-if="item.status == 0" class='figma-status-pill bg-primary mb-0'>{{ __('registered') }}</label>
+                                            <label v-else-if="item.status == 1" class='figma-status-pill bg-success mb-0'>{{ __('approved') }}</label>
+                                            <label v-else-if="item.status == 2" class='figma-status-pill bg-warning mb-0'>{{ __('reject') }}</label>
+                                            <label v-else-if="item.status == 3" class='figma-status-pill bg-danger mb-0'>{{ __('deactive') }}</label>
+                                            <label v-else-if="item.status == 7" class='figma-status-pill bg-danger mb-0'>{{ __('removed') }}</label>
+                                        </div>
+                                        <div class="item-card-stats justify-content-center">
+                                            <span class="item-card-chip">#{{ item.id }}</span>
+                                            <span class="item-card-chip">{{ __('commission') }}: {{ item.commission }}</span>
+                                            <span class="item-card-chip" v-if="item.categories_array" style="cursor: pointer;"
+                                                v-b-tooltip.hover :title="item.categories_array"><i class="fa fa-info-circle"></i>{{ __('category') }}</span>
+                                            <span class="item-card-chip" style="cursor: pointer;"
+                                                v-b-tooltip.hover="{ html: true, title: sellerInfoHtml(item), boundary: 'window' }"><i class="fa fa-info-circle"></i>{{ __('seller_info') }}</span>
+                                            <span class="item-card-chip" style="cursor: pointer;"
+                                                v-b-tooltip.hover="{ html: true, title: storeInfoHtml(item), boundary: 'window' }"><i class="fa fa-info-circle"></i>{{ __('store_information') }}</span>
+                                            <span class="item-card-chip" style="cursor: pointer;"
+                                                v-b-tooltip.hover="{ html: true, title: otherInfoHtml(item), boundary: 'window' }"><i class="fa fa-info-circle"></i>{{ __('other_info') }}</span>
+                                            <span class="item-card-chip" v-if="item.created_at"><i class="bi bi-calendar3"></i>{{ item.created_at }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-footer request-card-footer" v-if="$can('seller_delete')">
+                                        <button class="btn btn-sm btn-outline-success request-card-btn" type="button"
+                                            @click="updateStatus(fullIndex(item), item.id, 1)">
+                                            <i class="bi bi-check-circle"></i>{{ __('approve') }}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger request-card-btn" type="button"
+                                            @click="updateStatus(fullIndex(item), item.id, 2)">
+                                            <i class="bi bi-x-circle"></i>{{ __('reject') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else class="table-responsive">
                             <b-table :items="translatedRecords" :fields="fields" :current-page="currentPage"
                                 :per-page="perPage" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
                                 :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                                 :busy="isLoading" stacked="md" show-empty
                                 :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -54,54 +120,53 @@
                                     {{ row.item.mobile | mobileMask }}
                                 </template>
                                 <template #cell(seller_info)="row">
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
+                                    <small class="d-inline-flex me-2 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2 align-middle"
                                         v-b-tooltip.hover="{ html: true, title: sellerInfoHtml(row.item), boundary: 'window' }">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
                                     {{ row.item.name }}
                                 </template>
                                 <template #cell(store_info)="row">
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
+                                    <small class="d-inline-flex me-2 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2 align-middle"
                                         v-b-tooltip.hover="{ html: true, title: storeInfoHtml(row.item), boundary: 'window' }">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
                                     {{ row.item.store_name }}
                                 </template>
                                 <template #cell(other_info)="row">
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
+                                    <small class="d-inline-flex me-2 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2 align-middle"
                                         v-b-tooltip.hover="{ html: true, title: otherInfoHtml(row.item), boundary: 'window' }">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
                                     {{ row.item.store_name }}
                                 </template>
                                 <template #cell(logo)="row">
-                                    <span v-if="!row.item.logo">{{ __('no_image') }}</span>
-                                    <img v-else :src="$storageUrl + row.item.logo" height="50" />
+                                    <img :src="row.item.logo ? ($storageUrl + row.item.logo) : $placeholderImage" class="rounded-3 border" height="40" width="40" />
                                 </template>
                                 <template #cell(created_at)="row">
                                     {{ row.item.created_at }}
                                 </template>
                                 <template #cell(status)="row">
-                                    <label v-if="row.item.status == 0" class='badge bg-primary'>{{ __('registered')
+                                    <label v-if="row.item.status == 0" class='figma-status-pill bg-primary mb-0'>{{ __('registered')
                                         }}</label>
-                                    <label v-else-if="row.item.status == 1" class='badge bg-success'>{{ __('approved')
+                                    <label v-else-if="row.item.status == 1" class='figma-status-pill bg-success mb-0'>{{ __('approved')
                                         }}</label>
-                                    <label v-else-if="row.item.status == 2" class='badge bg-warning'>{{ __('reject')
+                                    <label v-else-if="row.item.status == 2" class='figma-status-pill bg-warning mb-0'>{{ __('reject')
                                         }}</label>
-                                    <label v-else-if="row.item.status == 3" class='badge bg-danger'>{{ __('deactive')
+                                    <label v-else-if="row.item.status == 3" class='figma-status-pill bg-danger mb-0'>{{ __('deactive')
                                         }}</label>
-                                    <label v-else-if="row.item.status == 7" class='badge bg-danger'>{{ __('removed')
+                                    <label v-else-if="row.item.status == 7" class='figma-status-pill bg-danger mb-0'>{{ __('removed')
                                         }}</label>
                                 </template>
 
                                 <template #cell(require_products_approval)="row">
-                                    <label v-if="row.item.require_products_approval == 1" class='badge bg-success'>{{
+                                    <label v-if="row.item.require_products_approval == 1" class='figma-status-pill bg-success mb-0'>{{
                                         __('yes') }}</label>
                                     <label v-else-if="row.item.require_products_approval == 0"
-                                        class='badge bg-danger'>{{ __('no') }}</label>
+                                        class='figma-status-pill bg-danger mb-0'>{{ __('no') }}</label>
                                 </template>
                                 <template #cell(actions)="row">
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex gap-2 justify-content-center">
                                         <button class="figma-action-btn" type="button"
                                             @click="updateStatus(row.index, row.item.id, 1)" v-if="$can('seller_delete')"
                                             v-b-tooltip.hover :title="__('approve')">
@@ -116,16 +181,19 @@
                                 </template>
 
                             </b-table>
-                        </b-row>
+                        </div>
 
                     </div>
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                            'of' }} <span class="showing-bold">{{ totalRows }}</span>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                            <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                                class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         </div>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
-                            class="figma-pagination mb-0"></b-pagination>
+                            class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<"
+                            next-text=">"></b-pagination>
                     </div>
                 </div>
 
@@ -134,20 +202,23 @@
     </div>
 </template>
 <script>
+import ViewModeMixin from '../../mixins/ViewModeMixin';
+
 export default {
+    mixins: [ViewModeMixin],
     data: function () {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'seller_info', label: __('seller_info'), class: 'text-legt', sortable: true, sortDirection: 'desc' },
-                { key: 'store_info', label: __('seller_info'), class: 'text-left', sortable: true, sortDirection: 'desc' },
-                { key: 'categories_array', label: __('category'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'city.formatted_address', label: __('city'), class: 'text-center', sortable: true, sortDirection: 'desc' },
+                { key: 'seller_info', label: __('seller_info'), sortable: true, sortDirection: 'desc' },
+                { key: 'store_info', label: __('store_information'), class: 'text-left', sortable: true, sortDirection: 'desc' },
+                { key: 'categories_array', label: __('category'), sortable: true, sortDirection: 'desc' },
+                { key: 'city.formatted_address', label: __('city'), sortable: true, sortDirection: 'desc' },
                 { key: 'logo', label: __('logo'), class: 'text-center', sortable: true, sortDirection: 'desc' },
                 { key: 'other_info', label: __('other_info'), class: 'text-left', sortable: true, sortDirection: 'desc' },
-                { key: 'commission', label: __('commission'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'created_at', label: __('date'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'status', label: __('status'), class: 'text-center', sortable: true, sortDirection: 'desc' },
+                { key: 'commission', label: __('commission'), sortable: true, sortDirection: 'desc' },
+                { key: 'created_at', label: __('date'), sortable: true, sortDirection: 'desc' },
+                { key: 'status', label: __('status'), sortable: true, sortDirection: 'desc' },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,
@@ -195,6 +266,10 @@ export default {
                 return translatedSeller;
             });
         },
+        // Grid view: same records and order as the table (search is server side).
+        gridRecords() {
+            return this.gridSort(this.translatedRecords);
+        },
         pageEnd() {
             return Math.min(this.currentPage * this.perPage, this.totalRows);
         }
@@ -211,7 +286,16 @@ export default {
             this.getRecords();
         });
     },
+    watch: {
+        perPage() {
+            this.currentPage = 1;
+        }
+    },
     methods: {
+        // Grid view: same order as the b-table (its sortBy / sortDesc are synced from the list view headers).
+        fullIndex(item) {
+            return (this.records || []).findIndex(r => r.id === item.id);
+        },
         escapeHtml(value) {
             const div = document.createElement('div');
             div.textContent = value ?? '';
@@ -234,7 +318,6 @@ export default {
         storeInfoHtml(item) {
             return this.kvTableHtml(__('store_details'), [
                 [__('name'), item.store_name],
-                [__('url'), item.store_url],
                 [__('description'), this.strip_tags(item.store_description)],
             ]);
         },
@@ -300,8 +383,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(async result => {
                 if (result.value) {
                     let remarks = "";
@@ -359,8 +442,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -380,3 +463,23 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* Approve / reject buttons in the grid card footer (registration requests) */
+.request-card-footer {
+    gap: 8px;
+}
+
+.request-card-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+</style>

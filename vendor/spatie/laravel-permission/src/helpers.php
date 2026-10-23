@@ -1,20 +1,33 @@
 <?php
 
-if (! function_exists('getModelForGuard')) {
-    /**
-     * @param string $guard
-     *
-     * @return string|null
-     */
-    function getModelForGuard(string $guard)
-    {
-        return collect(config('auth.guards'))
-            ->map(function ($guard) {
-                if (! isset($guard['provider'])) {
-                    return;
-                }
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Guard;
+use Spatie\Permission\PermissionRegistrar;
 
-                return config("auth.providers.{$guard['provider']}.model");
-            })->get($guard);
+if (! function_exists('getModelForGuard')) {
+    function getModelForGuard(string $guard): ?string
+    {
+        return Guard::getModelForGuard($guard);
+    }
+
+}
+
+if (! function_exists('setPermissionsTeamId')) {
+    /**
+     * @param  int|string|null|Model  $id
+     */
+    function setPermissionsTeamId($id)
+    {
+        app(PermissionRegistrar::class)->setPermissionsTeamId($id);
+    }
+}
+
+if (! function_exists('getPermissionsTeamId')) {
+    /**
+     * @return int|string|null
+     */
+    function getPermissionsTeamId()
+    {
+        return app(PermissionRegistrar::class)->getPermissionsTeamId();
     }
 }

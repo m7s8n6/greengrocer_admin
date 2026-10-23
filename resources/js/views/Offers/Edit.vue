@@ -1,14 +1,14 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade static>
-        <div slot="modal-footer">
-            <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }} 
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+            <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
-                <div class="form-group">
+                <div class="form-group col-12 col-md-6">
                     <label>{{ __('type') }}</label>
                     <select class="form-control form-select" v-model="type">
                         <option value="default"> {{ __('default') }}</option>
@@ -17,34 +17,34 @@
                         <option value="offer_url"> {{ __('offer_url') }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='category'">
+                <div class="form-group col-12 col-md-6" v-if="type=='category'">
                     <label>{{ __('category') }}</label>
                     <select class="form-control form-select" v-model="type_id" required >
                         <option value="">{{ __('select_category') }}</option>
                         <option v-for="category in categories" :value="category.id">{{ category.name }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='product'">
-                    <label> {{ __('products') }}</label>
+                <div class="form-group col-12 col-md-6" v-if="type=='product'">
+                    <label>{{ __('products') }}</label>
                     <select class="form-control form-select" v-model="type_id" required>
                         <option value=""> {{ __('select_product') }}</option>
                         <option v-for="product in products" :value="product.id">{{ product.name }}</option>
                     </select>
                 </div>
-                <div class="form-group" v-if="type=='offer_url'">
-                    <label> {{ __('link') }}</label>
+                <div class="form-group col-12 col-md-6" v-if="type=='offer_url'">
+                    <label>{{ __('link') }}</label>
                     <input type="url" class="form-control" v-model="offer_url" placeholder="Enter Link" required>
                 </div>
              
-                <div class="form-group">
-                    <label for="offer_image">{{ __('offer_image') }}<i class="text-danger">*</i></label>
-                    <p class="text-muted">{{ __('image_prefer_size_1024px_width_200px_height') }}</p>
+                <div class="form-group col-12">
+                    <label for="offer_image">{{ __('offer_image') }} <i class="text-danger">*</i></label>
+                    <p class="text-muted small mb-2">{{ __('image_prefer_size_1024px_width_200px_height') }}</p>
                     <span v-if="error" class="error">{{ error }}</span>
                     <input type="file" name="offer_image" accept="image/*" id="offer_image" v-on:change="handleFileUpload" ref="file_image" class="file-input">
 
                     <div class="file-input-div bg-gray-100" @click="$refs.file_image.click()" @drop="dropFile" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
                         <template v-if="image && image.name !== ''">
-                            <label> {{ __('selected_file_name') }} {{ image.name }}</label>
+                            <label>{{ __('selected_file_name') }} {{ image.name }}</label>
                         </template>
                         <template v-else>
                             <label><i class="fa fa-cloud-upload-alt fa-2x"></i></label>
@@ -52,14 +52,14 @@
                         </template>
                     </div>
 
-                    <div class="row" v-if="image_url">
-                        <div class="col-md-2">
+                    <div class="row mt-3" v-if="image_url">
+                        <div class="col-12">
                             <img class="custom-image" :src="image_url" title='Offer Image' alt='Offer Image'/>
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="position"> {{ __('position') }}<i class="text-danger">*</i></label>
+                <div class="form-group col-12 col-md-6">
+                    <label for="position">{{ __('position') }} <i class="text-danger">*</i></label>
                     <select name="position" id="position" v-model="position" class="form-control form-select">
                         <option value="top"> {{ __('top') }}</option>
                         <option value="below_slider"> {{ __('below_slider') }}</option>
@@ -68,8 +68,8 @@
                     </select>
                 </div>
 
-                <div class="form-group" v-if="position === 'below_section'">
-                    <label for="section_id"> {{ __('section_position') }}<i class="text-danger">*</i></label>
+                <div class="form-group col-12 col-md-6" v-if="position === 'below_section'">
+                    <label for="section_id">{{ __('section_position') }} <i class="text-danger">*</i></label>
                     <select name="section_id" id="section_id" v-model="section_id" class="form-control form-select">
                         <option value=""> {{ __('select_section') }}</option>
                         <option v-for="section in sections" :value="section.id">{{section.title}}</option>
@@ -183,7 +183,7 @@ export default {
                 }
             }).catch(error => {
                 vm.isLoading = false;
-                if (error.request.statusText) {
+                if (error.request && error.request.statusText) {
                     this.showError(error.request.statusText);
                 }else if (error.message) {
                     this.showError(error.message);
@@ -201,5 +201,15 @@ export default {
 </script>
 
 <style scoped>
-
+.custom-image {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1024 / 200;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
 </style>

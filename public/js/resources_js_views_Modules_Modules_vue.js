@@ -282,23 +282,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -614,39 +597,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.image_url = URL.createObjectURL(file);
       }
     },
-    isModuleActive: function isModuleActive(id) {
-      var module = this.modules.find(function (m) {
-        return m.id === id;
-      });
-      return !!module && module.status === 1;
-    },
-    onStatusToggle: function onStatusToggle(id, checked, event) {
-      var module = this.modules.find(function (m) {
-        return m.id === id;
-      });
-      if (!module) {
-        return;
-      }
-      if (!checked) {
+    toggleStatus: function toggleStatus(item) {
+      var _this10 = this;
+      if (item.status === 0) {
         var otherActiveModules = this.modules.filter(function (m) {
-          return m.id !== id && m.status === 1;
+          return m.id !== item.id && m.status === 1;
         });
-        if (otherActiveModules.length === 0 || module.is_default) {
-          // Reject before touching module.status - undoes the browser's own optimistic
-          // toggle on the native checkbox immediately, instead of relying on Vue's
-          // reactive repaint to race the (synchronously painted) error modal.
-          if (event && event.target) {
-            event.target.checked = true;
+        if (otherActiveModules.length === 0 || item.is_default) {
+          this.showError(otherActiveModules.length === 0 ? __('at_least_one_module_must_be_on') || 'At least one module must be active' : __('default_module_must_be_active') || 'Default module must be active');
+          item.status = 1;
+          var originalModule = this.modules.find(function (m) {
+            return m.id === item.id;
+          });
+          if (originalModule) {
+            originalModule.status = 1;
           }
-          this.showError(otherActiveModules.length === 0 ? __('at_least_one_module_must_be_on') || 'At least one module must be active' : __('default_module_must_be_active') || 'Default module must be active. Please set another module as default first before disabling this one.');
+          this.tableKey++; // Force table re-render
           return;
         }
       }
-      module.status = checked ? 1 : 0;
-      this.toggleStatus(module);
-    },
-    toggleStatus: function toggleStatus(item) {
-      var _this10 = this;
       var fd = new FormData();
       fd.append('id', item.id);
       fd.append('name', item.name);
@@ -657,6 +626,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         if (response.data.status === 1) {
           _this10.showMessage('success', response.data.message || 'Status updated successfully');
           _this10.$eventBus.$emit('modulesUpdated');
+          var _originalModule = _this10.modules.find(function (m) {
+            return m.id === item.id;
+          });
+          if (_originalModule) {
+            _originalModule.status = item.status;
+          }
           var activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
           if (item.id === activeModuleId && item.status === 0) {
             var otherActiveModule = _this10.modules.find(function (m) {
@@ -672,11 +647,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         } else {
           _this10.showError(response.data.message);
           item.status = 1;
+          var _originalModule2 = _this10.modules.find(function (m) {
+            return m.id === item.id;
+          });
+          if (_originalModule2) {
+            _originalModule2.status = 1;
+          }
+          _this10.tableKey++; // Force table re-render
           _this10.getRecords();
         }
       })["catch"](function () {
         _this10.showError(__('something_went_wrong'));
         item.status = 1;
+        var originalModule = _this10.modules.find(function (m) {
+          return m.id === item.id;
+        });
+        if (originalModule) {
+          originalModule.status = 1;
+        }
+        _this10.tableKey++; // Force table re-render
         _this10.getRecords();
       });
     },
@@ -1138,7 +1127,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.file-input-div[data-v-b99ddee0] {\n    border: 2px dashed #d1d5db;\n    border-radius: 8px;\n    padding: 20px;\n    text-align: center;\n    cursor: pointer;\n    display: block;\n    transition: all 0.2s ease-in-out;\n}\n.file-input-div[data-v-b99ddee0]:hover {\n    background-color: #f3f4f6;\n    border-color: #9ca3af;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.module-grid[data-v-b99ddee0] {\n    padding: 20px 20px 4px;\n}\n.module-card[data-v-b99ddee0] {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n    padding: 16px;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    box-shadow: var(--ui-shadow);\n    transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.module-card[data-v-b99ddee0]:hover {\n    border-color: var(--theme-primary-300);\n    box-shadow: var(--ui-shadow-lg);\n}\n.module-card__top[data-v-b99ddee0] {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n}\n.module-card__icon[data-v-b99ddee0] {\n    flex: 0 0 42px;\n    width: 42px;\n    height: 42px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 10px;\n    background: var(--ui-primary-soft);\n    color: var(--theme-primary-600);\n    overflow: hidden;\n}\n.module-card__icon img[data-v-b99ddee0] {\n    width: 26px;\n    height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n.module-card__title[data-v-b99ddee0] {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n.module-card__title h6[data-v-b99ddee0] {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.module-card__title small[data-v-b99ddee0] {\n    font-size: 12px;\n}\n.module-card__drag[data-v-b99ddee0] {\n    flex: 0 0 32px;\n    width: 32px;\n    height: 32px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    color: var(--ui-text-subtle);\n    cursor: move;\n}\n.module-card__drag[data-v-b99ddee0]:hover {\n    color: var(--theme-primary-600);\n    border-color: var(--theme-primary-300);\n}\n.module-card__desc[data-v-b99ddee0] {\n    flex: 1 1 auto;\n    margin: 0;\n    font-size: 13px;\n    color: var(--ui-text-muted);\n    display: -webkit-box;\n    -webkit-line-clamp: 2;\n    -webkit-box-orient: vertical;\n    overflow: hidden;\n}\n.module-card__foot[data-v-b99ddee0] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding-top: 12px;\n    border-top: 1px solid var(--ui-border);\n}\n.module-card__switch[data-v-b99ddee0] {\n    cursor: pointer;\n}\n.module-empty[data-v-b99ddee0] {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 8px;\n    padding: 40px 16px 56px;\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n.module-empty i[data-v-b99ddee0] {\n    font-size: 28px;\n    color: var(--ui-text-subtle);\n}\n.module-preview[data-v-b99ddee0] {\n    max-height: 150px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n@media (max-width: 575.98px) {\n.module-grid[data-v-b99ddee0] {\n        padding: 16px 16px 4px;\n}\n}\n.file-input-div[data-v-b99ddee0] {\n    border: 2px dashed var(--ui-border-strong);\n    border-radius: var(--ui-radius);\n    padding: 20px;\n    text-align: center;\n    cursor: pointer;\n    display: block;\n    transition: all 0.2s ease-in-out;\n}\n.file-input-div[data-v-b99ddee0]:hover {\n    background-color: var(--ui-surface-muted);\n    border-color: var(--theme-primary-300);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1282,11 +1271,12 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "page-title mb-2" }, [
+        _c("div", { staticClass: "page-title mb-3" }, [
           _c(
             "div",
             {
-              staticClass: "d-flex justify-content-between align-items-center",
+              staticClass:
+                "d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2",
             },
             [
               _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -1379,7 +1369,7 @@ var render = function () {
                           },
                         ],
                         staticClass:
-                          "btn btn-figma-filter d-flex align-items-center gap-2",
+                          "btn btn-figma-columns d-flex align-items-center gap-2",
                         attrs: { title: _vm.__("refresh") },
                         on: {
                           click: function ($event) {
@@ -1403,7 +1393,7 @@ var render = function () {
             _vm.isLoading
               ? _c(
                   "div",
-                  { staticClass: "text-center text-black my-3" },
+                  { staticClass: "text-center text-muted my-4" },
                   [
                     _c("b-spinner", { staticClass: "align-middle" }),
                     _vm._v(" "),
@@ -1412,495 +1402,642 @@ var render = function () {
                   1
                 )
               : !_vm.canReorder
-              ? _c(
-                  "div",
-                  { staticClass: "table-responsive mb-0" },
-                  [
-                    _c("b-table", {
-                      key: _vm.tableKey,
-                      staticClass: "mb-0",
-                      attrs: {
-                        items: _vm.translatedModules,
-                        fields: _vm.fields,
-                        filter: _vm.filter,
-                        "sort-by": _vm.sortBy,
-                        "sort-desc": _vm.sortDesc,
-                        "sort-direction": _vm.sortDirection,
-                        bordered: false,
-                        "show-empty": "",
-                        small: "",
-                      },
-                      on: {
-                        "update:sortBy": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sort-by": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sortDesc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                        "update:sort-desc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "cell(id)",
-                          fn: function (row) {
-                            return [
-                              _vm._v(
-                                "\n                            " +
-                                  _vm._s(row.item.id) +
-                                  "\n                        "
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(image)",
-                          fn: function (row) {
-                            return [
-                              !row.item.image_url
-                                ? _c("p", { staticClass: "mb-0 text-muted" }, [
-                                    _vm._v(_vm._s(_vm.__("no_image"))),
-                                  ])
-                                : _c("img", {
-                                    staticClass: "rounded",
-                                    staticStyle: {
-                                      "object-fit": "cover",
-                                      width: "50px",
-                                    },
-                                    attrs: {
-                                      src: row.item.image_url,
-                                      height: "50",
-                                    },
-                                  }),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(description)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "p",
-                                {
-                                  directives: [
-                                    {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      modifiers: { hover: true },
-                                    },
-                                  ],
-                                  staticClass:
-                                    "mb-0 text-truncate text-center mx-auto",
-                                  staticStyle: { "max-width": "250px" },
-                                  attrs: {
-                                    title:
-                                      row.item.description ||
-                                      _vm.__("no_description"),
-                                  },
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                " +
-                                      _vm._s(
-                                        row.item.description ||
-                                          _vm.__("no_description")
-                                      ) +
-                                      "\n                            "
-                                  ),
-                                ]
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(is_default)",
-                          fn: function (row) {
-                            return [
-                              row.item.is_default
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("yes") || "Yes"))]
-                                  )
-                                : _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("no") || "No"))]
-                                  ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(status)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "form-check form-switch d-flex justify-content-center",
-                                },
-                                [
-                                  _c("input", {
-                                    staticClass: "form-check-input",
-                                    staticStyle: { cursor: "pointer" },
-                                    attrs: {
-                                      type: "checkbox",
-                                      id: "status-" + row.item.id,
-                                    },
-                                    domProps: {
-                                      checked: _vm.isModuleActive(row.item.id),
-                                    },
-                                    on: {
-                                      change: function ($event) {
-                                        return _vm.onStatusToggle(
-                                          row.item.id,
-                                          $event.target.checked,
-                                          $event
-                                        )
-                                      },
-                                    },
-                                  }),
-                                ]
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(actions)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "d-flex justify-content-center gap-2",
-                                },
-                                [
-                                  _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("edit") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.editRecord(row.item)
-                                        },
-                                      },
-                                    },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "edit icon",
-                                          hoverName: "edit Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
-                                    ],
-                                    1
-                                  ),
-                                ]
-                              ),
-                            ]
-                          },
-                        },
-                      ]),
-                    }),
-                  ],
-                  1
-                )
-              : _c("div", { staticClass: "table-responsive mb-0" }, [
-                  _c(
-                    "table",
-                    { staticClass: "table b-table mb-0" },
-                    [
-                      _c("thead", [
-                        _c("tr", [
-                          _c("th", {
-                            staticClass: "text-center",
-                            staticStyle: { width: "40px" },
-                          }),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("id"))),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("name"))),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("image"))),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("description"))),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("default") || "Default")),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("status"))),
-                          ]),
-                          _vm._v(" "),
-                          _c("th", { staticClass: "text-center" }, [
-                            _vm._v(_vm._s(_vm.__("actions"))),
-                          ]),
+              ? _c("div", { staticClass: "module-grid" }, [
+                  !_vm.translatedModules.length
+                    ? _c("div", { staticClass: "module-empty" }, [
+                        _c("i", { staticClass: "fa fa-cubes" }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.__("no_records_to_show"))),
                         ]),
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "draggable",
-                        {
-                          attrs: {
-                            tag: "tbody",
-                            animation: "200",
-                            handle: ".drag-handle",
-                            move: _vm.onModuleMove,
-                          },
-                          on: { end: _vm.updateModulesOrder },
-                          model: {
-                            value: _vm.modules,
-                            callback: function ($$v) {
-                              _vm.modules = $$v
+                      ])
+                    : _c(
+                        "div",
+                        { key: _vm.tableKey, staticClass: "row" },
+                        _vm._l(_vm.translatedModules, function (row) {
+                          return _c(
+                            "div",
+                            {
+                              key: row.id,
+                              staticClass: "col-12 col-md-6 col-xl-4 mb-3",
                             },
-                            expression: "modules",
-                          },
-                        },
-                        _vm._l(_vm.modules, function (module) {
-                          return _c("tr", { key: module.id }, [
-                            _c(
-                              "td",
-                              {
-                                staticClass: "text-center",
-                                class: { "drag-handle": !module.is_default },
-                                style: {
-                                  cursor: module.is_default
-                                    ? "not-allowed"
-                                    : "move",
-                                },
-                              },
-                              [
-                                !module.is_default
-                                  ? _c("i", {
-                                      staticClass:
-                                        "fas fa-arrows-alt text-muted",
-                                    })
-                                  : _vm._e(),
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _vm._v(_vm._s(module.id)),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _vm._v(_vm._s(_vm.getModuleName(module))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              !module.image_url
-                                ? _c("p", { staticClass: "mb-0 text-muted" }, [
-                                    _vm._v(_vm._s(_vm.__("no_image"))),
-                                  ])
-                                : _c("img", {
-                                    staticClass: "rounded mx-auto",
-                                    staticStyle: {
-                                      "object-fit": "cover",
-                                      width: "50px",
-                                    },
-                                    attrs: {
-                                      src: module.image_url,
-                                      height: "50",
-                                    },
-                                  }),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _c(
-                                "p",
-                                {
-                                  directives: [
-                                    {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      modifiers: { hover: true },
-                                    },
-                                  ],
-                                  staticClass: "mb-0 text-truncate mx-auto",
-                                  staticStyle: { "max-width": "250px" },
-                                  attrs: {
-                                    title:
-                                      _vm.getModuleDescription(module) ||
-                                      _vm.__("no_description"),
-                                  },
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                        " +
-                                      _vm._s(
-                                        _vm.getModuleDescription(module) ||
-                                          _vm.__("no_description")
-                                      ) +
-                                      "\n                                    "
-                                  ),
-                                ]
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              module.is_default
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("yes") || "Yes"))]
-                                  )
-                                : _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("no") || "No"))]
-                                  ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "form-check form-switch d-flex justify-content-center",
-                                },
-                                [
-                                  _c("input", {
-                                    staticClass: "form-check-input",
-                                    staticStyle: { cursor: "pointer" },
-                                    attrs: {
-                                      type: "checkbox",
-                                      id: "status-" + module.id,
-                                    },
-                                    domProps: {
-                                      checked: _vm.isModuleActive(module.id),
-                                    },
-                                    on: {
-                                      change: function ($event) {
-                                        return _vm.onStatusToggle(
-                                          module.id,
-                                          $event.target.checked,
-                                          $event
-                                        )
-                                      },
-                                    },
-                                  }),
-                                ]
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "d-flex justify-content-center gap-2",
-                                },
-                                [
+                            [
+                              _c("div", { staticClass: "module-card h-100" }, [
+                                _c("div", { staticClass: "module-card__top" }, [
                                   _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("edit") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.editRecord(module)
-                                        },
-                                      },
-                                    },
+                                    "div",
+                                    { staticClass: "module-card__icon" },
                                     [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "edit icon",
-                                          hoverName: "edit Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
+                                      row.image_url
+                                        ? _c("module-icon", {
+                                            attrs: {
+                                              src: row.image_url,
+                                              size: 24,
+                                              alt: row.name,
+                                            },
+                                          })
+                                        : _c("i", {
+                                            staticClass: "fa fa-cubes",
+                                          }),
                                     ],
                                     1
                                   ),
-                                ]
-                              ),
-                            ]),
-                          ])
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "module-card__title" },
+                                    [
+                                      _c(
+                                        "h6",
+                                        { staticClass: "mb-0 text-truncate" },
+                                        [_vm._v(_vm._s(row.name))]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "small",
+                                        { staticClass: "text-muted" },
+                                        [_vm._v("#" + _vm._s(row.id))]
+                                      ),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  row.is_default
+                                    ? _c(
+                                        "span",
+                                        {
+                                          staticClass:
+                                            "figma-status-pill bg-primary",
+                                        },
+                                        [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm.__("default") || "Default"
+                                            )
+                                          ),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "p",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "b-tooltip",
+                                        rawName: "v-b-tooltip.hover",
+                                        modifiers: { hover: true },
+                                      },
+                                    ],
+                                    staticClass: "module-card__desc",
+                                    attrs: {
+                                      title:
+                                        row.description ||
+                                        _vm.__("no_description"),
+                                    },
+                                  },
+                                  [
+                                    _vm._v(
+                                      "\n                                    " +
+                                        _vm._s(
+                                          row.description ||
+                                            _vm.__("no_description")
+                                        ) +
+                                        "\n                                "
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "module-card__foot" },
+                                  [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "d-flex align-items-center gap-2",
+                                      },
+                                      [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "form-check form-switch m-0",
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: row.status,
+                                                  expression: "row.status",
+                                                },
+                                              ],
+                                              staticClass:
+                                                "form-check-input module-card__switch",
+                                              attrs: {
+                                                type: "checkbox",
+                                                id: "status-" + row.id,
+                                                "true-value": 1,
+                                                "false-value": 0,
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  row.status
+                                                )
+                                                  ? _vm._i(row.status, null) >
+                                                    -1
+                                                  : _vm._q(row.status, 1),
+                                              },
+                                              on: {
+                                                change: [
+                                                  function ($event) {
+                                                    var $$a = row.status,
+                                                      $$el = $event.target,
+                                                      $$c = $$el.checked ? 1 : 0
+                                                    if (Array.isArray($$a)) {
+                                                      var $$v = null,
+                                                        $$i = _vm._i($$a, $$v)
+                                                      if ($$el.checked) {
+                                                        $$i < 0 &&
+                                                          _vm.$set(
+                                                            row,
+                                                            "status",
+                                                            $$a.concat([$$v])
+                                                          )
+                                                      } else {
+                                                        $$i > -1 &&
+                                                          _vm.$set(
+                                                            row,
+                                                            "status",
+                                                            $$a
+                                                              .slice(0, $$i)
+                                                              .concat(
+                                                                $$a.slice(
+                                                                  $$i + 1
+                                                                )
+                                                              )
+                                                          )
+                                                      }
+                                                    } else {
+                                                      _vm.$set(
+                                                        row,
+                                                        "status",
+                                                        $$c
+                                                      )
+                                                    }
+                                                  },
+                                                  function ($event) {
+                                                    return _vm.toggleStatus(row)
+                                                  },
+                                                ],
+                                              },
+                                            }),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          {
+                                            staticClass: "figma-status-pill",
+                                            class:
+                                              row.status == 1
+                                                ? "bg-success"
+                                                : "bg-danger",
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                            " +
+                                                _vm._s(
+                                                  row.status == 1
+                                                    ? _vm.__("active")
+                                                    : _vm.__("inactive")
+                                                ) +
+                                                "\n                                        "
+                                            ),
+                                          ]
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass: "figma-action-btn",
+                                        attrs: { title: _vm.__("edit") },
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.editRecord(row)
+                                          },
+                                        },
+                                      },
+                                      [
+                                        _c("base-icon", {
+                                          attrs: {
+                                            name: "edit icon",
+                                            hoverName: "edit Hover",
+                                            width: "24",
+                                            height: "24",
+                                          },
+                                        }),
+                                      ],
+                                      1
+                                    ),
+                                  ]
+                                ),
+                              ]),
+                            ]
+                          )
                         }),
                         0
                       ),
-                    ],
-                    1
-                  ),
-                ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
-              _c("div", { staticClass: "showing-results-text small" }, [
-                _vm._v(
-                  "\n                        " +
-                    _vm._s(_vm.__("Showing Result")) +
-                    " : "
+                ])
+              : _c(
+                  "div",
+                  { staticClass: "module-grid" },
+                  [
+                    !_vm.modules.length
+                      ? _c("div", { staticClass: "module-empty" }, [
+                          _c("i", { staticClass: "fa fa-cubes" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("no_records_to_show"))),
+                          ]),
+                        ])
+                      : _c(
+                          "draggable",
+                          {
+                            staticClass: "row",
+                            attrs: {
+                              tag: "div",
+                              animation: "200",
+                              handle: ".drag-handle",
+                              move: _vm.onModuleMove,
+                            },
+                            on: { end: _vm.updateModulesOrder },
+                            model: {
+                              value: _vm.modules,
+                              callback: function ($$v) {
+                                _vm.modules = $$v
+                              },
+                              expression: "modules",
+                            },
+                          },
+                          _vm._l(_vm.modules, function (module) {
+                            return _c(
+                              "div",
+                              {
+                                key: module.id,
+                                staticClass: "col-12 col-md-6 col-xl-4 mb-3",
+                              },
+                              [
+                                _c(
+                                  "div",
+                                  { staticClass: "module-card h-100" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "module-card__top" },
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "module-card__icon" },
+                                          [
+                                            module.image_url
+                                              ? _c("module-icon", {
+                                                  attrs: {
+                                                    src: module.image_url,
+                                                    size: 24,
+                                                    alt: _vm.getModuleName(
+                                                      module
+                                                    ),
+                                                  },
+                                                })
+                                              : _c("i", {
+                                                  staticClass: "fa fa-cubes",
+                                                }),
+                                          ],
+                                          1
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "module-card__title" },
+                                          [
+                                            _c(
+                                              "h6",
+                                              {
+                                                staticClass:
+                                                  "mb-0 text-truncate",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    _vm.getModuleName(module)
+                                                  )
+                                                ),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "small",
+                                              { staticClass: "text-muted" },
+                                              [_vm._v("#" + _vm._s(module.id))]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        module.is_default
+                                          ? _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "figma-status-pill bg-primary",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    _vm.__("default") ||
+                                                      "Default"
+                                                  )
+                                                ),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        !module.is_default
+                                          ? _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "module-card__drag drag-handle",
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fas fa-arrows-alt",
+                                                }),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "p",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass: "module-card__desc",
+                                        attrs: {
+                                          title:
+                                            _vm.getModuleDescription(module) ||
+                                            _vm.__("no_description"),
+                                        },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                    " +
+                                            _vm._s(
+                                              _vm.getModuleDescription(
+                                                module
+                                              ) || _vm.__("no_description")
+                                            ) +
+                                            "\n                                "
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "module-card__foot" },
+                                      [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "d-flex align-items-center gap-2",
+                                          },
+                                          [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass:
+                                                  "form-check form-switch m-0",
+                                              },
+                                              [
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value: module.status,
+                                                      expression:
+                                                        "module.status",
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "form-check-input module-card__switch",
+                                                  attrs: {
+                                                    type: "checkbox",
+                                                    id: "status-" + module.id,
+                                                    "true-value": 1,
+                                                    "false-value": 0,
+                                                  },
+                                                  domProps: {
+                                                    checked: Array.isArray(
+                                                      module.status
+                                                    )
+                                                      ? _vm._i(
+                                                          module.status,
+                                                          null
+                                                        ) > -1
+                                                      : _vm._q(
+                                                          module.status,
+                                                          1
+                                                        ),
+                                                  },
+                                                  on: {
+                                                    change: [
+                                                      function ($event) {
+                                                        var $$a = module.status,
+                                                          $$el = $event.target,
+                                                          $$c = $$el.checked
+                                                            ? 1
+                                                            : 0
+                                                        if (
+                                                          Array.isArray($$a)
+                                                        ) {
+                                                          var $$v = null,
+                                                            $$i = _vm._i(
+                                                              $$a,
+                                                              $$v
+                                                            )
+                                                          if ($$el.checked) {
+                                                            $$i < 0 &&
+                                                              _vm.$set(
+                                                                module,
+                                                                "status",
+                                                                $$a.concat([
+                                                                  $$v,
+                                                                ])
+                                                              )
+                                                          } else {
+                                                            $$i > -1 &&
+                                                              _vm.$set(
+                                                                module,
+                                                                "status",
+                                                                $$a
+                                                                  .slice(0, $$i)
+                                                                  .concat(
+                                                                    $$a.slice(
+                                                                      $$i + 1
+                                                                    )
+                                                                  )
+                                                              )
+                                                          }
+                                                        } else {
+                                                          _vm.$set(
+                                                            module,
+                                                            "status",
+                                                            $$c
+                                                          )
+                                                        }
+                                                      },
+                                                      function ($event) {
+                                                        return _vm.toggleStatus(
+                                                          module
+                                                        )
+                                                      },
+                                                    ],
+                                                  },
+                                                }),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "figma-status-pill",
+                                                class:
+                                                  module.status == 1
+                                                    ? "bg-success"
+                                                    : "bg-danger",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  "\n                                            " +
+                                                    _vm._s(
+                                                      module.status == 1
+                                                        ? _vm.__("active")
+                                                        : _vm.__("inactive")
+                                                    ) +
+                                                    "\n                                        "
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "button",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass: "figma-action-btn",
+                                            attrs: { title: _vm.__("edit") },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.editRecord(module)
+                                              },
+                                            },
+                                          },
+                                          [
+                                            _c("base-icon", {
+                                              attrs: {
+                                                name: "edit icon",
+                                                hoverName: "edit Hover",
+                                                width: "24",
+                                                height: "24",
+                                              },
+                                            }),
+                                          ],
+                                          1
+                                        ),
+                                      ]
+                                    ),
+                                  ]
+                                ),
+                              ]
+                            )
+                          }),
+                          0
+                        ),
+                  ],
+                  1
                 ),
-                _c("span", { staticClass: "showing-bold" }, [
-                  _vm._v(_vm._s(_vm.pageEnd)),
-                ]),
-                _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                _c("span", { staticClass: "showing-bold" }, [
-                  _vm._v(_vm._s(_vm.totalRows)),
-                ]),
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "d-flex align-items-center gap-3" },
-                [
-                  _c("b-pagination", {
-                    staticClass: "figma-pagination mb-0",
-                    attrs: {
-                      "total-rows": _vm.totalRows,
-                      "per-page": _vm.perPage,
-                      align: "right",
-                      "hide-goto-end-buttons": "",
-                      "hide-ellipsis": "",
-                      "prev-text": "<",
-                      "next-text": ">",
-                    },
-                    model: {
-                      value: _vm.currentPage,
-                      callback: function ($$v) {
-                        _vm.currentPage = $$v
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
+              [
+                _c("table-count", {
+                  attrs: {
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "total-rows": _vm.totalRows,
+                  },
+                }),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-3" },
+                  [
+                    _c("b-pagination", {
+                      staticClass: "figma-pagination mb-0",
+                      attrs: {
+                        "total-rows": _vm.totalRows,
+                        "per-page": _vm.perPage,
+                        align: "right",
+                        "hide-goto-end-buttons": "",
+                        "hide-ellipsis": "",
+                        "prev-text": "<",
+                        "next-text": ">",
                       },
-                      expression: "currentPage",
-                    },
-                  }),
-                ],
-                1
-              ),
-            ]),
+                      model: {
+                        value: _vm.currentPage,
+                        callback: function ($$v) {
+                          _vm.currentPage = $$v
+                        },
+                        expression: "currentPage",
+                      },
+                    }),
+                  ],
+                  1
+                ),
+              ],
+              1
+            ),
           ]),
         ]),
       ]),
@@ -1923,37 +2060,44 @@ var render = function () {
               fn: function () {
                 return [
                   _c(
-                    "b-button",
-                    {
-                      attrs: { variant: "primary", disabled: _vm.isSaving },
-                      on: {
-                        click: function ($event) {
-                          return _vm.$refs["dummy_submit"].click()
-                        },
-                      },
-                    },
+                    "div",
+                    { staticClass: "d-flex justify-content-end gap-2 w-100" },
                     [
-                      _vm._v(
-                        "\n                " +
-                          _vm._s(_vm.__("save")) +
-                          "\n                "
+                      _c(
+                        "b-button",
+                        {
+                          attrs: { variant: "outline-secondary" },
+                          on: { click: _vm.hideModal },
+                        },
+                        [_vm._v(_vm._s(_vm.__("cancel")))]
                       ),
-                      _vm.isSaving
-                        ? _c("b-spinner", {
-                            attrs: { small: "", label: "Saving" },
-                          })
-                        : _vm._e(),
+                      _vm._v(" "),
+                      _c(
+                        "b-button",
+                        {
+                          attrs: { variant: "primary", disabled: _vm.isSaving },
+                          on: {
+                            click: function ($event) {
+                              return _vm.$refs["dummy_submit"].click()
+                            },
+                          },
+                        },
+                        [
+                          _vm._v(
+                            "\n                    " +
+                              _vm._s(_vm.__("save")) +
+                              "\n                    "
+                          ),
+                          _vm.isSaving
+                            ? _c("b-spinner", {
+                                attrs: { small: "", label: "Saving" },
+                              })
+                            : _vm._e(),
+                        ],
+                        1
+                      ),
                     ],
                     1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "b-button",
-                    {
-                      attrs: { variant: "secondary" },
-                      on: { click: _vm.hideModal },
-                    },
-                    [_vm._v(_vm._s(_vm.__("cancel")))]
                   ),
                 ]
               },
@@ -2004,7 +2148,7 @@ var render = function () {
                           lang.is_default && _vm.languages.length > 1
                             ? _c(
                                 "div",
-                                { staticClass: "mb-3" },
+                                { staticClass: "mb-3 d-flex flex-wrap gap-2" },
                                 [
                                   _c(
                                     "b-button",
@@ -2016,7 +2160,6 @@ var render = function () {
                                           modifiers: { hover: true },
                                         },
                                       ],
-                                      staticClass: "mr-2",
                                       attrs: {
                                         size: "sm",
                                         variant: "outline-primary",
@@ -2306,11 +2449,8 @@ var render = function () {
                                         { staticClass: "mt-2 text-center" },
                                         [
                                           _c("img", {
-                                            staticClass: "img-thumbnail",
-                                            staticStyle: {
-                                              "max-height": "150px",
-                                              "object-fit": "contain",
-                                            },
+                                            staticClass:
+                                              "img-thumbnail module-preview",
                                             attrs: { src: _vm.image_url },
                                           }),
                                         ]
@@ -2432,10 +2572,7 @@ var render = function () {
                   )
                 : _vm._e(),
               _vm._v(" "),
-              _c("button", {
-                ref: "dummy_submit",
-                staticStyle: { display: "none" },
-              }),
+              _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
             ],
             1
           ),

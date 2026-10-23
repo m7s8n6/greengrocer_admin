@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('sales_reports') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -14,6 +14,17 @@
             </div>
 
             <section class="section">
+                <div class="row g-3 mb-3 report-kpis justify-content-start">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-green"><i class="bi bi-cash-stack"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_amount') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ final_total_sum }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="figma-main-section-card">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -65,11 +76,7 @@
                                                     @update="getSalesReports"
                                                     class="w-100"
                                                 ></date-range-picker>
-                                                <button v-if="dateRange.startDate" type="button"
-                                                    class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                    style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                    @click.stop="clearDate()"
-                                                    v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                                <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                     <i class="fa fa-times-circle text-muted"></i>
                                                 </button>
                                                 <base-icon name="CalendarDots" width="24" height="24" class="figma-filter-icon-right" useCurrentColor />
@@ -93,7 +100,7 @@
                                 :bordered="false"
                                 :busy="isLoading"
                                 stacked="md"
-                                show-empty
+                                show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')"
                                 small
                                 :tbody-tr-class="() => 'figma-tr align-middle'"
                                 class="figma-table mb-0">
@@ -110,14 +117,7 @@
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="d-flex align-items-center gap-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
-                                <div class="d-flex gap-3 text-success small border-start ps-4">
-                                    <span>{{ __('total_amount') }}: <strong>{{ $currency }} {{ final_total_sum }}</strong></span>
-                                </div>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                             </div>
@@ -236,4 +236,5 @@ export default {
         min-width: 90%;
     }
 }
+
 </style>

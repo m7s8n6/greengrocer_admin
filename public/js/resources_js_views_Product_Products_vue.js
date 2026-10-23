@@ -16,6 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Auth_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Auth.js */ "./resources/js/Auth.js");
 /* harmony import */ var fslightbox_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! fslightbox-vue */ "./node_modules/fslightbox-vue/index.js");
 /* harmony import */ var fslightbox_vue__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(fslightbox_vue__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -297,11 +298,140 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__["default"]],
   components: {
     FsLightbox: (fslightbox_vue__WEBPACK_IMPORTED_MODULE_2___default())
   },
@@ -408,7 +538,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       lightboxSources: [],
       showFilters: false,
       currentLanguageId: null,
-      activeLanguages: []
+      activeLanguages: [],
+      // The API returns one page at a time (grid view shows the array as is)
+      serverPagination: true
     };
   },
   computed: {
@@ -423,6 +555,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return this.fields.filter(function (field) {
         return field.visible;
       });
+    },
+    // Grid view cards: same records, search and order as the b-table
+    gridProducts: function gridProducts() {
+      return this.pagedItems(this.gridFilterSort(this.translatedProducts));
     },
     isSellerRoute: function isSellerRoute() {
       // Use this.$route to access the current route
@@ -579,6 +715,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }
   },
   methods: {
+    // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
+    productIndex: function productIndex(item) {
+      return this.products.findIndex(function (product) {
+        return product.product_variant_id === item.product_variant_id;
+      });
+    },
+    hasDiscount: function hasDiscount(item) {
+      var price = parseFloat(item.price);
+      var discounted = parseFloat(item.discounted_price);
+      return !isNaN(discounted) && discounted > 0 && (isNaN(price) || discounted < price);
+    },
     fetchActiveLanguages: function fetchActiveLanguages() {
       var _this5 = this;
       return axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/active_languages').then(function (response) {
@@ -630,6 +777,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         _this6.sellers = response.data.data.sellers;
         _this6.products = response.data.data.products;
         _this6.totalRows = response.data.total;
+        // Page changed: re-derive "Select All" from the new page's rows
+        _this6.selectCheckBox();
       });
     },
     deleteRecord: function deleteRecord(index, id) {
@@ -641,8 +790,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this7.isLoading = true;
@@ -712,8 +861,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           cancelButtonText: __('cancel'),
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33'
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)'
         }).then(function (result) {
           if (result.value) {
             var ids = uniqueSelectedItems.toString();
@@ -740,6 +889,179 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Thumbnail: 40px rounded square */\n.products-page[data-v-560efc7a]  .product-thumb {\n    width: 40px;\n    height: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n    cursor: pointer;\n}\n\n/* Checkbox column stays narrow */\n.products-page[data-v-560efc7a]  .products-table thead th:first-child,\n.products-page[data-v-560efc7a]  .products-table tbody td:first-child {\n    width: 44px;\n    padding-left: 16px !important;\n    padding-right: 8px !important;\n}\n.products-page[data-v-560efc7a]  .products-table .form-check-input {\n    position: static;\n    margin: 0;\n    width: 16px;\n    height: 16px;\n}\n\n/* Row actions: compact 32px icon buttons. !important needed: the legacy global\n   .figma-action-btn rule (custom-egrocer.scss) forces 40px with !important. */\n.products-page[data-v-560efc7a]  .product-row-actions {\n    flex-wrap: nowrap;\n}\n.products-page[data-v-560efc7a]  .product-row-actions .figma-action-btn {\n    width: 32px !important;\n    height: 32px !important;\n    min-width: 32px;\n    padding: 0 !important;\n    font-size: 14px;\n    line-height: 1;\n}\n.products-page[data-v-560efc7a]  .products-table td:last-child,\n.products-page[data-v-560efc7a]  .products-table th:last-child {\n    white-space: nowrap;\n}\n.products-page .products-bulk-delete[data-v-560efc7a]:not(:disabled) {\n    color: var(--theme-error-600) !important;\n    border-color: color-mix(in srgb, var(--theme-error-500) 40%, transparent) !important;\n}\n.products-page .products-bulk-delete:not(:disabled) i[data-v-560efc7a] {\n    color: var(--theme-error-600) !important;\n}\n.products-page .item-card-actions[data-v-560efc7a] {\n    margin-left: auto;\n}\n.products-page .products-card-img[data-v-560efc7a] {\n    cursor: zoom-in;\n}\n.products-page .products-select-all[data-v-560efc7a] {\n    cursor: pointer;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n}\n.products-page .products-select-all .form-check-input[data-v-560efc7a] {\n    position: static !important;\n    opacity: 1 !important;\n    clip: auto !important;\n    pointer-events: auto !important;\n    width: 16px !important;\n    height: 16px !important;\n    margin: 0 !important;\n    cursor: pointer !important;\n    flex-shrink: 0 !important;\n}\n.products-page .products-bulk-delete[data-v-560efc7a]:disabled {\n    opacity: 0.55;\n}\n\n/* Phones: stacked rows, actions left-aligned and wrapping */\n@media (max-width: 767.98px) {\n.products-page[data-v-560efc7a]  .products-table tbody td:first-child {\n        width: auto;\n}\n.products-page[data-v-560efc7a]  .product-row-actions {\n        flex-wrap: wrap;\n}\n.products-page[data-v-560efc7a]  .products-table td:last-child {\n        white-space: normal;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_style_index_0_id_560efc7a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_style_index_0_id_560efc7a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_style_index_0_id_560efc7a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Product/Products.vue":
 /*!*************************************************!*\
   !*** ./resources/js/views/Product/Products.vue ***!
@@ -751,23 +1073,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Products.vue?vue&type=template&id=560efc7a */ "./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a");
+/* harmony import */ var _Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Products.vue?vue&type=template&id=560efc7a&scoped=true */ "./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true");
 /* harmony import */ var _Products_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Products.vue?vue&type=script&lang=js */ "./resources/js/views/Product/Products.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Products_vue_vue_type_style_index_0_id_560efc7a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css */ "./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Products_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__.render,
-  _Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "560efc7a",
   null
   
 )
@@ -795,27 +1119,40 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a":
-/*!*******************************************************************************!*\
-  !*** ./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a ***!
-  \*******************************************************************************/
+/***/ "./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css ***!
+  \*********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_style_index_0_id_560efc7a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=style&index=0&id=560efc7a&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true ***!
+  \*******************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Products.vue?vue&type=template&id=560efc7a */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Products_vue_vue_type_template_id_560efc7a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Products.vue?vue&type=template&id=560efc7a&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a":
-/*!**********************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a ***!
-  \**********************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true":
+/*!**********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Products.vue?vue&type=template&id=560efc7a&scoped=true ***!
+  \**********************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -830,6 +1167,7 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "products-page" },
     [
       _c("div", { staticClass: "page-heading" }, [
         _c("div", { staticClass: "page-title mb-2" }, [
@@ -892,885 +1230,2042 @@ var render = function () {
         ]),
         _vm._v(" "),
         _c("section", { staticClass: "section" }, [
-          _c("div", { staticClass: "figma-main-section-card" }, [
-            _c(
-              "div",
-              { staticClass: "card-body p-0" },
-              [
-                _c(
-                  "div",
-                  {
-                    staticClass:
-                      "d-flex justify-content-between align-items-center flex-wrap gap-3 figma-action-bar-row p-3",
-                  },
-                  [
-                    _c(
-                      "div",
-                      {
-                        staticClass: "flex-grow-1",
-                        staticStyle: { "min-width": "250px" },
-                      },
-                      [
-                        _c("div", { staticClass: "figma-search-container" }, [
-                          _c("i", { staticClass: "fa fa-search text-muted" }),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.filter,
-                                expression: "filter",
-                              },
-                            ],
-                            staticClass: "figma-search-input",
-                            attrs: {
-                              type: "text",
-                              placeholder: _vm.__("search"),
-                            },
-                            domProps: { value: _vm.filter },
-                            on: {
-                              input: [
-                                function ($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.filter = $event.target.value
-                                },
-                                function ($event) {
-                                  return _vm.getRecords()
+          _c(
+            "div",
+            { staticClass: "figma-main-section-card products-list-card" },
+            [
+              _c(
+                "div",
+                { staticClass: "card-body p-0" },
+                [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "d-flex justify-content-between align-items-center flex-wrap gap-3 figma-action-bar-row p-3",
+                    },
+                    [
+                      _c(
+                        "div",
+                        {
+                          staticClass: "flex-grow-1",
+                          staticStyle: { "min-width": "250px" },
+                        },
+                        [
+                          _c("div", { staticClass: "figma-search-container" }, [
+                            _c("i", { staticClass: "fa fa-search text-muted" }),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.filter,
+                                  expression: "filter",
                                 },
                               ],
-                            },
-                          }),
-                        ]),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "d-flex gap-2 align-items-center flex-wrap flex-shrink-0",
-                      },
-                      [
-                        _c(
-                          "button",
-                          {
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2",
-                            class: { active: _vm.showFilters },
-                            on: {
-                              click: function ($event) {
-                                _vm.showFilters = !_vm.showFilters
-                              },
-                            },
-                          },
-                          [
-                            _c("base-icon", {
+                              staticClass: "figma-search-input",
                               attrs: {
-                                name: "Funnel",
-                                width: "24",
-                                height: "24",
-                                useCurrentColor: "",
+                                type: "text",
+                                placeholder: _vm.__("search"),
+                              },
+                              domProps: { value: _vm.filter },
+                              on: {
+                                input: [
+                                  function ($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.filter = $event.target.value
+                                  },
+                                  function ($event) {
+                                    return _vm.getRecords()
+                                  },
+                                ],
                               },
                             }),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(_vm.__("filters")))]),
-                            _vm._v(" "),
-                            _c("i", {
-                              staticClass: "bi ms-1",
-                              class: _vm.showFilters
-                                ? "bi-chevron-up"
-                                : "bi-chevron-down",
-                            }),
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2 text-danger",
-                            attrs: { disabled: _vm.selectedItems.length === 0 },
-                            on: { click: _vm.multipleDelete },
-                          },
-                          [
-                            _c("base-icon", {
+                          ]),
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "d-flex gap-2 align-items-center flex-wrap flex-shrink-0",
+                        },
+                        [
+                          _c(
+                            "button",
+                            {
+                              staticClass:
+                                "btn btn-figma-filter d-flex align-items-center gap-2",
+                              class: { active: _vm.showFilters },
+                              on: {
+                                click: function ($event) {
+                                  _vm.showFilters = !_vm.showFilters
+                                },
+                              },
+                            },
+                            [
+                              _c("base-icon", {
+                                attrs: {
+                                  name: "Funnel",
+                                  width: "16",
+                                  height: "16",
+                                  useCurrentColor: "",
+                                },
+                              }),
+                              _vm._v(" "),
+                              _c("span", [_vm._v(_vm._s(_vm.__("filters")))]),
+                              _vm._v(" "),
+                              _c("i", {
+                                staticClass: "bi ms-1",
+                                class: _vm.showFilters
+                                  ? "bi-chevron-up"
+                                  : "bi-chevron-down",
+                              }),
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass:
+                                "btn btn-figma-filter d-flex align-items-center gap-2 products-bulk-delete",
                               attrs: {
-                                name: "Type=Default",
-                                hoverName: "Type=Hover",
-                                width: "20",
-                                height: "20",
+                                disabled: _vm.selectedItems.length === 0,
                               },
-                            }),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(_vm.__("bulk_delete")))]),
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2",
-                            attrs: { title: _vm.__("refresh") },
-                            on: {
-                              click: function ($event) {
-                                return _vm.getRecords()
+                              on: { click: _vm.multipleDelete },
+                            },
+                            [
+                              _c("i", { staticClass: "bi bi-trash" }),
+                              _vm._v(" "),
+                              _c("span", [
+                                _vm._v(_vm._s(_vm.__("bulk_delete"))),
+                              ]),
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm.viewMode === "grid"
+                            ? _c(
+                                "label",
+                                {
+                                  staticClass:
+                                    "btn btn-figma-filter d-flex align-items-center gap-2 mb-0 products-select-all",
+                                },
+                                [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.all_select,
+                                        expression: "all_select",
+                                      },
+                                    ],
+                                    staticClass: "form-check-input m-0",
+                                    attrs: { type: "checkbox" },
+                                    domProps: {
+                                      checked: Array.isArray(_vm.all_select)
+                                        ? _vm._i(_vm.all_select, null) > -1
+                                        : _vm.all_select,
+                                    },
+                                    on: {
+                                      click: _vm.allSelectCheckBox,
+                                      change: function ($event) {
+                                        var $$a = _vm.all_select,
+                                          $$el = $event.target,
+                                          $$c = $$el.checked ? true : false
+                                        if (Array.isArray($$a)) {
+                                          var $$v = null,
+                                            $$i = _vm._i($$a, $$v)
+                                          if ($$el.checked) {
+                                            $$i < 0 &&
+                                              (_vm.all_select = $$a.concat([
+                                                $$v,
+                                              ]))
+                                          } else {
+                                            $$i > -1 &&
+                                              (_vm.all_select = $$a
+                                                .slice(0, $$i)
+                                                .concat($$a.slice($$i + 1)))
+                                          }
+                                        } else {
+                                          _vm.all_select = $$c
+                                        }
+                                      },
+                                    },
+                                  }),
+                                  _vm._v(" "),
+                                  _c("span", [
+                                    _vm._v(_vm._s(_vm.__("select_all"))),
+                                  ]),
+                                ]
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            {
+                              staticClass: "view-toggle",
+                              attrs: {
+                                role: "group",
+                                "aria-label": _vm.__("view"),
                               },
                             },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-refresh" }),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "b-dropdown",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
+                            [
+                              _c(
+                                "button",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass: "view-toggle-btn",
+                                  class: { active: _vm.viewMode === "grid" },
+                                  attrs: {
+                                    type: "button",
+                                    title: _vm.__("grid_view"),
+                                  },
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.setViewMode("grid")
+                                    },
+                                  },
+                                },
+                                [
+                                  _c("i", {
+                                    staticClass: "bi bi-grid-3x3-gap-fill",
+                                  }),
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass: "view-toggle-btn",
+                                  class: { active: _vm.viewMode === "list" },
+                                  attrs: {
+                                    type: "button",
+                                    title: _vm.__("list_view"),
+                                  },
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.setViewMode("list")
+                                    },
+                                  },
+                                },
+                                [_c("i", { staticClass: "bi bi-list-ul" })]
+                              ),
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              directives: [
+                                {
+                                  name: "b-tooltip",
+                                  rawName: "v-b-tooltip.hover",
+                                  modifiers: { hover: true },
+                                },
+                              ],
+                              staticClass:
+                                "btn btn-figma-filter d-flex align-items-center gap-2",
+                              attrs: { title: _vm.__("refresh") },
+                              on: {
+                                click: function ($event) {
+                                  return _vm.getRecords()
+                                },
                               },
-                            ],
-                            attrs: {
-                              variant: "figma-columns",
-                              "no-caret": "",
-                              "toggle-class":
-                                "btn-figma-columns d-flex align-items-center gap-2",
-                              title: _vm.__("columns"),
                             },
-                            scopedSlots: _vm._u([
-                              {
-                                key: "button-content",
-                                fn: function () {
-                                  return [
-                                    _c("i", { staticClass: "fa fa-th-list" }),
+                            [
+                              _c("i", { staticClass: "fa fa-refresh" }),
+                              _vm._v(" "),
+                              _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _vm.viewMode === "list"
+                            ? _c(
+                                "b-dropdown",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  attrs: {
+                                    variant: "figma-columns",
+                                    "no-caret": "",
+                                    "toggle-class":
+                                      "btn-figma-columns d-flex align-items-center gap-2",
+                                    title: _vm.__("columns"),
+                                  },
+                                  scopedSlots: _vm._u(
+                                    [
+                                      {
+                                        key: "button-content",
+                                        fn: function () {
+                                          return [
+                                            _c("i", {
+                                              staticClass: "fa fa-th-list",
+                                            }),
+                                            _vm._v(" "),
+                                            _c("span", [
+                                              _vm._v(_vm._s(_vm.__("columns"))),
+                                            ]),
+                                          ]
+                                        },
+                                        proxy: true,
+                                      },
+                                    ],
+                                    null,
+                                    false,
+                                    2845088985
+                                  ),
+                                },
+                                [
+                                  _vm._v(" "),
+                                  _c(
+                                    "b-dropdown-form",
+                                    {
+                                      staticClass: "p-2",
+                                      staticStyle: {
+                                        "min-width": "200px",
+                                        "max-height": "300px",
+                                        "overflow-y": "auto",
+                                      },
+                                    },
+                                    _vm._l(_vm.fields, function (field) {
+                                      return field.key !== "select"
+                                        ? _c(
+                                            "div",
+                                            {
+                                              key: field.key,
+                                              staticClass: "form-check mb-2",
+                                            },
+                                            [
+                                              _c("input", {
+                                                directives: [
+                                                  {
+                                                    name: "model",
+                                                    rawName: "v-model",
+                                                    value: field.visible,
+                                                    expression: "field.visible",
+                                                  },
+                                                ],
+                                                staticClass: "form-check-input",
+                                                attrs: {
+                                                  type: "checkbox",
+                                                  id: "col-" + field.key,
+                                                  disabled:
+                                                    _vm.visibleFields.length ==
+                                                      1 && field.visible,
+                                                },
+                                                domProps: {
+                                                  checked: Array.isArray(
+                                                    field.visible
+                                                  )
+                                                    ? _vm._i(
+                                                        field.visible,
+                                                        null
+                                                      ) > -1
+                                                    : field.visible,
+                                                },
+                                                on: {
+                                                  change: function ($event) {
+                                                    var $$a = field.visible,
+                                                      $$el = $event.target,
+                                                      $$c = $$el.checked
+                                                        ? true
+                                                        : false
+                                                    if (Array.isArray($$a)) {
+                                                      var $$v = null,
+                                                        $$i = _vm._i($$a, $$v)
+                                                      if ($$el.checked) {
+                                                        $$i < 0 &&
+                                                          _vm.$set(
+                                                            field,
+                                                            "visible",
+                                                            $$a.concat([$$v])
+                                                          )
+                                                      } else {
+                                                        $$i > -1 &&
+                                                          _vm.$set(
+                                                            field,
+                                                            "visible",
+                                                            $$a
+                                                              .slice(0, $$i)
+                                                              .concat(
+                                                                $$a.slice(
+                                                                  $$i + 1
+                                                                )
+                                                              )
+                                                          )
+                                                      }
+                                                    } else {
+                                                      _vm.$set(
+                                                        field,
+                                                        "visible",
+                                                        $$c
+                                                      )
+                                                    }
+                                                  },
+                                                },
+                                              }),
+                                              _vm._v(" "),
+                                              _c(
+                                                "label",
+                                                {
+                                                  staticClass:
+                                                    "form-check-label ms-2",
+                                                  attrs: {
+                                                    for: "col-" + field.key,
+                                                  },
+                                                },
+                                                [_vm._v(_vm._s(field.label))]
+                                              ),
+                                            ]
+                                          )
+                                        : _vm._e()
+                                    }),
+                                    0
+                                  ),
+                                ],
+                                1
+                              )
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.$roleSeller == _vm.login_user.role.name
+                            ? [
+                                _c(
+                                  "router-link",
+                                  {
+                                    staticClass:
+                                      "btn btn-figma-filter d-flex align-items-center gap-2",
+                                    attrs: {
+                                      to: "/seller/manage_products/create",
+                                    },
+                                  },
+                                  [
+                                    _c("i", { staticClass: "fa fa-plus" }),
                                     _vm._v(" "),
                                     _c("span", [
-                                      _vm._v(_vm._s(_vm.__("columns"))),
+                                      _vm._v(_vm._s(_vm.__("add_product"))),
                                     ]),
                                   ]
-                                },
-                                proxy: true,
-                              },
-                            ]),
-                          },
+                                ),
+                              ]
+                            : [
+                                _c(
+                                  "router-link",
+                                  {
+                                    staticClass:
+                                      "btn btn-figma-filter d-flex align-items-center gap-2",
+                                    attrs: { to: "/manage_products/create" },
+                                  },
+                                  [
+                                    _c("i", { staticClass: "fa fa-plus" }),
+                                    _vm._v(" "),
+                                    _c("span", [
+                                      _vm._v(_vm._s(_vm.__("add_product"))),
+                                    ]),
+                                  ]
+                                ),
+                              ],
+                        ],
+                        2
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-collapse",
+                    {
+                      model: {
+                        value: _vm.showFilters,
+                        callback: function ($$v) {
+                          _vm.showFilters = $$v
+                        },
+                        expression: "showFilters",
+                      },
+                    },
+                    [
+                      _c("div", { staticClass: "figma-filter-section" }, [
+                        _c(
+                          "div",
+                          { staticClass: "row g-4" },
                           [
-                            _vm._v(" "),
-                            _c(
-                              "b-dropdown-form",
-                              {
-                                staticClass: "p-2",
-                                staticStyle: {
-                                  "min-width": "200px",
-                                  "max-height": "300px",
-                                  "overflow-y": "auto",
-                                },
-                              },
-                              _vm._l(_vm.fields, function (field) {
-                                return field.key !== "select"
-                                  ? _c(
-                                      "div",
+                            _c("div", { staticClass: "col-md-4" }, [
+                              _c("div", { staticClass: "figma-filter-group" }, [
+                                _c(
+                                  "label",
+                                  { staticClass: "figma-filter-label" },
+                                  [_vm._v(_vm._s(_vm.__("category")))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "select",
+                                  {
+                                    directives: [
                                       {
-                                        key: field.key,
-                                        staticClass: "form-check mb-2",
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.category,
+                                        expression: "category",
                                       },
+                                    ],
+                                    staticClass: "form-select modern-select",
+                                    on: {
+                                      change: [
+                                        function ($event) {
+                                          var $$selectedVal =
+                                            Array.prototype.filter
+                                              .call(
+                                                $event.target.options,
+                                                function (o) {
+                                                  return o.selected
+                                                }
+                                              )
+                                              .map(function (o) {
+                                                var val =
+                                                  "_value" in o
+                                                    ? o._value
+                                                    : o.value
+                                                return val
+                                              })
+                                          _vm.category = $event.target.multiple
+                                            ? $$selectedVal
+                                            : $$selectedVal[0]
+                                        },
+                                        function ($event) {
+                                          return _vm.getRecords()
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  [
+                                    _c("option", { attrs: { value: "" } }, [
+                                      _vm._v(_vm._s(_vm.__("all_categories"))),
+                                    ]),
+                                    _vm._v(" "),
+                                    _vm._l(
+                                      _vm.translatedCategories,
+                                      function (category) {
+                                        return _c(
+                                          "option",
+                                          { domProps: { value: category.id } },
+                                          [_vm._v(_vm._s(category.name))]
+                                        )
+                                      }
+                                    ),
+                                  ],
+                                  2
+                                ),
+                              ]),
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col-md-4" }, [
+                              _c("div", { staticClass: "figma-filter-group" }, [
+                                _c(
+                                  "label",
+                                  { staticClass: "figma-filter-label" },
+                                  [_vm._v(_vm._s(_vm.__("status")))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "select",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.is_approved,
+                                        expression: "is_approved",
+                                      },
+                                    ],
+                                    staticClass: "form-select modern-select",
+                                    on: {
+                                      change: [
+                                        function ($event) {
+                                          var $$selectedVal =
+                                            Array.prototype.filter
+                                              .call(
+                                                $event.target.options,
+                                                function (o) {
+                                                  return o.selected
+                                                }
+                                              )
+                                              .map(function (o) {
+                                                var val =
+                                                  "_value" in o
+                                                    ? o._value
+                                                    : o.value
+                                                return val
+                                              })
+                                          _vm.is_approved = $event.target
+                                            .multiple
+                                            ? $$selectedVal
+                                            : $$selectedVal[0]
+                                        },
+                                        function ($event) {
+                                          return _vm.getRecords()
+                                        },
+                                      ],
+                                    },
+                                  },
+                                  [
+                                    _c("option", { attrs: { value: "" } }, [
+                                      _vm._v(_vm._s(_vm.__("all_statuses"))),
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("option", { attrs: { value: "1" } }, [
+                                      _vm._v(_vm._s(_vm.__("approved"))),
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("option", { attrs: { value: "0" } }, [
+                                      _vm._v(_vm._s(_vm.__("not_approved"))),
+                                    ]),
+                                  ]
+                                ),
+                              ]),
+                            ]),
+                            _vm._v(" "),
+                            _vm.$roleSeller != _vm.login_user.role.name
+                              ? [
+                                  _c("div", { staticClass: "col-md-4" }, [
+                                    _c(
+                                      "div",
+                                      { staticClass: "figma-filter-group" },
+                                      [
+                                        _c(
+                                          "label",
+                                          { staticClass: "figma-filter-label" },
+                                          [_vm._v(_vm._s(_vm.__("seller")))]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "select",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.seller,
+                                                expression: "seller",
+                                              },
+                                            ],
+                                            staticClass:
+                                              "form-select modern-select",
+                                            on: {
+                                              change: [
+                                                function ($event) {
+                                                  var $$selectedVal =
+                                                    Array.prototype.filter
+                                                      .call(
+                                                        $event.target.options,
+                                                        function (o) {
+                                                          return o.selected
+                                                        }
+                                                      )
+                                                      .map(function (o) {
+                                                        var val =
+                                                          "_value" in o
+                                                            ? o._value
+                                                            : o.value
+                                                        return val
+                                                      })
+                                                  _vm.seller = $event.target
+                                                    .multiple
+                                                    ? $$selectedVal
+                                                    : $$selectedVal[0]
+                                                },
+                                                function ($event) {
+                                                  return _vm.getRecords()
+                                                },
+                                              ],
+                                            },
+                                          },
+                                          [
+                                            _c(
+                                              "option",
+                                              { attrs: { value: "" } },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("all_sellers"))
+                                                ),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _vm._l(
+                                              _vm.translatedSellers,
+                                              function (seller) {
+                                                return _c(
+                                                  "option",
+                                                  {
+                                                    domProps: {
+                                                      value: seller.id,
+                                                    },
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(seller.name) +
+                                                        "\n                                                "
+                                                    ),
+                                                  ]
+                                                )
+                                              }
+                                            ),
+                                          ],
+                                          2
+                                        ),
+                                      ]
+                                    ),
+                                  ]),
+                                ]
+                              : _vm._e(),
+                          ],
+                          2
+                        ),
+                      ]),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _vm.viewMode === "grid"
+                    ? _c("div", [
+                        _vm.isLoading
+                          ? _c("div", { staticClass: "item-grid-state" }, [
+                              _c("i", { staticClass: "fa fa-spinner fa-spin" }),
+                              _vm._v(
+                                _vm._s(_vm.__("loading")) +
+                                  "...\n                        "
+                              ),
+                            ])
+                          : _vm.gridProducts.length === 0
+                          ? _c("div", { staticClass: "item-grid-state" }, [
+                              _c("i", {
+                                staticClass: "fa",
+                                class: _vm.filter ? "fa-search" : "fa-inbox",
+                              }),
+                              _vm._v(
+                                "\n                            " +
+                                  _vm._s(
+                                    _vm.filter
+                                      ? _vm.__(
+                                          "no_records_matching_your_request"
+                                        )
+                                      : _vm.__("no_records_to_show")
+                                  ) +
+                                  "\n                        "
+                              ),
+                            ])
+                          : _c(
+                              "div",
+                              { staticClass: "item-grid" },
+                              _vm._l(_vm.gridProducts, function (item) {
+                                return _c(
+                                  "div",
+                                  {
+                                    key: item.product_variant_id,
+                                    staticClass: "item-card",
+                                    class: {
+                                      "is-selected": _vm.selectedItems.includes(
+                                        item.product_variant_id
+                                      ),
+                                    },
+                                  },
+                                  [
+                                    _c(
+                                      "label",
+                                      { staticClass: "item-card-select mb-0" },
                                       [
                                         _c("input", {
                                           directives: [
                                             {
                                               name: "model",
                                               rawName: "v-model",
-                                              value: field.visible,
-                                              expression: "field.visible",
+                                              value: _vm.selectedItems,
+                                              expression: "selectedItems",
                                             },
                                           ],
-                                          staticClass: "form-check-input",
                                           attrs: {
                                             type: "checkbox",
-                                            id: "col-" + field.key,
-                                            disabled:
-                                              _vm.visibleFields.length == 1 &&
-                                              field.visible,
+                                            "aria-label": item.name,
                                           },
                                           domProps: {
+                                            value: item.product_variant_id,
                                             checked: Array.isArray(
-                                              field.visible
+                                              _vm.selectedItems
                                             )
-                                              ? _vm._i(field.visible, null) > -1
-                                              : field.visible,
+                                              ? _vm._i(
+                                                  _vm.selectedItems,
+                                                  item.product_variant_id
+                                                ) > -1
+                                              : _vm.selectedItems,
                                           },
                                           on: {
-                                            change: function ($event) {
-                                              var $$a = field.visible,
-                                                $$el = $event.target,
-                                                $$c = $$el.checked
-                                                  ? true
-                                                  : false
-                                              if (Array.isArray($$a)) {
-                                                var $$v = null,
-                                                  $$i = _vm._i($$a, $$v)
-                                                if ($$el.checked) {
-                                                  $$i < 0 &&
-                                                    _vm.$set(
-                                                      field,
-                                                      "visible",
-                                                      $$a.concat([$$v])
-                                                    )
-                                                } else {
-                                                  $$i > -1 &&
-                                                    _vm.$set(
-                                                      field,
-                                                      "visible",
-                                                      $$a
+                                            change: [
+                                              function ($event) {
+                                                var $$a = _vm.selectedItems,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v =
+                                                      item.product_variant_id,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (_vm.selectedItems =
+                                                        $$a.concat([$$v]))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (_vm.selectedItems = $$a
                                                         .slice(0, $$i)
                                                         .concat(
                                                           $$a.slice($$i + 1)
-                                                        )
-                                                    )
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.selectedItems = $$c
                                                 }
-                                              } else {
-                                                _vm.$set(field, "visible", $$c)
-                                              }
+                                              },
+                                              _vm.selectCheckBox,
+                                            ],
+                                          },
+                                        }),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-media" },
+                                      [
+                                        _c("img", {
+                                          staticClass: "products-card-img",
+                                          attrs: {
+                                            src: item.image
+                                              ? _vm.$storageUrl + item.image
+                                              : _vm.$placeholderImage,
+                                            alt: item.name,
+                                          },
+                                          on: {
+                                            click: function ($event) {
+                                              _vm.openLightbox(
+                                                item.image
+                                                  ? _vm.$storageUrl + item.image
+                                                  : _vm.$placeholderImage
+                                              )
                                             },
                                           },
                                         }),
                                         _vm._v(" "),
                                         _c(
-                                          "label",
-                                          {
-                                            staticClass:
-                                              "form-check-label ms-2",
-                                            attrs: { for: "col-" + field.key },
-                                          },
-                                          [_vm._v(_vm._s(field.label))]
+                                          "div",
+                                          { staticClass: "item-card-badges" },
+                                          [
+                                            item.is_approved == 1
+                                              ? _c(
+                                                  "span",
+                                                  {
+                                                    staticClass:
+                                                      "badge bg-success",
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(_vm.__("approved"))
+                                                    ),
+                                                  ]
+                                                )
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            item.is_approved == 0
+                                              ? _c(
+                                                  "span",
+                                                  {
+                                                    staticClass:
+                                                      "badge bg-danger",
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(
+                                                        _vm.__("not_approved")
+                                                      )
+                                                    ),
+                                                  ]
+                                                )
+                                              : _vm._e(),
+                                          ]
                                         ),
                                       ]
-                                    )
-                                  : _vm._e()
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-body" },
+                                      [
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass: "item-card-title",
+                                            attrs: { title: item.name },
+                                          },
+                                          [_vm._v(_vm._s(item.name))]
+                                        ),
+                                        _vm._v(" "),
+                                        _vm.$roleSeller !=
+                                          _vm.login_user.role.name &&
+                                        item.seller_name
+                                          ? _c(
+                                              "div",
+                                              {
+                                                staticClass: "item-card-meta",
+                                                attrs: {
+                                                  title: item.seller_name,
+                                                },
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass: "bi bi-shop",
+                                                }),
+                                                _vm._v(
+                                                  " " +
+                                                    _vm._s(item.seller_name) +
+                                                    "\n                                    "
+                                                ),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "item-card-meta" },
+                                          [
+                                            _vm._v(
+                                              "\n                                        " +
+                                                _vm._s(_vm.__("id")) +
+                                                ": #" +
+                                                _vm._s(
+                                                  item.product_variant_id
+                                                ) +
+                                                " · " +
+                                                _vm._s(_vm.__("product_id")) +
+                                                ": #" +
+                                                _vm._s(item.product_id) +
+                                                "\n                                    "
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          { staticClass: "item-card-price" },
+                                          [
+                                            _vm.hasDiscount(item)
+                                              ? [
+                                                  _c("span", [
+                                                    _vm._v(
+                                                      _vm._s(_vm.$currency) +
+                                                        _vm._s(
+                                                          item.discounted_price
+                                                        )
+                                                    ),
+                                                  ]),
+                                                  _vm._v(" "),
+                                                  _c("del", [
+                                                    _vm._v(
+                                                      _vm._s(_vm.$currency) +
+                                                        _vm._s(item.price)
+                                                    ),
+                                                  ]),
+                                                ]
+                                              : _c("span", [
+                                                  _vm._v(
+                                                    _vm._s(_vm.$currency) +
+                                                      _vm._s(item.price)
+                                                  ),
+                                                ]),
+                                          ],
+                                          2
+                                        ),
+                                        _vm._v(" "),
+                                        item.return_status == 1 ||
+                                        item.cancelable_status == 1
+                                          ? _c(
+                                              "div",
+                                              {
+                                                staticClass: "item-card-stats",
+                                              },
+                                              [
+                                                item.return_status == 1
+                                                  ? _c(
+                                                      "span",
+                                                      {
+                                                        staticClass:
+                                                          "item-card-chip",
+                                                      },
+                                                      [
+                                                        _c("i", {
+                                                          staticClass:
+                                                            "bi bi-arrow-counterclockwise",
+                                                        }),
+                                                        _vm._v(
+                                                          _vm._s(
+                                                            _vm.__("return")
+                                                          ) +
+                                                            "\n                                        "
+                                                        ),
+                                                      ]
+                                                    )
+                                                  : _vm._e(),
+                                                _vm._v(" "),
+                                                item.cancelable_status == 1
+                                                  ? _c(
+                                                      "span",
+                                                      {
+                                                        staticClass:
+                                                          "item-card-chip",
+                                                      },
+                                                      [
+                                                        _c("i", {
+                                                          staticClass:
+                                                            "bi bi-x-circle",
+                                                        }),
+                                                        _vm._v(
+                                                          _vm._s(
+                                                            _vm.__(
+                                                              "cancellation"
+                                                            )
+                                                          ) +
+                                                            "\n                                        "
+                                                        ),
+                                                      ]
+                                                    )
+                                                  : _vm._e(),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-footer" },
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "item-card-actions" },
+                                          [
+                                            _vm.$roleSeller ==
+                                            _vm.login_user.role.name
+                                              ? [
+                                                  _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "SellerViewProduct",
+                                                          params: {
+                                                            id: item.id,
+                                                            record: item,
+                                                          },
+                                                        },
+                                                        title: _vm.__("view"),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-eye",
+                                                      }),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "SellerEditProduct",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__("edit"),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-pencil",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "SellerProductRatings",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__(
+                                                                "view_ratings"
+                                                              ),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-star",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "SellerCloneProduct",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                                clone: true,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__(
+                                                                "clone_product"
+                                                              ),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-files",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                ]
+                                              : [
+                                                  _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "ViewProduct",
+                                                          params: {
+                                                            id: item.id,
+                                                            record: item,
+                                                          },
+                                                        },
+                                                        title: _vm.__("view"),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-eye",
+                                                      }),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "EditProduct",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__("edit"),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-pencil",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "ProductRatings",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__(
+                                                                "view_ratings"
+                                                              ),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-star",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                  _vm._v(" "),
+                                                  _vm.$can("product_update")
+                                                    ? _c(
+                                                        "router-link",
+                                                        {
+                                                          directives: [
+                                                            {
+                                                              name: "b-tooltip",
+                                                              rawName:
+                                                                "v-b-tooltip.hover",
+                                                              modifiers: {
+                                                                hover: true,
+                                                              },
+                                                            },
+                                                          ],
+                                                          staticClass:
+                                                            "figma-action-btn",
+                                                          attrs: {
+                                                            to: {
+                                                              name: "CloneProduct",
+                                                              params: {
+                                                                id: item.id,
+                                                                record: item,
+                                                                clone: true,
+                                                              },
+                                                            },
+                                                            title:
+                                                              _vm.__(
+                                                                "clone_product"
+                                                              ),
+                                                          },
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "bi bi-files",
+                                                          }),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                ],
+                                            _vm._v(" "),
+                                            _vm.$can("product_delete")
+                                              ? _c(
+                                                  "button",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "b-tooltip",
+                                                        rawName:
+                                                          "v-b-tooltip.hover",
+                                                        modifiers: {
+                                                          hover: true,
+                                                        },
+                                                      },
+                                                    ],
+                                                    staticClass:
+                                                      "figma-action-btn figma-delete-btn",
+                                                    attrs: {
+                                                      title: _vm.__("delete"),
+                                                    },
+                                                    on: {
+                                                      click: function ($event) {
+                                                        _vm.deleteRecord(
+                                                          _vm.productIndex(
+                                                            item
+                                                          ),
+                                                          item.product_variant_id
+                                                        )
+                                                      },
+                                                    },
+                                                  },
+                                                  [
+                                                    _c("i", {
+                                                      staticClass:
+                                                        "bi bi-trash",
+                                                    }),
+                                                  ]
+                                                )
+                                              : _vm._e(),
+                                          ],
+                                          2
+                                        ),
+                                      ]
+                                    ),
+                                  ]
+                                )
                               }),
                               0
                             ),
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _vm.$roleSeller == _vm.login_user.role.name
-                          ? [
-                              _c(
-                                "router-link",
-                                {
-                                  staticClass:
-                                    "btn btn-figma-columns d-flex align-items-center gap-2",
-                                  attrs: {
-                                    to: "/seller/manage_products/create",
-                                  },
-                                },
-                                [
-                                  _c("i", { staticClass: "fa fa-plus" }),
-                                  _vm._v(" "),
-                                  _c("span", [
-                                    _vm._v(_vm._s(_vm.__("add_product"))),
-                                  ]),
-                                ]
-                              ),
-                            ]
-                          : [
-                              _c(
-                                "router-link",
-                                {
-                                  staticClass:
-                                    "btn btn-figma-columns d-flex align-items-center gap-2",
-                                  attrs: { to: "/manage_products/create" },
-                                },
-                                [
-                                  _c("i", { staticClass: "fa fa-plus" }),
-                                  _vm._v(" "),
-                                  _c("span", [
-                                    _vm._v(_vm._s(_vm.__("add_product"))),
-                                  ]),
-                                ]
-                              ),
-                            ],
-                      ],
-                      2
-                    ),
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "b-collapse",
-                  {
-                    model: {
-                      value: _vm.showFilters,
-                      callback: function ($$v) {
-                        _vm.showFilters = $$v
-                      },
-                      expression: "showFilters",
-                    },
-                  },
-                  [
-                    _c("div", { staticClass: "figma-filter-section" }, [
-                      _c(
+                      ])
+                    : _c(
                         "div",
-                        { staticClass: "row g-4" },
+                        { staticClass: "table-responsive mb-0" },
                         [
-                          _c("div", { staticClass: "col-md-4" }, [
-                            _c("div", { staticClass: "figma-filter-group" }, [
-                              _c(
-                                "label",
-                                { staticClass: "figma-filter-label" },
-                                [_vm._v(_vm._s(_vm.__("category")))]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "select",
-                                {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.category,
-                                      expression: "category",
-                                    },
-                                  ],
-                                  staticClass: "form-select modern-select",
-                                  on: {
-                                    change: [
-                                      function ($event) {
-                                        var $$selectedVal =
-                                          Array.prototype.filter
-                                            .call(
-                                              $event.target.options,
-                                              function (o) {
-                                                return o.selected
-                                              }
-                                            )
-                                            .map(function (o) {
-                                              var val =
-                                                "_value" in o
-                                                  ? o._value
-                                                  : o.value
-                                              return val
-                                            })
-                                        _vm.category = $event.target.multiple
-                                          ? $$selectedVal
-                                          : $$selectedVal[0]
+                          _c("b-table", {
+                            staticClass: "products-table mb-0",
+                            attrs: {
+                              items: _vm.translatedProducts,
+                              fields: _vm.visibleFields,
+                              filter: _vm.filter,
+                              "filter-included-fields": _vm.filterOn,
+                              "sort-by": _vm.sortBy,
+                              "sort-desc": _vm.sortDesc,
+                              "sort-direction": _vm.sortDirection,
+                              bordered: false,
+                              busy: _vm.isLoading,
+                              stacked: "md",
+                              "show-empty": "",
+                              small: "",
+                            },
+                            on: {
+                              "update:sortBy": function ($event) {
+                                _vm.sortBy = $event
+                              },
+                              "update:sort-by": function ($event) {
+                                _vm.sortBy = $event
+                              },
+                              "update:sortDesc": function ($event) {
+                                _vm.sortDesc = $event
+                              },
+                              "update:sort-desc": function ($event) {
+                                _vm.sortDesc = $event
+                              },
+                            },
+                            scopedSlots: _vm._u([
+                              {
+                                key: "empty",
+                                fn: function (scope) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted py-4",
                                       },
-                                      function ($event) {
-                                        return _vm.getRecords()
-                                      },
-                                    ],
-                                  },
-                                },
-                                [
-                                  _c("option", { attrs: { value: "" } }, [
-                                    _vm._v(_vm._s(_vm.__("all_categories"))),
-                                  ]),
-                                  _vm._v(" "),
-                                  _vm._l(
-                                    _vm.translatedCategories,
-                                    function (category) {
-                                      return _c(
-                                        "option",
-                                        { domProps: { value: category.id } },
-                                        [_vm._v(_vm._s(category.name))]
-                                      )
-                                    }
-                                  ),
-                                ],
-                                2
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-4" }, [
-                            _c("div", { staticClass: "figma-filter-group" }, [
-                              _c(
-                                "label",
-                                { staticClass: "figma-filter-label" },
-                                [_vm._v(_vm._s(_vm.__("status")))]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "select",
-                                {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.is_approved,
-                                      expression: "is_approved",
-                                    },
-                                  ],
-                                  staticClass: "form-select modern-select",
-                                  on: {
-                                    change: [
-                                      function ($event) {
-                                        var $$selectedVal =
-                                          Array.prototype.filter
-                                            .call(
-                                              $event.target.options,
-                                              function (o) {
-                                                return o.selected
-                                              }
-                                            )
-                                            .map(function (o) {
-                                              var val =
-                                                "_value" in o
-                                                  ? o._value
-                                                  : o.value
-                                              return val
-                                            })
-                                        _vm.is_approved = $event.target.multiple
-                                          ? $$selectedVal
-                                          : $$selectedVal[0]
-                                      },
-                                      function ($event) {
-                                        return _vm.getRecords()
-                                      },
-                                    ],
-                                  },
-                                },
-                                [
-                                  _c("option", { attrs: { value: "" } }, [
-                                    _vm._v(_vm._s(_vm.__("all_statuses"))),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("option", { attrs: { value: "1" } }, [
-                                    _vm._v(_vm._s(_vm.__("approved"))),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("option", { attrs: { value: "0" } }, [
-                                    _vm._v(_vm._s(_vm.__("not_approved"))),
-                                  ]),
-                                ]
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _vm.$roleSeller != _vm.login_user.role.name
-                            ? [
-                                _c("div", { staticClass: "col-md-4" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "figma-filter-group" },
-                                    [
-                                      _c(
-                                        "label",
-                                        { staticClass: "figma-filter-label" },
-                                        [_vm._v(_vm._s(_vm.__("seller")))]
-                                      ),
-                                      _vm._v(" "),
-                                      _c(
-                                        "select",
-                                        {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: _vm.seller,
-                                              expression: "seller",
-                                            },
-                                          ],
+                                      [
+                                        _c("i", {
                                           staticClass:
-                                            "form-select modern-select",
-                                          on: {
-                                            change: [
-                                              function ($event) {
-                                                var $$selectedVal =
-                                                  Array.prototype.filter
-                                                    .call(
-                                                      $event.target.options,
-                                                      function (o) {
-                                                        return o.selected
-                                                      }
-                                                    )
-                                                    .map(function (o) {
-                                                      var val =
-                                                        "_value" in o
-                                                          ? o._value
-                                                          : o.value
-                                                      return val
-                                                    })
-                                                _vm.seller = $event.target
-                                                  .multiple
-                                                  ? $$selectedVal
-                                                  : $$selectedVal[0]
-                                              },
-                                              function ($event) {
-                                                return _vm.getRecords()
-                                              },
-                                            ],
-                                          },
-                                        },
-                                        [
-                                          _c(
-                                            "option",
-                                            { attrs: { value: "" } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(_vm.__("all_sellers"))
-                                              ),
-                                            ]
+                                            "fa fa-inbox fa-2x d-block mb-2",
+                                        }),
+                                        _vm._v(_vm._s(scope.emptyText)),
+                                      ]
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "emptyfiltered",
+                                fn: function (scope) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted py-4",
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "fa fa-search fa-2x d-block mb-2",
+                                        }),
+                                        _vm._v(_vm._s(scope.emptyFilteredText)),
+                                      ]
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "table-busy",
+                                fn: function () {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted my-3",
+                                      },
+                                      [
+                                        _c("b-spinner", {
+                                          staticClass: "align-middle",
+                                        }),
+                                        _vm._v(" "),
+                                        _c("strong", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("loading")) + "..."
                                           ),
-                                          _vm._v(" "),
-                                          _vm._l(
-                                            _vm.translatedSellers,
-                                            function (seller) {
-                                              return _c(
-                                                "option",
+                                        ]),
+                                      ],
+                                      1
+                                    ),
+                                  ]
+                                },
+                                proxy: true,
+                              },
+                              {
+                                key: "head(select)",
+                                fn: function (row) {
+                                  return [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.all_select,
+                                          expression: "all_select",
+                                        },
+                                      ],
+                                      staticClass: "form-check-input",
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(_vm.all_select)
+                                          ? _vm._i(_vm.all_select, null) > -1
+                                          : _vm.all_select,
+                                      },
+                                      on: {
+                                        click: _vm.allSelectCheckBox,
+                                        change: function ($event) {
+                                          var $$a = _vm.all_select,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (_vm.all_select = $$a.concat([
+                                                  $$v,
+                                                ]))
+                                            } else {
+                                              $$i > -1 &&
+                                                (_vm.all_select = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.all_select = $$c
+                                          }
+                                        },
+                                      },
+                                    }),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(select)",
+                                fn: function (row) {
+                                  return [
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.selectedItems,
+                                          expression: "selectedItems",
+                                        },
+                                      ],
+                                      staticClass: "form-check-input",
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        value: row.item.product_variant_id,
+                                        checked: Array.isArray(
+                                          _vm.selectedItems
+                                        )
+                                          ? _vm._i(
+                                              _vm.selectedItems,
+                                              row.item.product_variant_id
+                                            ) > -1
+                                          : _vm.selectedItems,
+                                      },
+                                      on: {
+                                        change: [
+                                          function ($event) {
+                                            var $$a = _vm.selectedItems,
+                                              $$el = $event.target,
+                                              $$c = $$el.checked ? true : false
+                                            if (Array.isArray($$a)) {
+                                              var $$v =
+                                                  row.item.product_variant_id,
+                                                $$i = _vm._i($$a, $$v)
+                                              if ($$el.checked) {
+                                                $$i < 0 &&
+                                                  (_vm.selectedItems =
+                                                    $$a.concat([$$v]))
+                                              } else {
+                                                $$i > -1 &&
+                                                  (_vm.selectedItems = $$a
+                                                    .slice(0, $$i)
+                                                    .concat($$a.slice($$i + 1)))
+                                              }
+                                            } else {
+                                              _vm.selectedItems = $$c
+                                            }
+                                          },
+                                          _vm.selectCheckBox,
+                                        ],
+                                      },
+                                    }),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(seller_name)",
+                                fn: function (row) {
+                                  return [
+                                    _vm._v(
+                                      "\n                                " +
+                                        _vm._s(row.item.seller_name) +
+                                        "\n                            "
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(image)",
+                                fn: function (row) {
+                                  return [
+                                    _c("img", {
+                                      staticClass: "product-thumb",
+                                      attrs: {
+                                        src: row.item.image
+                                          ? _vm.$storageUrl + row.item.image
+                                          : _vm.$placeholderImage,
+                                        alt: "Image",
+                                      },
+                                      on: {
+                                        click: function ($event) {
+                                          _vm.openLightbox(
+                                            row.item.image
+                                              ? _vm.$storageUrl + row.item.image
+                                              : _vm.$placeholderImage
+                                          )
+                                        },
+                                      },
+                                    }),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(is_approved)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.is_approved == 1
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-success" },
+                                          [_vm._v(_vm._s(_vm.__("approved")))]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    row.item.is_approved == 0
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-danger" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("not_approved"))
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(return_status)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.return_status == 0
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-danger" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("not_allowed"))
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    row.item.return_status == 1
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-success" },
+                                          [_vm._v(_vm._s(_vm.__("allowed")))]
+                                        )
+                                      : _vm._e(),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(cancelable_status)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.cancelable_status === 0
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-danger" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("not_allowed"))
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    row.item.cancelable_status == 1
+                                      ? _c(
+                                          "span",
+                                          { staticClass: "badge bg-success" },
+                                          [_vm._v(_vm._s(_vm.__("allowed")))]
+                                        )
+                                      : _vm._e(),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(actions)",
+                                fn: function (row) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "d-flex gap-1 product-row-actions",
+                                      },
+                                      [
+                                        _vm.$roleSeller ==
+                                        _vm.login_user.role.name
+                                          ? [
+                                              _c(
+                                                "router-link",
                                                 {
-                                                  domProps: {
-                                                    value: seller.id,
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn",
+                                                  attrs: {
+                                                    to: {
+                                                      name: "SellerViewProduct",
+                                                      params: {
+                                                        id: row.item.id,
+                                                        record: row.item,
+                                                      },
+                                                    },
+                                                    title: _vm.__("view"),
                                                   },
                                                 },
                                                 [
-                                                  _vm._v(
-                                                    _vm._s(seller.name) +
-                                                      "\n                                                "
-                                                  ),
+                                                  _c("i", {
+                                                    staticClass: "bi bi-eye",
+                                                  }),
                                                 ]
-                                              )
-                                            }
-                                          ),
-                                        ],
-                                        2
-                                      ),
-                                    ]
-                                  ),
-                                ]),
-                              ]
-                            : _vm._e(),
-                        ],
-                        2
-                      ),
-                    ]),
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "table-responsive mb-0" },
-                  [
-                    _c("b-table", {
-                      staticClass: "mb-0",
-                      attrs: {
-                        items: _vm.translatedProducts,
-                        fields: _vm.visibleFields,
-                        filter: _vm.filter,
-                        "filter-included-fields": _vm.filterOn,
-                        "sort-by": _vm.sortBy,
-                        "sort-desc": _vm.sortDesc,
-                        "sort-direction": _vm.sortDirection,
-                        bordered: false,
-                        busy: _vm.isLoading,
-                        stacked: "md",
-                        "show-empty": "",
-                        small: "",
-                      },
-                      on: {
-                        "update:sortBy": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sort-by": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sortDesc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                        "update:sort-desc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "table-busy",
-                          fn: function () {
-                            return [
-                              _c(
-                                "div",
-                                { staticClass: "text-center text-black my-2" },
-                                [
-                                  _c("b-spinner", {
-                                    staticClass: "align-middle",
-                                  }),
-                                  _vm._v(" "),
-                                  _c("strong", [
-                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                                  ]),
-                                ],
-                                1
-                              ),
-                            ]
-                          },
-                          proxy: true,
-                        },
-                        {
-                          key: "head(select)",
-                          fn: function (row) {
-                            return [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.all_select,
-                                    expression: "all_select",
-                                  },
-                                ],
-                                staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
-                                domProps: {
-                                  checked: Array.isArray(_vm.all_select)
-                                    ? _vm._i(_vm.all_select, null) > -1
-                                    : _vm.all_select,
-                                },
-                                on: {
-                                  click: _vm.allSelectCheckBox,
-                                  change: function ($event) {
-                                    var $$a = _vm.all_select,
-                                      $$el = $event.target,
-                                      $$c = $$el.checked ? true : false
-                                    if (Array.isArray($$a)) {
-                                      var $$v = null,
-                                        $$i = _vm._i($$a, $$v)
-                                      if ($$el.checked) {
-                                        $$i < 0 &&
-                                          (_vm.all_select = $$a.concat([$$v]))
-                                      } else {
-                                        $$i > -1 &&
-                                          (_vm.all_select = $$a
-                                            .slice(0, $$i)
-                                            .concat($$a.slice($$i + 1)))
-                                      }
-                                    } else {
-                                      _vm.all_select = $$c
-                                    }
-                                  },
-                                },
-                              }),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(select)",
-                          fn: function (row) {
-                            return [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.selectedItems,
-                                    expression: "selectedItems",
-                                  },
-                                ],
-                                staticClass: "form-check-input",
-                                attrs: { type: "checkbox" },
-                                domProps: {
-                                  value: row.item.product_variant_id,
-                                  checked: Array.isArray(_vm.selectedItems)
-                                    ? _vm._i(
-                                        _vm.selectedItems,
-                                        row.item.product_variant_id
-                                      ) > -1
-                                    : _vm.selectedItems,
-                                },
-                                on: {
-                                  change: [
-                                    function ($event) {
-                                      var $$a = _vm.selectedItems,
-                                        $$el = $event.target,
-                                        $$c = $$el.checked ? true : false
-                                      if (Array.isArray($$a)) {
-                                        var $$v = row.item.product_variant_id,
-                                          $$i = _vm._i($$a, $$v)
-                                        if ($$el.checked) {
-                                          $$i < 0 &&
-                                            (_vm.selectedItems = $$a.concat([
-                                              $$v,
-                                            ]))
-                                        } else {
-                                          $$i > -1 &&
-                                            (_vm.selectedItems = $$a
-                                              .slice(0, $$i)
-                                              .concat($$a.slice($$i + 1)))
-                                        }
-                                      } else {
-                                        _vm.selectedItems = $$c
-                                      }
-                                    },
-                                    _vm.selectCheckBox,
-                                  ],
-                                },
-                              }),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(seller_name)",
-                          fn: function (row) {
-                            return [
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(row.item.seller_name) +
-                                  "\n                            "
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(image)",
-                          fn: function (row) {
-                            return [
-                              _c("img", {
-                                staticStyle: { cursor: "pointer" },
-                                attrs: {
-                                  src: _vm.$storageUrl + row.item.image,
-                                  alt: "Image",
-                                  height: "50",
-                                },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.openLightbox(
-                                      _vm.$storageUrl + row.item.image
-                                    )
-                                  },
-                                },
-                              }),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(is_approved)",
-                          fn: function (row) {
-                            return [
-                              row.item.is_approved == 1
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("approved")))]
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              row.item.is_approved == 0
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("not_approved")))]
-                                  )
-                                : _vm._e(),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(return_status)",
-                          fn: function (row) {
-                            return [
-                              row.item.return_status == 0
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("not_allowed")))]
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              row.item.return_status == 1
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("allowed")))]
-                                  )
-                                : _vm._e(),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(cancelable_status)",
-                          fn: function (row) {
-                            return [
-                              row.item.cancelable_status === 0
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("not_allowed")))]
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              row.item.cancelable_status == 1
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("allowed")))]
-                                  )
-                                : _vm._e(),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(actions)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "div",
-                                { staticClass: "d-flex gap-2" },
-                                [
-                                  _vm.$roleSeller == _vm.login_user.role.name
-                                    ? [
-                                        _c(
-                                          "router-link",
-                                          {
-                                            directives: [
-                                              {
-                                                name: "b-tooltip",
-                                                rawName: "v-b-tooltip.hover",
-                                                modifiers: { hover: true },
-                                              },
+                                              ),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "SellerEditProduct",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                          },
+                                                        },
+                                                        title: _vm.__("edit"),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-pencil",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "SellerProductRatings",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                          },
+                                                        },
+                                                        title:
+                                                          _vm.__(
+                                                            "view_ratings"
+                                                          ),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-star",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "SellerCloneProduct",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                            clone: true,
+                                                          },
+                                                        },
+                                                        title:
+                                                          _vm.__(
+                                                            "clone_product"
+                                                          ),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-files",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
+                                            ]
+                                          : [
+                                              _c(
+                                                "router-link",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn",
+                                                  attrs: {
+                                                    to: {
+                                                      name: "ViewProduct",
+                                                      params: {
+                                                        id: row.item.id,
+                                                        record: row.item,
+                                                      },
+                                                    },
+                                                    title: _vm.__("view"),
+                                                  },
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass: "bi bi-eye",
+                                                  }),
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "EditProduct",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                          },
+                                                        },
+                                                        title: _vm.__("edit"),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-pencil",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "ProductRatings",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                          },
+                                                        },
+                                                        title:
+                                                          _vm.__(
+                                                            "view_ratings"
+                                                          ),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-star",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
+                                              _vm._v(" "),
+                                              _vm.$can("product_update")
+                                                ? _c(
+                                                    "router-link",
+                                                    {
+                                                      directives: [
+                                                        {
+                                                          name: "b-tooltip",
+                                                          rawName:
+                                                            "v-b-tooltip.hover",
+                                                          modifiers: {
+                                                            hover: true,
+                                                          },
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "figma-action-btn",
+                                                      attrs: {
+                                                        to: {
+                                                          name: "CloneProduct",
+                                                          params: {
+                                                            id: row.item.id,
+                                                            record: row.item,
+                                                            clone: true,
+                                                          },
+                                                        },
+                                                        title:
+                                                          _vm.__(
+                                                            "clone_product"
+                                                          ),
+                                                      },
+                                                    },
+                                                    [
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "bi bi-files",
+                                                      }),
+                                                    ]
+                                                  )
+                                                : _vm._e(),
                                             ],
-                                            staticClass: "figma-action-btn",
-                                            attrs: {
-                                              to: {
-                                                name: "SellerViewProduct",
-                                                params: {
-                                                  id: row.item.id,
-                                                  record: row.item,
-                                                },
-                                              },
-                                              title: _vm.__("view"),
-                                            },
-                                          },
-                                          [
-                                            _c("base-icon", {
-                                              attrs: {
-                                                name: "Eye",
-                                                hoverName: "Type=Hover (1)",
-                                                width: "24",
-                                                height: "24",
-                                              },
-                                            }),
-                                          ],
-                                          1
-                                        ),
                                         _vm._v(" "),
-                                        _vm.$can("product_update")
+                                        _vm.$can("product_delete")
                                           ? _c(
-                                              "router-link",
+                                              "button",
                                               {
                                                 directives: [
                                                   {
@@ -1780,369 +3275,112 @@ var render = function () {
                                                     modifiers: { hover: true },
                                                   },
                                                 ],
-                                                staticClass: "figma-action-btn",
+                                                staticClass:
+                                                  "figma-action-btn figma-delete-btn",
                                                 attrs: {
-                                                  to: {
-                                                    name: "SellerEditProduct",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                    },
+                                                  title: _vm.__("delete"),
+                                                },
+                                                on: {
+                                                  click: function ($event) {
+                                                    _vm.deleteRecord(
+                                                      _vm.productIndex(
+                                                        row.item
+                                                      ),
+                                                      row.item
+                                                        .product_variant_id
+                                                    )
                                                   },
-                                                  title: _vm.__("edit"),
                                                 },
                                               },
                                               [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "edit icon",
-                                                    hoverName: "edit Hover",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
+                                                _c("i", {
+                                                  staticClass: "bi bi-trash",
                                                 }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        _vm.$can("product_update")
-                                          ? _c(
-                                              "router-link",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  to: {
-                                                    name: "SellerProductRatings",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                    },
-                                                  },
-                                                  title: _vm.__("view_ratings"),
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "star",
-                                                    hoverName: "star hover",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        _vm.$can("product_update")
-                                          ? _c(
-                                              "router-link",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  to: {
-                                                    name: "SellerCloneProduct",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                      clone: true,
-                                                    },
-                                                  },
-                                                  title:
-                                                    _vm.__("clone_product"),
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "copy",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                      ]
-                                    : [
-                                        _c(
-                                          "router-link",
-                                          {
-                                            directives: [
-                                              {
-                                                name: "b-tooltip",
-                                                rawName: "v-b-tooltip.hover",
-                                                modifiers: { hover: true },
-                                              },
-                                            ],
-                                            staticClass: "figma-action-btn",
-                                            attrs: {
-                                              to: {
-                                                name: "ViewProduct",
-                                                params: {
-                                                  id: row.item.id,
-                                                  record: row.item,
-                                                },
-                                              },
-                                              title: _vm.__("view"),
-                                            },
-                                          },
-                                          [
-                                            _c("base-icon", {
-                                              attrs: {
-                                                name: "Eye",
-                                                hoverName: "Type=Hover (1)",
-                                                width: "24",
-                                                height: "24",
-                                              },
-                                            }),
-                                          ],
-                                          1
-                                        ),
-                                        _vm._v(" "),
-                                        _vm.$can("product_update")
-                                          ? _c(
-                                              "router-link",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  to: {
-                                                    name: "EditProduct",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                    },
-                                                  },
-                                                  title: _vm.__("edit"),
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "edit icon",
-                                                    hoverName: "edit Hover",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        _vm.$can("product_update")
-                                          ? _c(
-                                              "router-link",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  to: {
-                                                    name: "ProductRatings",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                    },
-                                                  },
-                                                  title: _vm.__("view_ratings"),
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "star",
-                                                    hoverName: "star hover",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        _vm.$can("product_update")
-                                          ? _c(
-                                              "router-link",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  to: {
-                                                    name: "CloneProduct",
-                                                    params: {
-                                                      id: row.item.id,
-                                                      record: row.item,
-                                                      clone: true,
-                                                    },
-                                                  },
-                                                  title:
-                                                    _vm.__("clone_product"),
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "copy",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
+                                              ]
                                             )
                                           : _vm._e(),
                                       ],
-                                  _vm._v(" "),
-                                  _vm.$can("product_delete")
-                                    ? _c(
-                                        "button",
-                                        {
-                                          directives: [
-                                            {
-                                              name: "b-tooltip",
-                                              rawName: "v-b-tooltip.hover",
-                                              modifiers: { hover: true },
-                                            },
-                                          ],
-                                          staticClass: "figma-action-btn",
-                                          attrs: { title: _vm.__("delete") },
-                                          on: {
-                                            click: function ($event) {
-                                              return _vm.deleteRecord(
-                                                row.index,
-                                                row.item.product_variant_id
-                                              )
-                                            },
-                                          },
-                                        },
-                                        [
-                                          _c("base-icon", {
-                                            attrs: {
-                                              name: "Type=Default",
-                                              hoverName: "Type=Hover",
-                                              width: "24",
-                                              height: "24",
-                                            },
-                                          }),
-                                        ],
-                                        1
-                                      )
-                                    : _vm._e(),
-                                ],
-                                2
-                              ),
-                            ]
-                          },
-                        },
-                      ]),
-                    }),
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "figma-table-footer flex-wrap gap-3" },
-                  [
-                    _c(
-                      "div",
-                      { staticClass: "d-flex align-items-center gap-2" },
-                      [
-                        _c(
-                          "label",
-                          { staticClass: "showing-results-text mb-0" },
-                          [_vm._v(_vm._s(_vm.__("per_page")))]
-                        ),
-                        _vm._v(" "),
-                        _c("b-form-select", {
-                          staticStyle: { width: "auto" },
-                          attrs: { options: _vm.pageOptions, size: "sm" },
-                          model: {
-                            value: _vm.perPage,
-                            callback: function ($$v) {
-                              _vm.perPage = $$v
+                                      2
+                                    ),
+                                  ]
+                                },
+                              },
+                            ]),
+                          }),
+                        ],
+                        1
+                      ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "figma-table-footer flex-wrap gap-3" },
+                    [
+                      _c(
+                        "div",
+                        { staticClass: "d-flex align-items-center gap-2" },
+                        [
+                          _c(
+                            "label",
+                            { staticClass: "showing-results-text mb-0" },
+                            [_vm._v(_vm._s(_vm.__("per_page")))]
+                          ),
+                          _vm._v(" "),
+                          _c("b-form-select", {
+                            staticStyle: { width: "auto" },
+                            attrs: { options: _vm.pageOptions, size: "sm" },
+                            model: {
+                              value: _vm.perPage,
+                              callback: function ($$v) {
+                                _vm.perPage = $$v
+                              },
+                              expression: "perPage",
                             },
-                            expression: "perPage",
-                          },
-                        }),
-                      ],
-                      1
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      { staticClass: "d-flex align-items-center gap-3" },
-                      [
-                        _c("b-pagination", {
-                          staticClass: "figma-pagination mb-0",
-                          attrs: {
-                            "total-rows": _vm.totalRows,
-                            "per-page": _vm.perPage,
-                            align: "right",
-                            "hide-goto-end-buttons": "",
-                            "hide-ellipsis": "",
-                            "prev-text": "<",
-                            "next-text": ">",
-                          },
-                          model: {
-                            value: _vm.currentPage,
-                            callback: function ($$v) {
-                              _vm.currentPage = $$v
+                          }),
+                          _vm._v(" "),
+                          _c("table-count", {
+                            attrs: {
+                              "current-page": _vm.currentPage,
+                              "per-page": _vm.perPage,
+                              "total-rows": _vm.totalRows,
                             },
-                            expression: "currentPage",
-                          },
-                        }),
-                      ],
-                      1
-                    ),
-                  ]
-                ),
-              ],
-              1
-            ),
-          ]),
+                          }),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "d-flex align-items-center gap-3" },
+                        [
+                          _c("b-pagination", {
+                            staticClass: "figma-pagination mb-0",
+                            attrs: {
+                              "total-rows": _vm.totalRows,
+                              "per-page": _vm.perPage,
+                              align: "right",
+                              "hide-goto-end-buttons": "",
+                              "hide-ellipsis": "",
+                              "prev-text": "<",
+                              "next-text": ">",
+                            },
+                            model: {
+                              value: _vm.currentPage,
+                              callback: function ($$v) {
+                                _vm.currentPage = $$v
+                              },
+                              expression: "currentPage",
+                            },
+                          }),
+                        ],
+                        1
+                      ),
+                    ]
+                  ),
+                ],
+                1
+              ),
+            ]
+          ),
         ]),
       ]),
       _vm._v(" "),

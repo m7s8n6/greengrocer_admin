@@ -17,6 +17,17 @@
             </div>
         </div>
         <section class="section">
+            <div class="row g-3 mb-3 report-kpis justify-content-start">
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="figma-kpi-card-v2 w-100">
+                        <div class="figma-kpi-icon-v2 bg-stat-green"><i class="bi bi-percent"></i></div>
+                        <div class="figma-kpi-content-v2">
+                            <span class="figma-kpi-label-v2">{{ __('total_commission') }}</span>
+                            <span class="figma-kpi-value-v2">{{ $currency }} {{ total_commission.toFixed(2) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="figma-main-section-card">
                 <div class="card-body p-0">
                     <!-- Modern Filter Action Bar -->
@@ -55,13 +66,6 @@
                                                 :maxDate="maxDate" @update="getCommissionReports"
                                                 :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
                                                 :append-to-body="true" opens="right" class="w-100"></date-range-picker>
-                                            <button v-if="dateRange.startDate" type="button"
-                                                class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                @click.stop="clearDate()"
-                                                v-b-tooltip.hover :title="__('clear') || 'Clear'">
-                                                <i class="fa fa-times-circle text-muted"></i>
-                                            </button>
                                             <base-icon name="CalendarDots" width="24" height="24"
                                                 class="figma-filter-icon-right" useCurrentColor />
                                         </div>
@@ -92,7 +96,7 @@
                         <b-table :items="commissionReports" :fields="fields" :current-page="currentPage"
                             :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                             :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
-                            :bordered="false" :busy="isLoading" stacked="md" show-empty small
+                            :bordered="false" :busy="isLoading" stacked="md" show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')" small
                             :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table">
                             <template #head()="data">
                                 <span class="figma-th">{{ data.label }}</span>
@@ -105,21 +109,8 @@
                             </template>
                         </b-table>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <div class="p-3 rounded border bg-light d-inline-block">
-                                <span class="text-muted small me-2">{{ __('total_commission') }}:</span>
-                                <span class="h6 mb-0 text-success fw-bold">{{ $currency }} {{
-                                    total_commission.toFixed(2) }}</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }}
-                            <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<"
                             next-text=">"></b-pagination>
@@ -188,11 +179,6 @@ export default {
         this.getCommissionReports();
     },
     methods: {
-        clearDate() {
-            this.dateRange.startDate = null;
-            this.dateRange.endDate = null;
-            this.getCommissionReports();
-        },
         getCommissionReports() {
             this.isLoading = true;
             let param = {
@@ -226,4 +212,5 @@ export default {
         min-width: 90%;
     }
 }
+
 </style>

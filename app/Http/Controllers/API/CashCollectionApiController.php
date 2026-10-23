@@ -14,6 +14,7 @@ class CashCollectionApiController extends Controller
     public function getCashCollection(Request $request){
         // Load delivery boys with all translations for language-wise display
         $deliveryBoys = DeliveryBoy::withAllTranslations()
+            ->whereNull('seller_id')
             ->orderBy('id', 'ASC')
             ->get(['id', 'name', 'mobile', 'cash_received']);
 

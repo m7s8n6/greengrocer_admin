@@ -73,8 +73,15 @@
                             :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                             :bordered="false" :busy="isLoading" stacked="md" show-empty
                             :tbody-tr-class="() => 'figma-tr align-middle'" small class="w-100 figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-2">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -93,10 +100,10 @@
                                 <span v-else class="badge bg-danger">{{ __('undefine') }}Undefine</span>
                             </template>
                             <template #cell(receipt_image)="row">
-                                <img :src="row.item.receipt_image_url" height="50" />
+                                <img :src="row.item.receipt_image_url" height="50" class="wr-receipt-thumb" />
                             </template>
                             <template #cell(message)="row">
-                                <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
+                                <small class="wr-info-chip"
                                     v-b-tooltip.hover :title="row.item.message">
                                     <i class="fa fa-info-circle"></i>
                                 </small>
@@ -125,10 +132,11 @@
 
                 </div>
                 <div class="figma-table-footer">
-                    <div class="showing-results-text">
-                        {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd
-                            }}</span> {{ __('of')
-                        || 'of' }} <span class="showing-bold">{{ totalRowsFilter }}</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                        <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                            class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRowsFilter"></table-count>
                     </div>
                     <b-pagination v-model="currentPage" :total-rows="totalRowsFilter" :per-page="perPage" align="right"
                         class="figma-pagination mb-0"></b-pagination>
@@ -150,14 +158,14 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc', thClass: 'text-nowrap' },
-                { key: 'type', label: __('type'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'name', label: __('name'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'remark', label: __('remark'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
+                { key: 'type', label: __('type'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'name', label: __('name'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'amount', label: __('amount'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'message', label: __('message'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'status', label: __('status'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'remark', label: __('remark'), sortable: true, thClass: 'text-nowrap' },
                 { key: 'receipt_image', label: __('receipt_image'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'created_at', label: __('date'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
+                { key: 'created_at', label: __('date'), sortable: true, thClass: 'text-nowrap' },
                 { key: 'actions', label: __('actions'), thClass: 'text-nowrap', class: 'text-center' }
             ],
             totalRows: 1,
@@ -221,6 +229,11 @@ export default {
         });
         this.getRecords();
     },
+    watch: {
+        perPage() {
+            this.currentPage = 1;
+        }
+    },
     methods: {
         getRecords() {
             this.isLoading = true
@@ -244,8 +257,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -269,3 +282,25 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.wr-info-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    cursor: pointer;
+}
+
+.wr-receipt-thumb {
+    width: 50px;
+    object-fit: cover;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+}
+</style>

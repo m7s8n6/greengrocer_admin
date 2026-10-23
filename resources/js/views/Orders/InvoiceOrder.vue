@@ -1,13 +1,10 @@
 <template>
     <div>
-        <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>Invoice</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
+        <div class="invoice-page">
+            <div class="page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                    <h3 class="mb-0">Invoice</h3>
+                    <nav aria-label="breadcrumb" class="breadcrumb-header">
+                        <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item" v-if="isSellerRoute">
                                 <router-link to="/seller/dashboard">{{ __('dashboard') }}</router-link>
                             </li>
@@ -40,26 +37,17 @@
                             <li class="breadcrumb-item active" aria-current="page">Invoice</li>
                         </ol>
                     </nav>
-                </div>
             </div>
 
-            <div class="row">
-                <div class="col-12 col-md-12 order-md-1 order-last">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <section class="invoice" id="printMe" v-html="invoice">
+            <div class="card invoice-card">
+                <div class="invoice-card-header">
+                    <h5 class="invoice-card-title mb-0">Invoice <span v-if="id">#{{ id }}</span></h5>
+                    <button type="button" v-print="'#printMe'"  v-b-tooltip.hover title="Print" class="btn btn-outline-primary invoice-print-btn" ><i class="fa fa-print"></i> Print</button>
+                </div>
+                <div class="card-body invoice-card-body">
+                    <section class="invoice" id="printMe" v-html="invoice">
 
-                                    </section>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="card-footer">
-                            <button type="button" v-print="'#printMe'"  v-b-tooltip.hover title="Print" class="btn btn-sm btn-secondary" ><i class="fa fa-print"></i> Print</button>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -163,39 +151,225 @@ p {
     margin: 0 0 0px;
 }
 
+/* ===== Invoice card ===== */
+.invoice-card {
+    border: 1px solid var(--ui-border, var(--ui-border));
+    border-radius: var(--ui-radius-lg, 12px);
+    box-shadow: var(--ui-shadow);
+    overflow: hidden;
+}
+
+.invoice-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--ui-border, var(--ui-border));
+}
+
+.invoice-card-title {
+    font-family: var(--ui-font);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ui-heading, var(--theme-neutral-900));
+}
+
+.invoice-print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--ui-radius, 8px);
+}
+
+.invoice-card-body {
+    padding: 20px;
+}
+
 .invoice {
     position: relative;
-    background: #fff;
-    border: 1px solid #f4f4f4;
-    padding: 20px;
-    margin: 10px 25px
-}
-.invoice-title {
-    margin-top: 0
-}
-
-.well {
-    min-height: 20px;
-    padding: 19px;
-    margin-bottom: 20px;
-    background-color: #f5f5f5;
-    border: 1px solid #e3e3e3;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .05)
-}
-.well blockquote {
-    border-color: #ddd;
-    border-color: rgba(0, 0, 0, .15)
-}
-.well-lg {
-    padding: 24px;
-    border-radius: 6px
-}
-.well-sm {
-    padding: 9px;
-    border-radius: 3px
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0;
+    background: var(--ui-surface);
+    border: none;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--ui-text, var(--theme-neutral-800));
 }
 
+/* The invoice markup comes from the server (v-html), so it is styled with ::v-deep */
+.invoice ::v-deep .invoice {
+    margin: 0 !important;
+    padding: 24px !important;
+    border: 1px solid var(--ui-border, var(--ui-border)) !important;
+    border-radius: var(--ui-radius-lg, 12px);
+    background: var(--ui-surface) !important;
+}
 
+.invoice ::v-deep .page-header {
+    margin: 0;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 26px;
+    color: var(--ui-heading, var(--theme-neutral-900));
+}
+
+.invoice ::v-deep hr {
+    margin: 16px 0;
+    border-color: var(--ui-border, var(--ui-border));
+    opacity: 1;
+}
+
+.invoice ::v-deep .d-flex {
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: flex-start !important;
+}
+
+.invoice ::v-deep .invoice-col {
+    flex: 1 1 200px;
+    text-align: start;
+}
+
+.invoice ::v-deep .invoice-col > b,
+.invoice ::v-deep .col-md-4 > b,
+.invoice ::v-deep .h6 {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--ui-text-muted, var(--theme-neutral-500));
+}
+
+.invoice ::v-deep address,
+.invoice ::v-deep p {
+    margin-bottom: 2px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.invoice ::v-deep .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.invoice ::v-deep .col-md-4,
+.invoice ::v-deep .col-md-3 {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: start;
+}
+
+.invoice ::v-deep .table-responsive {
+    width: 100%;
+    padding: 0;
+    overflow-x: auto;
+    border: none;
+}
+
+.invoice ::v-deep table.table {
+    display: table;
+    width: 100%;
+    margin-bottom: 0;
+    border: 1px solid var(--ui-border, var(--ui-border));
+}
+
+.invoice ::v-deep table.table thead th {
+    padding: 10px 12px;
+    background: var(--ui-surface-muted, var(--theme-neutral-100));
+    border-bottom: 1px solid var(--ui-border, var(--ui-border));
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--ui-text-muted, var(--theme-neutral-500));
+    white-space: nowrap;
+}
+
+.invoice ::v-deep table.table td,
+.invoice ::v-deep table.table tfoot th {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-color: var(--ui-border, var(--ui-border));
+}
+
+.invoice ::v-deep table.table tfoot th,
+.invoice ::v-deep table.table tfoot td {
+    font-weight: 700;
+    background: var(--ui-surface-muted, var(--theme-neutral-100));
+}
+
+/* Totals block (second table, no .table class) */
+.invoice ::v-deep table:not(.table) {
+    min-width: 280px;
+    margin-left: auto;
+    border-collapse: collapse;
+}
+
+.invoice ::v-deep table:not(.table) tr {
+    height: auto !important; /* global table row heights (52px) would stretch the totals list */
+}
+
+.invoice ::v-deep table:not(.table) th,
+.invoice ::v-deep table:not(.table) td {
+    height: auto !important;
+    padding: 6px 0 !important; /* beats global table cell padding */
+    font-size: 13px;
+    border-bottom: 1px solid var(--ui-border, var(--ui-border));
+}
+
+.invoice ::v-deep table:not(.table) th {
+    font-weight: 400;
+    color: var(--ui-text-muted, var(--theme-neutral-600));
+    padding-right: 24px;
+}
+
+.invoice ::v-deep table:not(.table) td {
+    text-align: right;
+    font-weight: 600;
+    color: var(--ui-heading, var(--theme-neutral-900));
+}
+
+.invoice ::v-deep table:not(.table) tr:last-child th,
+.invoice ::v-deep table:not(.table) tr:last-child td {
+    padding-top: 10px;
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ui-heading, var(--theme-neutral-900));
+}
+
+@media (max-width: 575.98px) {
+    .invoice-card-body {
+        padding: 12px;
+    }
+
+    .invoice ::v-deep .invoice {
+        padding: 16px !important;
+    }
+
+    .invoice ::v-deep table:not(.table) {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .invoice ::v-deep .table-responsive {
+        flex: 1 1 100%;
+    }
+}
+
+@media print {
+    .invoice ::v-deep .invoice {
+        border: none !important;
+        padding: 0 !important;
+    }
+}
 </style>

@@ -98,7 +98,6 @@ class SettingApiController extends Controller
             "popup_end_date",
             "playstore_url",
             "appstore_url",
-            "guest_cart",
             "one_seller_cart",
             "website_mode",
             "website_mode_remark",
@@ -112,6 +111,13 @@ class SettingApiController extends Controller
             "firebase_authentication",
             "custom_sms_gateway_otp_based",
             "enable_road_path_tracking",
+            "broadcast_driver",
+            "pusher_app_key",
+            "pusher_app_cluster",
+            "reverb_app_key",
+            "reverb_host",
+            "reverb_port",
+            "reverb_scheme",
             "text_gen_key",
             "date_format",
             "time_format",
@@ -170,6 +176,13 @@ class SettingApiController extends Controller
             $data['cart_count'] = 0;
         }
 
+        $data['is_demo_mode_on'] = isDemoModeOn();
+
+        // Which map the apps should draw and which services the server uses: 'google' or 'osm'.
+        $data['map_provider'] = CommonHelper::activeMapProvider();
+
+        $data['deeplink_settings'] = \App\Http\Controllers\API\DeeplinkSettingsApiController::getDeeplinkSettings();
+
         if (isset($request->is_web_setting) && $request->is_web_setting == 1) {
             $webVariables = array(
                 "site_title",
@@ -193,7 +206,6 @@ class SettingApiController extends Controller
                 "dark_web_logo",
                 "placeholder_image",
                 "loading",
-                "guest_cart",
                 "one_seller_cart",
                 "website_mode",
                 "website_mode_remark",
@@ -207,6 +219,13 @@ class SettingApiController extends Controller
                 "firebase_authentication",
                 "custom_sms_gateway_otp_based",
                 "enable_road_path_tracking",
+                "broadcast_driver",
+                "pusher_app_key",
+                "pusher_app_cluster",
+                "reverb_app_key",
+                "reverb_host",
+                "reverb_port",
+                "reverb_scheme",
                 "text_gen_key"
             );
             $web_settings = CommonHelper::getSettings($webVariables);
@@ -220,10 +239,56 @@ class SettingApiController extends Controller
         if (!empty($data)) {
             $data = json_encode($data);
             $data = base64_encode($data);
-            return CommonHelper::responseWithData($data);
+            // `data` stays the base64 blob apps already decode; `realtime` is the same Pusher /
+            // Reverb connection info as plain JSON so it can be read without decoding.
+            $payload = CommonHelper::responseWithData($data)->getData(true);
+            $payload['realtime'] = $this->realtimePayload();
+            return response()->json($payload);
         } else {
             return  CommonHelper::responseError('No settings found!');
         }
+    }
+
+    /**
+     * Realtime (Pusher / Reverb) connection details as plain JSON - no base64 and none of the
+     * long policy texts that /settings returns - so app developers can read and test it easily.
+     * Only public values: the app key and connection endpoint, never the app secret.
+     */
+    /**
+     * Public realtime connection details (never the app secret), returned as the plain
+     * `realtime` object on /settings.
+     */
+    private function realtimePayload(): array
+    {
+        $driver = Setting::get_value('broadcast_driver');
+        $driver = in_array($driver, ['pusher', 'reverb'], true) ? $driver : '';
+
+        $data = [
+            'broadcast_driver' => $driver,
+            'enabled' => 0,
+            'key' => '',
+            'cluster' => '',
+            'host' => '',
+            'port' => '',
+            'scheme' => '',
+            // Private-channel auth endpoints (send the Bearer token with the request).
+            'customer_auth_endpoint' => url('customer/broadcasting/auth'),
+            'delivery_boy_auth_endpoint' => url('broadcasting/auth'),
+        ];
+
+        if ($driver === 'pusher') {
+            $data['key'] = trim((string) Setting::get_value('pusher_app_key'));
+            $data['cluster'] = trim((string) Setting::get_value('pusher_app_cluster'));
+            $data['enabled'] = ($data['key'] !== '' && $data['cluster'] !== '') ? 1 : 0;
+        } elseif ($driver === 'reverb') {
+            $data['key'] = trim((string) Setting::get_value('reverb_app_key'));
+            $data['host'] = trim((string) Setting::get_value('reverb_host'));
+            $data['port'] = trim((string) Setting::get_value('reverb_port'));
+            $data['scheme'] = trim((string) Setting::get_value('reverb_scheme'));
+            $data['enabled'] = ($data['key'] !== '' && $data['host'] !== '') ? 1 : 0;
+        }
+
+        return $data;
     }
 
     public function getPaymentMethods(Request $request)
@@ -403,6 +468,19 @@ class SettingApiController extends Controller
 
     public function getTimeSlots()
     {
+        $data = $this->buildTimeSlotsData();
+        if ($data === null) {
+            return  CommonHelper::responseError('No settings found!');
+        }
+        return CommonHelper::responseWithData($data);
+    }
+
+    /**
+     * Time slot payload for the current module, or null when slots are enabled but none are configured.
+     * Shared by the time_slots endpoint and the cart (checkout) response.
+     */
+    public function buildTimeSlotsData()
+    {
         // Time Slots are module-wise (module_id column + variable_{module_id} settings) -
         // without this filter every module's slots and settings would bleed into each other.
         $moduleId = request()->header('X-Module-Id');
@@ -412,15 +490,15 @@ class SettingApiController extends Controller
         // Feature off for this module: nothing else below is meaningful, so don't leak slots or
         // day-config that the admin form itself hides once Enable/Disable Time Slots is off.
         if (!in_array($timeSlotsIsEnabled, [1, '1', true, 'true'], true)) {
-            return CommonHelper::responseWithData([
+            return [
                 'time_slots_is_enabled' => 0,
-            ]);
+            ];
         }
 
         // A module is configured as either Fixed or Quick Delivery at a time (the admin's Slot
         // Type radio) - only slots matching that active type should ever reach the customer,
         // even if old rows of the other type are still sitting in the table from before a switch.
-        $activeSlotType = Setting::get_value('time_slot_type_' . $moduleId) ?: 'fixed';
+        $activeSlotType = Setting::effectiveTimeSlotType($moduleId);
 
         $timeSlots = TimeSlot::where('status', 1)
             ->where('module_id', $moduleId)
@@ -448,10 +526,9 @@ class SettingApiController extends Controller
                 $responce["delivery_estimate_days"] = Setting::get_value('delivery_estimate_days_' . $moduleId) ?? '';
             }
             $responce["time_slots"] = $timeSlots;
-            return CommonHelper::responseWithData($responce);
-        } else {
-            return  CommonHelper::responseError('No settings found!');
+            return $responce;
         }
+        return null;
     }
 
     public function getSeoSettings(Request $request)

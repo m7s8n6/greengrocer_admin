@@ -1,21 +1,17 @@
 <template>
     <div>
-        <div id="error">
-
-
-            <div class="error-page container">
-                <div class="col-md-8 col-12 offset-md-2">
-                    <div class="text-center">
-                        <img class="img-error" :src="img_url" alt="Not Found">
-                        <h1 class="error-title">System Error</h1>
-                        <p class="fs-5 text-gray-600">The website is currently unavailable. Try again later or contact the
-                            developer.</p>
-                        <button type="button" class="btn btn-lg btn-outline-primary mt-3" @click="$router.go(-1)">Go Back</button>
+        <div class="error-state-wrap error-state-wrap--page">
+            <div class="card error-state-card">
+                <div class="card-body text-center">
+                    <div class="error-state-code">500</div>
+                    <h1 class="error-state-title">System Error</h1>
+                    <p class="error-state-text">The website is currently unavailable. Try again later or contact the developer.</p>
+                    <div class="error-state-actions">
+                        <router-link :to="homePath" class="btn btn-primary"><i class="bi bi-house-door me-2"></i>{{ __('dashboard') }}</router-link>
+                        <button type="button" class="btn btn-outline-secondary" @click="$router.go(-1)"><i class="bi bi-arrow-left me-2"></i>Go Back</button>
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 </template>
@@ -28,5 +24,32 @@ export default {
             img_url: this.$baseUrl + '/images/error-500.png'
         };
     },
+    computed: {
+        // Dashboard of the panel the user came from (admin / seller / delivery boy)
+        homePath: function () {
+            const path = (this.$route && this.$route.path) || '';
+            if (path.indexOf('/seller') === 0) return '/seller';
+            if (path.indexOf('/delivery_boy') === 0) return '/delivery_boy';
+            return '/dashboard';
+        }
+    },
 };
 </script>
+
+<style scoped>
+
+@media (max-width: 575.98px) {
+    .error-state-card .card-body {
+        padding: 32px 20px;
+    }
+
+    .error-state-code {
+        font-size: 56px;
+    }
+
+    .error-state-actions .btn {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+}
+</style>

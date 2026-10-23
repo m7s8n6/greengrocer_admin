@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('order_list') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -28,7 +28,7 @@
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2" :class="{'active': showFilters}" @click="showFilters = !showFilters">
-                                <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                 <span>{{ __('filters') || 'Filters' }}</span>
                                 <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                             </button>
@@ -102,6 +102,12 @@
                             :busy="isLoading" stacked="md" show-empty show-details
                             :tbody-tr-class="() => 'figma-tr align-middle'" small
                             class="figma-order-table mb-0">
+                            <template #empty="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                            </template>
+                            <template #emptyfiltered="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                            </template>
 
                             <template #table-busy>
                                 <div class="text-center py-4">
@@ -113,7 +119,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <i :class="row.detailsShowing ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"
                                         @click="toggleOrder(row)"
-                                        style="cursor:pointer;font-size:0.7rem;color:#aaa;"></i>
+                                        style="cursor:pointer;font-size:0.7rem;color:var(--theme-neutral-400);"></i>
                                     <span class="figma-link-blue">#{{ row.item.id }}</span>
                                 </div>
                             </template>
@@ -150,7 +156,7 @@
                                     <router-link
                                         :to="{ name: 'DeliveryBoyOrder', params: { id: row.item.id, record: row.item } }"
                                         class="figma-action-btn">
-                                        <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
+                                        <i class="bi bi-eye"></i>
                                     </router-link>
                                 </div>
                             </template>
@@ -194,11 +200,14 @@
 
                     <!-- Footer: Totals + Pagination -->
                     <div class="figma-table-footer flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-4">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalOrderRows }}</span>
+                        <div class="d-flex align-items-center flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"
+                                    @change="currentPage = 1"></b-form-select>
                             </div>
-                            <div class="d-flex gap-3 text-success small border-start ps-4">
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalOrderRows"></table-count>
+                            <div class="d-flex flex-wrap gap-3 figma-footer-totals">
                                 <span>{{ __('total_amount') }}: <strong>{{ $currency }} {{ total_amount }}</strong></span>
                                 <span>{{ __('total_dchrg') }}: <strong>{{ $currency }} {{ delivery_charge }}</strong></span>
                                 <span>{{ __('total_final_amount') }}: <strong>{{ $currency }} {{ remaining_final }}</strong></span>
@@ -206,8 +215,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-3">
                             <b-pagination v-model="currentPage" :total-rows="totalOrderRows" :per-page="perPage"
-                                align="right" class="figma-pagination mb-0"
-                                hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
+                                align="right" class="figma-pagination mb-0"></b-pagination>
                         </div>
                     </div>
                 </div>
@@ -550,6 +558,42 @@ export default {
 @media only screen and (min-width: 600px) {
     .vue-daterange-picker[data-v-1ebd09d2] {
         min-width: 90%;
+    }
+}
+
+/* List footer: results + totals left, pagination right */
+.figma-table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px !important;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+}
+
+.figma-footer-totals {
+    font-size: 13px;
+    color: var(--ui-text-muted);
+    padding-left: 12px;
+    border-left: 1px solid var(--ui-border);
+}
+
+.figma-footer-totals strong {
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+@media (max-width: 767.98px) {
+    .figma-table-footer {
+        justify-content: center;
+        padding: 12px 16px !important;
+    }
+
+    .figma-footer-totals {
+        padding-left: 0;
+        border-left: none;
     }
 }
 </style>

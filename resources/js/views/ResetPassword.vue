@@ -5,32 +5,28 @@
 
                 <div class="auth-card">
                     <div class="auth-logo">
-                        <a href="javascript:void(0)" style="display: flex; align-items: center; justify-content: flex-start;">
-                            <img v-if="$appLogo != ''" :src="$storageUrl+$appLogo" style="height: 70px; width: 70px;" alt='Logo'/>
-                            <img v-else :src="$baseUrl + '/images/logo.png'" style="height: 70px; width: 70px;" alt='Logo'/>
-                            <h2 style="margin: 10px;">{{ $appName }}</h2>
+                        <a href="javascript:void(0)" class="d-flex align-items-center justify-content-center">
+                            <img class="auth-logo-img login-logo-light" v-if="$appLogo != ''" :src="$storageUrl + $appLogo" alt="Logo" />
+                            <img class="auth-logo-img login-logo-light" v-else :src="$baseUrl + '/images/logo.png'" alt="Logo" />
+                            <img class="auth-logo-img login-logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo" alt="Logo" />
                         </a>
                     </div>
 
                     <h4>{{ __('reset_your_password_here') }}</h4>
 
-                    <form @submit.prevent="resetPassword()">
+                    <form class="mt-4" @submit.prevent="resetPassword()">
                         <div class="form-group position-relative has-icon-left">
                             <input :type="showPassword ? 'text' : 'password'" class="form-control form-control-xl" :placeholder="__('new_password')" v-model="user.password" required>
-                            <div class="form-control-icon"><i class="bi bi-shield-lock"></i></div>
-                            <button type="button" v-on:click="showPassword = !showPassword"
-                                    style="background: transparent; border: none; padding: 0; outline: none; margin-top: -45px; position: absolute; right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px;">
-                                <img :src="showPassword ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'"
-                                     style="width: 22px; height: 22px; filter: invert(0.85); opacity: 0.85;" alt="toggle-password" />
+                            <div class="form-control-icon"><i class="bi bi-key"></i></div>
+                            <button type="button" v-on:click="showPassword = !showPassword" class="auth-pw-toggle">
+                                <img :src="showPassword ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'" alt="toggle-password" />
                             </button>
                         </div>
                         <div class="form-group position-relative has-icon-left">
                             <input :type="showPasswordConfirmation ? 'text' : 'password'" class="form-control form-control-xl" :placeholder="__('confirm_new_password')" v-model="user.password_confirmation" required>
-                            <div class="form-control-icon"><i class="bi bi-shield-lock"></i></div>
-                            <button type="button" v-on:click="showPasswordConfirmation = !showPasswordConfirmation"
-                                    style="background: transparent; border: none; padding: 0; outline: none; margin-top: -45px; position: absolute; right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px;">
-                                <img :src="showPasswordConfirmation ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'"
-                                     style="width: 22px; height: 22px; filter: invert(0.85); opacity: 0.85;" alt="toggle-password" />
+                            <div class="form-control-icon"><i class="bi bi-key"></i></div>
+                            <button type="button" v-on:click="showPasswordConfirmation = !showPasswordConfirmation" class="auth-pw-toggle">
+                                <img :src="showPasswordConfirmation ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'" alt="toggle-password" />
                             </button>
                         </div>
                         <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5 auth-btn">
@@ -106,5 +102,13 @@ export default {
 }
 </script>
 <style scoped>
-
+.login-logo-dark {
+    display: none;
+}
+body.theme-dark .login-logo-light {
+    display: none;
+}
+body.theme-dark .login-logo-dark {
+    display: block;
+}
 </style>

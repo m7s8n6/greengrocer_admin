@@ -1,1699 +1,1384 @@
 <template>
-    <div>
+    <div class="store-settings">
         <div class="page-heading">
             <div class="page-title">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('store_settings') }}</h3>
+                <div class="settings-page-head">
+                    <div class="settings-page-head__main">
+                        <router-link to="/system_settings" class="settings-back-link">
+                            <i class="fas fa-arrow-left settings-back-link__icon" aria-hidden="true"></i>
+                            <span>{{ __('settings') }}</span>
+                        </router-link>
+                        <h3>{{ activeTab }}</h3>
                     </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                    <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">{{ __('store_settings') }}</li>
-                            </ol>
-                        </nav>
+                    <nav aria-label="breadcrumb" class="breadcrumb-header">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <router-link to="/system_settings">{{ __('settings') }}</router-link>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ activeTab }}</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <section class="section" :aria-label="__('update_system_settings')">
+            <!-- Section switcher: slim, horizontally scrollable pills (same switching logic as before) -->
+            <div class="settings-pills" ref="settingsPills" role="tablist" :aria-label="__('store_settings')">
+                <button type="button" v-for="(tab, index) in tabs" :key="index" @click="activeTab = tab"
+                    class="settings-pill" role="tab" :aria-selected="activeTab === tab ? 'true' : 'false'"
+                    :class="{ 'active': activeTab === tab }">
+                    <i class="fas fa-fw settings-pill__icon" :class="settingsNavIcons[index] || 'fa-cog'" aria-hidden="true"></i>
+                    <span>{{ tab }}</span>
+                </button>
+            </div>
+
+            <div class="settings-panel">
+                <!-- ===================== STORE ===================== -->
+                <div v-if="activeTab === __('store_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('store_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('store_setting_desc', 'Store name, support contacts, logos and copyright text.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data"
+                                @submit.prevent="saveStoreBasicSetting" novalidate>
+
+                                <b-tabs v-model="activeLanguageTab" content-class="mt-3" :lazy="false">
+                                    <b-tab v-for="language in languages" :key="language.id">
+                                        <template #title>
+                                            <span :class="{ 'text-primary font-weight-bold': language.is_default }">
+                                                {{ language.name }}
+                                            </span>
+                                        </template>
+
+                                        <!-- Translate buttons (Store setting) -->
+                                        <div class="settings-translate-bar" v-if="language.is_default && languages.length > 1">
+                                            <b-button size="sm" variant="outline-primary"
+                                                @click="translateEmptyStoreSetting(language)"
+                                                v-b-tooltip.hover title="Only empty fields will be translated."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingEmpty">{{ __('translate_empty_fields') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <b-button size="sm" variant="outline-danger"
+                                                @click="translateOverwriteStoreSetting(language)"
+                                                v-b-tooltip.hover title="All fields will be translated and overwritten."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingOverwrite">{{ __('translate_and_overwrite') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <div v-if="translateSuccessMessage" class="text-success font-weight-bold w-100">{{
+                                                translateSuccessMessage }}</div>
+                                        </div>
+
+                                        <template v-if="language.is_default">
+                                            <input type="hidden" v-model="store_settings.system_configurations">
+                                            <input type="hidden" v-model="store_settings.system_timezone_gmt">
+                                            <input type="hidden" v-model="store_settings.system_configurations_id">
+                                        </template>
+
+                                        <div class="settings-group">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_store_details', 'Store details') }}</h6>
+                                            <div class="row">
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label for="app_name">{{ __('app_name') }}</label>
+                                                    <input type="text" class="form-control" required name="app_name" id="app_name"
+                                                        v-model="store_settings.app_name"
+                                                        placeholder="Name of the App - used in whole system" />
+                                                </div>
+
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label>{{ __('support_number') }}</label>
+                                                    <input type="text" class="form-control" v-model="store_settings.support_number"
+                                                        inputmode="numeric" @input="validateMobileNumber" />
+                                                    <span v-if="mobilevalidationError" class="error">
+                                                        {{ mobilevalidationError }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label>{{ __('support_email') }}</label>
+                                                    <input type="email" class="form-control" v-model="store_settings.support_email" />
+                                                </div>
+
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label>{{ __('copyright_details') }}</label>
+                                                    <textarea class="form-control" rows="3"
+                                                        v-model="storeTranslations.copyright_details[language.code]"
+                                                        :placeholder="__('enter_copyright_details_here')"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-group" v-if="language.is_default">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_logos_images', 'Logos & images') }}</h6>
+                                            <div class="row">
+                                                <!-- LOGO -->
+                                                <div class="form-group col-12 col-md-6 col-xl-4 settings-upload">
+                                                    <label>{{ __('logo') }}</label>
+                                                    <input type="file" :id="`logo_${language.code}`" class="file-input"
+                                                        accept="image/*" @change="onLogoUpload($event)" />
+                                                    <label :for="`logo_${language.code}`" class="file-input-div">
+                                                        <span v-if="Logoerror" class="error">{{ Logoerror }}</span>
+                                                        <template v-if="logo_name">
+                                                            {{ __('selected_file_name') }} {{ logo_name }}
+                                                        </template>
+                                                        <template v-else>
+                                                            <i class="fa fa-cloud-upload-alt fa-2x"></i>
+                                                            {{ __('drop_files_here_or_click_to_upload') }}
+                                                        </template>
+                                                    </label>
+                                                    <img v-if="logo_url" :src="logo_url" class="img-fluid store-settings-img-preview" />
+                                                </div>
+
+                                                <!-- DARK LOGO -->
+                                                <div class="form-group col-12 col-md-6 col-xl-4 settings-upload">
+                                                    <label>{{ __('dark_logo') }}</label>
+                                                    <input type="file" :id="`dark_logo_${language.code}`" class="file-input"
+                                                        accept="image/*" @change="onDarkLogoUpload($event)" />
+                                                    <label :for="`dark_logo_${language.code}`" class="file-input-div">
+                                                        <span v-if="Dark_logoerror" class="error">{{ Dark_logoerror }}</span>
+                                                        <template v-if="dark_logo_name">
+                                                            {{ __('selected_file_name') }} {{ dark_logo_name }}
+                                                        </template>
+                                                        <template v-else>
+                                                            <i class="fa fa-cloud-upload-alt fa-2x"></i>
+                                                            {{ __('drop_files_here_or_click_to_upload') }}
+                                                        </template>
+                                                    </label>
+                                                    <img v-if="dark_logo_url" :src="dark_logo_url" class="img-fluid store-settings-img-preview" />
+                                                </div>
+
+                                                <!-- INVOICE LOGO -->
+                                                <div class="form-group col-12 col-md-6 col-xl-4 settings-upload">
+                                                    <label>{{ __('invoice_logo') }}</label>
+                                                    <input type="file" :id="`invoice_logo_${language.code}`" class="file-input"
+                                                        accept="image/*" @change="onInvoiceLogoUpload($event)" />
+                                                    <label :for="`invoice_logo_${language.code}`" class="file-input-div">
+                                                        <span v-if="Invoice_logoerror" class="error">{{ Invoice_logoerror }}</span>
+                                                        <template v-if="invoice_logo_name">
+                                                            {{ __('selected_file_name') }} {{ invoice_logo_name }}
+                                                        </template>
+                                                        <template v-else>
+                                                            <i class="fa fa-cloud-upload-alt fa-2x"></i>
+                                                            {{ __('drop_files_here_or_click_to_upload') }}
+                                                        </template>
+                                                    </label>
+                                                    <img v-if="invoice_logo_url" :src="invoice_logo_url" class="img-fluid store-settings-img-preview" />
+                                                </div>
+
+                                                <!-- FSSAI -->
+                                                <div class="form-group col-12 col-md-6 col-xl-4 settings-upload">
+                                                    <label>{{ __('fssai_lic_image') }}</label>
+                                                    <input type="file" :id="`fssaiLicImg_${language.code}`" class="file-input"
+                                                        accept="image/*" @change="onFssaiUpload($event)" />
+                                                    <label :for="`fssaiLicImg_${language.code}`" class="file-input-div">
+                                                        <span v-if="Fssaierror" class="error">{{ Fssaierror }}</span>
+                                                        <template v-if="fssai_lic_img_name">
+                                                            {{ __('selected_file_name') }} {{ fssai_lic_img_name }}
+                                                        </template>
+                                                        <template v-else>
+                                                            <i class="fa fa-cloud-upload-alt fa-2x"></i>
+                                                            {{ __('drop_files_here_or_click_to_upload') }}
+                                                        </template>
+                                                    </label>
+                                                    <img v-if="fssai_lic_img_url" :src="fssai_lic_img_url" class="img-fluid store-settings-img-preview" />
+                                                </div>
+
+                                                <!-- PANEL LOGIN BACKGROUND -->
+                                                <div class="form-group col-12 col-md-6 col-xl-4 settings-upload">
+                                                    <label>{{ __('panel_login_background_img') }}</label>
+                                                    <input type="file" :id="`panelLoginBgImg_${language.code}`" class="file-input"
+                                                        accept="image/*" @change="onPanelLoginBgUpload($event)" />
+                                                    <label :for="`panelLoginBgImg_${language.code}`" class="file-input-div">
+                                                        <span v-if="Panel_login_background_imgerror" class="error">{{
+                                                            Panel_login_background_imgerror }}</span>
+                                                        <template v-if="panel_login_background_img_name">
+                                                            {{ __('selected_file_name') }} {{ panel_login_background_img_name }}
+                                                        </template>
+                                                        <template v-else>
+                                                            <i class="fa fa-cloud-upload-alt fa-2x"></i>
+                                                            {{ __('drop_files_here_or_click_to_upload') }}
+                                                        </template>
+                                                    </label>
+                                                    <img v-if="panel_login_background_img_url" :src="panel_login_background_img_url"
+                                                        class="img-fluid store-settings-img-preview" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </b-tab>
+                                </b-tabs>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">
+                                        {{ __('update') }}
+                                        <b-spinner v-if="isLoading" small></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== ADDRESS ===================== -->
+                <div v-if="activeTab === __('address_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('store_address_settings') }}</h4>
+                            <p class="settings-card-desc">{{ tr('store_address_settings_desc', 'Store address and map location shown to customers and on invoices.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveAddressSetting">
+
+                                <b-tabs v-model="activeLanguageTab" content-class="mt-3" :lazy="false">
+                                    <b-tab v-for="language in languages" :key="language.id">
+                                        <template #title>
+                                            <span :class="{ 'text-primary font-weight-bold': language.is_default }">
+                                                {{ language.name }}
+                                            </span>
+                                        </template>
+
+                                        <!-- Translate buttons (Store address) -->
+                                        <div class="settings-translate-bar" v-if="language.is_default && languages.length > 1">
+                                            <b-button size="sm" variant="outline-primary"
+                                                @click="translateEmptyAddressSetting(language)"
+                                                v-b-tooltip.hover title="Only empty fields will be translated."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingEmpty">{{ __('translate_empty_fields') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <b-button size="sm" variant="outline-danger"
+                                                @click="translateOverwriteAddressSetting(language)"
+                                                v-b-tooltip.hover title="All fields will be translated and overwritten."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingOverwrite">{{ __('translate_and_overwrite') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <div v-if="translateSuccessMessage" class="text-success font-weight-bold w-100">{{
+                                                translateSuccessMessage }}</div>
+                                        </div>
+
+                                        <div class="settings-group">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_address_location', 'Address & location') }}</h6>
+                                            <div class="row">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="store_address">{{ __('address') }}</label>
+                                                    <textarea class="form-control" name="store_address" id="store_address" rows="2"
+                                                        v-model="addressTranslations.store_address[language.code]"></textarea>
+                                                </div>
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label for="city_name">{{ __('default_city') }}</label>
+                                                    <multiselect v-model="city" :options="cities" @close="setCityId"
+                                                        placeholder="Select & Search City" label="name" track-by="name"
+                                                        id="city_name" required>
+                                                        <template slot="singleLabel" slot-scope="props">
+                                                            <span class="option__desc">
+                                                                <span class="option__title">{{ props.option.name }}</span>
+                                                            </span>
+                                                        </template>
+                                                        <template slot="option" slot-scope="props">
+                                                            <div class="option__desc">
+                                                                <span class="option__title">{{ props.option.formatted_address }}</span>
+                                                            </div>
+                                                        </template>
+                                                    </multiselect>
+                                                    <p v-if="cities.length === 0" class="settings-help">
+                                                        {{ __('city_not_found') }}. <router-link target="_blank" to="/cities/create"
+                                                            v-if="$can('city_create')">Add new city here.</router-link>
+                                                    </p>
+                                                </div>
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label for="map_latitude">{{ __('latitude') }}</label>
+                                                    <input type="text" class="form-control" required name="map_latitude"
+                                                        id="map_latitude" v-model="store_settings.map_latitude"
+                                                        :placeholder='__("latitude")' />
+                                                </div>
+                                                <div class="form-group col-12 col-md-6" v-if="language.is_default">
+                                                    <label for="map_longitude">{{ __('longitude') }}</label>
+                                                    <input type="text" class="form-control" required name="map_longitude"
+                                                        id="map_longitude" v-model="store_settings.map_longitude"
+                                                        :placeholder="__('longitude')" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-group" v-if="language.is_default">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_currency_region', 'Currency & time zone') }}</h6>
+                                            <div class="row">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="currency">{{ __('store_currency') }}(Symbol or Code-$ or USD):</label>
+                                                    <input type="text" class="form-control" required name="currency" id="currency"
+                                                        v-model="store_settings.currency"
+                                                        placeholder="Either Symbol or Code - For Example $ or USD" />
+                                                </div>
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="currency_code">{{ __('currency_code') }}</label>
+                                                    <select class="form-control form-select" required name="currency_code"
+                                                        id="currency_code" v-model="store_settings.currency_code">
+                                                        <option value="">Select Country Currency Code</option>
+                                                        <option v-for="code in currency_codes" v-if="code.currencyCode !== ''"
+                                                            :value='code.currencyCode'>
+                                                            {{ code.currencyCode + ' - ' + code.countryName }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="decimal_point">{{ __('decimal_point') }}</label>
+                                                    <select class="form-control form-select" required name="decimal_point"
+                                                        id="decimal_point" v-model="store_settings.decimal_point">
+                                                        <option value="">{{ __('select_currency_decimal_point') }}</option>
+                                                        <option value="0">0</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label class="system_timezone" for="system_timezone">{{ __('system_timezone') }}</label>
+                                                    <select class="form-control form-select" name="system_timezone"
+                                                        id="system_timezone" v-model="store_settings.system_timezone">
+                                                        <option v-for="timezone_option in timezone_options"
+                                                            :value="timezone_option[2]" :data-gmt="timezone_option[1]">
+                                                            {{ timezone_option[2] }} - GMT {{ timezone_option[1] }} -
+                                                            {{ timezone_option[0] }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </b-tab>
+                                </b-tabs>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== OTHER ===================== -->
+                <div v-if="activeTab === __('other_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('other_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('other_setting_desc', 'Country code, date and time formats, cart limits and stock alerts.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveOtherSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_cart_stock', 'Cart & stock') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="max_cart_items_count">{{ __('maximum_items_allowed_in_cart') }}
+                                                <i class="text-danger">*</i></label>
+                                            <input type="number" required class="form-control" name="max_cart_items_count"
+                                                id="max_cart_items_count" v-model="store_settings.max_cart_items_count"
+                                                placeholder='Maximum Items Allowed In Cart' min='1' />
+                                            <small class="settings-help">{{ __('maximum_items_user_can_add_to_cart_at_once') }}</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="min_order_amount">{{ __('minimum_order_amount') }}</label>
+                                            <input type="number" class="form-control" name="min_order_amount"
+                                                id="min_order_amount" v-model="store_settings.min_order_amount"
+                                                :placeholder='__("minimum_order_amount")' min="0" />
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="low_stock_limit">{{ __('low_stock_limit') }}</label>
+                                            <input type="number" class="form-control" required name="low_stock_limit"
+                                                id="low_stock_limit" v-model="store_settings.low_stock_limit"
+                                                placeholder='Product low stock limit' />
+                                            <small class="settings-help">{{ __('product_will_be_considered_as_low_stock_if_stock_goes_below_this_limit') }}</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="few_quantity_left_alert">{{ __('few_quantity_left_alert') }}</label>
+                                            <input type="number" class="form-control" name="few_quantity_left_alert"
+                                                id="few_quantity_left_alert" v-model="store_settings.few_quantity_left_alert"
+                                                placeholder='Few Quantity Left Alert' min='1' />
+                                            <small class="settings-help">{{ __('will_show_few_quantity_left_in_product_cart') }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_formats_region', 'Formats & region') }}</h6>
+                                    <div class="row">
+                                        <!-- Date format setting - used globally across the app -->
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="date_format">{{ __('date_format') }}</label>
+                                            <select name="date_format" id="date_format" v-model="store_settings.date_format"
+                                                class="form-control form-select">
+                                                <option v-for="opt in dateFormatOptions" :key="opt.value" :value="opt.value">{{ opt.label }}
+                                                </option>
+                                            </select>
+                                            <small class="settings-help">{{ __('date_displayed_everywhere_in_this_format') }}</small>
+                                        </div>
+
+                                        <!-- Time format setting - used globally across the app -->
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="time_format">{{ __('time_format') }}</label>
+                                            <select name="time_format" id="time_format" v-model="store_settings.time_format"
+                                                class="form-control form-select">
+                                                <option v-for="opt in timeFormatOptions" :key="opt.value" :value="opt.value">{{ opt.label }}
+                                                </option>
+                                            </select>
+                                            <small class="settings-help">{{ __('time_displayed_everywhere_in_this_format') }}</small>
+                                        </div>
+
+                                        <!-- Country code setting -->
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="country_code">{{ __('country_code') }}</label>
+                                            <select name="country_code" id="country_code" v-model="store_settings.country_code"
+                                                @change="onCountryCodeChange" class="form-control form-select">
+                                                <option value="">{{ __('select') }}</option>
+                                                <option v-for="opt in countryCodeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                                            </select>
+                                            <small class="settings-help">{{ __('it_will_used_as_default_country_code_for_phone_numbers') }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_preferences', 'Preferences') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_delivery_charge_refundable">{{ __("is_delivery_charge_refundable") }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="is_delivery_charge_refundable"
+                                                    v-model="store_settings.is_delivery_charge_refundable" :true-value="1" :false-value="0">
+                                                <label class="form-check-label" for="is_delivery_charge_refundable">
+                                                    {{ store_settings.is_delivery_charge_refundable ? __('yes') : __('no') }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="allow_all_category_level">{{ __("allow_all_category_level") }}</label>
+                                                <p class="setting-row__desc">{{ __('when_off_products_can_only_be_assigned_to_an_end_level_category') }}</p>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="allow_all_category_level"
+                                                    v-model="store_settings.allow_all_category_level" :true-value="1" :false-value="0">
+                                                <label class="form-check-label" for="allow_all_category_level">
+                                                    {{ store_settings.allow_all_category_level ? __('yes') : __('no') }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="rating">{{ __('product_rating') }}</label>
+                                                <p class="setting-row__desc">{{ __('enable_and_disable_product_rating_system') }}</p>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="rating" id="rating" v-model="store_settings.product_rating">
+                                                <label class="form-check-label" for="rating">{{ onOff(store_settings.product_rating) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== DELIVERY BOY ===================== -->
+                <div v-if="activeTab === __('delivery_boy_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('delivery_boy_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('delivery_boy_setting_desc', 'How delivery boys earn bonuses and confirm deliveries.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveDeliveryBoySetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_bonus', 'Bonus') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="delivery_boy_bonus_settings">{{ __('bonus_settings') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="delivery_boy_bonus_settings" id="delivery_boy_bonus_settings"
+                                                    v-model="store_settings.delivery_boy_bonus_settings">
+                                                <label class="form-check-label" for="delivery_boy_bonus_settings">{{ onOff(store_settings.delivery_boy_bonus_settings) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row settings-group-fields" v-if="store_settings.delivery_boy_bonus_settings == 1">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="delivery_boy_bonus_type">{{ __('bonus_type') }}</label>
+                                            <select name="delivery_boy_bonus_type" id="delivery_boy_bonus_type"
+                                                v-model="store_settings.delivery_boy_bonus_type" class="form-control form-select">
+                                                <option value="">{{ __('select') }}</option>
+                                                <option value="1">{{ __('commission') }}</option>
+                                                <option value="0">{{ __('fixed') }}/{{ __('salaried') }}</option>
+                                            </select>
+                                        </div>
+                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
+                                            class="form-group col-12 col-md-6">
+                                            <label for="delivery_boy_bonus_percentage">{{ __('delivery_boy_bonus_percentage') }}(%)</label>
+                                            <input type="number" min="0.1" max="100" step="0.1" class="form-control"
+                                                name="delivery_boy_bonus_percentage" id="delivery_boy_bonus_percentage"
+                                                v-model="store_settings.delivery_boy_bonus_percentage" placeholder='Delivery Boy Bonus' />
+                                        </div>
+                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
+                                            class="form-group col-12 col-md-6">
+                                            <label for="delivery_boy_bonus_min_amount">{{ __('minimum_bonus_amount') }}</label>
+                                            <input type="number" min="0" step="0.1" required class="form-control"
+                                                name="delivery_boy_bonus_min_amount" id="delivery_boy_bonus_min_amount"
+                                                v-model="store_settings.delivery_boy_bonus_min_amount" placeholder='Minimum bonus amount' />
+                                            <small class="settings-help">{{ __('set_0_if_you_want_to_remove_limit') }}.</small>
+                                        </div>
+                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
+                                            class="form-group col-12 col-md-6">
+                                            <label for="delivery_boy_bonus_max_amount">{{ __('maximum_bonus_amount') }}</label>
+                                            <input type="number" min="0" step="0.1" required class="form-control"
+                                                name="delivery_boy_bonus_max_amount" id="delivery_boy_bonus_max_amount"
+                                                v-model="store_settings.delivery_boy_bonus_max_amount" placeholder='Maximum bonus amount' />
+                                            <small class="settings-help">{{ __('set_0_if_you_want_to_remove_limit') }}.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_delivery_confirmation', 'Delivery confirmation') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="generate_otp">{{ __('Order Delivery OTP System') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="generate_otp" id="generate_otp" v-model="store_settings.generate_otp">
+                                                <label class="form-check-label" for="generate_otp">{{ onOff(store_settings.generate_otp) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== APP ===================== -->
+                <div v-if="activeTab === __('app_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('app_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('app_setting_desc', 'App store links and version control for the customer, seller and delivery boy apps.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveAppSetting">
+                                <b-tabs v-model="activeLanguageTab" content-class="mt-3" :lazy="false">
+                                    <b-tab v-for="language in languages" :key="language.id">
+                                        <template #title>
+                                            <span :class="{ 'text-primary font-weight-bold': language.is_default }">
+                                                {{ language.name }}
+                                            </span>
+                                        </template>
+
+                                        <!-- Translate buttons (App setting) -->
+                                        <div class="settings-translate-bar" v-if="language.is_default && languages.length > 1">
+                                            <b-button size="sm" variant="outline-primary"
+                                                @click="translateEmptyAppSetting(language)"
+                                                v-b-tooltip.hover title="Only empty fields will be translated."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingEmpty">{{ __('translate_empty_fields') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <b-button size="sm" variant="outline-danger"
+                                                @click="translateOverwriteAppSetting(language)"
+                                                v-b-tooltip.hover title="All fields will be translated and overwritten."
+                                                :disabled="loadingEmpty || loadingOverwrite">
+                                                <span v-if="!loadingOverwrite">{{ __('translate_and_overwrite') }}</span>
+                                                <b-spinner v-else small></b-spinner>
+                                            </b-button>
+                                            <div v-if="translateSuccessMessage" class="text-success font-weight-bold w-100">{{
+                                                translateSuccessMessage }}</div>
+                                        </div>
+
+                                        <div class="settings-group">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_app_availability', 'App availability') }}</h6>
+                                            <p class="settings-help settings-group-help">{{
+                                                __('in_this_mode_you_can_set_your_app_in_maitenance_and_that_application_will_not_work_till_not_disabled_from_here')
+                                            }}</p>
+                                            <div class="setting-rows">
+                                                <div class="setting-row setting-row--expandable">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="app_mode_customer">{{ __('customer_app') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="app_mode_customer" id="app_mode_customer"
+                                                            v-model="store_settings.app_mode_customer">
+                                                        <label class="form-check-label" for="app_mode_customer">{{ onOff(store_settings.app_mode_customer) }}</label>
+                                                    </div>
+                                                    <div class="setting-row__extra form-floating" v-if="store_settings.app_mode_customer == 1">
+                                                        <textarea name="message" id="app_mode_customer_remark"
+                                                            v-model="appTranslations.app_mode_customer_remark[language.code]"
+                                                            class="form-control" placeholder="Enter Notification Message Here!"></textarea>
+                                                        <label for="app_mode_customer_remark">{{ __('customer_app_remark') }}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="setting-row setting-row--expandable">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="app_mode_seller">{{ __('seller_app') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="app_mode_seller" id="app_mode_seller"
+                                                            v-model="store_settings.app_mode_seller">
+                                                        <label class="form-check-label" for="app_mode_seller">{{ onOff(store_settings.app_mode_seller) }}</label>
+                                                    </div>
+                                                    <div class="setting-row__extra form-floating" v-if="store_settings.app_mode_seller == 1">
+                                                        <textarea name="message" id="app_mode_seller_remark"
+                                                            v-model="appTranslations.app_mode_seller_remark[language.code]"
+                                                            class="form-control" placeholder="Enter Notification Message Here!"></textarea>
+                                                        <label for="app_mode_seller_remark">{{ __('seller_app_remark') }}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="setting-row setting-row--expandable">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="app_mode_delivery_boy">{{ __('delivery_boy_app') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="app_mode_delivery_boy" id="app_mode_delivery_boy"
+                                                            v-model="store_settings.app_mode_delivery_boy">
+                                                        <label class="form-check-label" for="app_mode_delivery_boy">{{ onOff(store_settings.app_mode_delivery_boy) }}</label>
+                                                    </div>
+                                                    <div class="setting-row__extra form-floating" v-if="store_settings.app_mode_delivery_boy == 1">
+                                                        <textarea name="message" id="app_mode_delivery_boy_remark"
+                                                            v-model="appTranslations.app_mode_delivery_boy_remark[language.code]"
+                                                            class="form-control" placeholder="Enter Notification Message Here!"></textarea>
+                                                        <label for="app_mode_delivery_boy_remark">{{ __('delivery_boy_app_remark') }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-group" v-if="language.is_default">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_store_links', 'Store links') }}</h6>
+                                            <div class="row">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="playstore_url">{{ __('playstore_url') }}</label>
+                                                    <input type="url" class="form-control" name="playstore_url" id="playstore_url"
+                                                        v-model="store_settings.playstore_url" :placeholder='__("playstore_url")' />
+                                                </div>
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="appstore_url">{{ __('appstore_url') }}</label>
+                                                    <input type="url" class="form-control" name="appstore_url" id="appstore_url"
+                                                        v-model="store_settings.appstore_url" :placeholder='__("appstore_url")' />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-group" v-if="language.is_default">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_android_versions', 'Android version control') }}</h6>
+                                            <div class="setting-rows">
+                                                <div class="setting-row">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="is_version_system_on">{{ __('android_version_system_status') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="is_version_system_on" id="is_version_system_on"
+                                                            v-model="store_settings.is_version_system_on">
+                                                        <label class="form-check-label" for="is_version_system_on">{{ onOff(store_settings.is_version_system_on) }}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="setting-row" v-if="store_settings.is_version_system_on == 1">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="required_force_update">{{ __('android_required_force_update') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="required_force_update" id="required_force_update"
+                                                            v-model="store_settings.required_force_update">
+                                                        <label class="form-check-label" for="required_force_update">{{ onOff(store_settings.required_force_update) }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row settings-group-fields" v-if="store_settings.is_version_system_on == 1">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="current_version">{{ __('android_current_version_of_app') }}</label>
+                                                    <input type="text" class="form-control" required name="current_version"
+                                                        id="current_version" v-model="store_settings.current_version"
+                                                        placeholder='Current Version' />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-group" v-if="language.is_default">
+                                            <h6 class="settings-group-title">{{ tr('settings_sub_ios_versions', 'iOS version control') }}</h6>
+                                            <div class="setting-rows">
+                                                <div class="setting-row">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="ios_is_version_system_on">{{ __('ios_version_system_status') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="ios_is_version_system_on" id="ios_is_version_system_on"
+                                                            v-model="store_settings.ios_is_version_system_on">
+                                                        <label class="form-check-label" for="ios_is_version_system_on">{{ onOff(store_settings.ios_is_version_system_on) }}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="setting-row" v-if="store_settings.ios_is_version_system_on == 1">
+                                                    <div class="setting-row__text">
+                                                        <label class="setting-row__label" for="ios_required_force_update">{{ __('ios_required_force_update') }}</label>
+                                                    </div>
+                                                    <div class="setting-row__control form-check form-switch">
+                                                        <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                            name="ios_required_force_update" id="ios_required_force_update"
+                                                            v-model="store_settings.ios_required_force_update">
+                                                        <label class="form-check-label" for="ios_required_force_update">{{ onOff(store_settings.ios_required_force_update) }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row settings-group-fields" v-if="store_settings.ios_is_version_system_on == 1">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="ios_current_version">{{ __('ios_current_version_of_app') }}</label>
+                                                    <input type="text" class="form-control" required name="ios_current_version"
+                                                        id="ios_current_version" v-model="store_settings.ios_current_version"
+                                                        placeholder='IOS Current Version' />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="settings-actions">
+                                            <b-button type="submit" variant="primary" :disabled="isLoading"
+                                                v-if="$can('manage_store_settings')">{{ __('update') }}
+                                                <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                            </b-button>
+                                        </div>
+                                    </b-tab>
+                                </b-tabs>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== FRONTEND HOME ===================== -->
+                <div v-if="activeTab === __('frontend_home_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('frontend_home_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('frontend_home_setting_desc', 'Choose which sections appear on the website home page and how many items they show.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveFrontendHomeSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_home_sections', 'Home page sections') }}</h6>
+                                    <p class="settings-help settings-group-help">{{ __('in_this_mode_you_can_set_your_app_web_home_page') }}.</p>
+                                    <div class="setting-rows">
+                                        <div class="setting-row setting-row--expandable">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_category_section_in_homepage">{{ __('display_category_section_in_home_page') }}?</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="is_category_section_in_homepage" id="is_category_section_in_homepage"
+                                                    v-model="store_settings.is_category_section_in_homepage">
+                                                <label class="form-check-label" for="is_category_section_in_homepage">{{ onOff(store_settings.is_category_section_in_homepage) }}</label>
+                                            </div>
+                                            <div class="setting-row__extra" v-if="store_settings.is_category_section_in_homepage == 1">
+                                                <label for="count_category_section_in_homepage">{{ __('count_category_display_in_homepage') }}</label>
+                                                <input type="number" name="message" id="count_category_section_in_homepage" :min="1"
+                                                    :required="store_settings.is_category_section_in_homepage == 1"
+                                                    v-model="store_settings.count_category_section_in_homepage" class="form-control"
+                                                    placeholder="Enter Category Number Here!" @input="validateInput">
+                                                <span v-if="validationCategoryError" class="error">{{ validationCategoryError }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row setting-row--expandable">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_brand_section_in_homepage">{{ __('display_brand_section_in_home_page') }}?</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="is_brand_section_in_homepage" id="is_brand_section_in_homepage"
+                                                    v-model="store_settings.is_brand_section_in_homepage">
+                                                <label class="form-check-label" for="is_brand_section_in_homepage">{{ onOff(store_settings.is_brand_section_in_homepage) }}</label>
+                                            </div>
+                                            <div class="setting-row__extra" v-if="store_settings.is_brand_section_in_homepage == 1">
+                                                <label for="count_brand_section_in_homepage">{{ __('count_brand_display_in_homepage') }}</label>
+                                                <input type="number" name="message" id="count_brand_section_in_homepage" :min="1"
+                                                    :required="store_settings.is_brand_section_in_homepage == 1"
+                                                    v-model="store_settings.count_brand_section_in_homepage" class="form-control"
+                                                    placeholder="Enter Brand Number Here!" @input="validateInput">
+                                                <span v-if="validationBrandError" class="error">{{ validationBrandError }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row setting-row--expandable">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_seller_section_in_homepage">{{ __('display_seller_section_in_home_page') }}?</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="is_seller_section_in_homepage" id="is_seller_section_in_homepage"
+                                                    v-model="store_settings.is_seller_section_in_homepage">
+                                                <label class="form-check-label" for="is_seller_section_in_homepage">{{ onOff(store_settings.is_seller_section_in_homepage) }}</label>
+                                            </div>
+                                            <div class="setting-row__extra" v-if="store_settings.is_seller_section_in_homepage == 1">
+                                                <label for="count_seller_section_in_homepage">{{ __('count_seller_display_in_homepage') }}</label>
+                                                <input type="number" name="message" id="count_seller_section_in_homepage" :min="1"
+                                                    :required="store_settings.is_seller_section_in_homepage == 1"
+                                                    v-model="store_settings.count_seller_section_in_homepage" class="form-control"
+                                                    placeholder="Enter Seller Number Here!" @input="validateInput">
+                                                <span v-if="validationSellerError" class="error">{{ validationSellerError }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row setting-row--expandable">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_country_section_in_homepage">{{ __('display_country_section_in_home_page') }}?</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="is_country_section_in_homepage" id="is_country_section_in_homepage"
+                                                    v-model="store_settings.is_country_section_in_homepage">
+                                                <label class="form-check-label" for="is_country_section_in_homepage">{{ onOff(store_settings.is_country_section_in_homepage) }}</label>
+                                            </div>
+                                            <div class="setting-row__extra" v-if="store_settings.is_country_section_in_homepage == 1">
+                                                <label for="count_country_section_in_homepage">{{ __('count_country_display_in_homepage') }}</label>
+                                                <input type="number" name="message" id="count_country_section_in_homepage" :min="1"
+                                                    :required="store_settings.is_country_section_in_homepage == 1"
+                                                    v-model="store_settings.count_country_section_in_homepage" class="form-control"
+                                                    placeholder="Enter Country Number Here!" @input="validateInput">
+                                                <span v-if="validationCountryError" class="error">{{ validationCountryError }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SMTP ===================== -->
+                <div v-if="activeTab === __('smtp_mail_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('smtp_mail_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('smtp_mail_setting_desc', 'Mail server used to send emails, plus a test email.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveSmtpMailSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_mail_server', 'Mail server') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="mailer">{{ __('mailer') }}</label>
+                                            <select class="form-control form-select" required name="mailer" id="mailer"
+                                                v-model="store_settings.mailer">
+                                                <option value="smtp">SMTP</option>
+                                                <option value="sendmail">Sendmail</option>
+                                            </select>
+                                            <small class="settings-help">{{ __('select_mail_driver') }}</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_from_mail">{{ __('from_email_id') }}</label>
+                                            <input type="text" class="form-control" required name="smtp_from_mail"
+                                                id="smtp_from_mail" v-model="store_settings.smtp_from_mail"
+                                                placeholder='From SMTP Email ID' />
+                                            <small class="settings-help">{{ __('this_email_id_will_be_used_in_smtp_mail_system') }}</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_reply_to">{{ __('reply_to_email_id') }}</label>
+                                            <input type="email" class="form-control" required name="smtp_reply_to"
+                                                id="smtp_reply_to" v-model="store_settings.smtp_reply_to"
+                                                placeholder='From SMTP Email ID' />
+                                            <small class="settings-help">{{ __('this_email_id_will_be_used_in_smtp_mail_system') }}</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_email_password">{{ __('smtp_email_password') }}</label>
+                                            <input type="text" class="form-control" required name="smtp_email_password"
+                                                id="smtp_email_password" v-model="store_settings.smtp_email_password"
+                                                placeholder='Enter your SMTP email password' />
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_host">{{ __('smtp_host') }}</label>
+                                            <input type="text" class="form-control" required name="smtp_host" id="smtp_host"
+                                                v-model="store_settings.smtp_host" placeholder='SMTP Host address' />
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_port">{{ __('smtp_port') }}</label>
+                                            <input type="text" class="form-control" required name="smtp_port" id="smtp_port"
+                                                v-model="store_settings.smtp_port" placeholder='SMTP Port' />
+                                            <small class="settings-help"><b>TLS:</b> 587 &middot; <b>SSL:</b> 465</small>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_content_type">{{ __('smtp_email_content_type') }}</label>
+                                            <select name="smtp_content_type" id="smtp_content_type"
+                                                v-model="store_settings.smtp_content_type" class="form-control form-select">
+                                                <option value="">{{ __('select_smtp_email_content_tpe') }}</option>
+                                                <option value="html">{{ __('html') }}</option>
+                                                <option value="text">{{ __('text') }}</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="smtp_encryption_type">{{ __('smtp_encryption') }}</label>
+                                            <select name="smtp_encryption_type" id="smtp_encryption_type"
+                                                v-model="store_settings.smtp_encryption_type" class="form-control form-select">
+                                                <option value="">{{ __('select_smtp_encryption_type') }}</option>
+                                                <option value="tls">{{ __('tls') }}</option>
+                                                <option value="ssl">{{ __('ssl') }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ __('email_test') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <div class="d-flex settings-inline-field">
+                                                <input type="text" class="form-control" name="test_email"
+                                                    v-model="store_settings.test_email" placeholder='Enter Email Address for Test'>
+                                                <b-button type="button" class="m-0 text-nowrap" variant="outline-primary"
+                                                    @click="testMail" :disabled="isSendingTestEmail">
+                                                    {{ __('test_mail') }}
+                                                    <b-spinner v-if="isSendingTestEmail" small label="Spinning"></b-spinner>
+                                                </b-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== THIRD PARTY API ===================== -->
+                <div v-if="activeTab === __('third_party_api_credentials')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('third_party_api_credentials') }}</h4>
+                            <p class="settings-card-desc">{{ tr('third_party_api_credentials_desc', 'Map provider and API keys used by the panel and apps.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveThirdPartyApiSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_maps', 'Maps') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="map_provider">{{ __('map_provider') }}</label>
+                                            <select class="form-control form-select" name="map_provider" id="map_provider"
+                                                v-model="store_settings.map_provider">
+                                                <option value="google">{{ __('google_maps_paid') }}</option>
+                                                <option value="osm">{{ __('openstreetmap_free') }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row" v-if="store_settings.map_provider !== 'osm'">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="google_place_api_key">{{ __('place_api_key') }}</label>
+                                            <input type="text" class="form-control" name="google_place_api_key" id="google_place_api_key"
+                                                :value="shouldHideThirdPartyValues ? '' : store_settings.google_place_api_key"
+                                                @input="!shouldHideThirdPartyValues && (store_settings.google_place_api_key = $event.target.value)"
+                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Google Place Api Key'"
+                                                :readonly="shouldHideThirdPartyValues">
+                                            <input type="hidden" class="form-control" name="apiKey" id="apiKey"
+                                                v-model="store_settings.apiKey" placeholder="apiKey">
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="google_map_api_key">{{ __('map_api_key') }}</label>
+                                            <input type="text" class="form-control" name="google_map_api_key" id="google_map_api_key"
+                                                :value="shouldHideThirdPartyValues ? '' : store_settings.google_map_api_key"
+                                                @input="!shouldHideThirdPartyValues && (store_settings.google_map_api_key = $event.target.value)"
+                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Google Map Api Key'"
+                                                :readonly="shouldHideThirdPartyValues">
+                                            <input type="hidden" class="form-control" name="googleMapApiKey" id="googleMapApiKey"
+                                                v-model="store_settings.googleMapApiKey" placeholder="googleMapApiKey">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_ai', 'AI content') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="text_gen_key">{{ __('gemini_key') }}</label>
+                                            <input type="text" class="form-control" name="text_gen_key" id="text_gen_key"
+                                                :value="shouldHideThirdPartyValues ? '' : store_settings.text_gen_key"
+                                                @input="!shouldHideThirdPartyValues && (store_settings.text_gen_key = $event.target.value)"
+                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Gemini Key'"
+                                                :readonly="shouldHideThirdPartyValues">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary"
+                                        :disabled="isLoading || shouldHideThirdPartyValues"
+                                        v-if="$can('manage_store_settings') && ($isDemo != 1 || (login_user && login_user.id === 1))">{{
+                                        __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SELLER ===================== -->
+                <div v-if="activeTab === __('seller_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('seller_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('seller_setting_desc', 'Seller cart rules, commission and self pickup.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveSellerSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_cart_pickup', 'Cart & pickup') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="one_seller_cart">{{ __('one_seller_cart') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="one_seller_cart" id="one_seller_cart" v-model="store_settings.one_seller_cart">
+                                                <label class="form-check-label" for="one_seller_cart">{{ onOff(store_settings.one_seller_cart) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row" v-if="store_settings.one_seller_cart == 1">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="self_pickup_mode">{{ __('self_pickup_mode') }}</label>
+                                                <p class="setting-row__desc">{{ __('self_pickup_mode_description') }}</p>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="self_pickup_mode" id="self_pickup_mode" v-model="store_settings.self_pickup_mode">
+                                                <label class="form-check-label" for="self_pickup_mode">{{ onOff(store_settings.self_pickup_mode) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ __('commission') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="seller_commission">{{ __('seller_commission') }}</label>
+                                            <input type="number" class="form-control" name="seller_commission" id="seller_commission"
+                                                v-model="store_settings.seller_commission" placeholder="Seller Commission"
+                                                step="0.1" min="0" max="100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== LOGIN ===================== -->
+                <div v-if="activeTab === __('login_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('login_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('login_setting_desc', 'Sign-in methods available to customers.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveRecordLoginSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_sign_in_methods', 'Sign-in methods') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="phone_login">{{ __('phone_login') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="phone_login" id="phone_login" v-model="login_settings.phone_login">
+                                                <label class="form-check-label" for="phone_login">{{ onOff(login_settings.phone_login) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="google_login">{{ __('google_login') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="google_login" id="google_login" v-model="login_settings.google_login">
+                                                <label class="form-check-label" for="google_login">{{ onOff(login_settings.google_login) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="apple_login">{{ __('apple_login') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="apple_login" id="apple_login" v-model="login_settings.apple_login">
+                                                <label class="form-check-label" for="apple_login">{{ onOff(login_settings.apple_login) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="email_login">{{ __('email_login') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="email_login" id="email_login" v-model="login_settings.email_login">
+                                                <label class="form-check-label" for="email_login">{{ onOff(login_settings.email_login) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group" v-if="login_settings.phone_login == '1'">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_phone_auth', 'Phone authentication') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="phone_auth_otp">{{ __('phone_auth_otp') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class='form-check-input' id="phone_auth_otp" type='checkbox' true-value="1"
+                                                    false-value="0" v-model="login_settings.phone_auth_otp">
+                                                <label class="form-check-label" for="phone_auth_otp">{{ onOff(login_settings.phone_auth_otp) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="phone_auth_password">{{ __('phone_auth_password') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class='form-check-input' id="phone_auth_password" type='checkbox' true-value="1"
+                                                    false-value="0" v-model="login_settings.phone_auth_password">
+                                                <label class="form-check-label" for="phone_auth_password">{{ onOff(login_settings.phone_auth_password) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row"
+                                            v-if="login_settings.phone_auth_otp == '1' || login_settings.phone_auth_password == '1'">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="firebase_authentication">{{ __('firebase_authentication') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class='form-check-input' id="firebase_authentication" type='checkbox'
+                                                    true-value="1" false-value="0" v-model="login_settings.firebase_authentication">
+                                                <label class="form-check-label" for="firebase_authentication">{{ onOff(login_settings.firebase_authentication) }}</label>
+                                            </div>
+                                        </div>
+                                        <div class="setting-row"
+                                            v-if="login_settings.phone_auth_otp == '1' || login_settings.phone_auth_password == '1'">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="custom_sms_gateway_otp_based">{{ __('custom_sms_gateway_otp_based') }}</label>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input class='form-check-input' id="custom_sms_gateway_otp_based" type='checkbox'
+                                                    true-value="1" false-value="0" v-model="login_settings.custom_sms_gateway_otp_based">
+                                                <label class="form-check-label" for="custom_sms_gateway_otp_based">{{ onOff(login_settings.custom_sms_gateway_otp_based) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ __('demo_mode') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="is_demo_mode_on">{{ __('demo_mode') }}</label>
+                                                <p class="setting-row__desc">Apps pre-fill the default login credentials when this is on. Keep it off on live.</p>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="is_demo_mode_on" id="is_demo_mode_on" v-model="login_settings.is_demo_mode_on"
+                                                    :disabled="!login_user || Number(login_user.id) !== 1">
+                                                <label class="form-check-label" for="is_demo_mode_on">{{ onOff(login_settings.is_demo_mode_on) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">
+                                        {{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== CART ===================== -->
+                <div v-if="activeTab === __('cart_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('cart_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('cart_setting_desc', 'Guest cart and abandoned-cart reminder notifications.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveCartSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_cart_reminders', 'Cart reminders') }}</h6>
+                                    <div class="setting-rows">
+                                        <div class="setting-row">
+                                            <div class="setting-row__text">
+                                                <label class="setting-row__label" for="cart_notification">{{ __('cart_notification') }}
+                                                    <i class="fa fa-question-circle text-secondary" v-b-tooltip.hover
+                                                        :title="__('product_will_be_add_incart_without_login')"></i></label>
+                                                <p class="setting-row__desc">{{ __('product_will_be_add_incart_without_login') }}</p>
+                                            </div>
+                                            <div class="setting-row__control form-check form-switch">
+                                                <input type="checkbox" true-value="1" false-value="0" class="form-check-input"
+                                                    name="cart_notification" id="cart_notification" v-model="store_settings.cart_notification">
+                                                <label class="form-check-label" for="cart_notification">{{ onOff(store_settings.cart_notification) }}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row settings-group-fields" v-if="store_settings.cart_notification == 1">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="notification_delay_after_cart_addition">{{ __('notification_delay_after_cart_addition') }}
+                                                <i class="text-danger">*</i>
+                                                <i class="fa fa-question-circle text-secondary" v-b-tooltip.hover
+                                                    :title="__('notification_delay_after_cart_addition_tooltip')"></i></label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text myDivClass">
+                                                        <span class="mySpanClass">{{ __('minutes') }}</span>
+                                                    </div>
+                                                </div>
+                                                <input type="number" class="form-control" name="notification_delay_after_cart_addition"
+                                                    id="notification_delay_after_cart_addition" min="0"
+                                                    v-model="store_settings.notification_delay_after_cart_addition">
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="notification_interval">{{ __('notification_interval') }}
+                                                <i class="text-danger">*</i>
+                                                <i class="fa fa-question-circle text-secondary" v-b-tooltip.hover
+                                                    :title="__('notification_delay_after_cart_addition_tooltip')"></i></label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text myDivClass">
+                                                        <span class="mySpanClass">{{ __('minutes') }}</span>
+                                                    </div>
+                                                </div>
+                                                <input type="number" class="form-control" name="notification_interval"
+                                                    id="notification_interval" min="0" v-model="store_settings.notification_interval">
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="notification_stop_time">{{ __('notification_stop_time') }}
+                                                <i class="text-danger">*</i>
+                                                <i class="fa fa-question-circle text-secondary" v-b-tooltip.hover
+                                                    :title="__('notification_stop_time_tooltip')"></i></label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text myDivClass">
+                                                        <span class="mySpanClass">{{ __('minutes') }}</span>
+                                                    </div>
+                                                </div>
+                                                <input type="number" class="form-control" name="notification_stop_time"
+                                                    id="notification_stop_time" min="0" v-model="store_settings.notification_stop_time">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">{{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== REFER & EARN ===================== -->
+                <div v-if="activeTab === __('refer_earn_setting')">
+                    <div class="card settings-section-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('refer_earn_setting') }}</h4>
+                            <p class="settings-card-desc">{{ tr('refer_earn_setting_desc', 'Referral rewards for customers who invite new users.') }}</p>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" @submit.prevent="saveReferEarnSetting">
+                                <div class="settings-group">
+                                    <h6 class="settings-group-title">{{ tr('settings_sub_referral_rewards', 'Referral rewards') }}</h6>
+                                    <div class="row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="referral_min_order_amount">{{ __('minimum_order_for_referral') }}</label>
+                                            <input type="number" class="form-control" name="referral_min_order_amount"
+                                                id="referral_min_order_amount" v-model="refer_earn_settings.referral_min_order_amount"
+                                                :placeholder='__("minimum_order_for_referral")' />
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="referral_credit_first_order">{{ __('referral_credit_first_order') }}</label>
+                                            <input type="number" class="form-control" name="referral_credit_first_order"
+                                                id="referral_credit_first_order" v-model="refer_earn_settings.referral_credit_first_order"
+                                                :placeholder='__("referral_credit_first_order")' />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-actions">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading"
+                                        v-if="$can('manage_store_settings')">
+                                        {{ __('update') }}
+                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                    </b-button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-            <section class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ __('update_system_settings') }}</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12 vertical-tabs-container">
-                                <div class="tab-buttons">
-                                    <button v-for="(tab, index) in tabs" :key="index" @click="activeTab = tab"
-                                        :class="{ 'active': activeTab === tab }">
-                                        {{ tab }}
-                                    </button>
-                                </div>
-
-                                <div class="tab-content">
-                                    <div v-if="activeTab === __('store_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('store_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveStoreBasicSetting" novalidate>
-
-                                                    <b-tabs v-model="activeLanguageTab" content-class="mt-3"
-                                                        :lazy="false">
-                                                        <b-tab v-for="language in languages" :key="language.id">
-                                                            <template #title>
-                                                                <span
-                                                                    :class="{ 'text-primary font-weight-bold': language.is_default }">
-                                                                    {{ language.name }}
-                                                                </span>
-                                                            </template>
-
-                                                            <!-- Translate buttons (Store setting) -->
-                                                            <div class="mb-3"
-                                                                v-if="language.is_default && languages.length > 1">
-                                                                <b-button size="sm" variant="outline-primary"
-                                                                    class="mr-2"
-                                                                    @click="translateEmptyStoreSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="Only empty fields will be translated."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingEmpty">{{
-                                                                        __('translate_empty_fields') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <b-button size="sm" variant="outline-danger"
-                                                                    @click="translateOverwriteStoreSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="All fields will be translated and overwritten."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingOverwrite">{{
-                                                                        __('translate_and_overwrite') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <div v-if="translateSuccessMessage"
-                                                                    class="text-success mt-2 font-weight-bold">{{
-                                                                        translateSuccessMessage }}</div>
-                                                            </div>
-
-                                                            <div class="row">
-
-                                                                <template v-if="language.is_default">
-                                                                    <input type="hidden"
-                                                                        v-model="store_settings.system_configurations">
-                                                                    <input type="hidden"
-                                                                        v-model="store_settings.system_timezone_gmt">
-                                                                    <input type="hidden"
-                                                                        v-model="store_settings.system_configurations_id">
-                                                                </template>
-
-                                                                <div class="form-group col-12 col-md-4 mb-3 mt-0"
-                                                                    v-if="language.is_default">
-                                                                    <label for="app_name">{{ __('app_name') }}:</label>
-                                                                    <input type="text" class="form-control" required
-                                                                        name="app_name" id="app_name"
-                                                                        v-model="store_settings.app_name"
-                                                                        placeholder="Name of the App - used in whole system" />
-
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-4 mb-3"
-                                                                    v-if="language.is_default">
-                                                                    <label>{{ __('support_number') }}</label>
-                                                                    <input type="text" class="form-control"
-                                                                        v-model="store_settings.support_number"
-                                                                        inputmode="numeric"
-                                                                        @input="validateMobileNumber" />
-                                                                    <span v-if="mobilevalidationError" class="error">
-                                                                        {{ mobilevalidationError }}
-                                                                    </span>
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-4 mb-3"
-                                                                    v-if="language.is_default">
-                                                                    <label>{{ __('support_email') }}</label>
-                                                                    <input type="email" class="form-control"
-                                                                        v-model="store_settings.support_email" />
-                                                                </div>
-
-                                                                <div class="col-md-12" v-if="language.is_default">
-                                                                    <div class="row">
-                                                                        <!-- LOGO -->
-                                                                        <div
-                                                                            class="form-group col-12 col-md-4 mb-3 mt-0">
-                                                                            <label>{{ __('logo') }}</label>
-                                                                            <input type="file"
-                                                                                :id="`logo_${language.code}`"
-                                                                                class="file-input" accept="image/*"
-                                                                                @change="onLogoUpload($event)" />
-                                                                            <label :for="`logo_${language.code}`"
-                                                                                class="file-input-div">
-                                                                                <span v-if="Logoerror" class="error">{{
-                                                                                    Logoerror }}</span>
-
-                                                                                <template v-if="logo_name">
-                                                                                    {{ __('selected_file_name') }} {{
-                                                                                        logo_name }}
-                                                                                </template>
-                                                                                <template v-else>
-                                                                                    <i
-                                                                                        class="fa fa-cloud-upload-alt fa-2x"></i>
-                                                                                    {{
-                                                                                        __('drop_files_here_or_click_to_upload')
-                                                                                    }}
-                                                                                </template>
-                                                                            </label>
-                                                                            <img v-if="logo_url" :src="logo_url"
-                                                                                class="img-fluid store-settings-img-preview" />
-                                                                        </div>
-
-                                                                        <!-- DARK LOGO -->
-                                                                        <div
-                                                                            class="form-group col-12 col-md-4 mb-3 mt-0">
-                                                                            <label>{{ __('dark_logo') }}</label>
-                                                                            <input type="file"
-                                                                                :id="`dark_logo_${language.code}`"
-                                                                                class="file-input" accept="image/*"
-                                                                                @change="onDarkLogoUpload($event)" />
-                                                                            <label :for="`dark_logo_${language.code}`"
-                                                                                class="file-input-div">
-                                                                                <span v-if="Dark_logoerror" class="error">{{
-                                                                                    Dark_logoerror }}</span>
-
-                                                                                <template v-if="dark_logo_name">
-                                                                                    {{ __('selected_file_name') }} {{
-                                                                                        dark_logo_name }}
-                                                                                </template>
-                                                                                <template v-else>
-                                                                                    <i
-                                                                                        class="fa fa-cloud-upload-alt fa-2x"></i>
-                                                                                    {{
-                                                                                        __('drop_files_here_or_click_to_upload')
-                                                                                    }}
-                                                                                </template>
-                                                                            </label>
-                                                                            <img v-if="dark_logo_url" :src="dark_logo_url"
-                                                                                class="img-fluid store-settings-img-preview" />
-                                                                        </div>
-
-                                                                        <!-- INVOICE LOGO -->
-                                                                        <div
-                                                                            class="form-group col-12 col-md-4 mb-3 mt-0">
-                                                                            <label>{{ __('invoice_logo') }}</label>
-                                                                            <input type="file"
-                                                                                :id="`invoice_logo_${language.code}`"
-                                                                                class="file-input" accept="image/*"
-                                                                                @change="onInvoiceLogoUpload($event)" />
-                                                                            <label :for="`invoice_logo_${language.code}`"
-                                                                                class="file-input-div">
-                                                                                <span v-if="Invoice_logoerror" class="error">{{
-                                                                                    Invoice_logoerror }}</span>
-
-                                                                                <template v-if="invoice_logo_name">
-                                                                                    {{ __('selected_file_name') }} {{
-                                                                                        invoice_logo_name }}
-                                                                                </template>
-                                                                                <template v-else>
-                                                                                    <i
-                                                                                        class="fa fa-cloud-upload-alt fa-2x"></i>
-                                                                                    {{
-                                                                                        __('drop_files_here_or_click_to_upload')
-                                                                                    }}
-                                                                                </template>
-                                                                            </label>
-                                                                            <img v-if="invoice_logo_url" :src="invoice_logo_url"
-                                                                                class="img-fluid store-settings-img-preview" />
-                                                                        </div>
-
-                                                                        <!-- FSSAI -->
-                                                                        <div class="form-group col-12 col-md-4 mb-3">
-                                                                            <label>{{ __('fssai_lic_image') }}</label>
-                                                                            <input type="file"
-                                                                                :id="`fssaiLicImg_${language.code}`"
-                                                                                class="file-input" accept="image/*"
-                                                                                @change="onFssaiUpload($event)" />
-                                                                            <label :for="`fssaiLicImg_${language.code}`"
-                                                                                class="file-input-div">
-                                                                                <span v-if="Fssaierror" class="error">{{
-                                                                                    Fssaierror }}</span>
-
-                                                                                <template v-if="fssai_lic_img_name">
-                                                                                    {{ __('selected_file_name') }} {{
-                                                                                        fssai_lic_img_name }}
-                                                                                </template>
-                                                                                <template v-else>
-                                                                                    <i
-                                                                                        class="fa fa-cloud-upload-alt fa-2x"></i>
-                                                                                    {{
-                                                                                        __('drop_files_here_or_click_to_upload')
-                                                                                    }}
-                                                                                </template>
-                                                                            </label>
-                                                                            <img v-if="fssai_lic_img_url"
-                                                                                :src="fssai_lic_img_url"
-                                                                                class="img-fluid store-settings-img-preview" />
-                                                                        </div>
-
-                                                                        <!-- PANEL LOGIN BACKGROUND -->
-                                                                        <div class="form-group col-12 col-md-4 mb-3">
-                                                                            <label>{{ __('panel_login_background_img')
-                                                                                }}</label>
-                                                                            <input type="file"
-                                                                                :id="`panelLoginBgImg_${language.code}`"
-                                                                                class="file-input" accept="image/*"
-                                                                                @change="onPanelLoginBgUpload($event)" />
-                                                                            <label
-                                                                                :for="`panelLoginBgImg_${language.code}`"
-                                                                                class="file-input-div">
-                                                                                <span
-                                                                                    v-if="Panel_login_background_imgerror"
-                                                                                    class="error">{{
-                                                                                        Panel_login_background_imgerror
-                                                                                    }}</span>
-
-                                                                                <template
-                                                                                    v-if="panel_login_background_img_name">
-                                                                                    {{ __('selected_file_name') }} {{
-                                                                                        panel_login_background_img_name }}
-                                                                                </template>
-                                                                                <template v-else>
-                                                                                    <i
-                                                                                        class="fa fa-cloud-upload-alt fa-2x"></i>
-                                                                                    {{
-                                                                                        __('drop_files_here_or_click_to_upload')
-                                                                                    }}
-                                                                                </template>
-                                                                            </label>
-                                                                            <img v-if="panel_login_background_img_url"
-                                                                                :src="panel_login_background_img_url"
-                                                                                class="img-fluid store-settings-img-preview" />
-                                                                        </div>
-
-                                                                    </div>
-                                                                </div>
-
-
-                                                                <div class="form-group col-md-6">
-                                                                    <label>{{ __('copyright_details') }}</label>
-                                                                    <textarea class="form-control" rows="4"
-                                                                        v-model="storeTranslations.copyright_details[language.code]"
-                                                                        :placeholder="__('enter_copyright_details_here')"></textarea>
-                                                                </div>
-
-                                                            </div>
-
-                                                        </b-tab>
-                                                    </b-tabs>
-
-                                                    <b-button type="submit" variant="primary" :disabled="isLoading"
-                                                        v-if="$can('manage_store_settings')">
-                                                        {{ __('update') }}
-                                                        <b-spinner v-if="isLoading" small></b-spinner>
-                                                    </b-button>
-
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('address_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('store_address_settings') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveAddressSetting">
-
-                                                    <b-tabs v-model="activeLanguageTab" content-class="mt-3"
-                                                        :lazy="false">
-                                                        <b-tab v-for="language in languages" :key="language.id">
-                                                            <template #title>
-                                                                <span
-                                                                    :class="{ 'text-primary font-weight-bold': language.is_default }">
-                                                                    {{ language.name }}
-                                                                </span>
-                                                            </template>
-
-                                                            <!-- Translate buttons (Store address) -->
-                                                            <div class="mb-3"
-                                                                v-if="language.is_default && languages.length > 1">
-                                                                <b-button size="sm" variant="outline-primary"
-                                                                    class="mr-2"
-                                                                    @click="translateEmptyAddressSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="Only empty fields will be translated."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingEmpty">{{
-                                                                        __('translate_empty_fields') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <b-button size="sm" variant="outline-danger"
-                                                                    @click="translateOverwriteAddressSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="All fields will be translated and overwritten."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingOverwrite">{{
-                                                                        __('translate_and_overwrite') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <div v-if="translateSuccessMessage"
-                                                                    class="text-success mt-2 font-weight-bold">{{
-                                                                        translateSuccessMessage }}</div>
-                                                            </div>
-
-                                                            <div class="row">
-                                                                <div class="form-group col-12 col-md-6 mt-0">
-                                                                    <label for="store_address">{{ __('address') }}
-                                                                    </label>
-                                                                    <textarea class="form-control" name="store_address"
-                                                                        id="store_address" rows="2"
-                                                                        v-model="addressTranslations.store_address[language.code]"></textarea>
-                                                                </div>
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="map_latitude"> {{ __('latitude')
-                                                                        }}</label>
-                                                                    <input type="text" class="form-control" required
-                                                                        name="map_latitude" id="map_latitude"
-                                                                        v-model="store_settings.map_latitude"
-                                                                        :placeholder='__("latitude")' />
-
-                                                                </div>
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="map_longitude"> {{ __('longitude')
-                                                                        }}</label>
-                                                                    <input type="text" class="form-control" required
-                                                                        name="map_longitude" id="map_longitude"
-                                                                        v-model="store_settings.map_longitude"
-                                                                        :placeholder="__('longitude')" />
-                                                                </div>
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="currency"> {{ __('store_currency')
-                                                                        }}(Symbol or
-                                                                        Code-$ or USD):</label>
-                                                                    <input type="text" class="form-control" required
-                                                                        name="currency" id="currency"
-                                                                        v-model="store_settings.currency"
-                                                                        placeholder="Either Symbol or Code - For Example $ or USD" />
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="currency_code"> {{ __('currency_code')
-                                                                        }}</label>
-                                                                    <select class="form-control form-select" required
-                                                                        name="currency_code" id="currency_code"
-                                                                        v-model="store_settings.currency_code">
-                                                                        <option value="">Select Country Currency Code
-                                                                        </option>
-                                                                        <option v-for="code in currency_codes"
-                                                                            v-if="code.currencyCode !== ''"
-                                                                            :value='code.currencyCode'>
-                                                                            {{ code.currencyCode + ' - ' +
-                                                                                code.countryName }}
-                                                                        </option>
-                                                                    </select>
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="decimal_point">{{ __('decimal_point')
-                                                                        }}</label>
-                                                                    <select class="form-control form-select" required
-                                                                        name="decimal_point" id="decimal_point"
-                                                                        v-model="store_settings.decimal_point">
-                                                                        <option value="">{{
-                                                                            __('select_currency_decimal_point')
-                                                                            }}</option>
-                                                                        <option value="0">0</option>
-                                                                        <option value="1">1</option>
-                                                                        <option value="2">2</option>
-                                                                    </select>
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label class="system_timezone"
-                                                                        for="system_timezone">{{
-                                                                            __('system_timezone') }}</label>
-                                                                    <select class="form-control form-select"
-                                                                        name="system_timezone" id="system_timezone"
-                                                                        v-model="store_settings.system_timezone">
-                                                                        <option
-                                                                            v-for="timezone_option in timezone_options"
-                                                                            :value="timezone_option[2]"
-                                                                            :data-gmt="timezone_option[1]">
-                                                                            {{ timezone_option[2] }} - GMT {{
-                                                                                timezone_option[1]
-                                                                            }} -
-                                                                            {{ timezone_option[0] }}
-                                                                        </option>
-                                                                    </select>
-                                                                </div>
-
-                                                                <div class="form-group col-12 col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="city_name">{{
-                                                                        __('default_city') }}</label>
-
-                                                                    <multiselect v-model="city" :options="cities"
-                                                                        @close="setCityId"
-                                                                        placeholder="Select & Search City" label="name"
-                                                                        track-by="name" id="city_name" required>
-                                                                        <template slot="singleLabel" slot-scope="props">
-                                                                            <span class="option__desc">
-                                                                                <span class="option__title">{{
-                                                                                    props.option.name
-                                                                                    }}</span>
-                                                                            </span>
-                                                                        </template>
-                                                                        <template slot="option" slot-scope="props">
-                                                                            <div class="option__desc">
-                                                                                <span class="option__title">{{
-                                                                                    props.option.formatted_address
-                                                                                    }}</span>
-                                                                            </div>
-                                                                        </template>
-                                                                    </multiselect>
-
-                                                                    <p v-if="cities.length === 0" class="text-muted">
-                                                                        {{ __('city_not_found') }}. <router-link
-                                                                            target="_blank" class="text-muted"
-                                                                            to="/cities/create"
-                                                                            v-if="$can('city_create')">Add new city
-                                                                            here.</router-link>
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </b-tab></b-tabs>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                    <div v-if="activeTab === __('other_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('other_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveOtherSetting">
-                                                    <div class="row">
-
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="max_cart_items_count"> {{
-                                                                __('maximum_items_allowed_in_cart') }} </label> <i
-                                                                class="text-danger">*</i>
-                                                            <input type="number" required class="form-control"
-                                                                name="max_cart_items_count" id="max_cart_items_count"
-                                                                v-model="store_settings.max_cart_items_count"
-                                                                placeholder='Maximum Items Allowed In Cart' min='1' />
-                                                            <span class="text text-primary font-size-13">( {{
-                                                                __('maximum_items_user_can_add_to_cart_at_once')
-                                                            }})</span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="min_order_amount"> {{ __('minimum_order_amount')
-                                                            }}</label>
-                                                            <input type="number" class="form-control"
-                                                                name="min_order_amount" id="min_order_amount"
-                                                                v-model="store_settings.min_order_amount"
-                                                                :placeholder='__("minimum_order_amount")' min="0" />
-                                                        </div>
-
-                                                        <div class="form-group col-md-6">
-                                                            <label for="is_delivery_charge_refundable">{{
-                                                                __("is_delivery_charge_refundable") }}</label><br>
-                                                            <div class="form-check form-switch mt-2">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="is_delivery_charge_refundable"
-                                                                    v-model="store_settings.is_delivery_charge_refundable"
-                                                                    :true-value="1" :false-value="0">
-                                                                <label class="form-check-label"
-                                                                    for="is_delivery_charge_refundable">
-                                                                    {{ store_settings.is_delivery_charge_refundable ?
-                                                                        __('yes') : __('no') }}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="allow_all_category_level">{{
-                                                                __("allow_all_category_level") }}</label><br>
-                                                            <div class="form-check form-switch mt-2">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="allow_all_category_level"
-                                                                    v-model="store_settings.allow_all_category_level"
-                                                                    :true-value="1" :false-value="0">
-                                                                <label class="form-check-label"
-                                                                    for="allow_all_category_level">
-                                                                    {{ store_settings.allow_all_category_level ?
-                                                                        __('yes') : __('no') }}
-                                                                </label>
-                                                            </div>
-                                                            <span class="text text-primary font-size-13"> ( {{
-                                                                __('when_off_products_can_only_be_assigned_to_an_end_level_category')
-                                                            }} ) </span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="low_stock_limit">{{ __('low_stock_limit')
-                                                            }}</label>
-                                                            <input type="number" class="form-control" required
-                                                                name="low_stock_limit" id="low_stock_limit"
-                                                                v-model="store_settings.low_stock_limit"
-                                                                placeholder='Product low stock limit' />
-                                                            <span class="text text-primary font-size-13"> ( {{
-                                                                __('product_will_be_considered_as_low_stock_if_stock_goes_below_this_limit')
-                                                            }} ) </span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="rating">{{ __('product_rating') }}</label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="rating" id="rating"
-                                                                    v-model="store_settings.product_rating">
-                                                            </div>
-                                                            <span class="text text-primary font-size-13"> ( {{
-                                                                __('enable_and_disable_product_rating_system') }} )
-                                                            </span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="few_quantity_left_alert">{{
-                                                                __('few_quantity_left_alert') }}</label>
-                                                            <input type="number" class="form-control"
-                                                                name="few_quantity_left_alert"
-                                                                id="few_quantity_left_alert"
-                                                                v-model="store_settings.few_quantity_left_alert"
-                                                                placeholder='Few Quantity Left Alert' min='1' />
-                                                            <span class="text text-primary font-size-13"> ( {{
-                                                                __('will_show_few_quantity_left_in_product_cart') }} )
-                                                            </span>
-                                                        </div>
-
-                                                        <!-- Date format setting - used globally across the app -->
-                                                        <div class="form-group col-md-6">
-                                                            <label for="date_format">{{ __('date_format') }}</label>
-                                                            <select name="date_format" id="date_format"
-                                                                v-model="store_settings.date_format"
-                                                                class="form-control form-select">
-                                                                <option v-for="opt in dateFormatOptions"
-                                                                    :key="opt.value" :value="opt.value">{{ opt.label }}
-                                                                </option>
-                                                            </select>
-                                                            <span class="text text-primary font-size-13"> ({{
-                                                                __('date_displayed_everywhere_in_this_format')
-                                                                }})</span>
-                                                        </div>
-
-                                                        <!-- Time format setting - used globally across the app -->
-                                                        <div class="form-group col-md-6">
-                                                            <label for="time_format">{{ __('time_format') }}</label>
-                                                            <select name="time_format" id="time_format"
-                                                                v-model="store_settings.time_format"
-                                                                class="form-control form-select">
-                                                                <option v-for="opt in timeFormatOptions"
-                                                                    :key="opt.value" :value="opt.value">{{ opt.label }}
-                                                                </option>
-                                                            </select>
-                                                            <span class="text text-primary font-size-13"> ({{
-                                                                __('time_displayed_everywhere_in_this_format')
-                                                                }})</span>
-                                                        </div>
-
-                                                        <!-- Country code setting -->
-                                                        <div class="form-group col-md-6">
-                                                            <label for="country_code">{{ __('country_code') }}</label>
-                                                            <select name="country_code" id="country_code"
-                                                                v-model="store_settings.country_code"
-                                                                @change="onCountryCodeChange"
-                                                                class="form-control form-select">
-                                                                <option value="">{{ __('select') }}</option>
-                                                                <option v-for="opt in countryCodeOptions"
-                                                                    :key="opt.value" :value="opt.value">{{ opt.label
-                                                                    }}</option>
-                                                            </select>
-                                                            <span class="text text-primary font-size-13"> ({{
-                                                                __('it_will_used_as_default_country_code_for_phone_numbers')
-                                                                }})</span>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                    <div v-if="activeTab === __('delivery_boy_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('delivery_boy_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveDeliveryBoySetting">
-                                                    <div class="row">
-
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="delivery_boy_bonus_settings">{{
-                                                                __('bonus_settings') }}</label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input"
-                                                                    name="delivery_boy_bonus_settings"
-                                                                    id="delivery_boy_bonus_settings"
-                                                                    v-model="store_settings.delivery_boy_bonus_settings">
-                                                            </div>
-                                                        </div>
-                                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1"
-                                                            class="form-group col-md-6">
-                                                            <label for="delivery_boy_bonus_type">{{ __('bonus_type')
-                                                            }}</label>
-                                                            <select name="delivery_boy_bonus_type"
-                                                                id="delivery_boy_bonus_type"
-                                                                v-model="store_settings.delivery_boy_bonus_type"
-                                                                class="form-control form-select">
-                                                                <option value="">{{ __('select') }}</option>
-                                                                <option value="1">{{ __('commission') }}</option>
-                                                                <option value="0">{{ __('fixed') }}/{{ __('salaried') }}
-                                                                </option>
-                                                            </select>
-                                                        </div>
-                                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
-                                                            class="form-group col-md-6">
-                                                            <label for="delivery_boy_bonus_percentage">{{
-                                                                __('delivery_boy_bonus_percentage') }}(%)</label>
-                                                            <input type="number" min="0.1" max="100" step="0.1"
-                                                                class="form-control"
-                                                                name="delivery_boy_bonus_percentage"
-                                                                id="delivery_boy_bonus_percentage"
-                                                                v-model="store_settings.delivery_boy_bonus_percentage"
-                                                                placeholder='Delivery Boy Bonus' />
-                                                        </div>
-
-                                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
-                                                            class="form-group col-md-6">
-                                                            <label for="delivery_boy_bonus_min_amount">{{
-                                                                __('minimum_bonus_amount') }}</label>
-                                                            <input type="number" min="0" step="0.1" required
-                                                                class="form-control"
-                                                                name="delivery_boy_bonus_min_amount"
-                                                                id="delivery_boy_bonus_min_amount"
-                                                                v-model="store_settings.delivery_boy_bonus_min_amount"
-                                                                placeholder='Minimum bonus amount' />
-                                                            <span class="text text-primary font-size-13">{{
-                                                                __('set_0_if_you_want_to_remove_limit')
-                                                            }}.</span>
-                                                        </div>
-
-                                                        <div v-if="store_settings.delivery_boy_bonus_settings == 1 && store_settings.delivery_boy_bonus_type == 1"
-                                                            class="form-group col-md-6">
-                                                            <label for="delivery_boy_bonus_max_amount">{{
-                                                                __('maximum_bonus_amount') }}</label>
-                                                            <input type="number" min="0" step="0.1" required
-                                                                class="form-control"
-                                                                name="delivery_boy_bonus_max_amount"
-                                                                id="delivery_boy_bonus_max_amount"
-                                                                v-model="store_settings.delivery_boy_bonus_max_amount"
-                                                                placeholder='Maximum bonus amount' />
-                                                            <span class="text text-primary font-size-13">{{
-                                                                __('set_0_if_you_want_to_remove_limit')
-                                                            }}.</span>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="row">
-
-                                                        <div class="form-group col-md-6">
-                                                            <label for="generate_otp">{{ __('Order Delivery OTP System')
-                                                            }}</label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="generate_otp"
-                                                                    id="generate_otp"
-                                                                    v-model="store_settings.generate_otp">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('app_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('app_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <span class=" text text-primary font-size-13">{{
-                                                    __('in_this_mode_you_can_set_your_app_in_maitenance_and_that_application_will_not_work_till_not_disabled_from_here')
-                                                    }}</span>
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveAppSetting">
-                                                    <b-tabs v-model="activeLanguageTab" content-class="mt-3"
-                                                        :lazy="false">
-                                                        <b-tab v-for="language in languages" :key="language.id">
-                                                            <template #title>
-                                                                <span
-                                                                    :class="{ 'text-primary font-weight-bold': language.is_default }">
-                                                                    {{ language.name }}
-                                                                </span>
-                                                            </template>
-
-                                                            <!-- Translate buttons (App setting) -->
-                                                            <div class="mb-3"
-                                                                v-if="language.is_default && languages.length > 1">
-                                                                <b-button size="sm" variant="outline-primary"
-                                                                    class="mr-2"
-                                                                    @click="translateEmptyAppSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="Only empty fields will be translated."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingEmpty">{{
-                                                                        __('translate_empty_fields') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <b-button size="sm" variant="outline-danger"
-                                                                    @click="translateOverwriteAppSetting(language)"
-                                                                    v-b-tooltip.hover
-                                                                    title="All fields will be translated and overwritten."
-                                                                    :disabled="loadingEmpty || loadingOverwrite">
-                                                                    <span v-if="!loadingOverwrite">{{
-                                                                        __('translate_and_overwrite') }}</span>
-                                                                    <b-spinner v-else small></b-spinner>
-                                                                </b-button>
-                                                                <div v-if="translateSuccessMessage"
-                                                                    class="text-success mt-2 font-weight-bold">{{
-                                                                        translateSuccessMessage }}</div>
-                                                            </div>
-
-                                                            <div class="row">
-                                                                <div class="form-group col-md-6 mt-0">
-                                                                    <label for="app_mode_customer">{{ __('customer_app')
-                                                                        }}
-                                                                        <span class="text text-primary font-size-13">(
-                                                                            {{
-                                                                                __('enable') }}/{{ __('disable') }}
-                                                                            )</span></label><br>
-                                                                    <div class="form-check form-switch">
-                                                                        <input type="checkbox" true-value="1"
-                                                                            false-value="0" class="form-check-input"
-                                                                            name="app_mode_customer"
-                                                                            id="app_mode_customer"
-                                                                            v-model="store_settings.app_mode_customer">
-                                                                    </div>
-
-                                                                    <div class="form-floating mb-3"
-                                                                        v-if="store_settings.app_mode_customer == 1">
-                                                                        <textarea name="message"
-                                                                            id="app_mode_customer_remark"
-                                                                            v-model="appTranslations.app_mode_customer_remark[language.code]"
-                                                                            class="form-control"
-                                                                            placeholder="Enter Notification Message Here!"></textarea>
-                                                                        <label for="app_mode_customer_remark">{{
-                                                                            __('customer_app_remark') }}</label>
-                                                                    </div>
-
-
-                                                                </div>
-                                                                <div class="form-group col-md-6">
-                                                                    <label for="app_mode_seller">{{ __('seller_app') }}
-                                                                        <span class="text text-primary font-size-13">(
-                                                                            {{
-                                                                                __('enable') }}/{{ __('disable') }}
-                                                                            )</span></label><br>
-                                                                    <div class="form-check form-switch">
-                                                                        <input type="checkbox" true-value="1"
-                                                                            false-value="0" class="form-check-input"
-                                                                            name="app_mode_seller" id="app_mode_seller"
-                                                                            v-model="store_settings.app_mode_seller">
-                                                                    </div>
-                                                                    <div class="form-floating mb-3"
-                                                                        v-if="store_settings.app_mode_seller == 1">
-                                                                        <textarea name="message"
-                                                                            id="app_mode_seller_remark"
-                                                                            v-model="appTranslations.app_mode_seller_remark[language.code]"
-                                                                            class="form-control"
-                                                                            placeholder="Enter Notification Message Here!"></textarea>
-                                                                        <label for="app_mode_seller_remark">{{
-                                                                            __('seller_app_remark') }}</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="form-group col-md-6">
-                                                                    <label for="app_mode_delivery_boy">{{
-                                                                        __('delivery_boy_app')
-                                                                        }}<span class="text text-primary font-size-13">(
-                                                                            {{
-                                                                                __('enable') }}/{{ __('disable') }}
-                                                                            )</span></label><br>
-                                                                    <div class="form-check form-switch">
-                                                                        <input type="checkbox" true-value="1"
-                                                                            false-value="0" class="form-check-input"
-                                                                            name="app_mode_delivery_boy"
-                                                                            id="app_mode_delivery_boy"
-                                                                            v-model="store_settings.app_mode_delivery_boy">
-                                                                    </div>
-
-                                                                    <div class="form-floating mb-3"
-                                                                        v-if="store_settings.app_mode_delivery_boy == 1">
-                                                                        <textarea name="message"
-                                                                            id="app_mode_delivery_boy_remark"
-                                                                            v-model="appTranslations.app_mode_delivery_boy_remark[language.code]"
-                                                                            class="form-control"
-                                                                            placeholder="Enter Notification Message Here!"></textarea>
-                                                                        <label for="app_mode_delivery_boy_remark">{{
-                                                                            __('delivery_boy_app_remark') }}</label>
-                                                                    </div>
-
-                                                                </div>
-
-                                                                <div class="form-group col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="playstore_url">{{ __('playstore_url')
-                                                                        }}</label><br>
-                                                                    <input type="url" class="form-control"
-                                                                        name="playstore_url" id="playstore_url"
-                                                                        v-model="store_settings.playstore_url"
-                                                                        :placeholder='__("playstore_url")' />
-                                                                </div>
-                                                                <div class="form-group col-md-6"
-                                                                    v-if="language.is_default">
-                                                                    <label for="appstore_url">{{ __('appstore_url')
-                                                                        }}</label><br>
-                                                                    <input type="url" class="form-control"
-                                                                        name="appstore_url" id="appstore_url"
-                                                                        v-model="store_settings.appstore_url"
-                                                                        :placeholder='__("appstore_url")' />
-                                                                </div>
-                                                                <div class="mt-3" v-if="language.is_default">
-                                                                    <div class="row">
-                                                                        <div class="form-group col-md-6"
-                                                                            v-if="language.is_default">
-                                                                            <label for="is_version_system_on">{{
-                                                                                __('android_version_system_status')
-                                                                                }}</label><br>
-                                                                            <div class="form-check form-switch">
-                                                                                <input type="checkbox" true-value="1"
-                                                                                    false-value="0"
-                                                                                    class="form-check-input"
-                                                                                    name="is_version_system_on"
-                                                                                    id="is_version_system_on"
-                                                                                    v-model="store_settings.is_version_system_on">
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="form-group col-md-6"
-                                                                            v-if="store_settings.is_version_system_on == 1">
-                                                                            <label for="required_force_update">{{
-                                                                                __('android_required_force_update')
-                                                                                }}</label><br>
-                                                                            <div class="form-check form-switch">
-                                                                                <input type="checkbox" true-value="1"
-                                                                                    false-value="0"
-                                                                                    class="form-check-input"
-                                                                                    name="required_force_update"
-                                                                                    id="required_force_update"
-                                                                                    v-model="store_settings.required_force_update">
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="form-group col-md-6"
-                                                                            v-if="store_settings.is_version_system_on == 1">
-                                                                            <label for="current_version">{{
-                                                                                __('android_current_version_of_app')
-                                                                                }}</label>
-                                                                            <input type="text" class="form-control"
-                                                                                required name="current_version"
-                                                                                id="current_version"
-                                                                                v-model="store_settings.current_version"
-                                                                                placeholder='Current Version' />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="mb-3" v-if="language.is_default">
-                                                                    <div class="row">
-                                                                        <div class="form-group col-md-6">
-                                                                            <label for="ios_is_version_system_on">{{
-                                                                                __('ios_version_system_status')
-                                                                                }}</label><br>
-                                                                            <div class="form-check form-switch">
-                                                                                <input type="checkbox" true-value="1"
-                                                                                    false-value="0"
-                                                                                    class="form-check-input"
-                                                                                    name="ios_is_version_system_on"
-                                                                                    id="ios_is_version_system_on"
-                                                                                    v-model="store_settings.ios_is_version_system_on">
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="form-group col-md-6"
-                                                                            v-if="store_settings.ios_is_version_system_on == 1">
-                                                                            <label for="ios_required_force_update">{{
-                                                                                __('ios_required_force_update')
-                                                                                }}</label><br>
-                                                                            <div class="form-check form-switch">
-                                                                                <input type="checkbox" true-value="1"
-                                                                                    false-value="0"
-                                                                                    class="form-check-input"
-                                                                                    name="ios_required_force_update"
-                                                                                    id="ios_required_force_update"
-                                                                                    v-model="store_settings.ios_required_force_update">
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="form-group col-md-6"
-                                                                            v-if="store_settings.ios_is_version_system_on == 1">
-                                                                            <label for="ios_current_version">{{
-                                                                                __('ios_current_version_of_app')
-                                                                                }}</label>
-                                                                            <input type="text" class="form-control"
-                                                                                required name="ios_current_version"
-                                                                                id="ios_current_version"
-                                                                                v-model="store_settings.ios_current_version"
-                                                                                placeholder='IOS Current Version' />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="form-group col-md-6">
-                                                                    <b-button type="submit" variant="primary"
-                                                                        :disabled="isLoading"
-                                                                        v-if="$can('manage_store_settings')">{{
-                                                                            __('update') }}
-                                                                        <b-spinner v-if="isLoading" small
-                                                                            label="Spinning"></b-spinner>
-                                                                    </b-button>
-                                                                </div>
-                                                            </div>
-                                                        </b-tab></b-tabs>
-                                                </form>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('frontend_home_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('frontend_home_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <span class=" text text-primary font-size-13">{{
-                                                    __('in_this_mode_you_can_set_your_app_web_home_page')
-                                                }}.</span>
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveFrontendHomeSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="">{{ __('display_category_section_in_home_page')
-                                                            }}? </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input"
-                                                                    name="is_category_section_in_homepage"
-                                                                    id="is_category_section_in_homepage"
-                                                                    v-model="store_settings.is_category_section_in_homepage">
-                                                            </div>
-                                                            <div class="mt-2"
-                                                                v-if="store_settings.is_category_section_in_homepage == 1">
-                                                                <label for="count_category_section_in_homepage">{{
-                                                                    __('count_category_display_in_homepage')
-                                                                }}</label>
-                                                                <input type="number" name="message"
-                                                                    id="count_category_section_in_homepage" :min="1"
-                                                                    :required="store_settings.is_category_section_in_homepage == 1"
-                                                                    v-model="store_settings.count_category_section_in_homepage"
-                                                                    class="form-control"
-                                                                    placeholder="Enter Category Number Here!"
-                                                                    @input="validateInput">
-                                                                <span v-if="validationCategoryError" class="error">{{
-                                                                    validationCategoryError }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="">{{ __('display_brand_section_in_home_page')
-                                                            }}? </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input"
-                                                                    name="is_brand_section_in_homepage"
-                                                                    id="is_brand_section_in_homepage"
-                                                                    v-model="store_settings.is_brand_section_in_homepage">
-                                                            </div>
-                                                            <div class="mt-2"
-                                                                v-if="store_settings.is_brand_section_in_homepage == 1">
-                                                                <label for="count_brand_section_in_homepage">{{
-                                                                    __('count_brand_display_in_homepage')
-                                                                }}</label>
-                                                                <input type="number" name="message"
-                                                                    id="count_brand_section_in_homepage" :min="1"
-                                                                    :required="store_settings.is_brand_section_in_homepage == 1"
-                                                                    v-model="store_settings.count_brand_section_in_homepage"
-                                                                    class="form-control"
-                                                                    placeholder="Enter Brand Number Here!"
-                                                                    @input="validateInput">
-                                                                <span v-if="validationBrandError" class="error">{{
-                                                                    validationBrandError }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="">{{ __('display_seller_section_in_home_page')
-                                                            }}?</label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input"
-                                                                    name="is_seller_section_in_homepage"
-                                                                    id="is_seller_section_in_homepage"
-                                                                    v-model="store_settings.is_seller_section_in_homepage">
-                                                            </div>
-                                                            <div class="mt-2"
-                                                                v-if="store_settings.is_seller_section_in_homepage == 1">
-                                                                <label for="count_seller_section_in_homepage">{{
-                                                                    __('count_seller_display_in_homepage')
-                                                                }}</label>
-                                                                <input type="number" name="message"
-                                                                    id="count_seller_section_in_homepage" :min="1"
-                                                                    :required="store_settings.is_seller_section_in_homepage == 1"
-                                                                    v-model="store_settings.count_seller_section_in_homepage"
-                                                                    class="form-control"
-                                                                    placeholder="Enter Seller Number Here!"
-                                                                    @input="validateInput">
-                                                                <span v-if="validationSellerError" class="error">{{
-                                                                    validationSellerError }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="">{{ __('display_country_section_in_home_page')
-                                                            }}? </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input"
-                                                                    name="is_country_section_in_homepage"
-                                                                    id="is_country_section_in_homepage"
-                                                                    v-model="store_settings.is_country_section_in_homepage">
-                                                            </div>
-                                                            <div class="mt-2"
-                                                                v-if="store_settings.is_country_section_in_homepage == 1">
-                                                                <label for="count_country_section_in_homepage">{{
-                                                                    __('count_country_display_in_homepage')
-                                                                }}</label>
-                                                                <input type="number" name="message"
-                                                                    id="count_country_section_in_homepage" :min="1"
-                                                                    :required="store_settings.is_country_section_in_homepage == 1"
-                                                                    v-model="store_settings.count_country_section_in_homepage"
-                                                                    class="form-control"
-                                                                    placeholder="Enter Country Number Here!"
-                                                                    @input="validateInput">
-                                                                <span v-if="validationCountryError" class="error">{{
-                                                                    validationCountryError }}</span>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('smtp_mail_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('smtp_mail_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveSmtpMailSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="mailer">{{ __('mailer') }}:</label>
-                                                            <select class="form-control form-select" required
-                                                                name="mailer" id="mailer"
-                                                                v-model="store_settings.mailer">
-                                                                <option value="smtp">SMTP</option>
-                                                                <option value="sendmail">Sendmail</option>
-                                                            </select>
-                                                            <span class="text text-primary font-size-13">( {{
-                                                                __('select_mail_driver') }})</span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_from_mail">{{ __('from_email_id')
-                                                            }}:</label>
-                                                            <input type="text" class="form-control" required
-                                                                name="smtp_from_mail" id="smtp_from_mail"
-                                                                v-model="store_settings.smtp_from_mail"
-                                                                placeholder='From SMTP Email ID' />
-                                                            <span class="text text-primary font-size-13">( {{
-                                                                __('this_email_id_will_be_used_in_smtp_mail_system')
-                                                            }})</span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_reply_to">{{ __('reply_to_email_id')
-                                                            }}:</label>
-                                                            <input type="email" class="form-control" required
-                                                                name="smtp_reply_to" id="smtp_reply_to"
-                                                                v-model="store_settings.smtp_reply_to"
-                                                                placeholder='From SMTP Email ID' />
-                                                            <span class="text text-primary font-size-13">({{
-                                                                __('this_email_id_will_be_used_in_smtp_mail_system')
-                                                            }})</span>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_email_password">{{
-                                                                __('smtp_email_password') }}: </label>
-                                                            <input type="text" class="form-control" required
-                                                                name="smtp_email_password" id="smtp_email_password"
-                                                                v-model="store_settings.smtp_email_password"
-                                                                placeholder='Enter your SMTP email password' />
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_host">{{ __('smtp_host') }}: </label>
-                                                            <input type="text" class="form-control" required
-                                                                name="smtp_host" id="smtp_host"
-                                                                v-model="store_settings.smtp_host"
-                                                                placeholder='SMTP Host address' />
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_port">{{ __('smtp_port') }}:</label> <span
-                                                                class="text text-primary font-size-13"> ( <b>TLS:
-                                                                </b>587 <b>SSL: </b>465 )</span>
-                                                            <input type="text" class="form-control" required
-                                                                name="smtp_port" id="smtp_port"
-                                                                v-model="store_settings.smtp_port"
-                                                                placeholder='SMTP Port' />
-
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_content_type">{{
-                                                                __('smtp_email_content_type') }}: </label>
-                                                            <select name="smtp_content_type" id="smtp_content_type"
-                                                                v-model="store_settings.smtp_content_type"
-                                                                class="form-control form-select">
-                                                                <option value="">{{ __('select_smtp_email_content_tpe')
-                                                                }}</option>
-                                                                <option value="html">{{ __('html') }}</option>
-                                                                <option value="text">{{ __('text') }}</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="smtp_encryption_type">{{ __('smtp_encryption')
-                                                            }}: </label>
-                                                            <select name="smtp_encryption_type"
-                                                                id="smtp_encryption_type"
-                                                                v-model="store_settings.smtp_encryption_type"
-                                                                class="form-control form-select">
-                                                                <option value="">{{ __('select_smtp_encryption_type') }}
-                                                                </option>
-                                                                <option value="tls">{{ __('tls') }}</option>
-                                                                <option value="ssl">{{ __('ssl') }}</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <hr>
-                                                    <div class="row">
-                                                        <h6>{{ __('email_test') }}</h6>
-                                                        <div class="form-group col-md-6">
-                                                            <div class="d-flex gap-3">
-                                                                <input type="text" class="form-control"
-                                                                    name="test_email"
-                                                                    v-model="store_settings.test_email"
-                                                                    placeholder='Enter Email Address for Test'>
-                                                                <b-button type="button" class="m-0 text-nowrap"
-                                                                    variant="primary" @click="testMail"
-                                                                    :disabled="isSendingTestEmail">
-                                                                    {{ __('test_mail') }}
-                                                                    <b-spinner v-if="isSendingTestEmail" small
-                                                                        label="Spinning"></b-spinner>
-                                                                </b-button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mt-3">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('third_party_api_credentials')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('third_party_api_credentials') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveThirdPartyApiSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="google_place_api_key">{{ __('place_api_key')
-                                                            }}</label>
-                                                            <input type="text" class="form-control"
-                                                                name="google_place_api_key" id="google_place_api_key"
-                                                                :value="shouldHideThirdPartyValues ? '' : store_settings.google_place_api_key"
-                                                                @input="!shouldHideThirdPartyValues && (store_settings.google_place_api_key = $event.target.value)"
-                                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Google Place Api Key'"
-                                                                :readonly="shouldHideThirdPartyValues">
-                                                            <input type="hidden" class="form-control" name="apiKey"
-                                                                id="apiKey" v-model="store_settings.apiKey"
-                                                                placeholder="apiKey">
-
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="google_map_api_key">{{ __('map_api_key')
-                                                            }}</label>
-                                                            <input type="text" class="form-control"
-                                                                name="google_map_api_key" id="google_map_api_key"
-                                                                :value="shouldHideThirdPartyValues ? '' : store_settings.google_map_api_key"
-                                                                @input="!shouldHideThirdPartyValues && (store_settings.google_map_api_key = $event.target.value)"
-                                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Google Map Api Key'"
-                                                                :readonly="shouldHideThirdPartyValues">
-                                                            <input type="hidden" class="form-control"
-                                                                name="googleMapApiKey" id="googleMapApiKey"
-                                                                v-model="store_settings.googleMapApiKey"
-                                                                placeholder="googleMapApiKey">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <label for="text_gen_key ">{{ __('gemini_key') }}</label>
-                                                            <input type="text" class="form-control" name="text_gen_key"
-                                                                id="text_gen_key"
-                                                                :value="shouldHideThirdPartyValues ? '' : store_settings.text_gen_key"
-                                                                @input="!shouldHideThirdPartyValues && (store_settings.text_gen_key = $event.target.value)"
-                                                                :placeholder="shouldHideThirdPartyValues ? __('demo_mode') : 'Gemini Key'"
-                                                                :readonly="shouldHideThirdPartyValues">
-
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading || shouldHideThirdPartyValues"
-                                                                v-if="$can('manage_store_settings') && ($isDemo != 1 || (login_user && login_user.id === 1))">{{
-                                                                __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('seller_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('seller_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveSellerSetting">
-                                                    <div class=" row -align-items-center">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="one_seller_cart">{{ __('one_seller_cart')
-                                                            }}<span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span></label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="one_seller_cart"
-                                                                    id="one_seller_cart"
-                                                                    v-model="store_settings.one_seller_cart">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="seller_commission">{{ __('seller_commission')
-                                                            }}</label>
-                                                            <input type="number" class="form-control"
-                                                                name="seller_commission" id="seller_commission"
-                                                                v-model="store_settings.seller_commission"
-                                                                placeholder="Seller Commission" step="0.1" min="0"
-                                                                max="100">
-                                                        </div>
-                                                        <div class="form-group col-md-6"
-                                                            v-if="store_settings.one_seller_cart == 1">
-                                                            <label for="self_pickup_mode">{{ __('self_pickup_mode')
-                                                            }}<span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span></label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="self_pickup_mode"
-                                                                    id="self_pickup_mode"
-                                                                    v-model="store_settings.self_pickup_mode">
-                                                            </div>
-                                                            <span class="text text-primary font-size-13">{{
-                                                                __('self_pickup_mode_description') }}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('login_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('login_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveRecordLoginSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mb-3">
-                                                            <label for="phone_login">{{ __('phone_login') }}
-                                                                <span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span>
-                                                            </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="phone_login"
-                                                                    id="phone_login"
-                                                                    v-model="login_settings.phone_login">
-
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="google_login">{{ __('google_login') }}
-                                                                <span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span>
-                                                            </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="google_login"
-                                                                    id="google_login"
-                                                                    v-model="login_settings.google_login">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="apple_login">{{ __('apple_login') }}
-                                                                <span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span>
-                                                            </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="apple_login"
-                                                                    id="apple_login"
-                                                                    v-model="login_settings.apple_login">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="apple_login">{{ __('email_login') }}
-                                                                <span class="text text-primary font-size-13">( {{
-                                                                    __('enable') }}/{{ __('disable') }}
-                                                                    )</span>
-                                                            </label><br>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="email_login"
-                                                                    id="email_login"
-                                                                    v-model="login_settings.email_login">
-                                                            </div>
-                                                        </div>
-                                                        <div v-if="login_settings.phone_login == '1'"
-                                                            class="form-group col-md-6">
-
-                                                            <label for="phone_auth_otp">{{ __('phone_auth_otp') }}
-                                                                <small>[ {{ __('enable') }} / {{ __('disable') }} ]
-                                                                </small>
-                                                            </label><br>
-                                                            <div class='form-check form-switch'>
-                                                                <input class='form-check-input' id="phone_auth_otp"
-                                                                    type='checkbox' true-value="1" false-value="0"
-                                                                    v-model="login_settings.phone_auth_otp">
-                                                            </div>
-
-                                                        </div>
-                                                        <div v-if="login_settings.phone_login == '1'"
-                                                            class="form-group col-md-6">
-
-                                                            <label for="phone_auth_password">{{
-                                                                __('phone_auth_password') }}
-                                                                <small>[ {{ __('enable') }} / {{ __('disable') }} ]
-                                                                </small>
-                                                            </label><br>
-                                                            <div class='form-check form-switch'>
-                                                                <input class='form-check-input' id="phone_auth_password"
-                                                                    type='checkbox' true-value="1" false-value="0"
-                                                                    v-model="login_settings.phone_auth_password">
-                                                            </div>
-
-                                                        </div>
-                                                        <div v-if="login_settings.phone_auth_otp == '1' || login_settings.phone_auth_password == '1'"
-                                                            class="form-group col-md-6">
-
-
-                                                            <label for="firebase_authentication">{{
-                                                                __('firebase_authentication') }}
-                                                                <small>[ {{ __('enable') }} / {{ __('disable') }} ]
-                                                                </small>
-                                                            </label><br>
-                                                            <div class='form-check form-switch'>
-                                                                <input class='form-check-input'
-                                                                    id="firebase_authentication" type='checkbox'
-                                                                    true-value="1" false-value="0"
-                                                                    v-model="login_settings.firebase_authentication">
-                                                            </div>
-
-                                                        </div>
-
-                                                        <div v-if="login_settings.phone_auth_otp == '1' || login_settings.phone_auth_password == '1'"
-                                                            class="form-group col-md-6">
-
-
-                                                            <label for="custom_sms_gateway_otp_based">{{
-                                                                __('custom_sms_gateway_otp_based') }}
-                                                                <small>[ {{ __('enable') }} / {{ __('disable') }} ]
-                                                                </small>
-                                                            </label><br>
-                                                            <div class='form-check form-switch'>
-                                                                <input class='form-check-input'
-                                                                    id="custom_sms_gateway_otp_based" type='checkbox'
-                                                                    true-value="1" false-value="0"
-                                                                    v-model="login_settings.custom_sms_gateway_otp_based">
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">
-                                                                {{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div v-if="activeTab === __('cart_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('cart_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveCartSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="low_stock_limit">{{ __('cart_notification') }}
-                                                            </label> <i class="fa fa-question-circle text-secondary" v-b-tooltip.hover :title="__('product_will_be_add_incart_without_login')"></i>
-                                                            <div class="form-check form-switch">
-                                                                <input type="checkbox" true-value="1" false-value="0"
-                                                                    class="form-check-input" name="cart_notification"
-                                                                    id="cart_notification"
-                                                                    v-model="store_settings.cart_notification">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6"
-                                                            v-if="store_settings.cart_notification == 1">
-                                                            <label for="notification_delay_after_cart_addition"> {{
-                                                                __('notification_delay_after_cart_addition') }}</label>
-                                                            <i class="text-danger">* </i><i class="fa fa-question-circle text-secondary" v-b-tooltip.hover :title="__('notification_delay_after_cart_addition_tooltip')"></i>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <div class="input-group-text myDivClass"
-                                                                        style="height: 42px;">
-                                                                        <span class="mySpanClass">{{ __('minutes')
-                                                                        }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <input type="number" style="height: 42px;"
-                                                                    class="form-control"
-                                                                    name="notification_delay_after_cart_addition"
-                                                                    id="notification_delay_after_cart_addition" min="0"
-                                                                    v-model="store_settings.notification_delay_after_cart_addition">
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group col-md-6"
-                                                            v-if="store_settings.cart_notification == 1">
-                                                            <label for="notification_interval"> {{
-                                                                __('notification_interval') }}</label> <i
-                                                                class="text-danger">* </i><i class="fa fa-question-circle text-secondary" v-b-tooltip.hover :title="__('notification_delay_after_cart_addition_tooltip')"></i>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <div class="input-group-text myDivClass"
-                                                                        style="height: 42px;">
-                                                                        <span class="mySpanClass">{{ __('minutes')
-                                                                        }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <input type="number" style="height: 42px;"
-                                                                    class="form-control" name="notification_interval"
-                                                                    id="notification_interval" min="0"
-                                                                    v-model="store_settings.notification_interval">
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="form-group col-md-6"
-                                                            v-if="store_settings.cart_notification == 1">
-                                                            <label for="notification_stop_time"> {{
-                                                                __('notification_stop_time') }}</label> <i
-                                                                class="text-danger">* </i><i class="fa fa-question-circle text-secondary" v-b-tooltip.hover :title="__('notification_stop_time_tooltip')"></i>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <div class="input-group-text myDivClass"
-                                                                        style="height: 42px;">
-                                                                        <span class="mySpanClass">{{ __('minutes')
-                                                                        }}</span>
-                                                                    </div>
-                                                                </div>
-                                                                <input type="number" style="height: 42px;"
-                                                                    class="form-control" name="notification_stop_time"
-                                                                    id="notification_stop_time" min="0"
-                                                                    v-model="store_settings.notification_stop_time">
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">{{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                    <div v-if="activeTab === __('refer_earn_setting')">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title">{{ __('refer_earn_setting') }}</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <form method="post" enctype="multipart/form-data"
-                                                    @submit.prevent="saveReferEarnSetting">
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6 mt-0">
-                                                            <label for="referral_min_order_amount">{{
-                                                                __('minimum_order_for_referral') }}</label><br>
-                                                            <input type="number" class="form-control"
-                                                                name="referral_min_order_amount"
-                                                                id="referral_min_order_amount"
-                                                                v-model="refer_earn_settings.referral_min_order_amount"
-                                                                :placeholder='__("minimum_order_for_referral")' />
-                                                        </div>
-                                                        <div class="form-group col-md-6">
-                                                            <label for="referral_credit_first_order">{{
-                                                                __('referral_credit_first_order') }}</label><br>
-                                                            <input type="number" class="form-control"
-                                                                name="referral_credit_first_order"
-                                                                id="referral_credit_first_order"
-                                                                v-model="refer_earn_settings.referral_credit_first_order"
-                                                                :placeholder='__("referral_credit_first_order")' />
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="form-group col-md-6">
-                                                            <b-button type="submit" variant="primary"
-                                                                :disabled="isLoading"
-                                                                v-if="$can('manage_store_settings')">
-                                                                {{ __('update') }}
-                                                                <b-spinner v-if="isLoading" small
-                                                                    label="Spinning"></b-spinner>
-                                                            </b-button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-        </div>
+        </section>
     </div>
 </template>
 <script>
@@ -1755,7 +1440,8 @@ export default {
                 phone_auth_otp: 0,
                 phone_auth_password: 0,
                 firebase_authentication: 0,
-                custom_sms_gateway_otp_based: 0
+                custom_sms_gateway_otp_based: 0,
+                is_demo_mode_on: 0
             },
             refer_earn_settings: {},
             record: null,
@@ -1782,8 +1468,12 @@ export default {
             Invoice_logoerror: null,
             Panel_login_background_imgerror: null,
             Fssaierror: null,
+            // Icons for the settings nav (same order as `tabs`; presentation only)
+            settingsNavIcons: ['fa-store', 'fa-map-marker-alt', 'fa-sliders-h', 'fa-motorcycle', 'fa-mobile-alt', 'fa-home', 'fa-envelope', 'fa-key', 'fa-user-tie', 'fa-sign-in-alt', 'fa-shopping-cart', 'fa-gift'],
             tabs: [__('store_setting'), __('address_setting'), __('other_setting'), __('delivery_boy_setting'), __('app_setting'), __('frontend_home_setting'), __('smtp_mail_setting'), __('third_party_api_credentials'), __('seller_setting'), __('login_setting'), __('cart_setting'), __('refer_earn_setting')],
             activeTab: __('store_setting'),
+            // URL keys of the sections (same order as `tabs`) - /store_settings?section=<key>
+            tabKeys: ['store_setting', 'address_setting', 'other_setting', 'delivery_boy_setting', 'app_setting', 'frontend_home_setting', 'smtp_mail_setting', 'third_party_api_credentials', 'seller_setting', 'login_setting', 'cart_setting', 'refer_earn_setting'],
 
             // Base format definitions (value = PHP Carbon format, labelPrefix = before current date)
             dateFormatDefs: [
@@ -1858,6 +1548,17 @@ export default {
     },
 
     watch: {
+        // Keep ?section= in the URL in sync with the open section (deep links from the Settings hub)
+        activeTab(tab) {
+            const key = this.tabKeys[this.tabs.indexOf(tab)];
+            if (key && this.$route.query.section !== key) {
+                this.$router.replace({ query: { ...this.$route.query, section: key } }).catch(() => { });
+            }
+            this.$nextTick(this.scrollActivePillIntoView);
+        },
+        '$route.query.section'() {
+            this.openSectionFromRoute();
+        },
         'login_settings.phone_auth_otp': function (newValue) {
             if (newValue == 1) {
                 this.login_settings.phone_auth_password = 0;
@@ -1895,10 +1596,37 @@ export default {
         }
     },
     created() {
+        this.openSectionFromRoute();
         this.bootstrap();
     },
 
     methods: {
+        tr(key, fallback) {
+            const v = this.__(key);
+            return v && v !== key ? v : fallback;
+        },
+        // State text shown next to a switch
+        onOff(value) {
+            return value == 1 ? this.tr('enabled', 'Enabled') : this.tr('disabled', 'Disabled');
+        },
+        // Open the section named in ?section= (unknown / missing keys keep the current section)
+        openSectionFromRoute() {
+            const index = this.tabKeys.indexOf(this.$route.query.section);
+            if (index !== -1 && this.activeTab !== this.tabs[index]) {
+                this.activeTab = this.tabs[index];
+            }
+        },
+        // Scroll the pill switcher (not the page) so the active pill is visible
+        scrollActivePillIntoView() {
+            const bar = this.$refs.settingsPills;
+            const pill = bar && bar.querySelector('.settings-pill.active');
+            if (!bar || !pill) return;
+            const barRect = bar.getBoundingClientRect();
+            const pillRect = pill.getBoundingClientRect();
+            if (pillRect.left < barRect.left || pillRect.right > barRect.right) {
+                bar.scrollLeft += (pillRect.left + pillRect.width / 2) - (barRect.left + barRect.width / 2);
+            }
+        },
         onCountryCodeChange() {
             const selected = this.countryCodeOptions.find(opt => opt.value === this.store_settings.country_code);
             this.store_settings.nation_code = selected ? selected.code : '';
@@ -2119,15 +1847,15 @@ export default {
                     let data = response.data;
                     this.cities = data.data.cities || []
 
-                    if (this.deliveryBoys.id) {
+                    if (this.deliveryBoys && this.deliveryBoys.id && this.record) {
                         this.city = this.cities.filter((item) => {
                             return item.id === this.record.city_id;
                         });
                     }
                 }).catch(error => {
                     this.isLoading = false;
-                    if (error.request.statusText) {
-                        this.showError(error.request.statusText);
+                    if ((error.request && error.request.statusText) || error.message) {
+                        this.showError((error.request && error.request.statusText) || error.message);
                     } else if (error.message) {
                         this.showError(error.message);
                     } else {
@@ -2216,12 +1944,12 @@ export default {
                 if (this.store_settings.fssai_lic_img != "") {
                     this.fssai_lic_img_url = this.$storageUrl + this.store_settings.fssai_lic_img;
                 } else {
-                    this.fssai_lic_img_url = this.$baseUrl + '/images/fssai_lic_img.png';
+                    this.fssai_lic_img_url = ""; // no default image ships for this field
                 }
                 if (this.store_settings.panel_login_background_img != "") {
                     this.panel_login_background_img_url = this.$storageUrl + this.store_settings.panel_login_background_img;
                 } else {
-                    this.panel_login_background_img_url = this.$baseUrl + '/images/panel_login_background_img.png';
+                    this.panel_login_background_img_url = this.$baseUrl + '/images/panel_login_background_img.jpg';
                 }
                 // Guard against null/undefined before replace — a crash here aborts the whole callback
                 const copyrightRaw = this.store_settings.copyright_details
@@ -2482,8 +2210,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2531,8 +2259,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2699,8 +2427,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2747,8 +2475,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2764,7 +2492,7 @@ export default {
 
             let formData = new FormData();
 
-            const apiFields = ['google_place_api_key', 'google_map_api_key', 'apiKey', 'googleMapApiKey', 'text_gen_key'];
+            const apiFields = ['map_provider', 'google_place_api_key', 'google_map_api_key', 'apiKey', 'googleMapApiKey', 'text_gen_key'];
 
             apiFields.forEach(field => {
                 if (this.store_settings[field] !== undefined) {
@@ -2800,8 +2528,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2845,8 +2573,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2893,8 +2621,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2933,8 +2661,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -2972,8 +2700,8 @@ export default {
                 }
             }).catch(error => {
                 this.isLoading = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -3012,8 +2740,8 @@ export default {
                 }
             }).catch(error => {
                 vm.isSendingTestEmail = false;
-                if (error.request.statusText) {
-                    this.showError(error.request.statusText);
+                if ((error.request && error.request.statusText) || error.message) {
+                    this.showError((error.request && error.request.statusText) || error.message);
                 } else if (error.message) {
                     this.showError(error.message);
                 } else {
@@ -3188,6 +2916,7 @@ export default {
     },
 
     mounted() {
+        this.$nextTick(this.scrollActivePillIntoView);
     }
 
 }
@@ -3196,8 +2925,8 @@ export default {
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
 .file-input-div {
-    word-break: break-all;
-    overflow-wrap: break-word;
+    /* long file names wrap, but normal words are not split mid-word */
+    overflow-wrap: anywhere;
 }
 
 /* Limit Store Setting tab image preview size (Logo, FSSAI, Panel login background) */
@@ -3207,6 +2936,18 @@ export default {
     object-fit: contain;
     display: block;
     margin-top: 0.5rem;
+}
+
+/* Settings page layout (header with back link, pill switcher, section card, setting rows, sticky
+   action bar) lives in custom-egrocer.scss under "Settings hub & settings pages". */
+.settings-inline-field {
+    gap: 8px;
+}
+@media (max-width: 575.98px) {
+    .settings-inline-field {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 /* Form-floating labels styling for Bootstrap 4 support in both light and dark modes */

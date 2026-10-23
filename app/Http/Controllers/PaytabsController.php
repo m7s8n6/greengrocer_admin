@@ -235,10 +235,15 @@ class PaytabsController extends Controller
                     }
                 }
             } else {
-                $order_id = $notification['data']['order']['order_tags']['link_id'];
-                $explode = explode('-', $order_id);
-                if ($explode[0] == 'order') {
-                    Order::where('id', $explode[1])->update(['active_status' => OrderStatusList::$cancelled]);
+                // PayTabs sends our reference as top-level cart_id (same key the approved branch uses).
+                $order_id = $notification['cart_id'] ?? ($notification['data']['order']['order_tags']['link_id'] ?? '');
+                $explode = explode('-', (string) $order_id);
+                if (($explode[0] ?? '') == 'order' && !empty($explode[1])) {
+                    // Only an unpaid order may be cancelled by a failed callback - PayTabs can send a
+                    // declined/duplicate notification after the approved one, which must not cancel it.
+                    Order::where('id', $explode[1])
+                        ->where('active_status', OrderStatusList::$paymentPending)
+                        ->update(['active_status' => OrderStatusList::$cancelled]);
                 }
             }
         } catch (\Exception $e) {

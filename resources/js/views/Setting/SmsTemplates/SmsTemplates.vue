@@ -3,7 +3,7 @@
     <div>
 
         <div class="page-heading">
-            <div class="row">
+            <div class="page-title"><div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>{{ __('manage_sms_templates') }}</h3>
                 </div>
@@ -12,11 +12,12 @@
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                             </li>
+                            <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('manage_sms_templates') }}</li>
                         </ol>
                     </nav>
                 </div>
-            </div>
+            </div></div>
 
             <div class="row">
                 <div class="col-12 col-md-12 order-md-1 order-last">
@@ -47,10 +48,16 @@
                                     show-empty small class="figma-table mb-0"
                                     :tbody-tr-class="() => 'figma-tr align-middle'">
                                     <template #table-busy>
-                                        <div class="text-center text-black my-2">
+                                        <div class="text-center text-muted my-2">
                                             <b-spinner class="align-middle"></b-spinner>
                                             <strong>{{ __('loading') }}...</strong>
                                         </div>
+                                    </template>
+                                    <template #empty="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                    </template>
+                                    <template #emptyfiltered="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
                                     </template>
                                     <template #cell(updated_at)="row">
                                         {{ row.item.updated_at }}
@@ -59,7 +66,7 @@
                                     <template #cell(actions)="row">
                                         <div class="d-flex gap-2 justify-content-center">
                                             <button class="figma-action-btn" @click="edit_record = row.item"
-                                                v-if="$can('category_update')" v-b-tooltip.hover :title="__('edit')">
+                                                v-if="$can('sms_templates_update')" v-b-tooltip.hover :title="__('edit')">
                                                 <base-icon name="edit icon" hoverName="edit Hover" width="24"
                                                     height="24" />
                                             </button>
@@ -69,11 +76,7 @@
                             </div>
 
                             <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span
-                                        class="showing-bold">{{ totalRows
-                                        }}</span>
-                                </div>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                         align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis

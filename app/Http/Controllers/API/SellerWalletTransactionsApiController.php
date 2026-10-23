@@ -104,7 +104,7 @@ class SellerWalletTransactionsApiController extends Controller
 
         $sellers = null;
         if (!isset(auth()->user()->seller->id)) {
-            $sellers = Seller::withAllTranslations()->with('module')->orderBy('id', 'DESC')->get();
+            $sellers = Seller::withAllTranslations()->with('module.translations')->orderBy('id', 'DESC')->get();
 
             $sellerIds = $walletTransactions->pluck('seller_id')->unique()->filter();
             if ($sellerIds->isNotEmpty()) {

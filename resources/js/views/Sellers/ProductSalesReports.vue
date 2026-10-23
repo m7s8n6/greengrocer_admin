@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('product_sales_reports') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -57,11 +57,7 @@
                                                     @update="getProductSalesReports"
                                                     class="w-100"
                                                 ></date-range-picker>
-                                                <button v-if="dateRange.startDate" type="button"
-                                                    class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                    style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                    @click.stop="clearDate()"
-                                                    v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                                <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                     <i class="fa fa-times-circle text-muted"></i>
                                                 </button>
                                                 <base-icon name="CalendarDots" width="24" height="24" class="figma-filter-icon-right" useCurrentColor />
@@ -86,7 +82,7 @@
                                 :bordered="false"
                                 :busy="isLoading"
                                 stacked="md"
-                                show-empty
+                                show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')"
                                 small
                                 :tbody-tr-class="() => 'figma-tr align-middle'"
                                 class="figma-table mb-0">
@@ -99,9 +95,7 @@
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                             </div>

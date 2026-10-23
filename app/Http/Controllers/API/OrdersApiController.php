@@ -59,6 +59,7 @@ class OrdersApiController extends Controller
             'orders.delivery_time',
             'orders.additional_charges',
             'orders.active_status',
+            'orders.slot_type',
             'orders.order_type',
             'orders.created_at',
             'users.name as user_name',
@@ -199,6 +200,7 @@ class OrdersApiController extends Controller
             'orders.delivery_time',
             'orders.additional_charges',
             'orders.active_status',
+            'orders.slot_type',
             'orders.created_at',
             'users.name as user_name',
             DB::raw('(SELECT s.name FROM sellers s INNER JOIN order_items oi ON s.id = oi.seller_id WHERE oi.order_id = orders.id LIMIT 1) as seller_name'),
@@ -471,6 +473,15 @@ class OrdersApiController extends Controller
             }
         }
 
+        // A Quick Delivery order can be handed to a driver as soon as it is Received. That driver
+        // can't pick it up / take it out for delivery until the order has reached Shipped.
+        if (auth()->user()->role_id == Role::$roleDeliveryBoy
+            && $order->slot_type === OrderStatusList::$slotTypeExpress
+            && $order->active_status < OrderStatusList::$shipped
+            && $request->status_id > OrderStatusList::$shipped) {
+            return CommonHelper::responseError("This order is not ready for pickup yet.");
+        }
+
         DB::beginTransaction();
         try {
 
@@ -579,7 +590,8 @@ class OrdersApiController extends Controller
                                 if ($maxReturnDays > 0) {
 
                                     $returnPeriodEnd = $deliveredAt->copy()->addDays($maxReturnDays);
-                                    $delay = $now->diffInSeconds($returnPeriodEnd, false); // false: signed diff
+                                    //$delay = $now->diffInSeconds($returnPeriodEnd, false); // false: signed diff
+                                     $delay = (int) $now->diffInSeconds($returnPeriodEnd, false); // false: signed diff
 
                                     if ($delay > 0) {
                                         ProcessReferralBonusAfterReturnPeriod::dispatch($order->id)->delay(Carbon::now()->addSeconds($delay));
@@ -664,9 +676,27 @@ class OrdersApiController extends Controller
         if (empty($deliveryBoy)) {
             return CommonHelper::responseSuccess('delivery_boy_not_found');
         }
+
+        // Admin and seller fleets are separate: a seller may only use their own drivers (own
+        // fleet) or the admin's pool (shared), the admin only the admin's pool.
+        $assignSeller = auth()->user()->seller ?? null;
+        $allowedOwner = ($assignSeller && $assignSeller->usesOwnFleet()) ? $assignSeller->id : null;
+        if ((int) $deliveryBoy->seller_id !== (int) $allowedOwner) {
+            return CommonHelper::responseError('delivery_boy_not_available_for_this_account');
+        }
         $order = Order::find($request->order_id);
 
         if ($order) {
+            // Pre-existing gap (independent of auto-assign): a seller could previously
+            // call this with any guessed order id and assign/reassign its delivery boy,
+            // since only the admin route path was implicitly trusted. Order ids are
+            // plain auto-increment integers, easy to guess neighbouring ids. When the
+            // caller is a seller, restrict to orders containing that seller's own items.
+            $callerSeller = auth()->user()->seller ?? null;
+            if ($callerSeller && !OrderItem::where('order_id', $order->id)->where('seller_id', $callerSeller->id)->exists()) {
+                return CommonHelper::responseError('order_not_found');
+            }
+
             if ($order->active_status == OrderStatusList::$cancelled) {
                 return CommonHelper::responseError('could_not_update_order_status_cancelled_or_returned');
             }
@@ -886,7 +916,7 @@ class OrdersApiController extends Controller
                 $isDeliveryChargeRefundable = Setting::get_value('is_delivery_charge_refundable') ?? 0;
                 $non_refundable_delivery_charge = $isDeliveryChargeRefundable ? 0 : floatval($order->delivery_charge);
 
-                $additional_charges = json_decode($order->additional_charges, true) ?? [];
+                $additional_charges = CommonHelper::orderChargesArray($order->additional_charges);
                 $additional_charges_total = array_sum(array_column($additional_charges, 'amount'));
 
                 $order->active_status = OrderStatusList::$returned;
@@ -895,7 +925,7 @@ class OrdersApiController extends Controller
                 $order->remaining_final = $additional_charges_total + $non_refundable_delivery_charge;
                 $order->save();
             } else {
-                $additional_charges = json_decode($order->additional_charges, true) ?? [];
+                $additional_charges = CommonHelper::orderChargesArray($order->additional_charges);
                 $additional_charges_total = array_sum(array_column($additional_charges, 'amount'));
 
                 $order->remaining_total = floatval($order->remaining_total) - floatval($orderItem->sub_total);
@@ -998,7 +1028,7 @@ class OrdersApiController extends Controller
             $user = User::find($order->user_id);
             $currentBalance = floatval($user->balance);
 
-            $additional_charges = json_decode($order->additional_charges, true) ?? [];
+            $additional_charges = CommonHelper::orderChargesArray($order->additional_charges);
             $additional_charges_total = array_sum(array_column($additional_charges, 'amount'));
             $refundable_charges_total = 0;
             foreach ($additional_charges as $charge) {
@@ -1066,7 +1096,10 @@ class OrdersApiController extends Controller
             // Update order totals
             if ($isLastItem) {
                 $order->remaining_total = 0;
-                $order->remaining_final = $non_refundable_charges_total + $non_refundable_delivery_charge;
+                // A fully cancelled COD order owes nothing (the customer paid nothing; any wallet part is
+                // refunded above), same as when the customer cancels it. Prepaid orders keep the
+                // non-refundable charges that were already paid.
+                $order->remaining_final = $isCod ? 0 : $non_refundable_charges_total + $non_refundable_delivery_charge;
                 $order->wallet_balance = 0;
             } else {
                 $order->remaining_total = max(0, floatval($order->remaining_total) - $itemSubTotal);
@@ -1191,11 +1224,25 @@ class OrdersApiController extends Controller
         $defaultCode = $defaultLang ? $languageService->getLanguageCode($defaultLang->id) : 'en';
         $activeLangCodes = collect($languageService->getActiveLanguages())->pluck('code')->filter()->values()->all();
 
-        $query = DeliveryBoy::where('status', 1);
+        // Admin pool only - sellers' own drivers are assigned from the seller panel.
+        $query = DeliveryBoy::where('status', 1)->whereNull('seller_id');
         if ($cityId !== null) {
-            $query->where('city_id', $cityId);
+            $query->servingCity($cityId);
         }
         $deliveryBoys = $query->with('translations')->orderBy('id', 'DESC')->get();
+
+        // Open-order count for every driver in one grouped query (the model accessor runs one COUNT
+        // per driver, and `$db->x ?? 0` runs an accessor twice).
+        $pendingCounts = $deliveryBoys->isEmpty() ? collect() : Order::whereIn('delivery_boy_id', $deliveryBoys->pluck('id'))
+            ->whereNotIn('active_status', [
+                OrderStatusList::$paymentPending,
+                OrderStatusList::$delivered,
+                OrderStatusList::$cancelled,
+                OrderStatusList::$returned,
+            ])
+            ->selectRaw('delivery_boy_id, count(*) as aggregate')
+            ->groupBy('delivery_boy_id')
+            ->pluck('aggregate', 'delivery_boy_id');
 
         $result = [];
         foreach ($deliveryBoys as $db) {
@@ -1218,9 +1265,9 @@ class OrdersApiController extends Controller
             $result[] = [
                 'id' => $db->id,
                 'name' => $nameObj,
-                'pending_order_count' => $db->pending_order_count ?? 0,
-                'driving_license_url' => $db->driving_license_url ?? null,
-                'national_identity_card_url' => $db->national_identity_card_url ?? null,
+                'pending_order_count' => (int) ($pendingCounts[$db->id] ?? 0),
+                'driving_license_url' => $db->driving_license_url,
+                'national_identity_card_url' => $db->national_identity_card_url,
             ];
         }
         return $result;

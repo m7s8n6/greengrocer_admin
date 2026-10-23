@@ -284,6 +284,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -295,27 +301,22 @@ __webpack_require__.r(__webpack_exports__);
       fields: [{
         key: 'id',
         label: __('id'),
-        "class": 'text-center',
         sortable: true,
         sortDirection: 'desc'
       }, {
         key: 'type',
         label: __('type'),
-        "class": 'text-center',
         sortable: true
       }, {
         key: 'message',
         label: __('message'),
-        "class": 'text-center',
         sortable: true
       }, {
         key: 'updated_at',
-        label: __('last_updated'),
-        "class": 'text-center'
+        label: __('last_updated')
       }, {
         key: 'actions',
-        label: __('actions'),
-        "class": 'text-center'
+        label: __('actions')
       }],
       totalRows: 1,
       currentPage: 1,
@@ -394,8 +395,8 @@ __webpack_require__.r(__webpack_exports__);
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this3.isLoading = true;
@@ -604,8 +605,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -623,12 +637,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -651,7 +659,7 @@ var render = function () {
                 "div",
                 {
                   staticClass:
-                    "alert alert-light-warning color-warning alert-dismissible fade show",
+                    "alert alert-warning alert-dismissible fade show",
                   attrs: { role: "alert" },
                 },
                 [
@@ -677,7 +685,7 @@ var render = function () {
             : _vm._e(),
           _vm._v(" "),
           _c("div", { staticClass: "row" }, [
-            _c("div", { staticClass: "form-group mb-3" }, [
+            _c("div", { staticClass: "form-group col-12 col-md-6 mb-3" }, [
               _c("label", { attrs: { for: "type" } }, [
                 _vm._v(_vm._s(_vm.__("type"))),
               ]),
@@ -711,7 +719,7 @@ var render = function () {
               }),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group mb-3" }, [
+            _c("div", { staticClass: "form-group col-12 col-md-6 mb-3" }, [
               _c("label", { attrs: { for: "title" } }, [
                 _vm._v(" " + _vm._s(_vm.__("title"))),
               ]),
@@ -745,7 +753,7 @@ var render = function () {
               }),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group mb-3" }, [
+            _c("div", { staticClass: "form-group col-12 mb-3" }, [
               _c("label", { attrs: { for: "message" } }, [
                 _vm._v(" " + _vm._s(_vm.__("message"))),
               ]),
@@ -777,10 +785,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -815,7 +820,7 @@ var render = function () {
         "div",
         {
           staticClass:
-            "page-heading d-flex justify-content-between align-items-center mb-4",
+            "page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3",
         },
         [
           _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -897,6 +902,32 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "d-flex gap-2" }, [
+                  _c(
+                    "button",
+                    {
+                      directives: [
+                        {
+                          name: "b-tooltip",
+                          rawName: "v-b-tooltip.hover",
+                          modifiers: { hover: true },
+                        },
+                      ],
+                      staticClass:
+                        "btn btn-figma-columns d-flex align-items-center gap-2",
+                      attrs: { title: _vm.__("refresh") },
+                      on: {
+                        click: function ($event) {
+                          return _vm.getEmailTemplates()
+                        },
+                      },
+                    },
+                    [
+                      _c("i", { staticClass: "fa fa-refresh" }),
+                      _vm._v(" "),
+                      _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                    ]
+                  ),
+                  _vm._v(" "),
                   _vm.$can("create_email_template")
                     ? _c(
                         "button",
@@ -918,28 +949,6 @@ var render = function () {
                         ]
                       )
                     : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      directives: [
-                        {
-                          name: "b-tooltip",
-                          rawName: "v-b-tooltip.hover",
-                          modifiers: { hover: true },
-                        },
-                      ],
-                      staticClass:
-                        "btn btn-figma-filter d-flex align-items-center gap-2",
-                      attrs: { title: _vm.__("refresh") },
-                      on: {
-                        click: function ($event) {
-                          return _vm.getEmailTemplates()
-                        },
-                      },
-                    },
-                    [_c("i", { staticClass: "fa fa-refresh" })]
-                  ),
                 ]),
               ]
             ),
@@ -990,7 +999,7 @@ var render = function () {
                         return [
                           _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "text-center text-muted my-3" },
                             [
                               _c("b-spinner", { staticClass: "align-middle" }),
                               _vm._v(" "),
@@ -1005,17 +1014,51 @@ var render = function () {
                       proxy: true,
                     },
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "cell(image)",
                       fn: function (row) {
                         return [
-                          row.item.image === ""
-                            ? _c("p", [_vm._v(_vm._s(_vm.__("no_image")))])
-                            : _c("img", {
-                                attrs: {
-                                  src: _vm.$storageUrl + row.item.image,
-                                  height: "50",
-                                },
-                              }),
+                          _c("img", {
+                            attrs: {
+                              src: row.item.image
+                                ? _vm.$storageUrl + row.item.image
+                                : _vm.$placeholderImage,
+                              height: "40",
+                            },
+                          }),
                         ]
                       },
                     },
@@ -1023,30 +1066,42 @@ var render = function () {
                       key: "cell(message)",
                       fn: function (row) {
                         return [
-                          _c("div", [
-                            _c(
-                              "small",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    value: {
-                                      html: true,
-                                      title: row.item.message,
-                                      boundary: "window",
-                                    },
-                                    expression:
-                                      "{ html: true, title: row.item.message, boundary: 'window' }",
-                                    modifiers: { hover: true },
+                          _c(
+                            "div",
+                            [
+                              _c(
+                                "span",
+                                {
+                                  staticClass: "figma-action-btn",
+                                  attrs: {
+                                    id: "bonus" + row.item.id,
+                                    tabindex: "0",
+                                    "aria-label": _vm.__("message"),
                                   },
-                                ],
-                                staticClass:
-                                  "d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2",
-                              },
-                              [_c("i", { staticClass: "fa fa-info-circle" })]
-                            ),
-                          ]),
+                                },
+                                [_c("i", { staticClass: "fa fa-eye" })]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "b-popover",
+                                {
+                                  attrs: {
+                                    target: "bonus" + row.item.id,
+                                    triggers: "hover focus",
+                                    placement: "left",
+                                  },
+                                },
+                                [
+                                  _c("div", {
+                                    domProps: {
+                                      innerHTML: _vm._s(row.item.message),
+                                    },
+                                  }),
+                                ]
+                              ),
+                            ],
+                            1
+                          ),
                         ]
                       },
                     },
@@ -1054,84 +1109,77 @@ var render = function () {
                       key: "cell(actions)",
                       fn: function (row) {
                         return [
-                          _c(
-                            "div",
-                            {
-                              staticClass:
-                                "d-flex gap-2 justify-content-center",
-                            },
-                            [
-                              _vm.$can("update_email_template")
-                                ? _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("edit") },
-                                      on: {
-                                        click: function ($event) {
-                                          _vm.edit_record = row.item
-                                        },
+                          _c("div", { staticClass: "d-flex gap-2" }, [
+                            _vm.$can("update_email_template")
+                              ? _c(
+                                  "button",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "b-tooltip",
+                                        rawName: "v-b-tooltip.hover",
+                                        modifiers: { hover: true },
+                                      },
+                                    ],
+                                    staticClass: "figma-action-btn",
+                                    attrs: { title: _vm.__("edit") },
+                                    on: {
+                                      click: function ($event) {
+                                        _vm.edit_record = row.item
                                       },
                                     },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "edit icon",
-                                          hoverName: "edit Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
+                                  },
+                                  [
+                                    _c("base-icon", {
+                                      attrs: {
+                                        name: "edit icon",
+                                        hoverName: "edit Hover",
+                                        width: "24",
+                                        height: "24",
+                                      },
+                                    }),
+                                  ],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.$can("delete_email_template")
+                              ? _c(
+                                  "button",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "b-tooltip",
+                                        rawName: "v-b-tooltip.hover",
+                                        modifiers: { hover: true },
+                                      },
                                     ],
-                                    1
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.$can("delete_email_template")
-                                ? _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass:
-                                        "figma-action-btn figma-delete-btn",
-                                      attrs: { title: _vm.__("delete") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.deleteEmailTemplate(
-                                            row.index,
-                                            row.item.id
-                                          )
-                                        },
+                                    staticClass:
+                                      "figma-action-btn figma-delete-btn",
+                                    attrs: { title: _vm.__("delete") },
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.deleteEmailTemplate(
+                                          row.index,
+                                          row.item.id
+                                        )
                                       },
                                     },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "Type=Default",
-                                          hoverName: "Type=Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
-                                    ],
-                                    1
-                                  )
-                                : _vm._e(),
-                            ]
-                          ),
+                                  },
+                                  [
+                                    _c("base-icon", {
+                                      attrs: {
+                                        name: "Type=Default",
+                                        hoverName: "Type=Hover",
+                                        width: "24",
+                                        height: "24",
+                                      },
+                                    }),
+                                  ],
+                                  1
+                                )
+                              : _vm._e(),
+                          ]),
                         ]
                       },
                     },
@@ -1143,22 +1191,15 @@ var render = function () {
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "figma-table-footer" },
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c("table-count", {
+                  attrs: {
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "total-rows": _vm.totalRows,
+                  },
+                }),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="stock-page">
         <div class="page-heading">
             <div class="page-title mb-2">
                 <div class="d-flex justify-content-between align-items-center">
@@ -37,7 +37,13 @@
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                 :bordered="false" :busy="isLoading" stacked="md" show-empty small
                                 primary-key="product_variant_id"
-                                class="mb-0">
+                                class="mb-0 stock-table">
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
 
                                 <!-- ID column -->
                                 <template #cell(product_variant_id)="row">
@@ -51,21 +57,9 @@
                                     {{ getTranslatedProductName(row.item) }}
                                 </template>
 
-                                <!-- Measurement column -->
-                                <template #cell(variant)="row">
-
-                                    {{ getTranslatedVariant(row.item) }}
-
-                                </template>
-
-                                <!-- Type column with rowspan for 'loose' type products -->
-                                <template #cell(type)="row">
-                                    {{ row.item.type }}
-                                </template>
-
                                 <template #cell(image_url)="row">
-                                    <img :src="row.item.image_url" alt="Image" class="img-thumbnail" width="100"
-                                        @click="openLightbox(row.item.image_url)" style="cursor: pointer;" />
+                                    <img :src="row.item.image_url" alt="Image" class="stock-thumb"
+                                        @click="openLightbox(row.item.image_url)" />
                                 </template>
 
 
@@ -74,7 +68,7 @@
 
                                     <div
                                         v-if="edit_record && edit_record.product_variant_id === row.item.product_variant_id">
-                                        <b-form-input v-model="edit_record.stock" type="number" min="0"
+                                        <b-form-input v-model="edit_record.stock" type="number" min="0" size="sm" class="stock-input"
                                             @keyup.enter="updateStock(row.item.product_variant_id)"></b-form-input>
                                     </div>
                                     <div v-else>
@@ -92,24 +86,27 @@
                                 </template>
 
                                 <template #cell(actions)="row">
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex gap-1 stock-row-actions">
                                         <button v-if="edit_record && edit_record.product_variant_id === row.item.product_variant_id"
-                                                class="figma-action-btn"
+                                                class="figma-action-btn stock-save-btn"
                                                 @click="updateStock(row.item.product_variant_id)"
                                                 v-b-tooltip.hover :title="__('save')">
                                             <i class="fa fa-check"></i>
                                         </button>
                                         <button v-else class="figma-action-btn" @click="edit_record = { ...row.item }"
                                             v-b-tooltip.hover :title="__('edit')">
-                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                            <i class="bi bi-pencil"></i>
                                         </button>
                                     </div>
                                 </template>
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') || 'of' }} <span class="showing-bold">{{ totalRows }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                                    style="width: auto;"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
@@ -142,8 +139,6 @@ export default {
                 { key: 'product_variant_id', label: __('id'), class: 'text-center', sortable: true, sortDirection: 'desc' },
                 { key: 'image_url', label: __('image'), class: 'text-center' },
                 { key: 'name', label: __('name'), class: 'text-center' },
-                { key: 'variant', label: __('measurement'), class: 'text-center' },
-                { key: 'type', label: __('type'), class: 'text-center' },
                 { key: 'stock', label: __('stock'), class: 'text-center' },
                 { key: 'pv_status', label: __('status'), class: 'text-center' },
                 { key: 'actions', label: __('actions') }
@@ -194,7 +189,12 @@ export default {
             this.getRecords();
         },
         perPage() {
-            this.getRecords();
+            // a larger page size can leave the current page past the end - go back to page 1
+            if (this.currentPage !== 1) {
+                this.currentPage = 1;
+            } else {
+                this.getRecords();
+            }
         }
     },
     methods: {
@@ -377,3 +377,42 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.stock-page ::v-deep .stock-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    cursor: pointer;
+}
+
+.stock-page ::v-deep .stock-input {
+    max-width: 120px;
+    min-height: 32px;
+    height: 32px;
+}
+
+/* !important: legacy global .figma-action-btn forces 40px with !important */
+.stock-page ::v-deep .stock-row-actions .figma-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+.stock-page ::v-deep .stock-row-actions .stock-save-btn {
+    background: var(--theme-primary-500) !important;
+    border-color: var(--theme-primary-500) !important;
+    color: var(--theme-neutral-50) !important;
+}
+
+@media (max-width: 767.98px) {
+    .stock-page ::v-deep .stock-input {
+        max-width: 100%;
+    }
+}
+</style>

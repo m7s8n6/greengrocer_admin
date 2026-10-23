@@ -1,14 +1,14 @@
 <template>
   <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop no-fade static id="mymodal" no-enforce-focus>
-      <div slot="modal-footer">
+      <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+          <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
           <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
               <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
           </b-button>
-          <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
       </div>
       <form ref="my-form" @submit.prevent="saveRecord">
 
-          <div v-if="emailError" class="alert alert-light-warning color-warning alert-dismissible fade show" role="alert">
+          <div v-if="emailError" class="alert alert-warning alert-dismissible fade show" role="alert">
               <strong><i class="bi bi-exclamation-triangle"></i> {{ __('warning') }}</strong>
               {{ emailErrorMessage }}
               <button
@@ -21,17 +21,17 @@
 
           <div class="row">
 
-              <div class="form-group mb-3"> 
+              <div class="form-group col-12 col-md-6 mb-3">
                   <label for="type">{{ __('type') }}</label>
                   <input type="text" name="type" id="type" required v-model="type" class="form-control" :placeholder="__('type')" >
               </div>
             
-              <div class="form-group mb-3">
+              <div class="form-group col-12 col-md-6 mb-3">
                   <label for="title"> {{ __('title') }}</label>
                   <input type="text" name="title" id="title" required v-model="title" class="form-control" :placeholder="__('title')" >
               </div>
 
-              <div class="form-group mb-3">
+              <div class="form-group col-12 mb-3">
                   <label for="message"> {{ __('message') }}</label>
                   <div class="form-floating">
                       
@@ -44,7 +44,7 @@
                   </div>
               </div>
           </div>
-          <button ref="dummy_submit" style="display:none;"></button>
+          <button ref="dummy_submit" class="d-none"></button>
       </form>
   </b-modal>
 </template>

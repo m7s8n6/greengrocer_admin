@@ -30,136 +30,81 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-12 col-md-12 order-md-1 order-last">
+            <div v-if="!record" class="card">
+                <div class="card-body text-center text-muted py-5">
+                    <b-spinner small class="me-2"></b-spinner>{{ __('loading') }}...
+                </div>
+            </div>
+
+            <div class="row product-view" v-if="record">
+                <!-- Main column: gallery + info, description, variants -->
+                <div class="col-12 col-lg-8">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <h4>{{ __('product_details') }}</h4>
-                            <span class="pull-right">
-                                <router-link :to="isSellerRoute ? '/seller/manage_products' : '/manage_products'" class="btn btn-primary">{{ __('manage_products')
+                            <span>
+                                <router-link :to="isSellerRoute ? '/seller/manage_products' : '/manage_products'" class="btn btn-sm btn-outline-secondary">{{ __('manage_products')
                                     }}</router-link>
                             </span>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 table-responsive">
-                                    <table class="table table-bordered">
-                                        <tbody>
-                                            <tr>
-                                                <th class="th-width">{{ __('name') }}</th>
-                                                <td>{{ translatedRecord ? translatedRecord.name : '' }}</td>
-                                                <th class="th-width">{{ __('seller') }}</th>
-                                                <td>
-                                                    <template v-if="translatedRecord && translatedRecord.seller">
-                                                        {{ translatedRecord.seller.name }}
-                                                    </template>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('product_id') }}</th>
-                                                <td>{{ record.id }}</td>
-                                                <th class="th-width">{{ __('indicator') }}</th>
-                                                <td>
-                                                    <span v-if="record.status === 0" class="badge bg-info">{{ __('none')
-                                                        }}</span>
-                                                    <span v-if="record.status === 1" class="badge bg-success">{{
-                                                        __('veg') }}</span>
-                                                    <span v-if="record.status === 2" class="badge bg-danger">{{
-                                                        __('non_veg') }}</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('tax') }}</th>
-                                                <td>
-                                                    <template v-if="translatedRecord && translatedRecord.tax">
-                                                        {{ translatedRecord.tax.title }} {{
-                                                            translatedRecord.tax.percentage }}%
-                                                    </template>
-                                                </td>
-                                                <th class="th-width">{{ __('made_in') }}</th>
-                                                <td>
-                                                    <template v-if="record.made_in_country">
-                                                        {{ record.made_in_country.name }}
-                                                    </template>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('status') }}</th>
-                                                <td>
-                                                    <span v-if="record.status === 1" class="badge bg-success">{{
-                                                        __('active') }}</span>
-                                                    <span v-if="record.status === 0" class="badge bg-danger">{{
-                                                        __('deactive') }}</span>
-                                                </td>
-                                                <th class="th-width">{{ __('return') }}</th>
-                                                <td>
-                                                    <span class='badge bg-danger' v-if="record.return_status === 0">{{
-                                                        __('not_allowed') }}</span>
-                                                    <span class='badge bg-success' v-if="record.return_status === 1">{{
-                                                        __('allowed') }}</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('manufacturer') }}</th>
-                                                <td>
-                                                    {{ translatedRecord ? translatedRecord.manufacturer : '' }}
-                                                </td>
-                                                <th class="th-width">{{ __('till_status') }}</th>
-                                                <td>
-
-                                                    <span class='badge bg-danger' v-if="record.till_status == 0">{{
-                                                        __('not_applicable') }}</span>
-                                                    <span class='badge bg-success' v-if="record.till_status == 2">{{
-                                                        __('received') }}</span>
-                                                    <span class='badge bg-success' v-if="record.till_status == 3">{{
-                                                        __('processed') }}</span>
-                                                    <span class='badge bg-success' v-if="record.till_status == 4">{{
-                                                        __('shipped') }}</span>
-                                                    <span class='badge bg-success' v-if="record.till_status == 5">{{
-                                                        __('delivered') }}</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('is_approved') }}</th>
-                                                <td>
-                                                    <span class='badge bg-success' v-if="record.is_approved === 1">{{
-                                                        __('approved') }}</span>
-                                                    <span class='badge bg-danger' v-if="record.is_approved === 0">{{
-                                                        __('not_approved') }}</span>
-                                                </td>
-                                                <th class="th-width">{{ __('main_image') }}</th>
-                                                <td>
-                                                    <img :src="$storageUrl + record.image" height="75"
-                                                        v-if="record.image" />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('cancellation') }}</th>
-                                                <td>
-                                                    <span class='badge bg-danger'
-                                                        v-if="record.cancelable_status === 0">{{ __('not_allowed')
-                                                        }}</span>
-                                                    <span class='badge bg-success'
-                                                        v-if="record.cancelable_status === 1">{{ __('allowed') }}</span>
-                                                </td>
-                                                <th class="th-width">{{ __('category') }}</th>
-                                                <td>
-                                                    <template v-if="translatedRecord && translatedRecord.category">
-                                                        {{ translatedRecord.category.name }}
-                                                    </template>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th class="th-width">{{ __('other_images') }}</th>
-                                                <td colspan="3">
-                                                    <template v-if="other_images" v-for="image in other_images">
-                                                        <img :src="$storageUrl + image.image" height="75"
-                                                            style="margin-right: 2px;" />
-                                                    </template>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                            <div class="row g-4">
+                                <div class="col-12 col-md-5">
+                                    <div class="product-view-main-image">
+                                        <img :src="$storageUrl + record.image" v-if="record.image" alt="" />
+                                        <i v-else class="bi bi-image"></i>
+                                    </div>
+                                    <div class="product-view-thumbs" v-if="other_images && other_images.length">
+                                        <template v-if="other_images" v-for="image in other_images">
+                                            <img :src="$storageUrl + image.image" alt="" />
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-7">
+                                    <h4 class="product-view-name">{{ translatedRecord ? translatedRecord.name : '' }}</h4>
+                                    <dl class="product-view-dl">
+                                        <div>
+                                            <dt>{{ __('product_id') }}</dt>
+                                            <dd>#{{ record.id }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('category') }}</dt>
+                                            <dd>
+                                                <template v-if="translatedRecord && translatedRecord.category">
+                                                    {{ translatedRecord.category.name }}
+                                                </template>
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('seller') }}</dt>
+                                            <dd>
+                                                <template v-if="translatedRecord && translatedRecord.seller">
+                                                    {{ translatedRecord.seller.name }}
+                                                </template>
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('manufacturer') }}</dt>
+                                            <dd>{{ translatedRecord ? translatedRecord.manufacturer : '' }}</dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('made_in') }}</dt>
+                                            <dd>
+                                                <template v-if="record.made_in_country">
+                                                    {{ record.made_in_country.name }}
+                                                </template>
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt>{{ __('tax') }}</dt>
+                                            <dd>
+                                                <template v-if="translatedRecord && translatedRecord.tax">
+                                                    {{ translatedRecord.tax.title }} {{
+                                                        translatedRecord.tax.percentage }}%
+                                                </template>
+                                            </dd>
+                                        </div>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
@@ -170,21 +115,16 @@
                             <h4>{{ __('product_request_description') }}</h4>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <editor :placeholder="__('enter_product_description')"
-                                        :value="translatedRecord ? translatedRecord.description : ''"
-                                        :disabled="true"
-                                        :init="{
-                                            height: 400,
-                                            menubar: false,
-                                            toolbar: false,
-                                            statusbar: false,
-                                            readonly: true
-                                        }" />
-
-                                </div>
-                            </div>
+                            <editor :placeholder="__('enter_product_description')"
+                                :value="translatedRecord ? translatedRecord.description : ''"
+                                :disabled="true"
+                                :init="{
+                                    height: 260,
+                                    menubar: false,
+                                    toolbar: false,
+                                    statusbar: false,
+                                    readonly: true
+                                }" />
                         </div>
                     </div>
 
@@ -192,39 +132,115 @@
                         <div class="card-header">
                             <h4>{{ __('product_variants') }}</h4>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th class="th-width">{{ __('image') }}</th>
-                                                <th class="th-width">{{ __('product_name') }}</th>
-                                                <th class="th-width">{{ __('variant_id') }}</th>
-                                                <th class="th-width">{{ __('variant') }}</th>
-                                                <th class="th-width">{{ __('stock') }}</th>
-                                                <th class="th-width">{{ __('price') }}({{ $currency }})</th>
-                                                <th class="th-width">{{ __('discounted_price') }}({{ $currency }})</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="variant in record.variants" :key="variant.id">
-                                                <td>
-                                                    <img v-if="variant.images && variant.images.length"
-                                                        :src="variant.images[0].image_url"
-                                                        class="variant-thumb" alt="">
-                                                </td>
-                                                <td>{{ record.name }}</td>
-                                                <td>{{ variant.id }}</td>
-                                                <td>{{ variantLabel(variant) }}</td>
-                                                <td>{{ variant.stock }}</td>
-                                                <td>{{ variant.price }}</td>
-                                                <td>{{ variant.discounted_price }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ __('image') }}</th>
+                                            <th>{{ __('product_name') }}</th>
+                                            <th>{{ __('variant_id') }}</th>
+                                            <th>{{ __('variant') }}</th>
+                                            <th>{{ __('stock') }}</th>
+                                            <th>{{ __('price') }}({{ $currency }})</th>
+                                            <th>{{ __('discounted_price') }}({{ $currency }})</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="variant in record.variants" :key="variant.id">
+                                            <td>
+                                                <img v-if="variant.images && variant.images.length"
+                                                    :src="variant.images[0].image_url"
+                                                    class="variant-thumb" alt="">
+                                                <img v-else-if="record.image" :src="$storageUrl + record.image"
+                                                    class="variant-thumb" alt="">
+                                            </td>
+                                            <td>{{ record.name }}</td>
+                                            <td>{{ variant.id }}</td>
+                                            <td>{{ variantLabel(variant) }}</td>
+                                            <td>{{ variant.stock }}</td>
+                                            <td>{{ variant.price }}</td>
+                                            <td>{{ variant.discounted_price }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side column: status & settings -->
+                <div class="col-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>{{ __('product_status') }}</h4>
+                        </div>
+                        <div class="card-body">
+                            <dl class="product-view-dl product-view-dl--side">
+                                <div>
+                                    <dt>{{ __('is_approved') }}</dt>
+                                    <dd>
+                                        <span class='badge bg-success' v-if="record.is_approved === 1">{{
+                                            __('approved') }}</span>
+                                        <span class='badge bg-danger' v-if="record.is_approved === 0">{{
+                                            __('not_approved') }}</span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('status') }}</dt>
+                                    <dd>
+                                        <span v-if="record.status === 1" class="badge bg-success">{{
+                                            __('active') }}</span>
+                                        <span v-if="record.status === 0" class="badge bg-danger">{{
+                                            __('deactive') }}</span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('indicator') }}</dt>
+                                    <dd>
+                                        <span v-if="record.status === 0" class="badge bg-info">{{ __('none')
+                                            }}</span>
+                                        <span v-if="record.status === 1" class="badge bg-success">{{
+                                            __('veg') }}</span>
+                                        <span v-if="record.status === 2" class="badge bg-danger">{{
+                                            __('non_veg') }}</span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('return') }}</dt>
+                                    <dd>
+                                        <span class='badge bg-danger' v-if="record.return_status === 0">{{
+                                            __('not_allowed') }}</span>
+                                        <span class='badge bg-success' v-if="record.return_status === 1">{{
+                                            __('allowed') }}</span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('cancellation') }}</dt>
+                                    <dd>
+                                        <span class='badge bg-danger'
+                                            v-if="record.cancelable_status === 0">{{ __('not_allowed')
+                                            }}</span>
+                                        <span class='badge bg-success'
+                                            v-if="record.cancelable_status === 1">{{ __('allowed') }}</span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{{ __('till_status') }}</dt>
+                                    <dd>
+                                        <span class='badge bg-danger' v-if="record.till_status == 0">{{
+                                            __('not_applicable') }}</span>
+                                        <span class='badge bg-success' v-if="record.till_status == 2">{{
+                                            __('received') }}</span>
+                                        <span class='badge bg-success' v-if="record.till_status == 3">{{
+                                            __('processed') }}</span>
+                                        <span class='badge bg-success' v-if="record.till_status == 4">{{
+                                            __('shipped') }}</span>
+                                        <span class='badge bg-success' v-if="record.till_status == 5">{{
+                                            __('delivered') }}</span>
+                                    </dd>
+                                </div>
+                            </dl>
                         </div>
                     </div>
                 </div>
@@ -421,8 +437,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     let postData = {
@@ -443,79 +459,117 @@ export default {
 };
 </script>
 <style scoped>
-.th-width {
-    width: 170px;
-}
-
 .variant-thumb {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
 }
 
-.card {
-    border: 1px solid #EDEDED !important;
-    border-radius: 12px !important;
+.product-view .card {
+    margin-bottom: 20px;
+}
+
+.product-view .card > .card-body:not(.p-0) {
+    padding-top: 20px;
+}
+
+.product-view .card > .card-header h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin-bottom: 0;
+}
+
+/* Gallery */
+.product-view-main-image {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-surface-muted);
     overflow: hidden;
-    margin-bottom: 24px;
 }
 
-.card-header {
-    border-bottom: 1px solid #EDEDED !important;
-    background-color: #FFFFFF !important;
-    padding: 1rem 1.25rem !important;
+.product-view-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-.card-body {
-    padding: 1.5rem !important;
+.product-view-main-image i {
+    font-size: 40px;
+    color: var(--ui-text-subtle);
 }
 
-.table-responsive {
-    border: none !important;
-    background: transparent !important;
+.product-view-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
 }
 
-.table {
-    margin-bottom: 0 !important;
+.product-view-thumbs img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface-muted);
 }
 
-.table-bordered,
-.table-bordered th,
-.table-bordered td {
-    border: 1px solid #EDEDED !important;
+/* Main info */
+.product-view-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin-bottom: 14px;
+    overflow-wrap: anywhere;
 }
 
-.table thead th {
-    background-color: #F8F9FA !important;
-    border-bottom-width: 1px !important;
+.product-view-dl {
+    margin: 0;
 }
 
-/* Dark Mode Styles */
-body.theme-dark .card {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+.product-view-dl > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ui-border);
 }
 
-body.theme-dark .card-header {
-    background-color: #1e293b !important;
-    border-bottom-color: #334155 !important;
+.product-view-dl > div:last-child {
+    border-bottom: 0;
 }
 
-body.theme-dark .card-header h4 {
-    color: #f1f5f9 !important;
+.product-view-dl dt {
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ui-text-muted);
 }
 
-body.theme-dark .table-bordered,
-body.theme-dark .table-bordered th,
-body.theme-dark .table-bordered td {
-    border-color: #334155 !important;
-    background-color: #1e293b !important;
-    color: #f1f5f9 !important;
+.product-view-dl dd {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-text);
+    text-align: right;
+    overflow-wrap: anywhere;
 }
 
-body.theme-dark .table thead th {
-    background-color: #334155 !important;
-    color: #f1f5f9 !important;
+.product-view-dl--side > div:first-child {
+    padding-top: 0;
+}
+
+.product-view .table th,
+.product-view .table td {
+    white-space: nowrap;
 }
 </style>

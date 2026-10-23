@@ -78,6 +78,9 @@ public function save(Request $request)
     $defaultLanguage = $this->languageService->getDefaultLanguage();
     $isDefaultLanguage = ($request->language_id == $defaultLanguage->id);
     $slotType = $request->slot_type === 'express' ? 'express' : 'fixed';
+    if ($slotType === 'express' && !self::oneSellerCartOn()) {
+        return CommonHelper::responseError('quick_delivery_requires_one_seller_cart');
+    }
 
     // Base rules (always)
     $rules = [
@@ -156,6 +159,9 @@ public function update(Request $request)
     $defaultLanguage = $this->languageService->getDefaultLanguage();
     $isDefaultLanguage = ($request->language_id == $defaultLanguage->id);
     $slotType = $request->slot_type === 'express' ? 'express' : 'fixed';
+    if ($slotType === 'express' && !self::oneSellerCartOn()) {
+        return CommonHelper::responseError('quick_delivery_requires_one_seller_cart');
+    }
 
     $rules = [
         'id' => 'required|exists:time_slots,id',
@@ -227,6 +233,12 @@ public function update(Request $request)
         }
     }
 
+    /** Quick Delivery needs a single pickup per order, so it requires One Seller Cart. */
+    private static function oneSellerCartOn(): bool
+    {
+        return (int) trim((string) Setting::get_value('one_seller_cart')) === 1;
+    }
+
     public function getTimeSlotsSettings(){
         // These five settings used to be one shared global row per key - switching module and
         // saving would silently overwrite every other module's Slot Type/Enable config too.
@@ -235,7 +247,7 @@ public function update(Request $request)
         $suffix = '_' . $moduleId;
 
         $timeSlot_settingsArray = array(
-            "time_slot_type" => Setting::get_value('time_slot_type' . $suffix) ?: 'fixed',
+            "time_slot_type" => Setting::effectiveTimeSlotType($moduleId),
             "time_slots_is_enabled" => Setting::get_value('time_slots_is_enabled' . $suffix) ?: false,
             "time_slots_allowed_days" => Setting::get_value('time_slots_allowed_days' . $suffix) ?: '',
             "delivery_estimate_days" => Setting::get_value('delivery_estimate_days' . $suffix) ?: '',
@@ -244,7 +256,8 @@ public function update(Request $request)
         $timeSlot_settings = Setting::whereIn('variable', $variables)->get();
         $data = array(
             "timeSlot_settingsObject" => $timeSlot_settingsArray,
-            "timeSlot_settings" => $timeSlot_settings
+            "timeSlot_settings" => $timeSlot_settings,
+            "one_seller_cart" => self::oneSellerCartOn() ? 1 : 0,
         );
         return CommonHelper::responseWithData($data);
 
@@ -263,6 +276,9 @@ public function update(Request $request)
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return CommonHelper::responseError($validator->errors()->first());
+        }
+        if ($request->time_slot_type === 'express' && !self::oneSellerCartOn()) {
+            return CommonHelper::responseError('quick_delivery_requires_one_seller_cart');
         }
         try {
             $moduleId = $request->header('X-Module-Id') ?: 1;

@@ -329,22 +329,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -696,8 +680,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this7.isLoading = true;
@@ -1179,7 +1163,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.faq-answer[data-v-0512156b] {\n    margin-top: 8px;\n    color: #666;\n    font-size: 14px;\n}\n\n/* Drag and drop styles */\n.ghost[data-v-0512156b] {\n    opacity: 0.5;\n    background: #c8ebfb;\n}\n.chosen[data-v-0512156b] {\n    background: #e3f2fd;\n}\n.dragging[data-v-0512156b] {\n    opacity: 0.8;\n}\n.drag-handle[data-v-0512156b] {\n    cursor: move;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n}\n.drag-handle[data-v-0512156b]:hover {\n    color: #007bff;\n}\n.table tbody tr[data-v-0512156b] {\n    cursor: default;\n}\n.table tbody tr[data-v-0512156b]:hover {\n    background-color: #f8f9fa;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.faq-answer[data-v-0512156b] {\n    margin-top: 4px;\n    color: var(--ui-text-muted);\n    font-size: 13px;\n    line-height: 1.5;\n}\n\n/* table prefix: global \"#main .table tbody td a\" paints links in primary */\n#main .table tbody td .faq-question[data-v-0512156b] {\n    display: block;\n    overflow-wrap: anywhere;\n    font-weight: 700 !important;\n    color: var(--ui-heading) !important;\n}\n#main .table tbody td .faq-toggle[data-v-0512156b] {\n    display: inline-block;\n    margin-top: 4px;\n    font-size: 12px !important;\n    cursor: pointer;\n    color: var(--theme-primary-600) !important;\n}\n.faq-col-drag[data-v-0512156b] { width: 50px;\n}\n.faq-col-id[data-v-0512156b] { width: 80px;\n}\n.faq-col-sm[data-v-0512156b] { width: 100px;\n}\n.faq-col-actions[data-v-0512156b] { width: 120px;\n}\n.drag-handle i[data-v-0512156b] {\n    color: var(--ui-text-subtle);\n}\n\n/* Drag and drop styles */\n.ghost[data-v-0512156b] {\n    opacity: 0.5;\n    background: var(--theme-info-100);\n}\n.chosen[data-v-0512156b] {\n    background: var(--theme-info-50);\n}\n.dragging[data-v-0512156b] {\n    opacity: 0.8;\n}\n.drag-handle[data-v-0512156b] {\n    cursor: move;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n}\n.drag-handle[data-v-0512156b]:hover {\n    color: var(--theme-primary-500);\n}\n.table tbody tr[data-v-0512156b] {\n    cursor: default;\n}\n.table tbody tr[data-v-0512156b]:hover {\n    background-color: var(--ui-surface-muted);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1392,57 +1376,47 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "page-title" }, [
-          _c("div", { staticClass: "row" }, [
-            _c(
-              "div",
-              { staticClass: "col-12 col-md-6 order-md-1 order-last" },
-              [_c("h3", [_vm._v(_vm._s(_vm.__("subscription_faqs")))])]
-            ),
+        _c(
+          "div",
+          {
+            staticClass:
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
+          },
+          [
+            _c("h3", { staticClass: "modern-page-title mb-0" }, [
+              _vm._v(_vm._s(_vm.__("subscription_faqs"))),
+            ]),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col-12 col-md-6 order-md-2 order-first" },
-              [
+            _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
                 _c(
-                  "nav",
-                  {
-                    staticClass: "breadcrumb-header float-start float-lg-end",
-                    attrs: { "aria-label": "breadcrumb" },
-                  },
+                  "li",
+                  { staticClass: "breadcrumb-item" },
                   [
-                    _c("ol", { staticClass: "breadcrumb" }, [
-                      _c(
-                        "li",
-                        { staticClass: "breadcrumb-item" },
-                        [
-                          _c("router-link", { attrs: { to: "/dashboard" } }, [
-                            _vm._v(_vm._s(_vm.__("dashboard"))),
-                          ]),
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "li",
-                        {
-                          staticClass: "breadcrumb-item active",
-                          attrs: { "aria-current": "page" },
-                        },
-                        [
-                          _vm._v(
-                            _vm._s(_vm.__("subscription_faqs")) +
-                              "\n                            "
-                          ),
-                        ]
-                      ),
-                    ]),
-                  ]
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "text-muted",
+                        attrs: { to: "/dashboard" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("dashboard")))]
+                    ),
+                  ],
+                  1
                 ),
-              ]
-            ),
-          ]),
-        ]),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  {
+                    staticClass: "breadcrumb-item active text-primary",
+                    attrs: { "aria-current": "page" },
+                  },
+                  [_vm._v(_vm._s(_vm.__("subscription_faqs")))]
+                ),
+              ]),
+            ]),
+          ]
+        ),
         _vm._v(" "),
         _c("section", { staticClass: "section" }, [
           _c("div", { staticClass: "row" }, [
@@ -1450,7 +1424,7 @@ var render = function () {
               "div",
               { staticClass: "col-12 col-md-12 order-md-1 order-last" },
               [
-                _c("div", { staticClass: "figma-main-section-card" }, [
+                _c("div", { staticClass: "card figma-main-section-card" }, [
                   _c("div", { staticClass: "card-body p-0" }, [
                     _c(
                       "div",
@@ -1459,124 +1433,41 @@ var render = function () {
                           "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row",
                       },
                       [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex align-items-center gap-3 flex-grow-1 flex-wrap",
-                          },
-                          [
-                            _c(
-                              "div",
-                              {
-                                staticClass: "figma-search-container",
-                                staticStyle: { "min-width": "250px" },
-                              },
-                              [
-                                _c("i", {
-                                  staticClass: "fa fa-search text-muted",
-                                }),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.filter,
-                                      expression: "filter",
-                                    },
-                                  ],
-                                  staticClass: "figma-search-input",
-                                  attrs: {
-                                    type: "text",
-                                    placeholder: _vm.__("search"),
-                                  },
-                                  domProps: { value: _vm.filter },
-                                  on: {
-                                    input: [
-                                      function ($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.filter = $event.target.value
-                                      },
-                                      function ($event) {
-                                        return _vm.getFaqs()
-                                      },
-                                    ],
-                                  },
-                                }),
-                              ]
-                            ),
+                        _c("div", { staticClass: "flex-grow-1" }, [
+                          _c("div", { staticClass: "figma-search-container" }, [
+                            _c("i", { staticClass: "fa fa-search text-muted" }),
                             _vm._v(" "),
-                            _c(
-                              "div",
-                              { staticClass: "form-check form-switch mb-0" },
-                              [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.enableDragDrop,
-                                      expression: "enableDragDrop",
-                                    },
-                                  ],
-                                  staticClass: "form-check-input",
-                                  attrs: {
-                                    type: "checkbox",
-                                    id: "dragDropSwitch",
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.filter,
+                                  expression: "filter",
+                                },
+                              ],
+                              staticClass: "figma-search-input",
+                              attrs: {
+                                type: "text",
+                                placeholder: _vm.__("search"),
+                              },
+                              domProps: { value: _vm.filter },
+                              on: {
+                                input: [
+                                  function ($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.filter = $event.target.value
                                   },
-                                  domProps: {
-                                    checked: Array.isArray(_vm.enableDragDrop)
-                                      ? _vm._i(_vm.enableDragDrop, null) > -1
-                                      : _vm.enableDragDrop,
+                                  function ($event) {
+                                    return _vm.getFaqs()
                                   },
-                                  on: {
-                                    change: function ($event) {
-                                      var $$a = _vm.enableDragDrop,
-                                        $$el = $event.target,
-                                        $$c = $$el.checked ? true : false
-                                      if (Array.isArray($$a)) {
-                                        var $$v = null,
-                                          $$i = _vm._i($$a, $$v)
-                                        if ($$el.checked) {
-                                          $$i < 0 &&
-                                            (_vm.enableDragDrop = $$a.concat([
-                                              $$v,
-                                            ]))
-                                        } else {
-                                          $$i > -1 &&
-                                            (_vm.enableDragDrop = $$a
-                                              .slice(0, $$i)
-                                              .concat($$a.slice($$i + 1)))
-                                        }
-                                      } else {
-                                        _vm.enableDragDrop = $$c
-                                      }
-                                    },
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _c(
-                                  "label",
-                                  {
-                                    staticClass:
-                                      "form-check-label text-nowrap ms-2",
-                                    attrs: { for: "dragDropSwitch" },
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n                                            " +
-                                        _vm._s(_vm.__("enable_drag_and_drop")) +
-                                        "\n                                        "
-                                    ),
-                                  ]
-                                ),
-                              ]
-                            ),
-                          ]
-                        ),
+                                ],
+                              },
+                            }),
+                          ]),
+                        ]),
                         _vm._v(" "),
                         _c(
                           "div",
@@ -1585,6 +1476,42 @@ var render = function () {
                               "d-flex gap-2 align-items-center flex-wrap",
                           },
                           [
+                            _c("reorder-toggle", {
+                              model: {
+                                value: _vm.enableDragDrop,
+                                callback: function ($$v) {
+                                  _vm.enableDragDrop = $$v
+                                },
+                                expression: "enableDragDrop",
+                              },
+                            }),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                directives: [
+                                  {
+                                    name: "b-tooltip",
+                                    rawName: "v-b-tooltip.hover",
+                                    modifiers: { hover: true },
+                                  },
+                                ],
+                                staticClass:
+                                  "btn btn-figma-columns d-flex align-items-center gap-2",
+                                attrs: { title: _vm.__("refresh") },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.getFaqs()
+                                  },
+                                },
+                              },
+                              [
+                                _c("i", { staticClass: "fa fa-refresh" }),
+                                _vm._v(" "),
+                                _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                              ]
+                            ),
+                            _vm._v(" "),
                             _vm.$can("subscription_faq_create")
                               ? _c(
                                   "button",
@@ -1611,33 +1538,8 @@ var render = function () {
                                   ]
                                 )
                               : _vm._e(),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
-                                ],
-                                staticClass:
-                                  "btn btn-figma-filter d-flex align-items-center gap-2",
-                                attrs: { title: _vm.__("refresh") },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.getFaqs()
-                                  },
-                                },
-                              },
-                              [
-                                _c("i", { staticClass: "fa fa-refresh" }),
-                                _vm._v(" "),
-                                _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                              ]
-                            ),
-                          ]
+                          ],
+                          1
                         ),
                       ]
                     ),
@@ -1652,19 +1554,13 @@ var render = function () {
                                 _c("tr", [
                                   _c(
                                     "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "50px" },
-                                    },
+                                    { staticClass: "text-center faq-col-drag" },
                                     [_vm._v(_vm._s(_vm.__("drag")))]
                                   ),
                                   _vm._v(" "),
                                   _c(
                                     "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "80px" },
-                                    },
+                                    { staticClass: "text-center faq-col-id" },
                                     [_vm._v(_vm._s(_vm.__("id")))]
                                   ),
                                   _vm._v(" "),
@@ -1678,10 +1574,7 @@ var render = function () {
                                   _vm._v(" "),
                                   _c(
                                     "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "100px" },
-                                    },
+                                    { staticClass: "text-center faq-col-sm" },
                                     [
                                       _vm._v(
                                         _vm._s(_vm.__("sort_order")) +
@@ -1692,18 +1585,15 @@ var render = function () {
                                   _vm._v(" "),
                                   _c(
                                     "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "100px" },
-                                    },
+                                    { staticClass: "text-center faq-col-sm" },
                                     [_vm._v(_vm._s(_vm.__("status")))]
                                   ),
                                   _vm._v(" "),
                                   _c(
                                     "th",
                                     {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "120px" },
+                                      staticClass:
+                                        "text-center faq-col-actions",
                                     },
                                     [_vm._v(_vm._s(_vm.__("actions")))]
                                   ),
@@ -1754,7 +1644,6 @@ var render = function () {
                                         {
                                           staticClass:
                                             "text-center drag-handle",
-                                          staticStyle: { cursor: "move" },
                                         },
                                         [
                                           _c("i", {
@@ -1771,7 +1660,7 @@ var render = function () {
                                         _c(
                                           "a",
                                           {
-                                            staticStyle: { color: "#435ebe" },
+                                            staticClass: "faq-question",
                                             attrs: {
                                               href: "javascript:void(0)",
                                             },
@@ -1816,11 +1705,7 @@ var render = function () {
                                               ? _c(
                                                   "a",
                                                   {
-                                                    staticStyle: {
-                                                      color: "#007bff",
-                                                      "font-size": "12px",
-                                                      cursor: "pointer",
-                                                    },
+                                                    staticClass: "faq-toggle",
                                                     attrs: {
                                                       href: "javascript:void(0)",
                                                     },
@@ -2054,13 +1939,34 @@ var render = function () {
                                   proxy: true,
                                 },
                                 {
+                                  key: "empty",
+                                  fn: function (scope) {
+                                    return [
+                                      _c(
+                                        "div",
+                                        {
+                                          staticClass:
+                                            "text-center text-muted py-4",
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass:
+                                              "fa fa-inbox fa-2x d-block mb-2",
+                                          }),
+                                          _vm._v(_vm._s(scope.emptyText)),
+                                        ]
+                                      ),
+                                    ]
+                                  },
+                                },
+                                {
                                   key: "cell(faqs)",
                                   fn: function (row) {
                                     return [
                                       _c(
                                         "a",
                                         {
-                                          staticStyle: { color: "#435ebe" },
+                                          staticClass: "faq-question",
                                           attrs: { href: "javascript:void(0)" },
                                         },
                                         [_vm._v(_vm._s(row.item.question))]
@@ -2092,11 +1998,7 @@ var render = function () {
                                           ? _c(
                                               "a",
                                               {
-                                                staticStyle: {
-                                                  color: "#007bff",
-                                                  "font-size": "12px",
-                                                  cursor: "pointer",
-                                                },
+                                                staticClass: "faq-toggle",
                                                 attrs: {
                                                   href: "javascript:void(0)",
                                                 },
@@ -2265,28 +2167,15 @@ var render = function () {
                     _vm._v(" "),
                     _c(
                       "div",
-                      {
-                        staticClass: "figma-table-footer flex-wrap gap-3 mt-4",
-                      },
+                      { staticClass: "figma-table-footer flex-wrap gap-3" },
                       [
-                        _c(
-                          "div",
-                          { staticClass: "showing-results-text small" },
-                          [
-                            _vm._v(
-                              "\n                                    " +
-                                _vm._s(_vm.__("Showing Result")) +
-                                " : "
-                            ),
-                            _vm._v('"showing-bold\\">' + _vm._s(_vm.pageEnd)),
-                            _vm._v(
-                              "\n                                    " +
-                                _vm._s(_vm.__("of")) +
-                                " "
-                            ),
-                            _vm._v('"showing-bold\\">' + _vm._s(_vm.totalRows)),
-                          ]
-                        ),
+                        _c("table-count", {
+                          attrs: {
+                            "current-page": _vm.currentPage,
+                            "per-page": _vm.perPage,
+                            "total-rows": _vm.totalRows,
+                          },
+                        }),
                         _vm._v(" "),
                         _c(
                           "div",
@@ -2314,7 +2203,8 @@ var render = function () {
                           ],
                           1
                         ),
-                      ]
+                      ],
+                      1
                     ),
                   ]),
                 ]),
@@ -2348,8 +2238,21 @@ var render = function () {
         [
           _c(
             "div",
-            { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+            {
+              staticClass: "d-flex justify-content-end flex-wrap gap-2 w-100",
+              attrs: { slot: "modal-footer" },
+              slot: "modal-footer",
+            },
             [
+              _c(
+                "b-button",
+                {
+                  attrs: { variant: "outline-secondary" },
+                  on: { click: _vm.hideModal },
+                },
+                [_vm._v(_vm._s(_vm.__("cancel")))]
+              ),
+              _vm._v(" "),
               _c(
                 "b-button",
                 {
@@ -2373,15 +2276,6 @@ var render = function () {
                     : _vm._e(),
                 ],
                 1
-              ),
-              _vm._v(" "),
-              _c(
-                "b-button",
-                {
-                  attrs: { variant: "secondary" },
-                  on: { click: _vm.hideModal },
-                },
-                [_vm._v(_vm._s(_vm.__("cancel")))]
               ),
             ],
             1
@@ -2583,14 +2477,15 @@ var render = function () {
                               _vm._v(" "),
                               _c("div", { staticClass: "col-md-12" }, [
                                 _c("div", { staticClass: "form-group" }, [
-                                  language.is_default
-                                    ? _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ])
-                                    : _vm._e(),
-                                  _vm._v(" "),
                                   _c("label", { attrs: { for: "question" } }, [
-                                    _vm._v(_vm._s(_vm.__("query"))),
+                                    _vm._v(_vm._s(_vm.__("query")) + " "),
+                                    language.is_default
+                                      ? _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        )
+                                      : _vm._e(),
                                   ]),
                                   _vm._v(" "),
                                   _c("input", {
@@ -2639,14 +2534,15 @@ var render = function () {
                               _vm._v(" "),
                               _c("div", { staticClass: "form-group" }, [
                                 _c("div", { staticClass: "form-group" }, [
-                                  language.is_default
-                                    ? _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ])
-                                    : _vm._e(),
-                                  _vm._v(" "),
                                   _c("label", { attrs: { for: "answer" } }, [
-                                    _vm._v(_vm._s(_vm.__("answer"))),
+                                    _vm._v(_vm._s(_vm.__("answer")) + " "),
+                                    language.is_default
+                                      ? _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        )
+                                      : _vm._e(),
                                   ]),
                                   _vm._v(" "),
                                   _c("textarea", {
@@ -2698,118 +2594,129 @@ var render = function () {
                                     "div",
                                     { staticClass: "row align-items-end" },
                                     [
-                                      _c("div", { staticClass: "col-md-6" }, [
-                                        _c(
-                                          "div",
-                                          { staticClass: "form-group mb-0" },
-                                          [
-                                            _c(
-                                              "label",
-                                              { attrs: { for: "sort_order" } },
-                                              [
-                                                _vm._v(
-                                                  _vm._s(_vm.__("sort_order"))
-                                                ),
-                                              ]
-                                            ),
-                                            _vm._v(" "),
-                                            _c("input", {
-                                              directives: [
+                                      _c(
+                                        "div",
+                                        { staticClass: "col-12 col-md-6" },
+                                        [
+                                          _c(
+                                            "div",
+                                            { staticClass: "form-group" },
+                                            [
+                                              _c(
+                                                "label",
                                                 {
-                                                  name: "model",
-                                                  rawName: "v-model",
+                                                  attrs: { for: "sort_order" },
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    _vm._s(_vm.__("sort_order"))
+                                                  ),
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c("input", {
+                                                directives: [
+                                                  {
+                                                    name: "model",
+                                                    rawName: "v-model",
+                                                    value: _vm.form.sort_order,
+                                                    expression:
+                                                      "form.sort_order",
+                                                  },
+                                                ],
+                                                staticClass: "form-control",
+                                                attrs: {
+                                                  type: "number",
+                                                  name: "sort_order",
+                                                  id: "sort_order",
+                                                  placeholder:
+                                                    _vm.__("enter_sort_order"),
+                                                  min: "0",
+                                                },
+                                                domProps: {
                                                   value: _vm.form.sort_order,
-                                                  expression: "form.sort_order",
                                                 },
-                                              ],
-                                              staticClass: "form-control",
-                                              attrs: {
-                                                type: "number",
-                                                name: "sort_order",
-                                                id: "sort_order",
-                                                placeholder:
-                                                  _vm.__("enter_sort_order"),
-                                                min: "0",
-                                              },
-                                              domProps: {
-                                                value: _vm.form.sort_order,
-                                              },
-                                              on: {
-                                                input: function ($event) {
-                                                  if ($event.target.composing) {
-                                                    return
-                                                  }
-                                                  _vm.$set(
-                                                    _vm.form,
-                                                    "sort_order",
-                                                    $event.target.value
-                                                  )
+                                                on: {
+                                                  input: function ($event) {
+                                                    if (
+                                                      $event.target.composing
+                                                    ) {
+                                                      return
+                                                    }
+                                                    _vm.$set(
+                                                      _vm.form,
+                                                      "sort_order",
+                                                      $event.target.value
+                                                    )
+                                                  },
                                                 },
-                                              },
-                                            }),
-                                          ]
-                                        ),
-                                      ]),
+                                              }),
+                                            ]
+                                          ),
+                                        ]
+                                      ),
                                       _vm._v(" "),
-                                      _c("div", { staticClass: "col-md-6" }, [
-                                        _c(
-                                          "div",
-                                          { staticClass: "form-group mb-0" },
-                                          [
-                                            _c(
-                                              "div",
-                                              {
-                                                staticClass:
-                                                  "d-flex align-items-center gap-2",
-                                              },
-                                              [
-                                                _c(
-                                                  "label",
-                                                  { staticClass: "mb-0" },
-                                                  [
-                                                    _vm._v(
-                                                      _vm._s(_vm.__("status"))
-                                                    ),
-                                                  ]
-                                                ),
-                                                _vm._v(" "),
-                                                _c("b-form-radio-group", {
-                                                  attrs: {
-                                                    options: [
-                                                      {
-                                                        text: _vm.__(
-                                                          "deactive"
-                                                        ),
-                                                        value: 0,
-                                                      },
-                                                      {
-                                                        text: _vm.__("active"),
-                                                        value: 1,
-                                                      },
-                                                    ],
-                                                    buttons: "",
-                                                    "button-variant":
-                                                      "outline-primary",
-                                                    required: "",
-                                                  },
-                                                  model: {
-                                                    value: _vm.form.status,
-                                                    callback: function ($$v) {
-                                                      _vm.$set(
-                                                        _vm.form,
-                                                        "status",
-                                                        $$v
-                                                      )
+                                      _c(
+                                        "div",
+                                        { staticClass: "col-12 col-md-6" },
+                                        [
+                                          _c(
+                                            "div",
+                                            { staticClass: "form-group" },
+                                            [
+                                              _c(
+                                                "div",
+                                                [
+                                                  _c(
+                                                    "label",
+                                                    { staticClass: "d-block" },
+                                                    [
+                                                      _vm._v(
+                                                        _vm._s(_vm.__("status"))
+                                                      ),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c("b-form-radio-group", {
+                                                    attrs: {
+                                                      options: [
+                                                        {
+                                                          text: _vm.__(
+                                                            "deactive"
+                                                          ),
+                                                          value: 0,
+                                                        },
+                                                        {
+                                                          text: _vm.__(
+                                                            "active"
+                                                          ),
+                                                          value: 1,
+                                                        },
+                                                      ],
+                                                      buttons: "",
+                                                      "button-variant":
+                                                        "outline-primary",
+                                                      required: "",
                                                     },
-                                                    expression: "form.status",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            ),
-                                          ]
-                                        ),
-                                      ]),
+                                                    model: {
+                                                      value: _vm.form.status,
+                                                      callback: function ($$v) {
+                                                        _vm.$set(
+                                                          _vm.form,
+                                                          "status",
+                                                          $$v
+                                                        )
+                                                      },
+                                                      expression: "form.status",
+                                                    },
+                                                  }),
+                                                ],
+                                                1
+                                              ),
+                                            ]
+                                          ),
+                                        ]
+                                      ),
                                     ]
                                   )
                                 : _vm._e(),

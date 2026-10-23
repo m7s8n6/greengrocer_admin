@@ -1,11 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
         static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <!-- Loading -->
         <div v-if="isLoadingData" class="text-center p-5">
@@ -44,14 +44,14 @@
                     </div>
 
                     <div class="row">
-                        <div class="form-group">
+                        <div class="form-group col-12">
                             <label for="question">{{ __('query') }}</label>
                             <i v-if="language.is_default" class="text-danger">*</i>
                             <input class="form-control" name="query" id="question"
                                 :required="language.is_default ? true : undefined"
                                 v-model="translations[language.id].question" :placeholder="__('query')">
                         </div>
-                        <div class="form-group ">
+                        <div class="form-group col-12">
                             <label for="answer">{{ __('answer') }}</label>
                             <i v-if="language.is_default" class="text-danger">*</i>
                             <textarea class="form-control" name="answer" id="answer"

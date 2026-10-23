@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('manage_withdrawal_requests') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -30,19 +30,21 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-primary d-flex align-items-center gap-2"
-                                    @click="create_new = true">
-                                    <i class="fa fa-plus"></i> {{ __('create_withdraw_request') }}
-                                </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                     <span>{{ __('filters') || 'Filters' }}</span>
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2" v-b-tooltip.hover
                                     :title="__('refresh')" @click="getWthdrawalRequests()">
                                     <i class="fa fa-refresh" aria-hidden="true"></i>
+                                    <span>{{ __('refresh') }}</span>
+                                </button>
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    @click="create_new = true">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{{ __('create_withdraw_request') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -73,9 +75,16 @@
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                 :bordered="false" :busy="isLoading" stacked="md" show-empty
                                 :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-order-table mb-0" small>
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
                                     <div class="text-center py-4">
-                                        <b-spinner class="align-middle" variant="dark"></b-spinner>
+                                        <b-spinner class="align-middle text-muted"></b-spinner>
                                     </div>
                                 </template>
                                 <template #head(amount)="row">
@@ -91,7 +100,7 @@
                                     <span v-else class="figma-status-pill bg-danger">{{ __('undefine') }}</span>
                                 </template>
                                 <template #cell(receipt_image)="row">
-                                    <img :src="row.item.receipt_image_url" height="40" class="rounded" />
+                                    <img :src="row.item.receipt_image_url" height="40" class="wr-receipt-thumb" />
                                 </template>
                                 <template #cell(created_at)="row">
                                     <div class="d-flex flex-column">
@@ -100,10 +109,13 @@
                                     </div>
                                 </template>
                                 <template #cell(message)="row">
-                                    <small class="d-inline-flex mb-0 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
-                                        style="cursor: pointer;" v-b-tooltip.hover :title="row.item.message">
+                                    <small :id="'bonus' + row.item.id"
+                                        class="wr-info-chip">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
+                                    <b-popover :target="'bonus' + row.item.id" triggers="hover" placement="left">
+                                        {{ row.item.message }}
+                                    </b-popover>
                                 </template>
                             </b-table>
                         </div>
@@ -111,10 +123,13 @@
                         <!-- Footer: Totals + Pagination -->
                         <div class="figma-table-footer flex-wrap gap-3">
                             <div class="d-flex align-items-center gap-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }}
-                                    <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
@@ -142,15 +157,15 @@ export default {
     data: function () {
         return {
             fields: [
-                { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc', class: 'text-center' },
-                { key: 'type', label: __('type'), sortable: true, class: 'text-center' },
-                { key: 'name', label: __('name'), sortable: true, class: 'text-center' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center' },
-                { key: 'remark', label: __('remark'), sortable: true, class: 'text-center' },
+                { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
+                { key: 'type', label: __('type'), sortable: true },
+                { key: 'name', label: __('name'), sortable: true },
+                { key: 'amount', label: __('amount'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'status', label: __('status'), sortable: true },
+                { key: 'remark', label: __('remark'), sortable: true },
                 { key: 'receipt_image', label: __('receipt_image'), sortable: true, class: 'text-center' },
-                { key: 'created_at', label: __('date'), sortable: true, class: 'text-center' },
+                { key: 'created_at', label: __('date'), sortable: true },
 
             ],
             totalRows: 1,
@@ -243,3 +258,25 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.wr-info-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    cursor: pointer;
+}
+
+.wr-receipt-thumb {
+    width: 40px;
+    object-fit: cover;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+}
+</style>

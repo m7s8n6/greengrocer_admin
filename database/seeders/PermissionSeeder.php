@@ -163,7 +163,20 @@ class PermissionSeeder extends Seeder
                     'manage_Notification_settings',
                     'manage_contact_us',
                     'manage_about_us',
-                    'manage_system_registration'
+                    'manage_system_registration',
+                    'theme_settings',
+                    'delivery_settings',
+                    'seller_delivery_boys',
+                    'sms_settings',
+                    'sms_templates_list',
+                    'sms_templates_update',
+                    'seo_settings_list',
+                    'seo_settings_create',
+                    'seo_settings_update',
+                    'seo_settings_delete',
+                    'deeplink_settings',
+                    'realtime_settings',
+                    'popup_offer'
                 ],
                 'category_name' => 'system',
                 'default_roles' => ['Super Admin', 'Admin']

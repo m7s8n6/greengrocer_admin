@@ -87,8 +87,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
 
 
 
@@ -438,25 +436,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -608,8 +587,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this5.isLoading = true;
@@ -1169,8 +1148,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end flex-wrap gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1188,12 +1180,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -1236,7 +1222,7 @@ var render = function () {
                       lang.is_default && _vm.languages.length > 1
                         ? _c(
                             "div",
-                            { staticClass: "mb-3" },
+                            { staticClass: "d-flex flex-wrap gap-2 mb-3" },
                             [
                               _c(
                                 "b-button",
@@ -1248,7 +1234,6 @@ var render = function () {
                                       modifiers: { hover: true },
                                     },
                                   ],
-                                  staticClass: "mr-2",
                                   attrs: {
                                     size: "sm",
                                     variant: "outline-primary",
@@ -1320,14 +1305,15 @@ var render = function () {
                         : _vm._e(),
                       _vm._v(" "),
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "form-group" }, [
-                          _c("label", [_vm._v(_vm._s(_vm.__("title")))]),
-                          _vm._v(" "),
-                          lang.is_default == 1
-                            ? _c("i", { staticClass: "text-danger" }, [
-                                _vm._v("*"),
-                              ])
-                            : _vm._e(),
+                        _c("div", { staticClass: "form-group col-md-6" }, [
+                          _c("label", [
+                            _vm._v(_vm._s(_vm.__("title")) + " "),
+                            lang.is_default == 1
+                              ? _c("i", { staticClass: "text-danger" }, [
+                                  _vm._v("*"),
+                                ])
+                              : _vm._e(),
+                          ]),
                           _vm._v(" "),
                           _c("input", {
                             directives: [
@@ -1361,16 +1347,15 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         lang.is_default == 1
-                          ? _c("div", { staticClass: "form-group" }, [
+                          ? _c("div", { staticClass: "form-group col-md-6" }, [
                               _c("label", [
-                                _vm._v(_vm._s(_vm.__("percentage"))),
+                                _vm._v(_vm._s(_vm.__("percentage")) + " "),
+                                lang.is_default
+                                  ? _c("i", { staticClass: "text-danger" }, [
+                                      _vm._v("*"),
+                                    ])
+                                  : _vm._e(),
                               ]),
-                              _vm._v(" "),
-                              lang.is_default
-                                ? _c("i", { staticClass: "text-danger" }, [
-                                    _vm._v("*"),
-                                  ])
-                                : _vm._e(),
                               _vm._v(" "),
                               _c("input", {
                                 directives: [
@@ -1406,47 +1391,63 @@ var render = function () {
                               }),
                               _vm._v(" "),
                               _vm.validationError
-                                ? _c("span", { staticClass: "error" }, [
-                                    _vm._v(_vm._s(_vm.validationError)),
-                                  ])
+                                ? _c(
+                                    "span",
+                                    {
+                                      staticClass:
+                                        "error text-danger small d-block mt-1",
+                                    },
+                                    [_vm._v(_vm._s(_vm.validationError))]
+                                  )
                                 : _vm._e(),
                             ])
                           : _vm._e(),
                         _vm._v(" "),
                         _vm.id && lang.is_default == 1
-                          ? _c("div", { staticClass: "form-group" }, [
-                              _c("label", [_vm._v(_vm._s(_vm.__("status")))]),
-                              _vm._v(" "),
-                              _c(
-                                "div",
-                                { staticClass: "col-md-9 text-left mt-1" },
-                                [
-                                  _c("b-form-radio-group", {
-                                    attrs: {
-                                      options: [
-                                        {
-                                          text: _vm.__("deactivate"),
-                                          value: 0,
-                                        },
-                                        { text: _vm.__("activate"), value: 1 },
-                                      ],
-                                      buttons: "",
-                                      "button-variant": "outline-primary",
-                                      required:
-                                        lang.is_default == 1 ? true : undefined,
-                                    },
-                                    model: {
-                                      value: _vm.status,
-                                      callback: function ($$v) {
-                                        _vm.status = $$v
+                          ? _c(
+                              "div",
+                              { staticClass: "form-group col-12 mb-0" },
+                              [
+                                _c("label", { staticClass: "d-block" }, [
+                                  _vm._v(_vm._s(_vm.__("status"))),
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "text-left mt-1" },
+                                  [
+                                    _c("b-form-radio-group", {
+                                      attrs: {
+                                        options: [
+                                          {
+                                            text: _vm.__("deactivate"),
+                                            value: 0,
+                                          },
+                                          {
+                                            text: _vm.__("activate"),
+                                            value: 1,
+                                          },
+                                        ],
+                                        buttons: "",
+                                        "button-variant": "outline-primary",
+                                        required:
+                                          lang.is_default == 1
+                                            ? true
+                                            : undefined,
                                       },
-                                      expression: "status",
-                                    },
-                                  }),
-                                ],
-                                1
-                              ),
-                            ])
+                                      model: {
+                                        value: _vm.status,
+                                        callback: function ($$v) {
+                                          _vm.status = $$v
+                                        },
+                                        expression: "status",
+                                      },
+                                    }),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            )
                           : _vm._e(),
                       ]),
                     ]
@@ -1496,7 +1497,7 @@ var render = function () {
           "div",
           {
             staticClass:
-              "page-heading d-flex justify-content-between align-items-center mb-4",
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
           },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -1535,7 +1536,7 @@ var render = function () {
         ),
         _vm._v(" "),
         _c("section", { staticClass: "section" }, [
-          _c("div", { staticClass: "figma-main-section-card" }, [
+          _c("div", { staticClass: "card figma-main-section-card" }, [
             _c(
               "div",
               { staticClass: "card-body p-0" },
@@ -1583,7 +1584,35 @@ var render = function () {
                       ]),
                     ]),
                     _vm._v(" "),
-                    _c("div", { staticClass: "d-flex gap-2" }, [
+                    _c("div", { staticClass: "d-flex flex-wrap gap-2" }, [
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass:
+                            "btn btn-figma-columns d-flex align-items-center gap-2",
+                          attrs: { title: _vm.__("refresh") },
+                          on: {
+                            click: function ($event) {
+                              return _vm.getRecords()
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-refresh" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
+                          ]),
+                        ]
+                      ),
+                      _vm._v(" "),
                       _c(
                         "button",
                         {
@@ -1601,58 +1630,38 @@ var render = function () {
                           _c("span", [_vm._v(_vm._s(_vm.__("add_tax")))]),
                         ]
                       ),
-                      _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          directives: [
-                            {
-                              name: "b-tooltip",
-                              rawName: "v-b-tooltip.hover",
-                              modifiers: { hover: true },
-                            },
-                          ],
-                          staticClass:
-                            "btn btn-figma-filter d-flex align-items-center gap-2",
-                          attrs: { title: _vm.__("refresh") },
-                          on: {
-                            click: function ($event) {
-                              return _vm.getRecords()
-                            },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-refresh" }),
-                          _vm._v(" "),
-                          _c("span", [
-                            _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
-                          ]),
-                        ]
-                      ),
                     ]),
                   ]
                 ),
                 _vm._v(" "),
-                _c("b-table", {
-                  staticClass: "figma-order-table mb-0",
+                _c("data-table", {
                   attrs: {
                     items: _vm.translatedTaxes,
                     fields: _vm.fields,
+                    busy: _vm.isLoading,
+                    "total-rows": _vm.totalRows,
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "page-options": _vm.pageOptions,
                     filter: _vm.filter,
                     "filter-included-fields": _vm.filterOn,
                     "sort-by": _vm.sortBy,
                     "sort-desc": _vm.sortDesc,
                     "sort-direction": _vm.sortDirection,
-                    bordered: false,
-                    busy: _vm.isLoading,
-                    stacked: "md",
-                    "show-empty": "",
-                    "tbody-tr-class": function () {
-                      return "figma-tr align-middle"
-                    },
-                    small: "",
                   },
                   on: {
+                    "update:currentPage": function ($event) {
+                      _vm.currentPage = $event
+                    },
+                    "update:current-page": function ($event) {
+                      _vm.currentPage = $event
+                    },
+                    "update:perPage": function ($event) {
+                      _vm.perPage = $event
+                    },
+                    "update:per-page": function ($event) {
+                      _vm.perPage = $event
+                    },
                     "update:sortBy": function ($event) {
                       _vm.sortBy = $event
                     },
@@ -1667,26 +1676,6 @@ var render = function () {
                     },
                   },
                   scopedSlots: _vm._u([
-                    {
-                      key: "table-busy",
-                      fn: function () {
-                        return [
-                          _c(
-                            "div",
-                            { staticClass: "text-center text-black my-2" },
-                            [
-                              _c("b-spinner", { staticClass: "align-middle" }),
-                              _vm._v(" "),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                              ]),
-                            ],
-                            1
-                          ),
-                        ]
-                      },
-                      proxy: true,
-                    },
                     {
                       key: "cell(id)",
                       fn: function (row) {
@@ -1806,58 +1795,6 @@ var render = function () {
               ],
               1
             ),
-            _vm._v(" "),
-            _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
-              _c(
-                "div",
-                { staticClass: "d-flex align-items-center gap-2" },
-                [
-                  _c("label", { staticClass: "showing-results-text mb-0" }, [
-                    _vm._v(_vm._s(_vm.__("per_page"))),
-                  ]),
-                  _vm._v(" "),
-                  _c("b-form-select", {
-                    staticStyle: { width: "auto" },
-                    attrs: { options: _vm.pageOptions, size: "sm" },
-                    model: {
-                      value: _vm.perPage,
-                      callback: function ($$v) {
-                        _vm.perPage = $$v
-                      },
-                      expression: "perPage",
-                    },
-                  }),
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "d-flex align-items-center gap-3" },
-                [
-                  _c("b-pagination", {
-                    staticClass: "figma-pagination mb-0",
-                    attrs: {
-                      "total-rows": _vm.totalRows,
-                      "per-page": _vm.perPage,
-                      align: "right",
-                      "hide-goto-end-buttons": "",
-                      "hide-ellipsis": "",
-                      "prev-text": "<",
-                      "next-text": ">",
-                    },
-                    model: {
-                      value: _vm.currentPage,
-                      callback: function ($$v) {
-                        _vm.currentPage = $$v
-                      },
-                      expression: "currentPage",
-                    },
-                  }),
-                ],
-                1
-              ),
-            ]),
           ]),
         ]),
       ]),

@@ -4,31 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL\Platforms\Keywords;
 
-use Doctrine\Deprecations\Deprecation;
-
 use function array_merge;
 
 /**
  * MariaDB 12.3 reserved keywords list.
+ *
+ * @deprecated
  */
-class MariaDb123Keywords extends MariaDb117Keywords
+class MariaDB123Keywords extends MariaDB117Keywords
 {
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated
-     */
-    public function getName(): string
-    {
-        Deprecation::triggerIfCalledFromOutside(
-            'doctrine/dbal',
-            'https://github.com/doctrine/dbal/pull/5433',
-            'MariaDb123Keywords::getName() is deprecated.',
-        );
-
-        return 'MariaDb123';
-    }
-
     /**
      * {@inheritDoc}
      *

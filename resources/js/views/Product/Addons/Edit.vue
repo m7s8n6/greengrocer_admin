@@ -1,11 +1,11 @@
 <template>
     <b-modal :key="id" ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop
         no-fade static size="lg">
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
 
         <form ref="my-form" @submit.prevent="saveRecord" novalidate>
@@ -16,7 +16,7 @@
 
                     <div class="row align-items-end">
                         <div class="form-group col-md-6">
-                            <label class="d-block mb-2">{{ __('name') }}<i class="text-danger" v-if="lang.is_default">*</i></label>
+                            <label class="d-block mb-2">{{ __('name') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="text" class="form-control" v-model="form[lang.id].name"
                                 :placeholder="__('name')" :required="lang.is_default ? true : undefined">
                         </div>
@@ -30,7 +30,7 @@
                     <!-- Group behaviour (not translatable; applies once to the whole group) -->
                     <div class="row align-items-end" v-if="lang.is_default">
                         <div class="form-group col-md-6">
-                            <label class="d-block mb-2">{{ __('type') || 'Type' }}<i class="text-danger">*</i></label>
+                            <label class="d-block mb-2">{{ __('type') || 'Type' }} <i class="text-danger">*</i></label>
                             <b-form-radio-group v-model="type" :options="[
                                 { text: __('free') || 'Free', value: 'free' },
                                 { text: __('paid') || 'Paid', value: 'paid' },
@@ -68,8 +68,8 @@
                     </div>
 
                     <div class="form-group" v-if="id && lang.is_default">
-                        <label>{{ __('status') }}</label>
-                        <div class="col-md-9 text-left mt-1">
+                        <label class="d-block">{{ __('status') }}</label>
+                        <div class="text-left mt-1">
                             <b-form-radio-group v-model="status" :options="[
                                 { text: __('deactivate'), value: 0 },
                                 { text: __('activate'), value: 1 },
@@ -77,29 +77,29 @@
                         </div>
                     </div>
 
-                    <hr>
+                    <hr class="addon-divider">
 
                     <!-- Options: price/type/add/remove only managed on the default language tab;
                          every other tab just translates the name of each already-added option. -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="mb-0">{{ __('options') || 'Options' }}</label>
+                        <label class="mb-0 addon-options-title">{{ __('options') || 'Options' }}</label>
                         <b-button v-if="lang.is_default" size="sm" variant="outline-primary" @click="addOption">
                             <i class="fa fa-plus"></i> {{ __('add_option') || 'Add Option' }}
                         </b-button>
                     </div>
 
                     <div v-for="(option, index) in options" :key="option._key"
-                        class="d-flex gap-2 align-items-center mb-2">
-                        <input type="text" class="form-control" v-model="option.form[lang.id].name"
+                        class="addon-option-row d-flex gap-2 align-items-center mb-2">
+                        <input type="text" class="form-control addon-option-name" v-model="option.form[lang.id].name"
                             :placeholder="__('option_name') || 'Option name (e.g. Extra Cheese)'"
                             :required="lang.is_default ? true : undefined">
 
                         <template v-if="lang.is_default">
                             <input v-if="type === 'paid'" type="number" min="0.01" step="0.01"
-                                class="form-control" style="max-width: 140px;" v-model.number="option.price"
+                                class="form-control addon-option-price" v-model.number="option.price"
                                 :placeholder="__('price') || 'Price'" required>
                             <input v-if="type === 'paid'" type="number" min="0" step="0.01" :max="option.price"
-                                class="form-control" style="max-width: 160px;" v-model.number="option.discounted_price"
+                                class="form-control addon-option-price addon-option-discount" v-model.number="option.discounted_price"
                                 :placeholder="__('discounted_price') || 'Discounted Price'">
                             <b-button size="sm" variant="outline-danger" @click="removeOption(index)"
                                 :disabled="options.length === 1">
@@ -394,3 +394,46 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.addon-divider {
+    border-top-color: var(--ui-border);
+    margin: 8px 0 16px;
+}
+
+.addon-options-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.addon-option-name {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.addon-option-price {
+    flex: 0 1 140px;
+    min-width: 0;
+}
+
+.addon-option-discount {
+    flex-basis: 160px;
+}
+
+@media (max-width: 575.98px) {
+    .addon-option-row {
+        flex-wrap: wrap;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed var(--ui-border);
+    }
+
+    .addon-option-name {
+        flex-basis: 100%;
+    }
+
+    .addon-option-price {
+        flex: 1 1 0;
+    }
+}
+</style>

@@ -1,8 +1,13 @@
 <template>
     <div id="app">
-        <div class="global-announcement-banner">
+        <div class="global-announcement-banner" role="note">
             <i class="fa fa-exclamation-circle"></i>
-            <span>{{ __('global_attributes_deprecation_notice') || 'Global attributes and custom fields-product are being deprecated in an upcoming update. Sellers will need to create their own attributes and custom fields-product - please replace any global attribute and custom fields-product currently used on your products.' }}</span>
+            <div class="announcement-ticker">
+                <div class="announcement-track">
+                    <span>{{ announcementText }}</span>
+                    <span aria-hidden="true">{{ announcementText }}</span>
+                </div>
+            </div>
         </div>
         <div id="sidebar" class="active">
             <div class="sidebar-wrapper active">
@@ -27,11 +32,6 @@
                 <div class="sidebar-menu">
                     <ul class="menu">
 
-                        <li class="sidebar-item sidebar-search">
-                            <b-form-input v-model="search" type="search" :placeholder="__('search')"
-                                v-on:keyup="filterItem" v-on:search="filterItem"></b-form-input>
-                        </li>
-
                         <!-- MODULES Section -->
                         <li class="sidebar-title text-muted text-uppercase"
                             style="padding: 0.5rem 1.5rem 0.5rem 1.5rem; font-size: 0.75rem; font-weight: 700; letter-spacing: .05rem; list-style: none;">
@@ -41,20 +41,22 @@
                         <template v-for="item in modulesSidebarItems">
                             <li class="sidebar-item"
                                 :class="{ 'active': isActive(item.url) || subIsActive(item), 'has-sub': isHasSub(item) }"
-                                v-if="item.role == true ? $role('Super Admin') : (item.permission && $can(item.permission)) || (item.permission === null && isHasSub(item) && hasAnySubmenuPermission(item))">
+                                v-if="item.role == true ? $role('Super Admin') : (item.permission && $can(item.permission)) || (item.permission === null && isHasSub(item) && hasAnySubmenuPermission(item)) || (item.settings_hub && hasAnySettingsPermission())">
 
                                 <template v-if="isHasSub(item)">
                                     <a class="sidebar-link">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
+                                        <span class="pending-dot" v-if="hasPending(item)"></span>
                                     </a>
                                     <ul class="submenu" :class="{ 'active': subIsActive(item) }">
                                         <template v-for="sub in item.submenu">
                                             <li class="submenu-item" :class="{ 'active': isActive(sub.url) }"
                                                 :key="sub.key"
                                                 v-if="sub.role ? $role('Super Admin') : sub.permission && $can(sub.permission)">
-                                                <router-link :to="sub.url" @click="closeSideBarMenu()">
+                                                <router-link :to="sub.url" @click.native="closeSideBarMenu()">
                                                     {{ sub.name }}
+                                                    <span class="pending-dot" v-if="hasPending(sub)"></span>
                                                 </router-link>
                                             </li>
                                         </template>
@@ -62,9 +64,10 @@
                                 </template>
 
                                 <template v-else>
-                                    <router-link class="sidebar-link" :to="item.url" @click="closeSideBarMenu()">
+                                    <router-link class="sidebar-link" :to="item.url" @click.native="closeSideBarMenu()">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
+                                        <span class="pending-dot" v-if="hasPending(item)"></span>
                                     </router-link>
                                 </template>
                             </li>
@@ -79,20 +82,22 @@
                         <template v-for="item in generalSidebarItems">
                             <li class="sidebar-item"
                                 :class="{ 'active': isActive(item.url) || subIsActive(item), 'has-sub': isHasSub(item) }"
-                                v-if="item.role == true ? $role('Super Admin') : (item.permission && $can(item.permission)) || (item.permission === null && isHasSub(item) && hasAnySubmenuPermission(item))">
+                                v-if="item.role == true ? $role('Super Admin') : (item.permission && $can(item.permission)) || (item.permission === null && isHasSub(item) && hasAnySubmenuPermission(item)) || (item.settings_hub && hasAnySettingsPermission())">
 
                                 <template v-if="isHasSub(item)">
                                     <a class="sidebar-link">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
+                                        <span class="pending-dot" v-if="hasPending(item)"></span>
                                     </a>
                                     <ul class="submenu" :class="{ 'active': subIsActive(item) }">
                                         <template v-for="sub in item.submenu">
                                             <li class="submenu-item" :class="{ 'active': isActive(sub.url) }"
                                                 :key="sub.key"
                                                 v-if="sub.role ? $role('Super Admin') : sub.permission && $can(sub.permission)">
-                                                <router-link :to="sub.url" @click="closeSideBarMenu()">
+                                                <router-link :to="sub.url" @click.native="closeSideBarMenu()">
                                                     {{ sub.name }}
+                                                    <span class="pending-dot" v-if="hasPending(sub)"></span>
                                                 </router-link>
                                             </li>
                                         </template>
@@ -100,9 +105,10 @@
                                 </template>
 
                                 <template v-else>
-                                    <router-link class="sidebar-link" :to="item.url" @click="closeSideBarMenu()">
+                                    <router-link class="sidebar-link" :to="item.url" @click.native="closeSideBarMenu()">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
+                                        <span class="pending-dot" v-if="hasPending(item)"></span>
                                     </router-link>
                                 </template>
                             </li>
@@ -146,11 +152,21 @@ export default {
     created() {
         this.closeSideBarMenu();
         this.checkPermissions();
+        this.fetchPendingCounts();
+        this.pendingTimer = setInterval(this.fetchPendingCounts, 60000);
+    },
+    beforeDestroy() {
+        clearInterval(this.pendingTimer);
+        if (this.bannerObserver) this.bannerObserver.disconnect();
     },
     watch: {
-        '$route': 'checkPermissions'
+        '$route': function () {
+            this.checkPermissions();
+            this.fetchPendingCounts();
+        }
     },
     mounted() {
+        this.observeBannerHeight();
         if (window.localStorage.getItem('lang')) {
             this.lang = window.localStorage.getItem('lang');
             console.log(this.lang);
@@ -198,12 +214,9 @@ export default {
                 }
             })
         }
-        window.addEventListener('DOMContentLoaded', (event) => {
-            var w = window.innerWidth;
-            if (w < 1200) {
-                document.getElementById('sidebar')?.classList?.remove('active');
-            }
-        });
+        if (window.innerWidth < 1200) {
+            document.getElementById('sidebar')?.classList?.remove('active');
+        }
         // Update backdrop when sidebar opens/closes on small screens
         const updateSidebarBackdrop = () => {
             const sidebar = document.getElementById('sidebar');
@@ -249,7 +262,7 @@ export default {
 
         // Scroll into active sidebar
         if (document.querySelector('.sidebar-item.active')) {
-            document.querySelector('.sidebar-item.active').scrollIntoView(false)
+            this.scrollSidebarToActive()
         }
 
 
@@ -257,9 +270,10 @@ export default {
     data: function () {
         return {
             lang: 'en',
-            search: '',
             isLoading: false,
             suspecious: null,
+            pendingCounts: {},
+            pendingTimer: null,
             sidebarItems: [
                 {
                     name: __('dashboard'),
@@ -303,12 +317,6 @@ export default {
                             url: '/manage_categories',
                             permission: 'category_list',
                         },
-                        {
-                            name: __('categories_order'),
-                            icon: 'grid-fill',
-                            url: '/categories_order',
-                            permission: 'manage_categories_order',
-                        },
                     ]
                 },
                 {
@@ -332,6 +340,7 @@ export default {
                             name: __('approve_requests'),
                             icon: 'grid-fill',
                             url: '/approve_requests',
+                            pending_key: 'product_approvals',
                             permission: 'approve_requests',
                         },
                         {
@@ -411,6 +420,7 @@ export default {
                             name: __('seller_requests'),
                             icon: 'grid-fill',
                             url: '/registered_sellers',
+                            pending_key: 'seller_requests',
                             permission: 'seller_requests',
                         },
                         {
@@ -473,7 +483,7 @@ export default {
                             name: __('manage_popup_offer'),
                             icon: 'grid-fill',
                             url: '/popup',
-                            permission: 'new_offer_image_list',
+                            permission: 'popup_offer',
                         }
                     ]
                 },
@@ -542,13 +552,26 @@ export default {
                     name: __('theme_settings'),
                     icon: 'paint-brush',
                     url: '/theme-settings',
-                    permission: 'manage_store_settings',
+                    permission: 'theme_settings',
                 },
                 {
                     name: __('delivery_settings'),
                     icon: 'truck',
-                    url: '/delivery_settings',
-                    permission: 'manage_time_slots',
+                    permission: null,
+                    submenu: [
+                        {
+                            name: __('delivery_settings'),
+                            icon: 'grid-fill',
+                            url: '/delivery_settings',
+                            permission: 'delivery_settings',
+                        },
+                        {
+                            name: 'Seller Delivery Boys',
+                            icon: 'grid-fill',
+                            url: '/auto-assign-settings',
+                            permission: 'seller_delivery_boys',
+                        },
+                    ]
                 },
                 {
                     name: __('delivery_boys'),
@@ -566,6 +589,7 @@ export default {
                             name: __('dlivery_boy_requests'),
                             icon: 'grid-fill',
                             url: '/registered_delivery_boys',
+                            pending_key: 'delivery_boy_requests',
                             permission: 'delivery_boy_list',
                         },
                         {
@@ -642,108 +666,14 @@ export default {
                 },
 
                 {
-                    name: __('system'),
-                    icon: 'wrench',
+                    // Single entry for every setting page; the pages themselves are listed as cards on
+                    // /system_settings (SettingsHub.vue). Replaces the old "System" and "Web Settings" submenus.
+                    name: __('settings'),
+                    icon: 'cog',
+                    url: '/system_settings',
                     permission: null,
                     is_general: true,
-                    submenu: [
-                        {
-                            name: __('store_settings'),
-                            icon: 'grid-fill',
-                            url: '/store_settings',
-                            permission: 'manage_store_settings',
-                        },
-                        {
-                            name: __('payment_methods'),
-                            icon: 'grid-fill',
-                            url: '/payment_methods',
-                            permission: 'manage_payment_methods',
-                        },
-                        {
-                            name: __('additional_charge'),
-                            icon: 'grid-fill',
-                            url: '/additional_charges',
-                            permission: 'additional_charges_list',
-                        },
-                        {
-                            name: __('contact_us'),
-                            icon: 'grid-fill',
-                            url: '/contact_us',
-                            permission: 'manage_contact_us',
-                        },
-                        {
-                            name: __('about_us'),
-                            icon: 'grid-fill',
-                            url: '/about_us',
-                            permission: 'manage_about_us',
-                        },
-
-                        {
-                            name: __('firebase_settings'),
-                            icon: 'grid-fill',
-                            url: '/firebase-settings',
-                            permission: 'manage_Notification_settings',
-                        },
-                        {
-                            name: __('notification_templates'),
-                            icon: 'grid-fill',
-                            url: '/notification-templates',
-                            permission: 'manage_Notification_settings',
-                        },
-                        {
-                            name: __('sms_settings'),
-                            icon: 'grid-fill',
-                            url: '/sms-settings',
-                            permission: 'manage_store_settings',
-                        },
-                        {
-                            name: __('sms_templates'),
-                            icon: 'grid-fill',
-                            url: '/sms-templates',
-                            permission: 'manage_store_settings',
-                        },
-                        {
-                            name: __('seo_settings'),
-                            icon: 'grid-fill',
-                            url: '/seo-settings',
-                            permission: 'manage_store_settings',
-                        },
-                        {
-                            name: __('system_registration'),
-                            icon: 'grid-fill',
-                            url: '/purchase_code',
-                            permission: 'manage_system_registration',
-                        },
-                        {
-                            name: __('system_updater'),
-                            icon: 'grid-fill',
-                            url: '/system_updater',
-                            permission: 'manage_store_settings',
-                        },
-
-                    ],
-                },
-
-                {
-                    name: __('web_settings'),
-                    icon: 'gear',
-                    permission: null,
-                    is_general: true,
-                    submenu: [
-                        {
-                            name: __('general_web_settings'),
-                            icon: 'grid-fill',
-                            url: '/general_settings',
-                            permission: 'general_settings',
-                        },
-                        {
-                            name: __('social_media'),
-                            icon: 'grid-fill',
-                            url: '/social_media',
-                            permission: 'manage_social_media_list',
-                        },
-
-                    ]
+                    settings_hub: true,
                 },
 
                 {
@@ -765,7 +695,6 @@ export default {
                         }
                     ]
                 },
-
                 {
                     name: __('subscriptions'),
                     icon: 'credit-card',
@@ -872,6 +801,7 @@ export default {
                             name: __('product_requests'),
                             icon: 'grid-fill',
                             url: '/product_requests',
+                            pending_key: 'product_requests',
                             permission: 'product_request_list',
                         },
                         {
@@ -944,6 +874,26 @@ export default {
                     is_general: true
                 },
             ],
+            // Former "System" / "Web Settings" submenu pages, now reached through the Settings hub.
+            // Kept here so checkPermissions() still guards them and the Settings item stays active on them.
+            settingsHubPages: [
+                { url: '/store_settings', permission: 'manage_store_settings' },
+                { url: '/payment_methods', permission: 'manage_payment_methods' },
+                { url: '/additional_charges', permission: 'additional_charges_list' },
+                { url: '/contact_us', permission: 'manage_contact_us' },
+                { url: '/about_us', permission: 'manage_about_us' },
+                { url: '/firebase-settings', permission: 'manage_Notification_settings' },
+                { url: '/notification-templates', permission: 'manage_Notification_settings' },
+                { url: '/sms-settings', permission: 'sms_settings' },
+                { url: '/deeplink-settings', permission: 'deeplink_settings' },
+                { url: '/realtime-settings', permission: 'realtime_settings' },
+                { url: '/sms-templates', permission: 'sms_templates_list' },
+                { url: '/seo-settings', permission: 'seo_settings_list' },
+                { url: '/purchase_code', permission: 'manage_system_registration' },
+                { url: '/system_updater', permission: 'manage_store_settings' },
+                { url: '/general_settings', permission: 'general_settings' },
+                { url: '/social_media', permission: 'manage_social_media_list' },
+            ],
             databasedownloadBtn: [
                 {
                     name: __('database_backup'),
@@ -956,11 +906,14 @@ export default {
         }
     },
     computed: {
+        announcementText() {
+            return __('global_attributes_deprecation_notice') || 'Global attributes and custom fields-product are being deprecated in an upcoming update. Sellers will need to create their own attributes and custom fields-product - please replace any global attribute and custom fields-product currently used on your products.';
+        },
         modulesSidebarItems() {
             const activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
             // Addons only makes sense for the Food Delivery module (id 4) - strip it out of the
-            // Products submenu for every other module regardless of the bucket-level filtering below.
-            const items = this.sidebarItems
+            // Products submenu for every other module.
+            return this.sidebarItems
                 .filter(item => !item.is_general)
                 .map(item => {
                     if (activeModuleId !== 4 && item.submenu) {
@@ -968,39 +921,6 @@ export default {
                     }
                     return item;
                 });
-
-            // Allowed modules sidebar items configuration
-            const moduleMenusConfig = {
-                1: null,
-                2: ['dashboard', 'orders', 'self_pickup_orders', 'categories', 'products', 'stock_management', 'home_sliders', 'offer_image', 'promo_code', 'featured_sections', 'blogs', 'sellers', 'return_requests', 'custom_fields', 'withdrawal_requests', 'theme_settings']
-            };
-
-            const allowedMenus = moduleMenusConfig[activeModuleId];
-            if (!allowedMenus) {
-                return items;
-            }
-
-            return items.filter(item => {
-                return allowedMenus.some(allowed => {
-                    if (allowed === 'dashboard' && item.url === '/dashboard') return true;
-                    if (allowed === 'orders' && item.url === '/orders') return true;
-                    if (allowed === 'self_pickup_orders' && item.url === '/self_pickup_orders') return true;
-                    if (allowed === 'categories' && item.submenu && item.submenu.some(s => s.url.includes('categories'))) return true;
-                    if (allowed === 'products' && item.submenu && item.submenu.some(s => s.url.includes('product') || s.url.includes('brand') || s.url.includes('attribute') || s.url.includes('unit') || s.url === '/media')) return true;
-                    if (allowed === 'stock_management' && item.url === '/manage_stock') return true;
-                    if (allowed === 'home_sliders' && item.submenu && item.submenu.some(s => s.url.includes('slider'))) return true;
-                    if (allowed === 'offer_image' && item.submenu && item.submenu.some(s => s.url.includes('offer') || s.url.includes('popup'))) return true;
-                    if (allowed === 'promo_code' && item.submenu && item.submenu.some(s => s.url.includes('promo'))) return true;
-                    if (allowed === 'featured_sections' && item.submenu && item.submenu.some(s => s.url.includes('sections'))) return true;
-                    if (allowed === 'blogs' && item.submenu && item.submenu.some(s => s.url.includes('blog'))) return true;
-                    if (allowed === 'sellers' && item.submenu && item.submenu.some(s => s.url.includes('seller'))) return true;
-                    if (allowed === 'return_requests' && item.url === '/return_requests') return true;
-                    if (allowed === 'custom_fields' && item.url === '/custom_fields/seller') return true;
-                    if (allowed === 'withdrawal_requests' && item.url === '/withdrawal_requests') return true;
-                    if (allowed === 'theme_settings' && item.url === '/theme-settings') return true;
-                    return false;
-                });
-            });
         },
         generalSidebarItems() {
             return this.sidebarItems.filter(item => item.is_general);
@@ -1010,29 +930,48 @@ export default {
         }
     },
     methods: {
-
-        filterItem() {
-
-            var filter = this.search;
-            $(`.sidebar-menu li:not(.sidebar-search):not(.sidebar-title)`).each(function (index, element) {
-                const item = $(element);
-                const parentListIsNested = item.closest('ul').hasClass('submenu');
-
-                if (item.text().match(new RegExp(filter, 'gi'))) {
-                    item.fadeIn();
-                    if (parentListIsNested) {
-                        item.closest('ul').removeClass('active');
-                    }
-                } else {
-                    item.fadeOut();
-                    if (parentListIsNested) {
-                        item.closest('ul').addClass('active');
-                    }
-                }
-            });
+        // Bring the active menu item into view by scrolling only the sidebar list. scrollIntoView()
+        // also scrolled the page itself, which on phones (off-canvas sidebar) hid the top bar.
+        scrollSidebarToActive() {
+            const item = document.querySelector('#sidebar .sidebar-item.active');
+            const wrapper = document.querySelector('#sidebar .sidebar-wrapper');
+            if (!item || !wrapper) return;
+            const offset = item.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
+            wrapper.scrollTop += offset - wrapper.clientHeight / 2;
         },
+
+        // The announcement banner wraps to several lines on phones, so its height is not a fixed 40/72px.
+        // Publish the real height as --banner-h so the sidebar and content offsets always clear it.
+        observeBannerHeight() {
+            const banner = document.querySelector('.global-announcement-banner');
+            if (!banner) return;
+            const apply = () => document.documentElement.style.setProperty('--banner-h', banner.offsetHeight + 'px');
+            apply();
+            if (window.ResizeObserver) {
+                this.bannerObserver = new ResizeObserver(apply);
+                this.bannerObserver.observe(banner);
+            } else {
+                window.addEventListener('resize', apply);
+            }
+        },
+
+        fetchPendingCounts() {
+            axios.get(this.$apiUrl + '/pending_counts').then((response) => {
+                this.pendingCounts = (response.data && response.data.data) || {};
+            }).catch(() => { });
+        },
+
+        // Red dot for a menu entry: its own pending_key, or any of its sub-entries (parent menus).
+        hasPending(entry) {
+            if (entry.pending_key) {
+                return (this.pendingCounts[entry.pending_key] || 0) > 0;
+            }
+            return Array.isArray(entry.submenu) && entry.submenu.some(sub => this.hasPending(sub));
+        },
+
         subIsActive(item) {
-            const paths = Array.isArray(item.submenu) ? item.submenu : [];
+            // The Settings hub item has no submenu: it is active on the hub and on every page it links to.
+            const paths = Array.isArray(item.submenu) ? item.submenu : (item.settings_hub ? this.settingsHubPages : []);
             return paths.some(path => {
                 return this.$route.path.indexOf(path.url) === 0;
             });
@@ -1050,6 +989,12 @@ export default {
                 }
             }
             return false;
+        },
+        // Settings hub item: visible when the user can open at least one page listed on the hub.
+        hasAnySettingsPermission() {
+            const extra = ['manage_time_slots', 'manage_privacy_policy', 'manage_privacy_policy_seller_app', 'manage_privacy_policy_delivery_boy'];
+            return this.settingsHubPages.some(page => page.permission && this.$can(page.permission))
+                || extra.some(permission => this.$can(permission));
         },
         hasAnySubmenuPermission(item) {
             if (!item.submenu || item.submenu.length === 0) {
@@ -1078,6 +1023,13 @@ export default {
                     if (menu.url === current_path) {
                         permission = menu.permission;
                     }
+                }
+            });
+
+            // Pages reached through the Settings hub keep their sidebar permission guard.
+            this.settingsHubPages.forEach(page => {
+                if (page.url === current_path) {
+                    permission = page.permission;
                 }
             });
 
@@ -1149,39 +1101,8 @@ export default {
     opacity: 0;
 }
 
-.global-announcement-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: var(--figma-primary-light, #FEF5E6);
-    color: var(--figma-primary, #FF9900);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-     z-index:1051;
-}
-
-/* body.theme-dark forces color:#F1F5F9 !important on every span/div/p globally (dark-mode
-   typography reset in custom-egrocer.scss) - that beats this banner's own color rule since
-   .global-announcement-banner alone has lower specificity, making the orange text invisible
-   against the near-white banner background. Re-declaring with the same body.theme-dark prefix
-   matches its specificity and wins on source order. */
-body.theme-dark .global-announcement-banner,
-body.theme-dark .global-announcement-banner span,
-body.theme-dark .global-announcement-banner i {
-    color: var(--figma-primary, #FF9900) !important;
-}
-
-body.theme-dark .global-announcement-banner {
-    background: #2A2013 !important;
-}
+/* Announcement banner, sidebar/#main offsets and sticky header: shared, see custom-egrocer.scss
+   ("Announcement ticker & sticky header"). */
 
 /* Swap sidebar logo for the dark-theme variant (Store Setting > Dark Logo) while the admin
    is in dark mode - .logo-dark only renders in the DOM when that setting has a value. */
@@ -1195,46 +1116,5 @@ body.theme-dark .logo-dark {
     display: block;
 }
 
-/* .sidebar-wrapper is position:fixed;top:0 in the base theme CSS, so it ignores normal document
-   flow entirely - inserting the banner before it in the DOM doesn't push it down like it does
-   for #main. Offset it explicitly by the banner's own height (kept in sync above) instead.
-   The base rule also sets height:100vh alongside top/bottom - since top/height/bottom together
-   are over-constrained, height wins and bottom gets dropped, so only changing top (without also
-   shrinking height) made the sidebar 40px taller than the viewport. It still has its own
-   overflow-y:auto, so that overflow silently became an internal scroll area - a page scroll
-   gesture landing over the sidebar dragged its own content (logo) up out of view instead of
-   scrolling the page, looking like the sidebar got "cut from above". Constraining height too
-   fixes it. */
-.sidebar-wrapper {
-    top: 40px !important;
-    height: calc(100vh - 40px) !important;
-}
-/* Now that the banner is position:fixed (out of document flow), #main no longer gets pushed
-   down by it naturally the way it did before - compensate with an explicit top offset so page
-   content starts below the banner instead of underneath it. */
-#main {
-    margin-top: 40px !important;
-}
-
-/* On narrow screens the message wraps to 2-3 lines - the fixed 40px height above was clipping
-   it and spilling the overflow onto the sidebar below. Let the banner grow with its content
-   instead, and bump the sidebar/#main offsets to match (kept in sync with the banner's own
-   min-height + padding below). */
-@media (max-width: 767px) {
-    .global-announcement-banner {
-        height: auto;
-        min-height: 40px;
-        padding: 8px 16px;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    .sidebar-wrapper {
-        top: 72px !important;
-        height: calc(100vh - 72px) !important;
-    }
-    #main {
-        margin-top: 72px !important;
-    }
-}
 </style>
 

@@ -311,6 +311,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 
 
@@ -738,49 +739,121 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4);
       }))();
     },
-    // Edit plan - populate form with plan data and check for conflicts
-    editPlan: function editPlan(plan) {
+    // Active / deactive switch on the card. Turning a plan ON is blocked while free-delivery time
+    // slots exist (same rule as creating / editing a plan); turning it OFF is always allowed.
+    togglePlanStatus: function togglePlanStatus(plan) {
       var _this8 = this;
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
-        var hasFreeDeliveryTimeSlots, map, def;
+        var newStatus, payload;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                _this8.activeLanguageTab = 0;
-
-                // Check for free delivery time slots before opening edit modal
-                _context5.next = 3;
+                newStatus = plan.status == 1 ? 0 : 1;
+                _context5.t0 = newStatus === 1;
+                if (!_context5.t0) {
+                  _context5.next = 6;
+                  break;
+                }
+                _context5.next = 5;
                 return _this8.checkFreeDeliveryTimeSlots();
-              case 3:
-                hasFreeDeliveryTimeSlots = _context5.sent;
-                if (!hasFreeDeliveryTimeSlots) {
-                  _context5.next = 7;
+              case 5:
+                _context5.t0 = _context5.sent;
+              case 6:
+                if (!_context5.t0) {
+                  _context5.next = 9;
                   break;
                 }
                 _this8.$swal.fire({
                   title: __('cannot_create_subscription_plan'),
-                  html: "\n                        <div class=\"text-left\">\n                            <p>".concat(__('free_delivery_time_slots_exist_message'), "</p>\n                            <p class=\"mt-3\">\n                                <strong>").concat(__('please_remove_free_delivery_time_slots_first'), "</strong>\n                            </p>\n                            <p class=\"mt-3\">\n                                <a href=\"/delivery_settings\" class=\"btn btn-primary btn-sm\">\n                                    ").concat(__('go_to_delivery_settings'), " <i class=\"fa fa-external-link-alt\"></i>\n                                </a>\n                            </p>\n                        </div>\n                    "),
+                  html: "\n                        <div class=\"text-left\">\n                            <p>".concat(__('free_delivery_time_slots_exist_message'), "</p>\n                            <p class=\"mt-3\"><strong>").concat(__('please_remove_free_delivery_time_slots_first'), "</strong></p>\n                        </div>\n                    "),
                   icon: 'warning',
                   confirmButtonText: __('ok'),
-                  confirmButtonColor: '#37a279',
+                  confirmButtonColor: 'var(--theme-primary-500)',
                   width: '600px'
                 });
                 return _context5.abrupt("return");
+              case 9:
+                // Same API and payload as the edit form's Save (subscription_plans/update/{id}); only the
+                // status differs, everything else is the plan's current data.
+                payload = {
+                  days: plan.days,
+                  price: plan.price,
+                  discounted_price: plan.discounted_price || null,
+                  free_delivery_above: plan.free_delivery_above || null,
+                  ios_product_id: plan.ios_product_id || null,
+                  status: newStatus,
+                  translations: (plan.translations || []).map(function (t) {
+                    return {
+                      language_id: t.language_id,
+                      name: t.name || ''
+                    };
+                  })
+                };
+                _this8.isLoading = true;
+                axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this8.$apiUrl + "/subscription_plans/update/".concat(plan.id), payload).then(function (response) {
+                  if (response.data.status === 1) {
+                    _this8.showMessage('success', response.data.message);
+                    _this8.getPlans();
+                  } else {
+                    _this8.isLoading = false;
+                    _this8.showError(response.data.message);
+                  }
+                })["catch"](function () {
+                  _this8.isLoading = false;
+                  _this8.showError(__('something_went_wrong'));
+                });
+              case 12:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }))();
+    },
+    // Edit plan - populate form with plan data and check for conflicts
+    editPlan: function editPlan(plan) {
+      var _this9 = this;
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+        var hasFreeDeliveryTimeSlots, map, def;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                _this9.activeLanguageTab = 0;
+
+                // Check for free delivery time slots before opening edit modal
+                _context6.next = 3;
+                return _this9.checkFreeDeliveryTimeSlots();
+              case 3:
+                hasFreeDeliveryTimeSlots = _context6.sent;
+                if (!hasFreeDeliveryTimeSlots) {
+                  _context6.next = 7;
+                  break;
+                }
+                _this9.$swal.fire({
+                  title: __('cannot_create_subscription_plan'),
+                  html: "\n                        <div class=\"text-left\">\n                            <p>".concat(__('free_delivery_time_slots_exist_message'), "</p>\n                            <p class=\"mt-3\">\n                                <strong>").concat(__('please_remove_free_delivery_time_slots_first'), "</strong>\n                            </p>\n                            <p class=\"mt-3\">\n                                <a href=\"/delivery_settings\" class=\"btn btn-primary btn-sm\">\n                                    ").concat(__('go_to_delivery_settings'), " <i class=\"fa fa-external-link-alt\"></i>\n                                </a>\n                            </p>\n                        </div>\n                    "),
+                  icon: 'warning',
+                  confirmButtonText: __('ok'),
+                  confirmButtonColor: 'var(--theme-primary-500)',
+                  width: '600px'
+                });
+                return _context6.abrupt("return");
               case 7:
-                _this8.resetForm();
-                _context5.next = 10;
-                return _this8.fetchActiveLanguages();
+                _this9.resetForm();
+                _context6.next = 10;
+                return _this9.fetchActiveLanguages();
               case 10:
-                _this8.form.id = plan.id;
-                _this8.form.days = plan.days;
-                _this8.form.price = plan.price;
-                _this8.form.discounted_price = plan.discounted_price;
-                _this8.form.free_delivery_above = plan.free_delivery_above;
-                _this8.form.ios_product_id = plan.ios_product_id;
-                _this8.form.status = plan.status;
+                _this9.form.id = plan.id;
+                _this9.form.days = plan.days;
+                _this9.form.price = plan.price;
+                _this9.form.discounted_price = plan.discounted_price;
+                _this9.form.free_delivery_above = plan.free_delivery_above;
+                _this9.form.ios_product_id = plan.ios_product_id;
+                _this9.form.status = plan.status;
                 map = {};
-                _this8.languages.forEach(function (l) {
+                _this9.languages.forEach(function (l) {
                   map[l.id] = {
                     language_id: l.id,
                     name: ''
@@ -793,63 +866,63 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   });
                 }
-                def = _this8.languages.find(function (l) {
+                def = _this9.languages.find(function (l) {
                   return l.is_default;
                 });
                 if (def && !map[def.id].name) {
                   map[def.id].name = plan.name || '';
                 }
-                _this8.form.translations = map;
-                _this8.activeLanguageTab = 0;
-                _this8.create_new = true;
+                _this9.form.translations = map;
+                _this9.activeLanguageTab = 0;
+                _this9.create_new = true;
               case 25:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     // Delete subscription plan
     deletePlan: function deletePlan(index, id) {
-      var _this9 = this;
-      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+      var _this10 = this;
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
-                _this9.$swal.fire({
+                _this10.$swal.fire({
                   title: __('are_you_sure'),
                   text: __('you_want_be_able_to_revert_this'),
                   confirmButtonText: __('yes_sure'),
                   cancelButtonText: __('cancel'),
                   icon: 'warning',
                   showCancelButton: true,
-                  confirmButtonColor: '#37a279',
-                  cancelButtonColor: '#d33'
+                  confirmButtonColor: 'var(--theme-primary-500)',
+                  cancelButtonColor: 'var(--theme-error-500)'
                 }).then(function (result) {
                   if (result.value) {
-                    _this9.isLoading = true;
-                    axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this9.$apiUrl + "/subscription_plans/delete/".concat(id)).then(function (response) {
-                      _this9.isLoading = false;
+                    _this10.isLoading = true;
+                    axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this10.$apiUrl + "/subscription_plans/delete/".concat(id)).then(function (response) {
+                      _this10.isLoading = false;
                       if (response.data.status === 1) {
-                        _this9.showMessage('success', response.data.message);
-                        _this9.getPlans();
+                        _this10.showMessage('success', response.data.message);
+                        _this10.getPlans();
                       } else {
-                        _this9.showError(response.data.message);
+                        _this10.showError(response.data.message);
                       }
                     })["catch"](function (error) {
-                      _this9.isLoading = false;
-                      _this9.showError(__('something_went_wrong'));
+                      _this10.isLoading = false;
+                      _this10.showError(__('something_went_wrong'));
                     });
                   }
                 });
               case 1:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     // Reset form to default values
@@ -874,95 +947,95 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.resetForm();
     },
     openAddModal: function openAddModal() {
-      var _this10 = this;
-      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
-        var hasFreeDeliveryTimeSlots;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _this10.activeLanguageTab = 0;
-
-                // Check for free delivery time slots before opening the modal
-                _context7.next = 3;
-                return _this10.checkFreeDeliveryTimeSlots();
-              case 3:
-                hasFreeDeliveryTimeSlots = _context7.sent;
-                if (!hasFreeDeliveryTimeSlots) {
-                  _context7.next = 7;
-                  break;
-                }
-                _this10.$swal.fire({
-                  title: __('cannot_create_subscription_plan'),
-                  html: "\n                        <div class=\"text-left\">\n                            <p>".concat(__('free_delivery_time_slots_exist_message'), "</p>\n                            <p class=\"mt-3\">\n                                <strong>").concat(__('please_remove_free_delivery_time_slots_first'), "</strong>\n                            </p>\n                                <p class=\"mt-3\">\n                                    <a href=\"/delivery_settings\" class=\"btn btn-primary btn-sm\">\n                                        ").concat(__('go_to_delivery_settings'), " <i class=\"fa fa-external-link-alt\"></i>\n                                    </a>\n                                </p>\n                        </div>\n                    "),
-                  icon: 'warning',
-                  confirmButtonText: __('ok'),
-                  confirmButtonColor: '#37a279',
-                  width: '600px'
-                });
-                return _context7.abrupt("return");
-              case 7:
-                // If no conflicts, proceed to open the modal
-                _this10.resetForm();
-                _context7.next = 10;
-                return _this10.fetchActiveLanguages();
-              case 10:
-                _this10.initializeTranslations([], null);
-                _this10.activeLanguageTab = 0;
-                _this10.create_new = true;
-              case 13:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7);
-      }))();
-    },
-    // Update subscription name in settings
-    updateSubscriptionName: function updateSubscriptionName() {
       var _this11 = this;
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
-        var response;
+        var hasFreeDeliveryTimeSlots;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
-                if (!(!_this11.subscriptionName || _this11.subscriptionName.trim() === '')) {
-                  _context8.next = 3;
+                _this11.activeLanguageTab = 0;
+
+                // Check for free delivery time slots before opening the modal
+                _context8.next = 3;
+                return _this11.checkFreeDeliveryTimeSlots();
+              case 3:
+                hasFreeDeliveryTimeSlots = _context8.sent;
+                if (!hasFreeDeliveryTimeSlots) {
+                  _context8.next = 7;
                   break;
                 }
-                _this11.showError(__('subscription_name_cannot_be_empty'));
-                return _context8.abrupt("return");
-              case 3:
-                _this11.isUpdatingName = true;
-                _context8.prev = 4;
-                _context8.next = 7;
-                return axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this11.$apiUrl + '/subscription_plans/update_setting', {
-                  subscription_name: _this11.subscriptionName.trim()
+                _this11.$swal.fire({
+                  title: __('cannot_create_subscription_plan'),
+                  html: "\n                        <div class=\"text-left\">\n                            <p>".concat(__('free_delivery_time_slots_exist_message'), "</p>\n                            <p class=\"mt-3\">\n                                <strong>").concat(__('please_remove_free_delivery_time_slots_first'), "</strong>\n                            </p>\n                                <p class=\"mt-3\">\n                                    <a href=\"/delivery_settings\" class=\"btn btn-primary btn-sm\">\n                                        ").concat(__('go_to_delivery_settings'), " <i class=\"fa fa-external-link-alt\"></i>\n                                    </a>\n                                </p>\n                        </div>\n                    "),
+                  icon: 'warning',
+                  confirmButtonText: __('ok'),
+                  confirmButtonColor: 'var(--theme-primary-500)',
+                  width: '600px'
                 });
+                return _context8.abrupt("return");
               case 7:
-                response = _context8.sent;
-                if (response.data.status === 1) {
-                  _this11.showMessage("success", response.data.message);
-                } else {
-                  _this11.showError(response.data.message);
-                }
-                _context8.next = 14;
-                break;
-              case 11:
-                _context8.prev = 11;
-                _context8.t0 = _context8["catch"](4);
-                _this11.showError(__('something_went_wrong'));
-              case 14:
-                _context8.prev = 14;
-                _this11.isUpdatingName = false;
-                return _context8.finish(14);
-              case 17:
+                // If no conflicts, proceed to open the modal
+                _this11.resetForm();
+                _context8.next = 10;
+                return _this11.fetchActiveLanguages();
+              case 10:
+                _this11.initializeTranslations([], null);
+                _this11.activeLanguageTab = 0;
+                _this11.create_new = true;
+              case 13:
               case "end":
                 return _context8.stop();
             }
           }
-        }, _callee8, null, [[4, 11, 14, 17]]);
+        }, _callee8);
+      }))();
+    },
+    // Update subscription name in settings
+    updateSubscriptionName: function updateSubscriptionName() {
+      var _this12 = this;
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee9() {
+        var response;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                if (!(!_this12.subscriptionName || _this12.subscriptionName.trim() === '')) {
+                  _context9.next = 3;
+                  break;
+                }
+                _this12.showError(__('subscription_name_cannot_be_empty'));
+                return _context9.abrupt("return");
+              case 3:
+                _this12.isUpdatingName = true;
+                _context9.prev = 4;
+                _context9.next = 7;
+                return axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this12.$apiUrl + '/subscription_plans/update_setting', {
+                  subscription_name: _this12.subscriptionName.trim()
+                });
+              case 7:
+                response = _context9.sent;
+                if (response.data.status === 1) {
+                  _this12.showMessage("success", response.data.message);
+                } else {
+                  _this12.showError(response.data.message);
+                }
+                _context9.next = 14;
+                break;
+              case 11:
+                _context9.prev = 11;
+                _context9.t0 = _context9["catch"](4);
+                _this12.showError(__('something_went_wrong'));
+              case 14:
+                _context9.prev = 14;
+                _this12.isUpdatingName = false;
+                return _context9.finish(14);
+              case 17:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, null, [[4, 11, 14, 17]]);
       }))();
     }
   },
@@ -1280,6 +1353,58 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Subscription name editor in the toolbar */\n.plan-name-editor .figma-search-container[data-v-23e12aae] {\n    width: 220px;\n}\n.plan-name-save[data-v-23e12aae] {\n    width: 38px;\n    padding: 0 !important;\n    justify-content: center;\n}\n\n/* Plan cards */\n.plan-grid[data-v-23e12aae] {\n    padding: 20px 20px 4px;\n}\n.plan-status-switch[data-v-23e12aae] {\n    margin-right: auto;\n}\n.plan-status-switch .form-check-input[data-v-23e12aae] {\n    cursor: pointer;\n    margin-top: 0;\n}\n.plan-card[data-v-23e12aae] {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    gap: 14px;\n    padding: 18px;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    box-shadow: var(--ui-shadow);\n    transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.plan-card[data-v-23e12aae]:hover {\n    border-color: var(--theme-primary-300);\n    box-shadow: var(--ui-shadow-lg);\n}\n.plan-card .min-w-0[data-v-23e12aae] {\n    min-width: 0;\n}\n.plan-name[data-v-23e12aae] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n    word-break: break-word;\n}\n.plan-id[data-v-23e12aae] {\n    font-size: 12px;\n    color: var(--ui-text-subtle);\n}\n.plan-price[data-v-23e12aae] {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: baseline;\n    gap: 6px;\n    padding: 12px 14px;\n    background: var(--ui-primary-soft);\n    border-radius: var(--ui-radius);\n}\n.plan-price-value[data-v-23e12aae] {\n    font-size: 22px;\n    font-weight: 700;\n    line-height: 1.1;\n    color: var(--theme-primary-700);\n}\n.plan-price-old[data-v-23e12aae] {\n    font-size: 13px;\n    color: var(--ui-text-subtle);\n    text-decoration: line-through;\n}\n.plan-price-period[data-v-23e12aae] {\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n.plan-features[data-v-23e12aae] {\n    list-style: none;\n    margin: 0;\n    padding: 0;\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.plan-features li[data-v-23e12aae] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n.plan-features li i[data-v-23e12aae] {\n    width: 16px;\n    text-align: center;\n    color: var(--theme-primary-500);\n}\n.plan-features li strong[data-v-23e12aae] {\n    margin-left: auto;\n    font-weight: 600;\n    color: var(--ui-text);\n}\n.plan-actions[data-v-23e12aae] {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 8px;\n    margin-top: auto;\n    padding-top: 12px;\n    border-top: 1px solid var(--ui-border);\n}\n.modal-form-actions[data-v-23e12aae] {\n    border-color: var(--ui-border) !important;\n}\n@media (max-width: 575.98px) {\n.plan-grid[data-v-23e12aae] {\n        padding: 16px 16px 0;\n}\n\n    /* the toolbar's phone grid rule treats this group as buttons (it holds one); keep it a row:\n       name box fills the width, save button stays a 38px square */\n.figma-action-bar-row > .plan-name-editor[data-v-23e12aae] {\n        display: flex !important;\n        width: 100%;\n        overflow: visible;\n}\n.plan-name-editor .plan-name-save[data-v-23e12aae] {\n        flex: 0 0 38px;\n        width: 38px;\n        min-width: 38px !important;\n}\n.plan-name-editor .figma-search-container[data-v-23e12aae] {\n        flex: 1 1 auto;\n        width: auto;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_style_index_0_id_23e12aae_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_style_index_0_id_23e12aae_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_style_index_0_id_23e12aae_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Subscriptions/Subscriptions.vue":
 /*!************************************************************!*\
   !*** ./resources/js/views/Subscriptions/Subscriptions.vue ***!
@@ -1290,23 +1415,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subscriptions.vue?vue&type=template&id=23e12aae */ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae");
+/* harmony import */ var _Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true */ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true");
 /* harmony import */ var _Subscriptions_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Subscriptions.vue?vue&type=script&lang=js */ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Subscriptions_vue_vue_type_style_index_0_id_23e12aae_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css */ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Subscriptions_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__.render,
-  _Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "23e12aae",
   null
   
 )
@@ -1333,26 +1460,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae":
-/*!******************************************************************************************!*\
-  !*** ./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae ***!
-  \******************************************************************************************/
+/***/ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css":
+/*!********************************************************************************************************************!*\
+  !*** ./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css ***!
+  \********************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Subscriptions.vue?vue&type=template&id=23e12aae */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_style_index_0_id_23e12aae_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=style&index=0&id=23e12aae&scoped=true&lang=css");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae":
-/*!*********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae ***!
-  \*********************************************************************************************************************************************************************************************************************************/
+/***/ "./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true ***!
+  \******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Subscriptions_vue_vue_type_template_id_23e12aae_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true");
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true":
+/*!*********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Subscriptions/Subscriptions.vue?vue&type=template&id=23e12aae&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1368,48 +1507,51 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("manage_subscriptions")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-            _c(
-              "nav",
-              {
-                staticClass: "breadcrumb-header float-start float-lg-end",
-                attrs: { "aria-label": "breadcrumb" },
-              },
-              [
-                _c("ol", { staticClass: "breadcrumb" }, [
-                  _c(
-                    "li",
-                    { staticClass: "breadcrumb-item" },
-                    [
-                      _c("router-link", { attrs: { to: "/dashboard" } }, [
-                        _vm._v(_vm._s(_vm.__("dashboard"))),
-                      ]),
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "li",
-                    {
-                      staticClass: "breadcrumb-item active",
-                      attrs: { "aria-current": "page" },
-                    },
-                    [_vm._v(_vm._s(_vm.__("manage_subscriptions")))]
-                  ),
-                ]),
-              ]
-            ),
-          ]),
-        ]),
+        _c(
+          "div",
+          {
+            staticClass:
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
+          },
+          [
+            _c("h3", { staticClass: "modern-page-title mb-0" }, [
+              _vm._v(_vm._s(_vm.__("manage_subscriptions"))),
+            ]),
+            _vm._v(" "),
+            _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
+                _c(
+                  "li",
+                  { staticClass: "breadcrumb-item" },
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "text-muted",
+                        attrs: { to: "/dashboard" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("dashboard")))]
+                    ),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  {
+                    staticClass: "breadcrumb-item active text-primary",
+                    attrs: { "aria-current": "page" },
+                  },
+                  [_vm._v(_vm._s(_vm.__("manage_subscriptions")))]
+                ),
+              ]),
+            ]),
+          ]
+        ),
         _vm._v(" "),
         _c("div", { staticClass: "row" }, [
           _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
-            _c("div", { staticClass: "figma-main-section-card" }, [
+            _c("div", { staticClass: "card figma-main-section-card" }, [
               _c("div", { staticClass: "card-body p-0" }, [
                 _c(
                   "div",
@@ -1418,124 +1560,102 @@ var render = function () {
                       "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row",
                   },
                   [
+                    _c("div", { staticClass: "flex-grow-1" }, [
+                      _c("div", { staticClass: "figma-search-container" }, [
+                        _c("i", { staticClass: "fa fa-search text-muted" }),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.filter,
+                              expression: "filter",
+                            },
+                          ],
+                          staticClass: "figma-search-input",
+                          attrs: {
+                            type: "text",
+                            placeholder: _vm.__("search"),
+                          },
+                          domProps: { value: _vm.filter },
+                          on: {
+                            input: [
+                              function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.filter = $event.target.value
+                              },
+                              function ($event) {
+                                _vm.currentPage = 1
+                                _vm.getPlans()
+                              },
+                            ],
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
                     _c(
                       "div",
                       {
                         staticClass:
-                          "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
+                          "d-flex align-items-center gap-2 plan-name-editor",
                       },
                       [
-                        _c(
-                          "div",
-                          {
-                            staticClass: "figma-search-container",
-                            staticStyle: { "min-width": "250px" },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-search text-muted" }),
-                            _vm._v(" "),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.filter,
-                                  expression: "filter",
-                                },
-                              ],
-                              staticClass: "figma-search-input",
-                              attrs: {
-                                type: "text",
-                                placeholder: _vm.__("search"),
+                        _c("div", { staticClass: "figma-search-container" }, [
+                          _c("i", { staticClass: "fa fa-tag" }),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.subscriptionName,
+                                expression: "subscriptionName",
                               },
-                              domProps: { value: _vm.filter },
-                              on: {
-                                input: [
-                                  function ($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.filter = $event.target.value
-                                  },
-                                  function ($event) {
-                                    _vm.currentPage = 1
-                                    _vm.getPlans()
-                                  },
-                                ],
+                            ],
+                            staticClass: "figma-search-input",
+                            attrs: {
+                              type: "text",
+                              placeholder: _vm.__("enter_subscription_name"),
+                            },
+                            domProps: { value: _vm.subscriptionName },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.subscriptionName = $event.target.value
                               },
-                            }),
-                          ]
-                        ),
+                            },
+                          }),
+                        ]),
                         _vm._v(" "),
                         _c(
-                          "div",
-                          { staticClass: "d-flex align-items-center gap-2" },
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass: "btn btn-figma-filter plan-name-save",
+                            attrs: {
+                              disabled: _vm.isUpdatingName,
+                              title: _vm.__("update"),
+                            },
+                            on: { click: _vm.updateSubscriptionName },
+                          },
                           [
-                            _c(
-                              "div",
-                              {
-                                staticClass: "figma-search-container",
-                                staticStyle: { "min-width": "200px" },
-                              },
-                              [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.subscriptionName,
-                                      expression: "subscriptionName",
-                                    },
-                                  ],
-                                  staticClass: "figma-search-input",
-                                  attrs: {
-                                    type: "text",
-                                    placeholder: _vm.__(
-                                      "enter_subscription_name"
-                                    ),
-                                  },
-                                  domProps: { value: _vm.subscriptionName },
-                                  on: {
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.subscriptionName = $event.target.value
-                                    },
-                                  },
+                            !_vm.isUpdatingName
+                              ? _c("i", { staticClass: "fa fa-save" })
+                              : _c("i", {
+                                  staticClass: "fa fa-spinner fa-spin",
                                 }),
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
-                                ],
-                                staticClass: "btn btn-figma-filter p-2",
-                                staticStyle: {
-                                  "min-width": "40px",
-                                  height: "40px",
-                                },
-                                attrs: {
-                                  disabled: _vm.isUpdatingName,
-                                  title: _vm.__("update"),
-                                },
-                                on: { click: _vm.updateSubscriptionName },
-                              },
-                              [
-                                !_vm.isUpdatingName
-                                  ? _c("i", { staticClass: "fa fa-save" })
-                                  : _c("i", {
-                                      staticClass: "fa fa-spinner fa-spin",
-                                    }),
-                              ]
-                            ),
                           ]
                         ),
                       ]
@@ -1548,6 +1668,32 @@ var render = function () {
                           "d-flex gap-2 align-items-center flex-wrap",
                       },
                       [
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass:
+                              "btn btn-figma-columns d-flex align-items-center gap-2",
+                            attrs: { title: _vm.__("refresh") },
+                            on: {
+                              click: function ($event) {
+                                return _vm.getPlans()
+                              },
+                            },
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-refresh" }),
+                            _vm._v(" "),
+                            _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                          ]
+                        ),
+                        _vm._v(" "),
                         _vm.$can("subscription_create")
                           ? _c(
                               "button",
@@ -1572,293 +1718,345 @@ var render = function () {
                               ]
                             )
                           : _vm._e(),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2",
-                            attrs: { title: _vm.__("refresh") },
-                            on: {
-                              click: function ($event) {
-                                return _vm.getPlans()
-                              },
-                            },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-refresh" }),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                          ]
-                        ),
                       ]
                     ),
                   ]
                 ),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "table-responsive" },
-                  [
-                    _c("b-table", {
-                      staticClass: "figma-table mb-0",
-                      attrs: {
-                        items: _vm.translatedPlans,
-                        fields: _vm.fields,
-                        "sort-by": _vm.sortBy,
-                        "sort-desc": _vm.sortDesc,
-                        "sort-direction": _vm.sortDirection,
-                        bordered: false,
-                        busy: _vm.isLoading,
-                        stacked: "md",
-                        "show-empty": "",
-                        small: "",
-                        "tbody-tr-class": function () {
-                          return "figma-tr align-middle"
-                        },
-                      },
-                      on: {
-                        "update:sortBy": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sort-by": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sortDesc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                        "update:sort-desc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "table-busy",
-                          fn: function () {
-                            return [
-                              _c(
-                                "div",
-                                { staticClass: "text-center text-black my-2" },
-                                [
-                                  _c("b-spinner", {
-                                    staticClass: "align-middle",
-                                  }),
+                _c("div", { staticClass: "plan-grid" }, [
+                  _vm.isLoading
+                    ? _c(
+                        "div",
+                        { staticClass: "text-center text-muted py-5" },
+                        [
+                          _c("b-spinner", { staticClass: "align-middle" }),
+                          _vm._v(" "),
+                          _c("strong", [
+                            _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                          ]),
+                        ],
+                        1
+                      )
+                    : !_vm.translatedPlans.length
+                    ? _c(
+                        "div",
+                        { staticClass: "text-center text-muted py-5" },
+                        [
+                          _c("i", {
+                            staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                          }),
+                          _vm._v(
+                            _vm._s(_vm.__("no_records_to_show")) +
+                              "\n                            "
+                          ),
+                        ]
+                      )
+                    : _c(
+                        "div",
+                        { staticClass: "row" },
+                        _vm._l(
+                          _vm.translatedPlans
+                            .map(function (item, index) {
+                              return { item: item, index: index }
+                            })
+                            .sort(function (a, b) {
+                              return _vm.sortDesc
+                                ? b.item.id - a.item.id
+                                : a.item.id - b.item.id
+                            }),
+                          function (row) {
+                            return _c(
+                              "div",
+                              {
+                                key: row.item.id,
+                                staticClass: "col-12 col-sm-6 col-xl-4 mb-3",
+                              },
+                              [
+                                _c("div", { staticClass: "plan-card h-100" }, [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass:
+                                        "d-flex justify-content-between align-items-start gap-2",
+                                    },
+                                    [
+                                      _c("div", { staticClass: "min-w-0" }, [
+                                        _c(
+                                          "div",
+                                          { staticClass: "plan-name" },
+                                          [_vm._v(_vm._s(row.item.name))]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("div", { staticClass: "plan-id" }, [
+                                          _vm._v("#" + _vm._s(row.item.id)),
+                                        ]),
+                                      ]),
+                                      _vm._v(" "),
+                                      row.item.status == 1
+                                        ? _c(
+                                            "span",
+                                            { staticClass: "badge bg-success" },
+                                            [_vm._v(_vm._s(_vm.__("active")))]
+                                          )
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      row.item.status == 0
+                                        ? _c(
+                                            "span",
+                                            { staticClass: "badge bg-danger" },
+                                            [_vm._v(_vm._s(_vm.__("deactive")))]
+                                          )
+                                        : _vm._e(),
+                                    ]
+                                  ),
                                   _vm._v(" "),
-                                  _c("strong", [
-                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                  _c(
+                                    "div",
+                                    { staticClass: "plan-price" },
+                                    [
+                                      row.item.discounted_price
+                                        ? [
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass: "plan-price-value",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.$currency) +
+                                                    _vm._s(
+                                                      parseFloat(
+                                                        row.item
+                                                          .discounted_price
+                                                      ).toFixed(2)
+                                                    )
+                                                ),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "span",
+                                              { staticClass: "plan-price-old" },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.$currency) +
+                                                    _vm._s(
+                                                      parseFloat(
+                                                        row.item.price
+                                                      ).toFixed(2)
+                                                    )
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        : _c(
+                                            "span",
+                                            { staticClass: "plan-price-value" },
+                                            [
+                                              _vm._v(
+                                                _vm._s(_vm.$currency) +
+                                                  _vm._s(
+                                                    parseFloat(
+                                                      row.item.price
+                                                    ).toFixed(2)
+                                                  )
+                                              ),
+                                            ]
+                                          ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "span",
+                                        { staticClass: "plan-price-period" },
+                                        [
+                                          _vm._v(
+                                            "/ " +
+                                              _vm._s(row.item.days) +
+                                              " " +
+                                              _vm._s(_vm.__("days"))
+                                          ),
+                                        ]
+                                      ),
+                                    ],
+                                    2
+                                  ),
+                                  _vm._v(" "),
+                                  _c("ul", { staticClass: "plan-features" }, [
+                                    _c("li", [
+                                      _c("i", {
+                                        staticClass: "fa fa-calendar",
+                                      }),
+                                      _vm._v(" "),
+                                      _c("span", [
+                                        _vm._v(_vm._s(_vm.__("days"))),
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("strong", [
+                                        _vm._v(_vm._s(row.item.days)),
+                                      ]),
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("li", [
+                                      _c("i", { staticClass: "fa fa-truck" }),
+                                      _vm._v(" "),
+                                      _c("span", [
+                                        _vm._v(
+                                          _vm._s(_vm.__("free_delivery_above"))
+                                        ),
+                                      ]),
+                                      _vm._v(" "),
+                                      row.item.free_delivery_above
+                                        ? _c("strong", [
+                                            _vm._v(
+                                              _vm._s(_vm.$currency) +
+                                                _vm._s(
+                                                  parseFloat(
+                                                    row.item.free_delivery_above
+                                                  ).toFixed(2)
+                                                )
+                                            ),
+                                          ])
+                                        : _c(
+                                            "strong",
+                                            { staticClass: "text-muted" },
+                                            [_vm._v("-")]
+                                          ),
+                                    ]),
                                   ]),
-                                ],
-                                1
-                              ),
-                            ]
-                          },
-                          proxy: true,
-                        },
-                        {
-                          key: "cell(name)",
-                          fn: function (row) {
-                            return [
-                              _c("strong", [_vm._v(_vm._s(row.item.name))]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(days)",
-                          fn: function (row) {
-                            return [
-                              _c("span", [
-                                _vm._v(
-                                  _vm._s(row.item.days) +
-                                    " " +
-                                    _vm._s(_vm.__("days"))
-                                ),
-                              ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(price)",
-                          fn: function (row) {
-                            return [
-                              _c("span", [
-                                _vm._v(
-                                  _vm._s(parseFloat(row.item.price).toFixed(2))
-                                ),
-                              ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(discounted_price)",
-                          fn: function (row) {
-                            return [
-                              row.item.discounted_price
-                                ? _c("span", [
-                                    _vm._v(
-                                      _vm._s(
-                                        parseFloat(
-                                          row.item.discounted_price
-                                        ).toFixed(2)
-                                      )
-                                    ),
-                                  ])
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(free_delivery_above)",
-                          fn: function (row) {
-                            return [
-                              row.item.free_delivery_above
-                                ? _c("span", [
-                                    _vm._v(
-                                      _vm._s(
-                                        parseFloat(
-                                          row.item.free_delivery_above
-                                        ).toFixed(2)
-                                      )
-                                    ),
-                                  ])
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(status)",
-                          fn: function (row) {
-                            return [
-                              row.item.status == 1
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-success" },
-                                    [_vm._v(_vm._s(_vm.__("active")))]
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              row.item.status == 0
-                                ? _c(
-                                    "span",
-                                    { staticClass: "badge bg-danger" },
-                                    [_vm._v(_vm._s(_vm.__("deactive")))]
-                                  )
-                                : _vm._e(),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(actions)",
-                          fn: function (row) {
-                            return [
-                              _c("div", { staticClass: "d-flex gap-2" }, [
-                                _vm.$can("subscription_update")
-                                  ? _c(
-                                      "button",
-                                      {
-                                        directives: [
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "plan-actions" }, [
+                                    _vm.$can("subscription_update")
+                                      ? _c(
+                                          "div",
                                           {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass:
+                                              "form-check form-switch plan-status-switch mb-0",
+                                            attrs: {
+                                              title:
+                                                row.item.status == 1
+                                                  ? _vm.__("active")
+                                                  : _vm.__("deactive"),
+                                            },
                                           },
-                                        ],
-                                        staticClass: "figma-action-btn",
-                                        attrs: { title: _vm.__("edit") },
-                                        on: {
-                                          click: function ($event) {
-                                            return _vm.editPlan(row.item)
-                                          },
-                                        },
-                                      },
-                                      [
-                                        _c("base-icon", {
-                                          attrs: {
-                                            name: "edit icon",
-                                            hoverName: "edit Hover",
-                                            width: "24",
-                                            height: "24",
-                                          },
-                                        }),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.$can("subscription_delete")
-                                  ? _c(
-                                      "button",
-                                      {
-                                        directives: [
+                                          [
+                                            _c("input", {
+                                              staticClass: "form-check-input",
+                                              attrs: {
+                                                type: "checkbox",
+                                                role: "switch",
+                                              },
+                                              domProps: {
+                                                checked: row.item.status == 1,
+                                              },
+                                              on: {
+                                                click: function ($event) {
+                                                  $event.preventDefault()
+                                                  return _vm.togglePlanStatus(
+                                                    row.item
+                                                  )
+                                                },
+                                              },
+                                            }),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.$can("subscription_update")
+                                      ? _c(
+                                          "button",
                                           {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass: "figma-action-btn",
+                                            attrs: { title: _vm.__("edit") },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.editPlan(row.item)
+                                              },
+                                            },
                                           },
-                                        ],
-                                        staticClass:
-                                          "figma-action-btn figma-delete-btn",
-                                        attrs: { title: _vm.__("delete") },
-                                        on: {
-                                          click: function ($event) {
-                                            return _vm.deletePlan(
-                                              row.index,
-                                              row.item.id
-                                            )
+                                          [
+                                            _c("base-icon", {
+                                              attrs: {
+                                                name: "edit icon",
+                                                hoverName: "edit Hover",
+                                                width: "24",
+                                                height: "24",
+                                              },
+                                            }),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.$can("subscription_delete")
+                                      ? _c(
+                                          "button",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass:
+                                              "figma-action-btn figma-delete-btn",
+                                            attrs: { title: _vm.__("delete") },
+                                            on: {
+                                              click: function ($event) {
+                                                return _vm.deletePlan(
+                                                  row.index,
+                                                  row.item.id
+                                                )
+                                              },
+                                            },
                                           },
-                                        },
-                                      },
-                                      [
-                                        _c("base-icon", {
-                                          attrs: {
-                                            name: "Type=Default",
-                                            hoverName: "Type=Hover",
-                                            width: "24",
-                                            height: "24",
-                                          },
-                                        }),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ]),
-                            ]
-                          },
-                        },
-                      ]),
-                    }),
-                  ],
-                  1
-                ),
+                                          [
+                                            _c("base-icon", {
+                                              attrs: {
+                                                name: "Type=Default",
+                                                hoverName: "Type=Hover",
+                                                width: "24",
+                                                height: "24",
+                                              },
+                                            }),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                  ]),
+                                ]),
+                              ]
+                            )
+                          }
+                        ),
+                        0
+                      ),
+                ]),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
+                  { staticClass: "figma-table-footer flex-wrap gap-3" },
                   [
-                    _c("div", { staticClass: "showing-results-text small" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(_vm.__("Showing Result")) +
-                          " : "
-                      ),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.pageEnd)),
-                      ]),
-                      _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.totalRows)),
-                      ]),
-                    ]),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -1886,7 +2084,8 @@ var render = function () {
                       ],
                       1
                     ),
-                  ]
+                  ],
+                  1
                 ),
               ]),
             ]),
@@ -2096,14 +2295,13 @@ var render = function () {
                           _vm.form.translations &&
                           _vm.form.translations[language.id]
                             ? _c("div", { staticClass: "form-group" }, [
-                                language.is_default
-                                  ? _c("i", { staticClass: "text-danger" }, [
-                                      _vm._v("*"),
-                                    ])
-                                  : _vm._e(),
-                                _vm._v(" "),
                                 _c("label", [
-                                  _vm._v(_vm._s(_vm.__("plan_name"))),
+                                  _vm._v(_vm._s(_vm.__("plan_name")) + " "),
+                                  language.is_default
+                                    ? _c("i", { staticClass: "text-danger" }, [
+                                        _vm._v("*"),
+                                      ])
+                                    : _vm._e(),
                                 ]),
                                 _vm._v(" "),
                                 _c("input", {
@@ -2147,14 +2345,21 @@ var render = function () {
                             ? [
                                 _c("div", { staticClass: "row" }, [
                                   _c("div", { staticClass: "col-md-6 mb-3" }, [
-                                    _c("label", { attrs: { for: "days" } }, [
-                                      _vm._v(_vm._s(_vm.__("days")) + " "),
-                                      _c(
-                                        "span",
-                                        { staticClass: "text-danger" },
-                                        [_vm._v("*")]
-                                      ),
-                                    ]),
+                                    _c(
+                                      "label",
+                                      {
+                                        staticClass: "d-block",
+                                        attrs: { for: "days" },
+                                      },
+                                      [
+                                        _vm._v(_vm._s(_vm.__("days")) + " "),
+                                        _c(
+                                          "span",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        ),
+                                      ]
+                                    ),
                                     _vm._v(" "),
                                     _c("input", {
                                       directives: [
@@ -2190,9 +2395,9 @@ var render = function () {
                                   _vm._v(" "),
                                   _c(
                                     "div",
-                                    { staticClass: "col-md-6 mt-3 mb-3" },
+                                    { staticClass: "col-md-6 mb-3" },
                                     [
-                                      _c("label", [
+                                      _c("label", { staticClass: "d-block" }, [
                                         _vm._v(_vm._s(_vm.__("status")) + " "),
                                         _c(
                                           "span",
@@ -2541,12 +2746,15 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "form-group d-flex justify-content-end gap-2" },
+                {
+                  staticClass:
+                    "d-flex justify-content-end gap-2 pt-3 mt-2 border-top modal-form-actions",
+                },
                 [
                   _c(
                     "button",
                     {
-                      staticClass: "btn btn-secondary",
+                      staticClass: "btn btn-outline-secondary",
                       attrs: { type: "button" },
                       on: { click: _vm.closeModal },
                     },

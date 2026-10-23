@@ -13,6 +13,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ThemePalette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../ThemePalette */ "./resources/js/ThemePalette.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -163,6 +164,91 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 var STOPS = {
@@ -316,10 +402,22 @@ function generateNeutralPalette(seed) {
       isLoading: false,
       isDefaultModule: true,
       statusTypes: ['success', 'error', 'warn', 'info'],
+      // Shown only until /api/theme answers; same defaults as ThemeService (neutral must not be white).
       seeds: {
         light_seed_primary: '#FF9900',
-        light_seed_neutral: '#FFFFFF'
+        light_seed_neutral: '#9E9E9E'
       },
+      usesDefaultColors: false,
+      // Admin panel colours (global): follow module themes, or own primary / neutral
+      admin: {
+        use_module_theme: true,
+        seed_primary: '#FF9900',
+        seed_neutral: '#9E9E9E',
+        primary: {},
+        neutral: {}
+      },
+      adminLoaded: false,
+      adminSaving: false,
       statusSeeds: {
         success: '#20B364',
         error: '#D63031',
@@ -347,24 +445,88 @@ function generateNeutralPalette(seed) {
     };
   },
   created: function created() {
+    // Palette bars show straight away (built-in defaults), then the saved colors replace them.
+    this.previewPalette('light', 'primary');
+    this.previewPalette('light', 'neutral');
     this.getTheme();
+    this.getAdminTheme();
   },
   methods: {
-    getTheme: function getTheme() {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
+    getAdminTheme: function getAdminTheme() {
       var _this = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/theme/admin').then(function (response) {
+        var d = response.data && response.data.data;
+        if (d) _this.admin = {
+          use_module_theme: !!d.use_module_theme,
+          seed_primary: d.seed_primary,
+          seed_neutral: d.seed_neutral,
+          primary: d.primary || {},
+          neutral: d.neutral || {}
+        };
+        _this.adminLoaded = true;
+      })["catch"](function () {
+        _this.adminLoaded = true;
+      });
+    },
+    previewAdmin: function previewAdmin(role) {
+      var seed = role === 'neutral' ? this.admin.seed_neutral : this.admin.seed_primary;
+      if (!/^#[0-9A-Fa-f]{6}$/.test(seed || '')) return;
+      this.admin[role] = role === 'neutral' ? generateNeutralPalette(seed) : generatePalette(seed);
+    },
+    saveAdminTheme: function saveAdminTheme() {
+      var _this2 = this;
+      if (!this.admin.use_module_theme && this.isNeutralTooLight(this.admin.seed_neutral)) {
+        var translated = __('neutral_color_too_light_warning');
+        this.showError(translated && translated !== 'neutral_color_too_light_warning' ? translated : 'Neutral too light — borders and dividers will be invisible in the app. Pick a colour with some depth (around #9E9E9E or darker).');
+        return;
+      }
+      this.adminSaving = true;
+      var formData = new FormData();
+      formData.append('use_module_theme', this.admin.use_module_theme ? '1' : '0');
+      if (!this.admin.use_module_theme) {
+        formData.append('seed_primary', this.admin.seed_primary);
+        formData.append('seed_neutral', this.admin.seed_neutral);
+      }
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/theme/admin/save', formData).then(function (res) {
+        _this2.adminSaving = false;
+        var data = res.data;
+        if (data.status === 1) {
+          _this2.showMessage('success', data.message);
+          (0,_ThemePalette__WEBPACK_IMPORTED_MODULE_1__.loadTheme)(_this2.$baseUrl); // repaint the panel with the new choice right away
+        } else {
+          _this2.showError(data.message);
+        }
+      })["catch"](function (error) {
+        _this2.adminSaving = false;
+        _this2.showError(error.message || __('something_went_wrong'));
+      });
+    },
+    getTheme: function getTheme() {
+      var _this3 = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/theme').then(function (response) {
-        var all = response.data.data;
-        var activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
-        var data = all && all[activeModuleId];
+        var all = response.data.data || {};
+        var modules = Object.values(all);
+        var defaultModule = modules.find(function (m) {
+          return m && m.module_is_default;
+        }) || modules[0];
+        var activeModuleId = Number(localStorage.getItem('active_module_id')) || defaultModule && defaultModule.module_id;
+        // A module without its own colors comes back with the default module's colors
+        // (uses_default_colors); Save stores them as its own.
+        var data = all[activeModuleId] || defaultModule;
         if (!data) return;
-        _this.theme = data;
-        _this.isDefaultModule = !!data.module_is_default;
-        _this.seeds.light_seed_primary = data.seed_primary;
-        _this.seeds.light_seed_neutral = data.seed_neutral;
-        _this.preview.light.primary = data.primary;
-        _this.preview.light.neutral = data.neutral;
-        _this.statusTypes.forEach(function (type) {
-          if (data[type] && data[type]['500']) _this.statusSeeds[type] = data[type]['500'];
+        _this3.theme = data;
+        _this3.usesDefaultColors = !!data.uses_default_colors;
+        _this3.isDefaultModule = !!data.module_is_default;
+        _this3.seeds.light_seed_primary = data.seed_primary;
+        _this3.seeds.light_seed_neutral = data.seed_neutral;
+        _this3.preview.light.primary = data.primary;
+        _this3.preview.light.neutral = data.neutral;
+        _this3.statusTypes.forEach(function (type) {
+          if (data[type] && data[type]['500']) _this3.statusSeeds[type] = data[type]['500'];
         });
       });
     },
@@ -384,67 +546,70 @@ function generateNeutralPalette(seed) {
       return luma > 158;
     },
     saveTheme: function saveTheme() {
-      var _this2 = this;
+      var _this4 = this;
       if (this.isNeutralTooLight(this.seeds.light_seed_neutral)) {
         var fallbackWarning = 'Neutral too light — borders and dividers will be invisible in the app. Pick a colour with some depth (around #9E9E9E or darker).';
         var translated = __('neutral_color_too_light_warning');
-        this.showWarning(translated && translated !== 'neutral_color_too_light_warning' ? translated : fallbackWarning);
+        this.showError(translated && translated !== 'neutral_color_too_light_warning' ? translated : fallbackWarning);
         return;
       }
       this.isLoading = true;
       var formData = new FormData();
       Object.keys(this.seeds).forEach(function (key) {
-        return formData.append(key, _this2.seeds[key]);
+        return formData.append(key, _this4.seeds[key]);
       });
       axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/theme/save', formData).then(function (res) {
         var data = res.data;
-        _this2.isLoading = false;
-        if (data.status === 1) {
-          _this2.theme = data.data;
-          _this2.showMessage("success", data.message);
-        } else {
-          _this2.showError(data.message);
-        }
-      })["catch"](function (error) {
-        _this2.isLoading = false;
-        _this2.showError(error.message || __('something_went_wrong'));
-      });
-    },
-    saveStatusColor: function saveStatusColor(type) {
-      var _this3 = this;
-      this.statusLoading[type] = true;
-      var formData = new FormData();
-      formData.append('seed', this.statusSeeds[type]);
-      axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/theme/status/' + type, formData).then(function (res) {
-        var data = res.data;
-        _this3.statusLoading[type] = false;
-        if (data.status === 1) {
-          _this3.theme = data.data;
-          _this3.showMessage("success", data.message);
-        } else {
-          _this3.showError(data.message);
-        }
-      })["catch"](function (error) {
-        _this3.statusLoading[type] = false;
-        _this3.showError(error.message || __('something_went_wrong'));
-      });
-    },
-    resetStatusColor: function resetStatusColor(type) {
-      var _this4 = this;
-      this.statusLoading[type] = true;
-      axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"](this.$apiUrl + '/theme/status/' + type + '/reset').then(function (res) {
-        var data = res.data;
-        _this4.statusLoading[type] = false;
+        _this4.isLoading = false;
         if (data.status === 1) {
           _this4.theme = data.data;
-          _this4.statusSeeds[type] = data.data[type]['500'];
+          (0,_ThemePalette__WEBPACK_IMPORTED_MODULE_1__.loadTheme)(_this4.$baseUrl);
           _this4.showMessage("success", data.message);
         } else {
           _this4.showError(data.message);
         }
       })["catch"](function (error) {
-        _this4.statusLoading[type] = false;
+        _this4.isLoading = false;
         _this4.showError(error.message || __('something_went_wrong'));
+      });
+    },
+    saveStatusColor: function saveStatusColor(type) {
+      var _this5 = this;
+      this.statusLoading[type] = true;
+      var formData = new FormData();
+      formData.append('seed', this.statusSeeds[type]);
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/theme/status/' + type, formData).then(function (res) {
+        var data = res.data;
+        _this5.statusLoading[type] = false;
+        if (data.status === 1) {
+          _this5.theme = data.data;
+          (0,_ThemePalette__WEBPACK_IMPORTED_MODULE_1__.loadTheme)(_this5.$baseUrl);
+          _this5.showMessage("success", data.message);
+        } else {
+          _this5.showError(data.message);
+        }
+      })["catch"](function (error) {
+        _this5.statusLoading[type] = false;
+        _this5.showError(error.message || __('something_went_wrong'));
+      });
+    },
+    resetStatusColor: function resetStatusColor(type) {
+      var _this6 = this;
+      this.statusLoading[type] = true;
+      axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"](this.$apiUrl + '/theme/status/' + type + '/reset').then(function (res) {
+        var data = res.data;
+        _this6.statusLoading[type] = false;
+        if (data.status === 1) {
+          _this6.theme = data.data;
+          _this6.statusSeeds[type] = data.data[type]['500'];
+          (0,_ThemePalette__WEBPACK_IMPORTED_MODULE_1__.loadTheme)(_this6.$baseUrl);
+          _this6.showMessage("success", data.message);
+        } else {
+          _this6.showError(data.message);
+        }
+      })["catch"](function (error) {
+        _this6.statusLoading[type] = false;
+        _this6.showError(error.message || __('something_went_wrong'));
       });
     }
   }
@@ -468,7 +633,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.card-header[data-v-0f7a895e] {\n    border-bottom: none;\n}\n.theme-settings-section .theme-card[data-v-0f7a895e] {\n    border-radius: 12px;\n    border: 1px solid #e9ecef;\n}\n.theme-card-header[data-v-0f7a895e] {\n    display: flex;\n    align-items: flex-start;\n    gap: 10px;\n    margin-bottom: 16px;\n}\n.color-dot[data-v-0f7a895e] {\n    width: 12px;\n    height: 12px;\n    border-radius: 50%;\n    margin-top: 6px;\n    flex-shrink: 0;\n}\n.theme-card-title[data-v-0f7a895e] {\n    margin: 0;\n    font-size: 1rem;\n    font-weight: 600;\n}\n.theme-card-desc[data-v-0f7a895e] {\n    margin: 2px 0 0;\n    font-size: 0.8rem;\n    color: #8592a3;\n}\n.hex-picker-row input[type=\"color\"][data-v-0f7a895e] {\n    flex-shrink: 0;\n}\n.hex-input[data-v-0f7a895e] {\n    width: 110px;\n    margin-left: 10px;\n    text-transform: uppercase;\n    font-family: monospace;\n}\n.palette-preview[data-v-0f7a895e] {\n    display: flex;\n    margin-top: 12px;\n    border-radius: 6px;\n    overflow: hidden;\n}\n.swatch[data-v-0f7a895e] {\n    flex: 1;\n    height: 26px;\n}\n.status-colors-title[data-v-0f7a895e] {\n    margin-top: 8px;\n    margin-bottom: 2px;\n    font-size: 1.1rem;\n    font-weight: 600;\n}\n.status-colors-desc[data-v-0f7a895e] {\n    font-size: 0.85rem;\n    color: #8592a3;\n    margin-bottom: 16px;\n}\n.theme-save-btn[data-v-0f7a895e] {\n    border-radius: 6px;\n}\n.theme-reset-btn[data-v-0f7a895e] {\n    border-radius: 6px;\n}\n.status-mobile-card[data-v-0f7a895e] {\n    border-radius: 12px;\n    border: 1px solid #e9ecef;\n    overflow: hidden;\n}\n.status-mobile-row[data-v-0f7a895e] {\n    border-bottom: 1px solid #e9ecef;\n}\n.status-mobile-row[data-v-0f7a895e]:last-child {\n    border-bottom: none;\n}\n.status-mobile-summary[data-v-0f7a895e] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 14px 16px;\n    cursor: pointer;\n}\n.status-mobile-title[data-v-0f7a895e] {\n    font-weight: 600;\n    flex: 1;\n}\n.status-mobile-hex[data-v-0f7a895e] {\n    font-family: monospace;\n    color: #8592a3;\n    font-size: 0.85rem;\n}\n.status-mobile-chevron[data-v-0f7a895e] {\n    color: #8592a3;\n    transition: transform 0.2s ease;\n}\n.status-mobile-summary:not(.collapsed) .status-mobile-chevron[data-v-0f7a895e] {\n    transform: rotate(180deg);\n}\n.status-mobile-body[data-v-0f7a895e] {\n    padding: 0 16px 16px;\n}\n@media (max-width: 575.98px) {\n.hex-picker-row[data-v-0f7a895e] {\n        flex-wrap: wrap;\n        row-gap: 8px;\n}\n.hex-input[data-v-0f7a895e] {\n        margin-left: 10px;\n}\n.card-footer.d-flex[data-v-0f7a895e] {\n        flex-wrap: wrap;\n        gap: 8px;\n}\n.card-footer.d-flex .btn[data-v-0f7a895e] {\n        flex: 1 1 auto;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.card-header[data-v-0f7a895e] {\n    border-bottom: none;\n}\n.theme-settings-section .theme-card[data-v-0f7a895e] {\n    border-radius: var(--ui-radius-lg);\n    border: 1px solid var(--ui-border);\n}\n.theme-card-header[data-v-0f7a895e] {\n    display: flex;\n    align-items: flex-start;\n    gap: 10px;\n    margin-bottom: 16px;\n}\n.color-dot[data-v-0f7a895e] {\n    width: 12px;\n    height: 12px;\n    border-radius: 50%;\n    margin-top: 6px;\n    flex-shrink: 0;\n}\n.theme-card-title[data-v-0f7a895e] {\n    margin: 0;\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.theme-card-desc[data-v-0f7a895e] {\n    margin: 2px 0 0;\n    font-size: 12px;\n    color: var(--ui-text-muted);\n}\n.hex-picker-row input[type=\"color\"][data-v-0f7a895e] {\n    flex-shrink: 0;\n}\n.hex-input[data-v-0f7a895e] {\n    width: 110px;\n    margin-inline-start: 10px;\n    direction: ltr; /* keep \"#F69609\" in order on RTL pages */\n    text-transform: uppercase;\n    font-family: var(--ui-font);\n    font-variant-numeric: tabular-nums;\n}\n.palette-preview[data-v-0f7a895e] {\n    display: flex;\n    margin-top: 12px;\n    border-radius: var(--ui-radius-sm);\n    overflow: hidden;\n    border: 1px solid var(--ui-border);\n}\n.swatch[data-v-0f7a895e] {\n    flex: 1;\n    height: 26px;\n}\n.status-colors-title[data-v-0f7a895e] {\n    margin-top: 8px;\n    margin-bottom: 2px;\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.status-colors-desc[data-v-0f7a895e] {\n    font-size: 13px;\n    color: var(--ui-text-muted);\n    margin-bottom: 16px;\n}\n.theme-save-btn[data-v-0f7a895e] {\n    border-radius: var(--ui-radius);\n}\n.theme-reset-btn[data-v-0f7a895e] {\n    border-radius: var(--ui-radius);\n}\n.status-mobile-card[data-v-0f7a895e] {\n    border-radius: var(--ui-radius-lg);\n    border: 1px solid var(--ui-border);\n    overflow: hidden;\n}\n.status-mobile-row[data-v-0f7a895e] {\n    border-bottom: 1px solid var(--ui-border);\n}\n.status-mobile-row[data-v-0f7a895e]:last-child {\n    border-bottom: none;\n}\n.status-mobile-summary[data-v-0f7a895e] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 14px 16px;\n    cursor: pointer;\n}\n.status-mobile-title[data-v-0f7a895e] {\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-heading);\n    flex: 1;\n}\n.status-mobile-hex[data-v-0f7a895e] {\n    font-family: var(--ui-font);\n    font-variant-numeric: tabular-nums;\n    color: var(--ui-text-muted);\n    font-size: 12px;\n}\n.status-mobile-chevron[data-v-0f7a895e] {\n    color: var(--ui-text-muted);\n    transition: transform 0.2s ease;\n}\n.status-mobile-summary:not(.collapsed) .status-mobile-chevron[data-v-0f7a895e] {\n    transform: rotate(180deg);\n}\n.status-mobile-body[data-v-0f7a895e] {\n    padding: 0 16px 16px;\n}\n@media (max-width: 575.98px) {\n.hex-picker-row[data-v-0f7a895e] {\n        flex-wrap: wrap;\n        row-gap: 8px;\n}\n.hex-input[data-v-0f7a895e] {\n        margin-inline-start: 10px;\n}\n.card-footer.d-flex[data-v-0f7a895e] {\n        flex-wrap: wrap;\n        gap: 8px;\n}\n.card-footer.d-flex .btn[data-v-0f7a895e] {\n        flex: 1 1 auto;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -632,6 +797,17 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
                     {
                       staticClass: "breadcrumb-item active",
                       attrs: { "aria-current": "page" },
@@ -655,6 +831,482 @@ var render = function () {
               on: {
                 submit: function ($event) {
                   $event.preventDefault()
+                  return _vm.saveAdminTheme.apply(null, arguments)
+                },
+              },
+            },
+            [
+              _c("div", { staticClass: "card theme-card mb-4" }, [
+                _c("div", { staticClass: "card-body" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "d-flex flex-wrap align-items-center justify-content-between gap-3",
+                    },
+                    [
+                      _c("div", { staticClass: "theme-card-header mb-0" }, [
+                        _c("span", {
+                          staticClass: "color-dot",
+                          style: {
+                            background: _vm.admin.use_module_theme
+                              ? _vm.seeds.light_seed_primary
+                              : _vm.admin.seed_primary,
+                          },
+                        }),
+                        _vm._v(" "),
+                        _c("div", [
+                          _c("h4", { staticClass: "theme-card-title" }, [
+                            _vm._v(
+                              _vm._s(
+                                _vm.tr(
+                                  "admin_panel_colors",
+                                  "Admin panel colours"
+                                )
+                              )
+                            ),
+                          ]),
+                          _vm._v(" "),
+                          _c("p", { staticClass: "theme-card-desc mb-0" }, [
+                            _vm._v(
+                              _vm._s(
+                                _vm.tr(
+                                  "admin_panel_colors_desc",
+                                  "Use each module's theme colours in the admin panel? Applies to every module."
+                                )
+                              )
+                            ),
+                          ]),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "btn-group btn-group-toggle segmented-toggle",
+                          attrs: {
+                            role: "radiogroup",
+                            "aria-label": _vm.tr(
+                              "admin_panel_colors",
+                              "Admin panel colours"
+                            ),
+                          },
+                        },
+                        [
+                          _c(
+                            "label",
+                            {
+                              staticClass: "btn",
+                              class: _vm.admin.use_module_theme
+                                ? "btn-primary"
+                                : "btn-outline-secondary",
+                            },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.admin.use_module_theme,
+                                    expression: "admin.use_module_theme",
+                                  },
+                                ],
+                                attrs: { type: "radio" },
+                                domProps: {
+                                  value: true,
+                                  checked: _vm._q(
+                                    _vm.admin.use_module_theme,
+                                    true
+                                  ),
+                                },
+                                on: {
+                                  change: function ($event) {
+                                    return _vm.$set(
+                                      _vm.admin,
+                                      "use_module_theme",
+                                      true
+                                    )
+                                  },
+                                },
+                              }),
+                              _vm._v(
+                                "\n                                    " +
+                                  _vm._s(
+                                    _vm.tr(
+                                      "use_module_colors",
+                                      "Yes, module colours"
+                                    )
+                                  ) +
+                                  "\n                                "
+                              ),
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "label",
+                            {
+                              staticClass: "btn",
+                              class: !_vm.admin.use_module_theme
+                                ? "btn-primary"
+                                : "btn-outline-secondary",
+                            },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.admin.use_module_theme,
+                                    expression: "admin.use_module_theme",
+                                  },
+                                ],
+                                attrs: { type: "radio" },
+                                domProps: {
+                                  value: false,
+                                  checked: _vm._q(
+                                    _vm.admin.use_module_theme,
+                                    false
+                                  ),
+                                },
+                                on: {
+                                  change: function ($event) {
+                                    return _vm.$set(
+                                      _vm.admin,
+                                      "use_module_theme",
+                                      false
+                                    )
+                                  },
+                                },
+                              }),
+                              _vm._v(
+                                "\n                                    " +
+                                  _vm._s(
+                                    _vm.tr(
+                                      "use_own_admin_colors",
+                                      "No, own colours"
+                                    )
+                                  ) +
+                                  "\n                                "
+                              ),
+                            ]
+                          ),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  !_vm.admin.use_module_theme
+                    ? _c("div", { staticClass: "row mt-4" }, [
+                        _c(
+                          "div",
+                          { staticClass: "col-12 col-md-6 mb-4 mb-md-0" },
+                          [
+                            _c("div", { staticClass: "theme-card-header" }, [
+                              _c("span", {
+                                staticClass: "color-dot",
+                                style: { background: _vm.admin.seed_primary },
+                              }),
+                              _vm._v(" "),
+                              _c("div", [
+                                _c("h4", { staticClass: "theme-card-title" }, [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.tr(
+                                        "admin_primary_color",
+                                        "Admin primary colour"
+                                      )
+                                    )
+                                  ),
+                                ]),
+                                _vm._v(" "),
+                                _c("p", { staticClass: "theme-card-desc" }, [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__(
+                                        "used_for_main_brand_elements_and_actions"
+                                      )
+                                    )
+                                  ),
+                                ]),
+                              ]),
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "d-flex align-items-center hex-picker-row",
+                              },
+                              [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.admin.seed_primary,
+                                      expression: "admin.seed_primary",
+                                    },
+                                  ],
+                                  attrs: { type: "color" },
+                                  domProps: { value: _vm.admin.seed_primary },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.admin,
+                                          "seed_primary",
+                                          $event.target.value
+                                        )
+                                      },
+                                      function ($event) {
+                                        return _vm.previewAdmin("primary")
+                                      },
+                                    ],
+                                  },
+                                }),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.admin.seed_primary,
+                                      expression: "admin.seed_primary",
+                                    },
+                                  ],
+                                  staticClass: "form-control hex-input",
+                                  attrs: { type: "text", maxlength: "7" },
+                                  domProps: { value: _vm.admin.seed_primary },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.admin,
+                                          "seed_primary",
+                                          $event.target.value
+                                        )
+                                      },
+                                      function ($event) {
+                                        return _vm.previewAdmin("primary")
+                                      },
+                                    ],
+                                  },
+                                }),
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "palette-preview" },
+                              _vm._l(_vm.admin.primary, function (hex, stop) {
+                                return _c("div", {
+                                  key: stop,
+                                  staticClass: "swatch",
+                                  style: { background: hex },
+                                  attrs: { title: stop + ": " + hex },
+                                })
+                              }),
+                              0
+                            ),
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-12 col-md-6" }, [
+                          _c("div", { staticClass: "theme-card-header" }, [
+                            _c("span", {
+                              staticClass: "color-dot",
+                              style: { background: _vm.admin.seed_neutral },
+                            }),
+                            _vm._v(" "),
+                            _c("div", [
+                              _c("h4", { staticClass: "theme-card-title" }, [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.tr(
+                                      "admin_neutral_color",
+                                      "Admin neutral colour"
+                                    )
+                                  )
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("p", { staticClass: "theme-card-desc" }, [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.__(
+                                      "used_for_text_backgrounds_borders_and_neutral_elements"
+                                    )
+                                  )
+                                ),
+                              ]),
+                            ]),
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            {
+                              staticClass:
+                                "d-flex align-items-center hex-picker-row",
+                            },
+                            [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.admin.seed_neutral,
+                                    expression: "admin.seed_neutral",
+                                  },
+                                ],
+                                attrs: { type: "color" },
+                                domProps: { value: _vm.admin.seed_neutral },
+                                on: {
+                                  input: [
+                                    function ($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.admin,
+                                        "seed_neutral",
+                                        $event.target.value
+                                      )
+                                    },
+                                    function ($event) {
+                                      return _vm.previewAdmin("neutral")
+                                    },
+                                  ],
+                                },
+                              }),
+                              _vm._v(" "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.admin.seed_neutral,
+                                    expression: "admin.seed_neutral",
+                                  },
+                                ],
+                                staticClass: "form-control hex-input",
+                                attrs: { type: "text", maxlength: "7" },
+                                domProps: { value: _vm.admin.seed_neutral },
+                                on: {
+                                  input: [
+                                    function ($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.admin,
+                                        "seed_neutral",
+                                        $event.target.value
+                                      )
+                                    },
+                                    function ($event) {
+                                      return _vm.previewAdmin("neutral")
+                                    },
+                                  ],
+                                },
+                              }),
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "palette-preview" },
+                            _vm._l(_vm.admin.neutral, function (hex, stop) {
+                              return _c("div", {
+                                key: stop,
+                                staticClass: "swatch",
+                                style: { background: hex },
+                                attrs: { title: stop + ": " + hex },
+                              })
+                            }),
+                            0
+                          ),
+                        ]),
+                      ])
+                    : _vm._e(),
+                ]),
+                _vm._v(" "),
+                _vm.$can("manage_store_settings")
+                  ? _c(
+                      "div",
+                      { staticClass: "card-footer d-flex justify-content-end" },
+                      [
+                        _vm.$can("theme_settings")
+                          ? _c(
+                              "b-button",
+                              {
+                                staticClass: "theme-save-btn",
+                                attrs: {
+                                  type: "submit",
+                                  variant: "primary",
+                                  disabled: _vm.adminSaving,
+                                },
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(_vm.__("save")) +
+                                    "\n                            "
+                                ),
+                                _vm.adminSaving
+                                  ? _c("b-spinner", {
+                                      attrs: { small: "", label: "Spinning" },
+                                    })
+                                  : _vm._e(),
+                              ],
+                              1
+                            )
+                          : _vm._e(),
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+              ]),
+            ]
+          ),
+          _vm._v(" "),
+          !_vm.admin.use_module_theme && _vm.adminLoaded
+            ? _c(
+                "div",
+                {
+                  staticClass:
+                    "alert alert-info d-flex align-items-center gap-2 mb-4",
+                  attrs: { role: "status" },
+                },
+                [
+                  _c("i", { staticClass: "bi bi-info-circle" }),
+                  _vm._v(" "),
+                  _c("span", [
+                    _vm._v(
+                      _vm._s(
+                        _vm.tr(
+                          "module_colors_used_by_web_apps",
+                          "The admin panel uses its own colours. The module colours below still apply to the website and the apps."
+                        )
+                      )
+                    ),
+                  ]),
+                ]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "form",
+            {
+              on: {
+                submit: function ($event) {
+                  $event.preventDefault()
                   return _vm.saveTheme.apply(null, arguments)
                 },
               },
@@ -662,6 +1314,31 @@ var render = function () {
             [
               _c("div", { staticClass: "card theme-card mb-4" }, [
                 _c("div", { staticClass: "card-body" }, [
+                  _vm.usesDefaultColors
+                    ? _c(
+                        "div",
+                        {
+                          staticClass:
+                            "alert alert-info d-flex align-items-center gap-2 mb-4",
+                          attrs: { role: "status" },
+                        },
+                        [
+                          _c("i", { staticClass: "bi bi-info-circle" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(
+                              _vm._s(
+                                _vm.__("theme_uses_default_module_colors") ===
+                                  "theme_uses_default_module_colors"
+                                  ? "This module uses the default module's colours. Change them and save to give it its own."
+                                  : _vm.__("theme_uses_default_module_colors")
+                              )
+                            ),
+                          ]),
+                        ]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
                   _c("div", { staticClass: "row" }, [
                     _c("div", { staticClass: "col-12 col-md-6 mb-4 mb-md-0" }, [
                       _c("div", { staticClass: "theme-card-header" }, [
@@ -886,32 +1563,34 @@ var render = function () {
                 _vm.$can("manage_store_settings")
                   ? _c(
                       "div",
-                      { staticClass: "card-footer" },
+                      { staticClass: "card-footer d-flex justify-content-end" },
                       [
-                        _c(
-                          "b-button",
-                          {
-                            staticClass: "theme-save-btn",
-                            attrs: {
-                              type: "submit",
-                              variant: "primary",
-                              disabled: _vm.isLoading,
-                            },
-                          },
-                          [
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm.__("save")) +
-                                "\n                            "
-                            ),
-                            _vm.isLoading
-                              ? _c("b-spinner", {
-                                  attrs: { small: "", label: "Spinning" },
-                                })
-                              : _vm._e(),
-                          ],
-                          1
-                        ),
+                        _vm.$can("theme_settings")
+                          ? _c(
+                              "b-button",
+                              {
+                                staticClass: "theme-save-btn",
+                                attrs: {
+                                  type: "submit",
+                                  variant: "primary",
+                                  disabled: _vm.isLoading,
+                                },
+                              },
+                              [
+                                _vm._v(
+                                  "\n                            " +
+                                    _vm._s(_vm.__("save")) +
+                                    "\n                            "
+                                ),
+                                _vm.isLoading
+                                  ? _c("b-spinner", {
+                                      attrs: { small: "", label: "Spinning" },
+                                    })
+                                  : _vm._e(),
+                              ],
+                              1
+                            )
+                          : _vm._e(),
                       ],
                       1
                     )
@@ -1088,23 +1767,25 @@ var render = function () {
                                     [_vm._v(_vm._s(_vm.__("reset_to_default")))]
                                   ),
                                   _vm._v(" "),
-                                  _c(
-                                    "button",
-                                    {
-                                      staticClass:
-                                        "btn btn-primary theme-save-btn",
-                                      attrs: {
-                                        type: "button",
-                                        disabled: _vm.statusLoading[type],
-                                      },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.saveStatusColor(type)
+                                  _vm.$can("theme_settings")
+                                    ? _c(
+                                        "button",
+                                        {
+                                          staticClass:
+                                            "btn btn-primary theme-save-btn",
+                                          attrs: {
+                                            type: "button",
+                                            disabled: _vm.statusLoading[type],
+                                          },
+                                          on: {
+                                            click: function ($event) {
+                                              return _vm.saveStatusColor(type)
+                                            },
+                                          },
                                         },
-                                      },
-                                    },
-                                    [_vm._v(_vm._s(_vm.__("save")))]
-                                  ),
+                                        [_vm._v(_vm._s(_vm.__("save")))]
+                                      )
+                                    : _vm._e(),
                                 ]
                               )
                             : _vm._e(),
@@ -1278,23 +1959,28 @@ var render = function () {
                                         ]
                                       ),
                                       _vm._v(" "),
-                                      _c(
-                                        "button",
-                                        {
-                                          staticClass:
-                                            "btn btn-primary theme-save-btn",
-                                          attrs: {
-                                            type: "button",
-                                            disabled: _vm.statusLoading[type],
-                                          },
-                                          on: {
-                                            click: function ($event) {
-                                              return _vm.saveStatusColor(type)
+                                      _vm.$can("theme_settings")
+                                        ? _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-primary theme-save-btn",
+                                              attrs: {
+                                                type: "button",
+                                                disabled:
+                                                  _vm.statusLoading[type],
+                                              },
+                                              on: {
+                                                click: function ($event) {
+                                                  return _vm.saveStatusColor(
+                                                    type
+                                                  )
+                                                },
+                                              },
                                             },
-                                          },
-                                        },
-                                        [_vm._v(_vm._s(_vm.__("save")))]
-                                      ),
+                                            [_vm._v(_vm._s(_vm.__("save")))]
+                                          )
+                                        : _vm._e(),
                                     ]
                                   )
                                 : _vm._e(),

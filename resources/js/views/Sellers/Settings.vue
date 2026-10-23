@@ -1,15 +1,26 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row mb-3">
-                <div class="col-12">
-                    <h3>{{ __('thermal_print_settings') }}</h3>
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>{{ __('thermal_print_settings') }}</h3>
+                    </div>
+                    <div class="col-12 col-md-6 order-md-2 order-first">
+                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><router-link to="/seller/dashboard">{{ __('dashboard') }}</router-link></li>
+                                <li class="breadcrumb-item active" aria-current="page">{{ __('thermal_print_settings') }}</li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h4>{{ __('thermal_print_settings') }}</h4>
+                    <h4 class="card-title float-none">{{ __('thermal_print_settings') }}</h4>
+                    <p class="text-muted small mb-0 mt-1">{{ tr('thermal_print_settings_desc', 'Logo and paper width used when printing thermal invoices.') }}</p>
                 </div>
 
                 <div class="card-body">
@@ -22,7 +33,7 @@
                             <input type="file" accept="image/*" ref="file_thermal_logo" class="file-input"
                                 @change="handleThermalLogo">
 
-                            <div class="file-input-div bg-gray-100" @click="$refs.file_thermal_logo.click()"
+                            <div class="file-input-div" @click="$refs.file_thermal_logo.click()"
                                 @drop="dropThermalLogo" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
 
                                 <template v-if="thermal_logo && thermal_logo.name">
@@ -47,14 +58,14 @@
                             <label>{{ __('thermal_paper_width') }}</label>
 
                             <b-form-radio-group v-model="thermal_paper_width" :options="paperOptions" buttons
-                                button-variant="outline-primary">
+                                button-variant="outline-primary" class="d-flex flex-wrap thermal-paper-group">
                             </b-form-radio-group>
                         </div>
 
                     </div>
                 </div>
 
-                <div class="card-footer">
+                <div class="card-footer d-flex justify-content-end">
                     <b-button variant="primary" :disabled="isLoading" @click="saveSettings">
                         {{ __('save') }}
                         <b-spinner small v-if="isLoading"></b-spinner>
@@ -92,6 +103,7 @@ export default {
     },
 
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
 
         // ================= LOAD SETTINGS =================
         getSettings() {
@@ -163,7 +175,13 @@ export default {
 .custom-image {
     height: auto;
     width: 60%;
-    border: 1px solid #ddd;
+    max-width: 200px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
     padding: 5px;
+    background: var(--ui-surface);
+}
+.thermal-paper-group {
+    margin-top: 2px;
 }
 </style>

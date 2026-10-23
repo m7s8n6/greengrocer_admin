@@ -12,6 +12,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _Edit__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Edit */ "./resources/js/views/DeliveryBoys/Edit.vue");
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -178,9 +179,82 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_1__["default"]],
   components: {
     'app-edit-record': _Edit__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
@@ -194,43 +268,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, {
         key: 'name',
         label: __('name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'mobile',
         label: __('mobile'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'email',
         label: __('email'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'address',
         label: __('address'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'bonus_percentage',
         label: __('bonus'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'balance',
         label: __('balance'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'cash_received',
         label: __('cash_received'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'status',
         label: __('status'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'is_available',
         label: __('available'),
@@ -303,6 +369,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         };
       });
     },
+    // Grid view: same records, client-side search and order as the table.
+    gridDeliveryBoys: function gridDeliveryBoys() {
+      return this.gridSort(this.gridFilter(this.translatedDeliveryBoys));
+    },
     pageEnd: function pageEnd() {
       return Math.min(this.currentPage * this.perPage, this.totalRows);
     }
@@ -323,6 +393,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   methods: {
+    // Grid view: same client-side search the b-table :filter applies (any field contains the text).
+    // Grid view: same order as the b-table (its sortBy / sortDesc are synced from the list view headers).
+    // Position of a card's record in this.deliveryBoys (the delete handler splices that array).
+    fullIndex: function fullIndex(item) {
+      return this.deliveryBoys.findIndex(function (b) {
+        return b.id === item.id;
+      });
+    },
     escapeHtml: function escapeHtml(value) {
       var div = document.createElement('div');
       div.textContent = value !== null && value !== void 0 ? value : '';
@@ -393,8 +471,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this6.isLoading = true;
@@ -442,6 +520,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+//
+//
 //
 //
 //
@@ -1012,6 +1092,149 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.db-info-chip[data-v-5e0b8e20] {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-sm);\n    background: var(--ui-surface-muted);\n    color: var(--ui-text-muted);\n    cursor: pointer;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/Edit.vue?vue&type=style&index=0&id=73eae76f&scoped=true&lang=css":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/Edit.vue?vue&type=style&index=0&id=73eae76f&scoped=true&lang=css ***!
@@ -1032,7 +1255,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.db-section-title[data-v-73eae76f] {\n    margin: 8px 0 12px;\n    padding-top: 16px;\n    border-top: 1px solid var(--ui-border);\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.db-status-group[data-v-73eae76f] {\n    gap: 8px;\n}\n.db-status-group[data-v-73eae76f]  .btn {\n    margin: 0;\n    border-radius: var(--ui-radius) !important; /* beat BootstrapVue btn-group joined corners */\n    font-size: 13px;\n    font-weight: 600;\n}\n.db-status-group[data-v-73eae76f]  .btn input[type=\"radio\"] {\n    position: absolute;\n    opacity: 0;\n    pointer-events: none;\n}\n.custom-image[data-v-73eae76f] {\n    width: 100%;\n    max-width: 96px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-sm);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1060,6 +1283,36 @@ ___CSS_LOADER_EXPORT___.push([module.id, "fieldset[disabled] .multiselect{pointe
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_style_index_0_id_5e0b8e20_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_style_index_0_id_5e0b8e20_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_style_index_0_id_5e0b8e20_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -1104,23 +1357,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DeliveryBoys.vue?vue&type=template&id=5e0b8e20 */ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20");
+/* harmony import */ var _DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true */ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true");
 /* harmony import */ var _DeliveryBoys_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DeliveryBoys.vue?vue&type=script&lang=js */ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _DeliveryBoys_vue_vue_type_style_index_0_id_5e0b8e20_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css */ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _DeliveryBoys_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__.render,
-  _DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5e0b8e20",
   null
   
 )
@@ -1205,6 +1460,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_style_index_0_id_5e0b8e20_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=style&index=0&id=5e0b8e20&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/DeliveryBoys/Edit.vue?vue&type=style&index=0&id=73eae76f&scoped=true&lang=css":
 /*!**********************************************************************************************************!*\
   !*** ./resources/js/views/DeliveryBoys/Edit.vue?vue&type=style&index=0&id=73eae76f&scoped=true&lang=css ***!
@@ -1218,19 +1486,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20":
-/*!****************************************************************************************!*\
-  !*** ./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20 ***!
-  \****************************************************************************************/
+/***/ "./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true ***!
+  \****************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryBoys.vue?vue&type=template&id=5e0b8e20 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DeliveryBoys_vue_vue_type_template_id_5e0b8e20_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true");
 
 
 /***/ }),
@@ -1252,10 +1520,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20":
-/*!*******************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20 ***!
-  \*******************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/DeliveryBoys/DeliveryBoys.vue?vue&type=template&id=5e0b8e20&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1314,16 +1582,6 @@ var render = function () {
         _c("div", { staticClass: "figma-main-section-card" }, [
           _c(
             "div",
-            { staticClass: "card-header border-0 bg-transparent py-3" },
-            [
-              _c("h4", { staticClass: "card-title mb-0 figma-card-title" }, [
-                _vm._v(_vm._s(_vm.__("delivery_boys"))),
-              ]),
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
             { staticClass: "card-body p-0" },
             [
               _c(
@@ -1371,7 +1629,7 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "div",
-                    { staticClass: "d-flex gap-2" },
+                    { staticClass: "d-flex gap-2 flex-wrap" },
                     [
                       _c(
                         "button",
@@ -1389,8 +1647,8 @@ var render = function () {
                           _c("base-icon", {
                             attrs: {
                               name: "Funnel",
-                              width: "24",
-                              height: "24",
+                              width: "16",
+                              height: "16",
                               useCurrentColor: "",
                             },
                           }),
@@ -1402,23 +1660,71 @@ var render = function () {
                         1
                       ),
                       _vm._v(" "),
-                      _vm.$can("delivery_boy_create")
-                        ? _c(
-                            "router-link",
+                      _c(
+                        "div",
+                        {
+                          staticClass: "view-toggle",
+                          attrs: {
+                            role: "group",
+                            "aria-label": _vm.__("view"),
+                          },
+                        },
+                        [
+                          _c(
+                            "button",
                             {
-                              staticClass:
-                                "btn btn-figma-filter d-flex align-items-center gap-2",
-                              attrs: { to: "/delivery_boys/create" },
+                              directives: [
+                                {
+                                  name: "b-tooltip",
+                                  rawName: "v-b-tooltip.hover",
+                                  modifiers: { hover: true },
+                                },
+                              ],
+                              staticClass: "view-toggle-btn",
+                              class: { active: _vm.viewMode === "grid" },
+                              attrs: {
+                                type: "button",
+                                title: _vm.__("grid_view"),
+                              },
+                              on: {
+                                click: function ($event) {
+                                  return _vm.setViewMode("grid")
+                                },
+                              },
                             },
                             [
-                              _c("i", { staticClass: "fa fa-plus" }),
-                              _vm._v(" "),
-                              _c("span", [
-                                _vm._v(_vm._s(_vm.__("add_delivery_boy"))),
-                              ]),
+                              _c("i", {
+                                staticClass: "bi bi-grid-3x3-gap-fill",
+                              }),
                             ]
-                          )
-                        : _vm._e(),
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              directives: [
+                                {
+                                  name: "b-tooltip",
+                                  rawName: "v-b-tooltip.hover",
+                                  modifiers: { hover: true },
+                                },
+                              ],
+                              staticClass: "view-toggle-btn",
+                              class: { active: _vm.viewMode === "list" },
+                              attrs: {
+                                type: "button",
+                                title: _vm.__("list_view"),
+                              },
+                              on: {
+                                click: function ($event) {
+                                  return _vm.setViewMode("list")
+                                },
+                              },
+                            },
+                            [_c("i", { staticClass: "bi bi-list-ul" })]
+                          ),
+                        ]
+                      ),
                       _vm._v(" "),
                       _c(
                         "button",
@@ -1445,6 +1751,24 @@ var render = function () {
                           _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
                         ]
                       ),
+                      _vm._v(" "),
+                      _vm.$can("delivery_boy_create")
+                        ? _c(
+                            "router-link",
+                            {
+                              staticClass:
+                                "btn btn-figma-filter d-flex align-items-center gap-2",
+                              attrs: { to: "/delivery_boys/create" },
+                            },
+                            [
+                              _c("i", { staticClass: "fa fa-plus" }),
+                              _vm._v(" "),
+                              _c("span", [
+                                _vm._v(_vm._s(_vm.__("add_delivery_boy"))),
+                              ]),
+                            ]
+                          )
+                        : _vm._e(),
                     ],
                     1
                   ),
@@ -1542,307 +1866,775 @@ var render = function () {
                 ]
               ),
               _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "table-responsive" },
-                [
-                  _c("b-table", {
-                    staticClass: "figma-order-table mb-0",
-                    attrs: {
-                      items: _vm.translatedDeliveryBoys,
-                      fields: _vm.fields,
-                      "current-page": _vm.currentPage,
-                      "per-page": _vm.perPage,
-                      filter: _vm.filter,
-                      "filter-included-fields": _vm.filterOn,
-                      "sort-by": _vm.sortBy,
-                      "sort-desc": _vm.sortDesc,
-                      "sort-direction": _vm.sortDirection,
-                      bordered: false,
-                      busy: _vm.isLoading,
-                      stacked: "md",
-                      "show-empty": "",
-                      "tbody-tr-class": function () {
-                        return "figma-tr align-middle"
-                      },
-                      small: "",
-                    },
-                    on: {
-                      "update:sortBy": function ($event) {
-                        _vm.sortBy = $event
-                      },
-                      "update:sort-by": function ($event) {
-                        _vm.sortBy = $event
-                      },
-                      "update:sortDesc": function ($event) {
-                        _vm.sortDesc = $event
-                      },
-                      "update:sort-desc": function ($event) {
-                        _vm.sortDesc = $event
-                      },
-                    },
-                    scopedSlots: _vm._u([
-                      {
-                        key: "table-busy",
-                        fn: function () {
-                          return [
-                            _c(
-                              "div",
-                              { staticClass: "text-center text-black my-2" },
-                              [
-                                _c("b-spinner", {
-                                  staticClass: "align-middle",
-                                }),
-                                _vm._v(" "),
-                                _c("strong", [
-                                  _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                                ]),
-                              ],
-                              1
-                            ),
-                          ]
-                        },
-                        proxy: true,
-                      },
-                      {
-                        key: "head(balance)",
-                        fn: function (row) {
-                          return [
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm.__("balance")) +
-                                _vm._s(" (" + _vm.$currency + ")") +
-                                "\n                        "
-                            ),
-                          ]
-                        },
-                      },
-                      {
-                        key: "head(cash_received)",
-                        fn: function (row) {
-                          return [
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm.__("cash_received")) +
-                                " " +
-                                _vm._s("(" + _vm.$currency + ")") +
-                                "\n                        "
-                            ),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(mobile)",
-                        fn: function (row) {
-                          return [
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm._f("mobileMask")(row.item.mobile)) +
-                                "\n                        "
-                            ),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(bonus_percentage)",
-                        fn: function (row) {
-                          return [
-                            _c("div", [
-                              _c(
-                                "small",
-                                {
-                                  directives: [
+              _vm.viewMode === "grid"
+                ? _c("div", [
+                    _vm.isLoading
+                      ? _c("div", { staticClass: "item-grid-state" }, [
+                          _c("i", { staticClass: "bi bi-hourglass-split" }),
+                          _vm._v(
+                            _vm._s(_vm.__("loading")) +
+                              "...\n                        "
+                          ),
+                        ])
+                      : !_vm.gridDeliveryBoys.length
+                      ? _c(
+                          "div",
+                          { staticClass: "item-grid-state" },
+                          [
+                            _vm.filter && _vm.translatedDeliveryBoys.length
+                              ? [
+                                  _c("i", { staticClass: "bi bi-search" }),
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__("no_records_matching_your_request")
+                                    ) + "\n                            "
+                                  ),
+                                ]
+                              : [
+                                  _c("i", { staticClass: "bi bi-inbox" }),
+                                  _vm._v(
+                                    _vm._s(_vm.__("no_records_to_show")) +
+                                      "\n                            "
+                                  ),
+                                ],
+                          ],
+                          2
+                        )
+                      : _c(
+                          "div",
+                          { staticClass: "item-grid item-grid--single-xs" },
+                          _vm._l(
+                            _vm.pagedItems(_vm.gridDeliveryBoys),
+                            function (item) {
+                              return _c(
+                                "div",
+                                { key: item.id, staticClass: "item-card" },
+                                [
+                                  _c(
+                                    "div",
                                     {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      value: {
-                                        html: true,
-                                        title: _vm.bonusDetailsHtml(row.item),
-                                        boundary: "window",
-                                      },
-                                      expression:
-                                        "{ html: true, title: bonusDetailsHtml(row.item), boundary: 'window' }",
-                                      modifiers: { hover: true },
+                                      staticClass:
+                                        "item-card-media item-card-media--avatar",
                                     },
-                                  ],
-                                  staticClass:
-                                    "d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2",
-                                },
-                                [_c("i", { staticClass: "fa fa-info-circle" })]
-                              ),
-                            ]),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(status)",
-                        fn: function (row) {
-                          return [
-                            row.item.status == 0
-                              ? _c(
-                                  "label",
-                                  { staticClass: "badge bg-primary" },
-                                  [_vm._v(_vm._s(_vm.__("registered")))]
-                                )
-                              : row.item.status == 1
-                              ? _c(
-                                  "label",
-                                  { staticClass: "badge bg-success" },
-                                  [_vm._v(_vm._s(_vm.__("active")))]
-                                )
-                              : row.item.status == 2
-                              ? _c(
-                                  "label",
-                                  { staticClass: "badge bg-warning" },
-                                  [_vm._v(_vm._s(_vm.__("not_approved")))]
-                                )
-                              : row.item.status == 3
-                              ? _c(
-                                  "label",
-                                  { staticClass: "badge bg-danger" },
-                                  [_vm._v(_vm._s(_vm.__("deactive")))]
-                                )
-                              : row.item.status == 4
-                              ? _c("label", { staticClass: "badge bg-black" }, [
-                                  _vm._v(_vm._s(_vm.__("blocked"))),
-                                ])
-                              : row.item.status == 7
-                              ? _c(
-                                  "label",
-                                  { staticClass: "badge bg-danger" },
-                                  [_vm._v(_vm._s(_vm.__("removed")))]
-                                )
-                              : _vm._e(),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(is_available)",
-                        fn: function (row) {
-                          return [
-                            row.item.status == 1
-                              ? _c(
-                                  "span",
-                                  { staticClass: "badge bg-success" },
-                                  [_vm._v(_vm._s(_vm.__("yes")))]
-                                )
-                              : _c("span", { staticClass: "badge bg-danger" }, [
-                                  _vm._v(_vm._s(_vm.__("no"))),
-                                ]),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(actions)",
-                        fn: function (row) {
-                          return [
-                            _c(
-                              "div",
-                              { staticClass: "d-flex gap-2" },
-                              [
-                                _vm.$can("seller_update")
-                                  ? _c(
-                                      "router-link",
+                                    [
+                                      _c(
+                                        "span",
+                                        { staticClass: "item-card-avatar" },
+                                        [_vm._v(_vm._s(_vm.initial(item.name)))]
+                                      ),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "item-card-body" }, [
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-title" },
+                                      [_vm._v(_vm._s(item.name))]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-meta" },
+                                      [
+                                        _c("i", {
+                                          staticClass: "bi bi-telephone me-1",
+                                        }),
+                                        _vm._v(
+                                          _vm._s(
+                                            _vm._f("mobileMask")(item.mobile)
+                                          )
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    item.email
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "item-card-meta" },
+                                          [
+                                            _c("i", {
+                                              staticClass:
+                                                "bi bi-envelope me-1",
+                                            }),
+                                            _vm._v(_vm._s(item.email)),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    item.address
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "item-card-meta" },
+                                          [
+                                            _c("i", {
+                                              staticClass: "bi bi-geo-alt me-1",
+                                            }),
+                                            _vm._v(_vm._s(item.address)),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
                                       {
-                                        directives: [
+                                        staticClass:
+                                          "item-card-stats justify-content-center",
+                                      },
+                                      [
+                                        _c(
+                                          "span",
+                                          { staticClass: "item-card-chip" },
+                                          [_vm._v("#" + _vm._s(item.id))]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          { staticClass: "item-card-chip" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("balance")) +
+                                                ": " +
+                                                _vm._s(_vm.$currency) +
+                                                _vm._s(item.balance)
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          { staticClass: "item-card-chip" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("cash_received")) +
+                                                ": " +
+                                                _vm._s(_vm.$currency) +
+                                                _vm._s(item.cash_received)
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
                                           {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                value: {
+                                                  html: true,
+                                                  title:
+                                                    _vm.bonusDetailsHtml(item),
+                                                  boundary: "window",
+                                                },
+                                                expression:
+                                                  "{ html: true, title: bonusDetailsHtml(item), boundary: 'window' }",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass: "item-card-chip",
+                                            staticStyle: { cursor: "pointer" },
                                           },
+                                          [
+                                            _c("i", {
+                                              staticClass: "fa fa-info-circle",
+                                            }),
+                                            _vm._v(_vm._s(_vm.__("bonus"))),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "span",
+                                          { staticClass: "item-card-chip" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("available")) +
+                                                ":\n                                            "
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                class:
+                                                  item.status == 1
+                                                    ? "text-success"
+                                                    : "text-danger",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    item.status == 1
+                                                      ? _vm.__("yes")
+                                                      : _vm.__("no")
+                                                  )
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                      ]
+                                    ),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-footer" },
+                                    [
+                                      _c("div", [
+                                        item.status == 0
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-primary mb-0",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("registered"))
+                                                ),
+                                              ]
+                                            )
+                                          : item.status == 1
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-success mb-0",
+                                              },
+                                              [_vm._v(_vm._s(_vm.__("active")))]
+                                            )
+                                          : item.status == 2
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-warning mb-0",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("not_approved"))
+                                                ),
+                                              ]
+                                            )
+                                          : item.status == 3
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-danger mb-0",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("deactive"))
+                                                ),
+                                              ]
+                                            )
+                                          : item.status == 4
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-dark mb-0",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("blocked"))
+                                                ),
+                                              ]
+                                            )
+                                          : item.status == 7
+                                          ? _c(
+                                              "label",
+                                              {
+                                                staticClass:
+                                                  "badge bg-danger mb-0",
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("removed"))
+                                                ),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                      ]),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "item-card-actions" },
+                                        [
+                                          _vm.$can("seller_update")
+                                            ? _c(
+                                                "router-link",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn",
+                                                  attrs: {
+                                                    to: {
+                                                      name: "EditDeliveryBoy",
+                                                      params: {
+                                                        id: item.id,
+                                                        record: item,
+                                                      },
+                                                    },
+                                                    title: _vm.__("edit"),
+                                                  },
+                                                },
+                                                [
+                                                  _c("base-icon", {
+                                                    attrs: {
+                                                      name: "edit icon",
+                                                      hoverName: "edit Hover",
+                                                      width: "24",
+                                                      height: "24",
+                                                    },
+                                                  }),
+                                                ],
+                                                1
+                                              )
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _vm.$can("delivery_boy_delete")
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn figma-delete-btn",
+                                                  attrs: {
+                                                    title: _vm.__("delete"),
+                                                  },
+                                                  on: {
+                                                    click: function ($event) {
+                                                      _vm.deleteDeliveryBoys(
+                                                        _vm.fullIndex(item),
+                                                        item.id
+                                                      )
+                                                    },
+                                                  },
+                                                },
+                                                [
+                                                  _c("base-icon", {
+                                                    attrs: {
+                                                      name: "Type=Default",
+                                                      hoverName: "Type=Hover",
+                                                      width: "24",
+                                                      height: "24",
+                                                    },
+                                                  }),
+                                                ],
+                                                1
+                                              )
+                                            : _vm._e(),
                                         ],
-                                        staticClass: "figma-action-btn",
-                                        attrs: {
-                                          to: {
-                                            name: "EditDeliveryBoy",
-                                            params: {
-                                              id: row.item.id,
-                                              record: row.item,
+                                        1
+                                      ),
+                                    ]
+                                  ),
+                                ]
+                              )
+                            }
+                          ),
+                          0
+                        ),
+                  ])
+                : _c(
+                    "div",
+                    { staticClass: "table-responsive" },
+                    [
+                      _c("b-table", {
+                        staticClass: "figma-order-table mb-0",
+                        attrs: {
+                          items: _vm.translatedDeliveryBoys,
+                          fields: _vm.fields,
+                          "current-page": _vm.currentPage,
+                          "per-page": _vm.perPage,
+                          filter: _vm.filter,
+                          "filter-included-fields": _vm.filterOn,
+                          "sort-by": _vm.sortBy,
+                          "sort-desc": _vm.sortDesc,
+                          "sort-direction": _vm.sortDirection,
+                          bordered: false,
+                          busy: _vm.isLoading,
+                          stacked: "md",
+                          "show-empty": "",
+                          "tbody-tr-class": function () {
+                            return "figma-tr align-middle"
+                          },
+                          small: "",
+                        },
+                        on: {
+                          "update:sortBy": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sort-by": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sortDesc": function ($event) {
+                            _vm.sortDesc = $event
+                          },
+                          "update:sort-desc": function ($event) {
+                            _vm.sortDesc = $event
+                          },
+                        },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "empty",
+                            fn: function (scope) {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-muted py-4",
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass:
+                                        "fa fa-inbox fa-2x d-block mb-2",
+                                    }),
+                                    _vm._v(_vm._s(scope.emptyText)),
+                                  ]
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "emptyfiltered",
+                            fn: function (scope) {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-muted py-4",
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass:
+                                        "fa fa-search fa-2x d-block mb-2",
+                                    }),
+                                    _vm._v(_vm._s(scope.emptyFilteredText)),
+                                  ]
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "table-busy",
+                            fn: function () {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-muted my-2",
+                                  },
+                                  [
+                                    _c("b-spinner", {
+                                      staticClass: "align-middle",
+                                    }),
+                                    _vm._v(" "),
+                                    _c("strong", [
+                                      _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                    ]),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
+                            proxy: true,
+                          },
+                          {
+                            key: "head(balance)",
+                            fn: function (row) {
+                              return [
+                                _vm._v(
+                                  "\n                                " +
+                                    _vm._s(_vm.__("balance")) +
+                                    _vm._s(" (" + _vm.$currency + ")") +
+                                    "\n                            "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "head(cash_received)",
+                            fn: function (row) {
+                              return [
+                                _vm._v(
+                                  "\n                                " +
+                                    _vm._s(_vm.__("cash_received")) +
+                                    " " +
+                                    _vm._s("(" + _vm.$currency + ")") +
+                                    "\n                            "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(mobile)",
+                            fn: function (row) {
+                              return [
+                                _vm._v(
+                                  "\n                                " +
+                                    _vm._s(
+                                      _vm._f("mobileMask")(row.item.mobile)
+                                    ) +
+                                    "\n                            "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(bonus_percentage)",
+                            fn: function (row) {
+                              return [
+                                _c("div", [
+                                  _c(
+                                    "small",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "b-tooltip",
+                                          rawName: "v-b-tooltip.hover",
+                                          value: {
+                                            html: true,
+                                            title: _vm.bonusDetailsHtml(
+                                              row.item
+                                            ),
+                                            boundary: "window",
+                                          },
+                                          expression:
+                                            "{ html: true, title: bonusDetailsHtml(row.item), boundary: 'window' }",
+                                          modifiers: { hover: true },
+                                        },
+                                      ],
+                                      staticClass: "db-info-chip",
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "fa fa-info-circle",
+                                      }),
+                                    ]
+                                  ),
+                                ]),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(status)",
+                            fn: function (row) {
+                              return [
+                                row.item.status == 0
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-primary" },
+                                      [_vm._v(_vm._s(_vm.__("registered")))]
+                                    )
+                                  : row.item.status == 1
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-success" },
+                                      [_vm._v(_vm._s(_vm.__("active")))]
+                                    )
+                                  : row.item.status == 2
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-warning" },
+                                      [_vm._v(_vm._s(_vm.__("not_approved")))]
+                                    )
+                                  : row.item.status == 3
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-danger" },
+                                      [_vm._v(_vm._s(_vm.__("deactive")))]
+                                    )
+                                  : row.item.status == 4
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-dark" },
+                                      [_vm._v(_vm._s(_vm.__("blocked")))]
+                                    )
+                                  : row.item.status == 7
+                                  ? _c(
+                                      "label",
+                                      { staticClass: "badge bg-danger" },
+                                      [_vm._v(_vm._s(_vm.__("removed")))]
+                                    )
+                                  : _vm._e(),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(is_available)",
+                            fn: function (row) {
+                              return [
+                                row.item.status == 1
+                                  ? _c(
+                                      "span",
+                                      { staticClass: "badge bg-success" },
+                                      [_vm._v(_vm._s(_vm.__("yes")))]
+                                    )
+                                  : _c(
+                                      "span",
+                                      { staticClass: "badge bg-danger" },
+                                      [_vm._v(_vm._s(_vm.__("no")))]
+                                    ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(actions)",
+                            fn: function (row) {
+                              return [
+                                _c(
+                                  "div",
+                                  { staticClass: "d-flex gap-2" },
+                                  [
+                                    _vm.$can("seller_update")
+                                      ? _c(
+                                          "router-link",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass: "figma-action-btn",
+                                            attrs: {
+                                              to: {
+                                                name: "EditDeliveryBoy",
+                                                params: {
+                                                  id: row.item.id,
+                                                  record: row.item,
+                                                },
+                                              },
+                                              title: _vm.__("edit"),
                                             },
                                           },
-                                          title: _vm.__("edit"),
-                                        },
-                                      },
-                                      [
-                                        _c("base-icon", {
-                                          attrs: {
-                                            name: "edit icon",
-                                            hoverName: "edit Hover",
-                                            width: "24",
-                                            height: "24",
-                                          },
-                                        }),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.$can("delivery_boy_delete")
-                                  ? _c(
-                                      "button",
-                                      {
-                                        directives: [
+                                          [
+                                            _c("base-icon", {
+                                              attrs: {
+                                                name: "edit icon",
+                                                hoverName: "edit Hover",
+                                                width: "24",
+                                                height: "24",
+                                              },
+                                            }),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.$can("delivery_boy_delete")
+                                      ? _c(
+                                          "button",
                                           {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
+                                            directives: [
+                                              {
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
+                                              },
+                                            ],
+                                            staticClass:
+                                              "figma-action-btn figma-delete-btn",
+                                            attrs: { title: _vm.__("delete") },
+                                            on: {
+                                              click: function ($event) {
+                                                _vm.deleteDeliveryBoys(
+                                                  _vm.fullIndex(row.item),
+                                                  row.item.id
+                                                )
+                                              },
+                                            },
                                           },
-                                        ],
-                                        staticClass:
-                                          "figma-action-btn figma-delete-btn",
-                                        attrs: { title: _vm.__("delete") },
-                                        on: {
-                                          click: function ($event) {
-                                            return _vm.deleteDeliveryBoys(
-                                              row.index,
-                                              row.item.id
-                                            )
-                                          },
-                                        },
-                                      },
-                                      [
-                                        _c("base-icon", {
-                                          attrs: {
-                                            name: "Type=Default",
-                                            hoverName: "Type=Hover",
-                                            width: "24",
-                                            height: "24",
-                                          },
-                                        }),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ],
-                              1
-                            ),
-                          ]
-                        },
-                      },
-                    ]),
-                  }),
-                ],
-                1
-              ),
+                                          [
+                                            _c("base-icon", {
+                                              attrs: {
+                                                name: "Type=Default",
+                                                hoverName: "Type=Hover",
+                                                width: "24",
+                                                height: "24",
+                                              },
+                                            }),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
+                          },
+                        ]),
+                      }),
+                    ],
+                    1
+                  ),
               _vm._v(" "),
               _c(
                 "div",
                 { staticClass: "figma-table-footer" },
                 [
-                  _c("div", { staticClass: "showing-results-text" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.__("Showing Result")) +
-                        " : "
-                    ),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.pageEnd)),
-                    ]),
-                    _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.totalRows)),
-                    ]),
-                  ]),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "d-flex align-items-center gap-3 flex-wrap",
+                    },
+                    [
+                      _c(
+                        "div",
+                        { staticClass: "d-flex align-items-center gap-2" },
+                        [
+                          _c(
+                            "label",
+                            { staticClass: "showing-results-text mb-0" },
+                            [_vm._v(_vm._s(_vm.__("per_page")))]
+                          ),
+                          _vm._v(" "),
+                          _c("b-form-select", {
+                            staticClass: "w-auto",
+                            attrs: { options: _vm.pageOptions, size: "sm" },
+                            model: {
+                              value: _vm.perPage,
+                              callback: function ($$v) {
+                                _vm.perPage = $$v
+                              },
+                              expression: "perPage",
+                            },
+                          }),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("table-count", {
+                        attrs: {
+                          "current-page": _vm.currentPage,
+                          "per-page": _vm.perPage,
+                          "total-rows": _vm.totalRows,
+                        },
+                      }),
+                    ],
+                    1
+                  ),
                   _vm._v(" "),
                   _c("b-pagination", {
                     staticClass: "figma-pagination mb-0",
@@ -1926,8 +2718,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex flex-wrap justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1945,12 +2750,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -2275,7 +3074,7 @@ var render = function () {
                   ),
                   _vm._v(" "),
                   _vm.deliveryBoys.driving_license_url
-                    ? _c("div", { staticClass: "row" }, [
+                    ? _c("div", { staticClass: "row mt-2" }, [
                         _vm.isImage(_vm.deliveryBoys.driving_license_url)
                           ? _c("div", { staticClass: "col-md-2" }, [
                               _c("img", {
@@ -2375,7 +3174,7 @@ var render = function () {
                   ),
                   _vm._v(" "),
                   _vm.deliveryBoys.national_identity_card_url
-                    ? _c("div", { staticClass: "row" }, [
+                    ? _c("div", { staticClass: "row mt-2" }, [
                         _vm.isImage(_vm.deliveryBoys.national_identity_card_url)
                           ? _c("div", { staticClass: "col-md-2" }, [
                               _c("img", {
@@ -2612,7 +3411,7 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "col-md-6" },
+                { staticClass: "col-md-6 form-group" },
                 [
                   _c("label", { attrs: { for: "city_name" } }, [
                     _vm._v(_vm._s(_vm.__("select_or_search_city"))),
@@ -2752,9 +3551,9 @@ var render = function () {
                       { staticClass: "form-group" },
                       [
                         _c("label", [_vm._v(_vm._s(_vm.__("status")))]),
-                        _c("br"),
                         _vm._v(" "),
                         _c("b-form-radio-group", {
+                          staticClass: "d-flex flex-wrap db-status-group",
                           attrs: {
                             options: [
                               { text: _vm.__("registered"), value: 0 },
@@ -2824,7 +3623,9 @@ var render = function () {
               _vm.customFields.length
                 ? [
                     _c("div", { staticClass: "col-md-12" }, [
-                      _c("h6", [_vm._v(_vm._s(_vm.__("custom_fields")))]),
+                      _c("h6", { staticClass: "db-section-title" }, [
+                        _vm._v(_vm._s(_vm.__("custom_fields"))),
+                      ]),
                     ]),
                     _vm._v(" "),
                     _vm._l(_vm.translatedCustomFields, function (field) {
@@ -2984,6 +3785,21 @@ var render = function () {
                                         )
                                       : _vm._e(),
                                   ]
+                                : field.type === "date"
+                                ? _c("custom-field-date", {
+                                    attrs: { placeholder: field.name },
+                                    model: {
+                                      value: _vm.customFieldValues[field.id],
+                                      callback: function ($$v) {
+                                        _vm.$set(
+                                          _vm.customFieldValues,
+                                          field.id,
+                                          $$v
+                                        )
+                                      },
+                                      expression: "customFieldValues[field.id]",
+                                    },
+                                  })
                                 : (field.type === "number"
                                     ? "number"
                                     : "text") === "checkbox"
@@ -3128,10 +3944,7 @@ var render = function () {
             2
           ),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]

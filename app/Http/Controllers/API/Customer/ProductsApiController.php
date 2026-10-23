@@ -54,17 +54,6 @@ class ProductsApiController extends Controller
 
         try {
 
-        // Temporary perf instrumentation - logs a single breakdown line per request,
-            // no response/behavior change. Safe to remove once the slow stage is identified.
-            $__perfStart = microtime(true);
-            $__perfLast = $__perfStart;
-            $__perfMarks = [];
-            $__perfMark = function ($label) use (&$__perfLast, &$__perfMarks) {
-                $now = microtime(true);
-                $__perfMarks[$label] = round(($now - $__perfLast) * 1000);
-                $__perfLast = $now;
-            };
-
             if ($request->has('category_slug') && !empty($request->category_slug)) {
                 $category_slugs = array_map('trim', explode(',', $request->category_slug));
                 $slug_category_ids = Category::where('status', 1)->whereIn('slug', $category_slugs)->pluck('id')->toArray();
@@ -156,7 +145,6 @@ class ProductsApiController extends Controller
                     $total_max_price = (float) ($productResult->max_price_with_tax ?? 0);
                 }
             }
-            $__perfMark('seller_ids_and_price_range');
 
             if ($sort == 'new') {
                 $sort = 'created_at DESC';
@@ -236,8 +224,18 @@ class ProductsApiController extends Controller
                     if (!empty($seller_category)) {
                         $seller_categories = explode(",", $seller_category['categories']);
 
+                        // Sellers only ever have parent categories assigned, but products can be
+                        // filed under a child category - expand to the full descendant tree
+                        // before matching, same as the no-category_ids branch above does.
+                        $seller_categories_tree = Category::with('catActiveChilds')
+                            ->where('status', 1)
+                            ->whereIn('id', $seller_categories)
+                            ->get()
+                            ->toArray();
+                        $seller_categories_expanded = CommonHelper::getCategoryChildIds($seller_categories_tree);
+
                         // Filter to only include categories that belong to this seller
-                        $valid_category_ids = array_intersect($category_ids_array, $seller_categories);
+                        $valid_category_ids = array_intersect($category_ids_array, $seller_categories_expanded);
 
                         if (empty($valid_category_ids)) {
                             return Response::json(array(
@@ -250,7 +248,6 @@ class ProductsApiController extends Controller
                             ));
                         }
 
-                        // Filter by exact category IDs only (no child categories)
                         $where .= " AND s.`slug` = '$seller_slug' AND p.`category_id` IN (" . implode(",", $valid_category_ids) . ") ";
                     } else {
                         return Response::json(array(
@@ -314,8 +311,18 @@ class ProductsApiController extends Controller
                     if (!empty($seller_category)) {
                         $seller_categories = explode(",", $seller_category['categories']);
 
+                        // Sellers only ever have parent categories assigned, but products can be
+                        // filed under a child category - expand to the full descendant tree
+                        // before matching, same as the no-category_ids branch below does.
+                        $seller_categories_tree = Category::with('catActiveChilds')
+                            ->where('status', 1)
+                            ->whereIn('id', $seller_categories)
+                            ->get()
+                            ->toArray();
+                        $seller_categories_expanded = CommonHelper::getCategoryChildIds($seller_categories_tree);
+
                         // Filter to only include categories that belong to this seller
-                        $valid_category_ids = array_intersect($category_ids_array, $seller_categories);
+                        $valid_category_ids = array_intersect($category_ids_array, $seller_categories_expanded);
 
                         if (empty($valid_category_ids)) {
                             return Response::json(array(
@@ -328,7 +335,6 @@ class ProductsApiController extends Controller
                             ));
                         }
 
-                        // Filter by exact category IDs only (no child categories)
                         $where .= " AND p.`seller_id` = " . $seller_id . " AND p.`category_id` IN (" . implode(",", $valid_category_ids) . ") ";
                     } else {
                         return Response::json(array(
@@ -532,7 +538,16 @@ class ProductsApiController extends Controller
                 $tagsArray = explode(',', $request->tag_names);
                 $tagIds = DB::table('tags')->whereIn('name', $tagsArray)->pluck('id')->toArray();
 
-                $products = $products->havingRaw("SUM(CASE WHEN pt.tag_id IN (" . implode(',', $tagIds) . ") THEN 1 ELSE 0 END) > 0")->where('p.slug', '!=', $request->tag_slug);
+                if (empty($tagIds)) {
+                    // No such tag: `IN ()` is a SQL syntax error (500), so match nothing instead.
+                    $products = $products->whereRaw('1 = 0');
+                } else {
+                    // Subquery (not WHERE on the pt join) so it filters before grouping while
+                    // GROUP_CONCAT(t.name) still lists all of a product's tags.
+                    $products = $products->whereIn('p.id', function ($q) use ($tagIds) {
+                        $q->select('product_id')->from('product_tag')->whereIn('tag_id', $tagIds);
+                    })->where('p.slug', '!=', $request->tag_slug);
+                }
             }
 
             if (isset($request->barcode) && !empty($request->barcode)) {
@@ -563,10 +578,8 @@ class ProductsApiController extends Controller
             // measured slower: forces MySQL to materialize the full grouped result into a
             // temp table before LIMIT can apply. Two leaner queries beat one heavier one here.)
             $total = (clone $products)->getQuery()->get()->count();
-            $__perfMark('count_query');
 
             $products = $products->skip($offset)->take($limit)->orderByRaw($sort)->get();
-            $__perfMark('page_query');
 
             $products = $products->makeHidden([
                 'row_order',
@@ -614,7 +627,6 @@ class ProductsApiController extends Controller
             $taxableAmountsByVariantId = \App\Helpers\ProductHelper::getTaxableAmountsBatch($allVariantIds);
 
             $ratingsByProductId = CommonHelper::productAverageRatingsBatch($pageProductIds);
-            $__perfMark('batch_loads');
 
             $i = 0;
             foreach ($products as $row) {
@@ -744,13 +756,9 @@ class ProductsApiController extends Controller
 
                 $i++;
             }
-            $__perfMark('per_product_loop');
 
             if (!empty($products)) {
                 $brands = CommonHelper::getBrandsHavingProducts();
-                $__perfMark('brands_query');
-
-                Log::info('[PERF] products endpoint total=' . round((microtime(true) - $__perfStart) * 1000) . 'ms breakdown=' . json_encode($__perfMarks));
 
                 return Response::json(array(
                     'status' => 1,
@@ -761,8 +769,6 @@ class ProductsApiController extends Controller
                     'data' => $products
                 ));
             } else {
-                Log::info('[PERF] products endpoint total=' . round((microtime(true) - $__perfStart) * 1000) . 'ms breakdown=' . json_encode($__perfMarks));
-
                 return Response::json(array(
                     'status' => 1,
                     'message' => 'success',
@@ -1053,8 +1059,10 @@ class ProductsApiController extends Controller
     public function getSimilarProducts(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required',
-            'category_id' => 'required',
+            'product_id' => 'required|integer',
+            'category_id' => 'required|integer',
+            'limit' => 'nullable|integer|min:1|max:50',
+            'offset' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -1063,33 +1071,58 @@ class ProductsApiController extends Controller
 
         $user_id = $request->user('api-customers') ? $request->user('api-customers')->id : '';
 
+        $product_id = (int) $request['product_id'];
+        $category_id = (int) $request['category_id'];
 
-        $product_id = $request['product_id'];
-        $category_id = $request['category_id'];
-
-        $limit = $request->get('limit', 6);
-        $offset = 0;
-        $order = "RAND()";
+        $limit = (int) $request->get('limit', 6);
+        $offset = (int) $request->get('offset', 0);
         $moduleId = request()->header('X-Module-Id') ?: 1;
-        $where = " AND p.module_id = $moduleId ";
 
-        $sql = "SELECT count(p.id) as total FROM `products` p JOIN `sellers`s ON s.id=p.seller_id where p.id != $product_id AND p.category_id = $category_id AND p.is_approved = 1 AND p.status = 1 and s.status = 1  $where ORDER BY $order LIMIT $offset,$limit";
-        $total = DB::select(DB::raw($sql));
-        if (count($total) > 0) {
-            $total = $total[0]->total;
-        } else {
-            $total = 0;
+        // Marketplace: similar = same category, any seller. Only products a customer can actually
+        // buy are offered (active, approved, active seller, at least one available in-stock variant).
+        $baseQuery = DB::table('products as p')
+            ->join('sellers as s', 's.id', '=', 'p.seller_id')
+            ->where('p.id', '!=', $product_id)
+            ->where('p.category_id', $category_id)
+            ->where('p.module_id', $moduleId)
+            ->where('p.status', 1)
+            ->where('p.is_approved', 1)
+            ->where('s.status', 1)
+            ->whereExists(function ($q) {
+                $q->select(DB::raw(1))
+                    ->from('product_variants as pvx')
+                    ->whereColumn('pvx.product_id', 'p.id')
+                    ->whereNull('pvx.deleted_at')
+                    ->where('pvx.status', 1)
+                    ->where(function ($q) {
+                        $q->where('p.is_unlimited_stock', 1)->orWhere('pvx.stock', '>', 0);
+                    });
+            });
+
+        $total = (clone $baseQuery)->count('p.id');
+
+        // Same brand as the source product first, then admin row order, then newest - stable
+        // between calls so the list does not reshuffle every time it is opened.
+        $sourceBrandId = DB::table('products')->where('id', $product_id)->value('brand_id');
+
+        $query = $baseQuery->select(
+            'p.*',
+            's.name as seller_name',
+            's.status as seller_status',
+            DB::raw('(SELECT MIN(pv.price) FROM product_variants pv WHERE pv.product_id = p.id AND pv.deleted_at IS NULL) as price')
+        );
+        if ($sourceBrandId) {
+            $query->orderByRaw('CASE WHEN p.brand_id = ? THEN 0 ELSE 1 END', [$sourceBrandId]);
         }
-
-        $rows = array();
-
-        $sql = "SELECT p.*,s.name as seller_name,s.status as seller_status,(SELECT MIN(pv.price) FROM product_variants pv WHERE pv.product_id=p.id) as price FROM products p  JOIN sellers s on s.id=p.seller_id where p.id != $product_id and p.status=1  and p.is_approved = 1 and  s.status = 1 and category_id = $category_id $where ORDER BY $order LIMIT $offset,$limit";
-        $res = DB::select(DB::raw($sql));
-        $res = json_decode(json_encode($res), true);
+        $res = $query->orderBy('p.row_order')->orderByDesc('p.id')
+            ->offset($offset)->limit($limit)->get();
 
         // indicator was dropped as a products column in version_4_0_1 - it now lives in
         // custom_field_values under the module=product "Product Type" CustomField.
         $indicatorFieldId = \App\Models\Product::resolveCustomFieldId('Product Type', $moduleId);
+
+        $rows = array();
+        $res = json_decode(json_encode($res), true);
 
         if (!empty($res)) {
             foreach ($res as $row) {
@@ -1114,7 +1147,7 @@ class ProductsApiController extends Controller
                 $tempRow['date_added'] = CommonHelper::formatDateTime($row['created_at']);
                 $tempRow['price'] = $row['price'];
                 $tempRow['type'] = $row['type'];
-                $tempRow['pincodes'] = $row['pincodes'];
+                $tempRow['pincodes'] = $row['pincodes'] ?? '';
                 $tempRow['is_approved'] = $row['is_approved'];
                 $tempRow['return_days'] = $row['return_days'];
                 $tempRow['image'] = (!empty($row['image'])) ? asset('storage/' . $row['image']) : '';
@@ -1152,8 +1185,8 @@ class ProductsApiController extends Controller
                     (SELECT short_code FROM attribute_values av WHERE av.id=pv.attribute_value_id) as measurement_unit_name,
                     (SELECT short_code FROM attribute_values av WHERE av.id=pv.attribute_value_id) as short_code,
                     (SELECT value FROM attribute_values av WHERE av.id=pv.attribute_value_id) as value
-                    FROM product_variants pv WHERE pv.product_id=" . $row['id'] . " ORDER BY pv.status ASC";
-                $variants = DB::select(DB::raw($sql1));
+                    FROM product_variants pv WHERE pv.product_id = ? AND pv.deleted_at IS NULL ORDER BY pv.status ASC";
+                $variants = DB::select($sql1, [$row['id']]);
                 $variants = json_decode(json_encode($variants), true);
                 if (empty($variants)) {
                     continue;
@@ -1467,18 +1500,18 @@ class ProductsApiController extends Controller
 
         $product_id = $request->product_id;
         if ($product_id != null) {
-            $productRatingImages = ProductRating::with('images')->where('product_id', $product_id)->get();
-            if ($productRatingImages->isNotEmpty()) {
-                $images = $productRatingImages->pluck('images')->flatten();
-                $total = $images->count();
-                $images = $productRatingImages->pluck('images')->flatten()->skip($offset)->take($limit);
-                $RatingImages = [];
-                foreach ($images as $image) {
-                    $RatingImages[] = $image->image_url;
-                }
-                return CommonHelper::responseWithData($RatingImages, $total);
+            if (!Product::where('id', $product_id)->exists()) {
+                return CommonHelper::responseError("Product not available");
             }
-            return CommonHelper::responseError("Product not available");
+            // A product with no ratings/photos is still a valid product: return an empty list.
+            $productRatingImages = ProductRating::with('images')->where('product_id', $product_id)->get();
+            $images = $productRatingImages->pluck('images')->flatten();
+            $total = $images->count();
+            $RatingImages = [];
+            foreach ($images->skip($offset)->take($limit) as $image) {
+                $RatingImages[] = $image->image_url;
+            }
+            return CommonHelper::responseWithData($RatingImages, $total);
         } else {
             return CommonHelper::responseError("Please select product first");
         }

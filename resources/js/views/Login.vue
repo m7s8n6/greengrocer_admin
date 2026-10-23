@@ -4,13 +4,13 @@
             <div class="auth-section">
                 <div class="auth-card">
                     <div class="auth-logo">
-                        <a href="javascript:void(0)"
-                            style="display: flex; align-items: center; justify-content: flex-start;">
-                            <img v-if="$appLogo != ''" :src="$storageUrl + $appLogo" style="height: 70px; width: 70px;"
+                        <a href="javascript:void(0)" class="d-flex align-items-center justify-content-center">
+                            <img class="auth-logo-img login-logo-light" v-if="$appLogo != ''" :src="$storageUrl + $appLogo"
                                 alt='Logo' />
-                            <img v-else :src="$baseUrl + '/images/logo.png'" style="height: 70px; width: 70px;"
+                            <img class="auth-logo-img login-logo-light" v-else :src="$baseUrl + '/images/logo.png'"
                                 alt='Logo' />
-                            <h2 style="margin: 10px;">{{ $appName }}</h2>
+                            <img class="auth-logo-img login-logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo"
+                                alt='Logo' />
                         </a>
                     </div>
                     <h4>{{ __('welcome_back') }}</h4>
@@ -20,24 +20,22 @@
                             <input type="email" class="form-control form-control-xl" :placeholder="__('email_address')"
                                 required v-model="user.email">
                             <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
+                                <i class="bi bi-envelope"></i>
                             </div>
                         </div>
                         <div class="form-group position-relative has-icon-left">
                             <input :type="showPassword ? 'text' : 'password'" class="form-control form-control-xl"
                                 :placeholder="__('password')" required v-model="user.password">
                             <div class="form-control-icon">
-                                <i class="bi bi-shield-lock"></i>
+                                <i class="bi bi-key"></i>
                             </div>
 
-                            <button type="button" v-on:click="showPassword = !showPassword"
-                                style="background: transparent; border: none; padding: 0; outline: none; margin-top: -45px; position: absolute; right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 38px;">
-                                <img :src="showPassword ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'"
-                                    style="width: 22px; height: 22px; filter: invert(0.85); opacity: 0.85;" alt="toggle-password" />
+                            <button type="button" v-on:click="showPassword = !showPassword" class="auth-pw-toggle">
+                                <img :src="showPassword ? $baseUrl + '/images/icons/show_password.svg' : $baseUrl + '/images/icons/hide_password.svg'" alt="toggle-password" />
                             </button>
 
                         </div>
-                        <div class="mb-4 text-end" style="margin-top: 35px;">
+                        <div class="auth-forgot text-end">
                             <router-link class="font-bold" to="/forgot-password"><span>{{ __('forgot_password') }}</span></router-link>
                         </div>
 
@@ -49,9 +47,9 @@
 
                         <hr>
                         <router-link to="/seller/login" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">
-                            {{ __('seller_panel') }}</router-link>
+                            <i class="bi bi-shop me-2"></i>{{ __('seller_panel') }}</router-link>
                         <router-link to="/delivery_boy/login" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">
-                            {{ __('delivery_boy_panel') }}</router-link>
+                            <i class="bi bi-truck me-2"></i>{{ __('delivery_boy_panel') }}</router-link>
 
 
                     </form>
@@ -67,6 +65,7 @@
 <script>
 import axios from 'axios';
 import Auth from '../Auth.js';
+import { afterLoginPath } from '../IntendedUrl.js';
 
 export default {
     components: {
@@ -94,7 +93,7 @@ export default {
         }
         let user_theme = sessionStorage.getItem("user-theme");
         this.userTheme = user_theme;
-        document.body.className = user_theme;
+        if (user_theme === 'theme-dark' || user_theme === 'theme-light') { document.body.classList.remove('theme-light', 'theme-dark'); document.body.classList.add(user_theme); }
     },
     methods: {
 
@@ -108,7 +107,7 @@ export default {
                 let data = res.data;
                 if (data.status === 1) {
                     Auth.login(data.data.access_token, data.data.user);
-                    this.$router.push('/dashboard');
+                    this.$router.push(afterLoginPath(data.data.user, '/dashboard'));
 
                 } else {
                     vm.showError(data.message);
@@ -128,4 +127,14 @@ export default {
     }
 }
 </script>
-<style scoped></style>
+<style>
+.login-logo-dark {
+    display: none;
+}
+body.theme-dark .login-logo-light {
+    display: none;
+}
+body.theme-dark .login-logo-dark {
+    display: block;
+}
+</style>

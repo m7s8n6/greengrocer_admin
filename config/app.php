@@ -175,7 +175,11 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        // Was disabled (broadcasting auth route never registered at all). Re-enabled for
+        // the auto-assign delivery boy feature's order-offer push channel - see
+        // BroadcastServiceProvider, gated to the auth:api guard the driver app already
+        // authenticates with, not the default web session guard.
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,

@@ -11,6 +11,7 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard')
                                         }}</router-link></li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('general_web_settings') }}
                                 </li>
                             </ol>
@@ -23,7 +24,8 @@
 
                     <div class="card mb-3">
                         <div class="card-header">
-                            <h4 class="card-title">{{ __('header_settings') }}</h4>
+                            <h4 class="card-title float-none">{{ __('header_settings') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('header_settings_desc', 'Website title, SEO meta, maintenance mode, logos and favicon.') }}</p>
                         </div>
 
                         <div class="card-body">
@@ -36,7 +38,7 @@
                                             {{ language.name }}
                                         </span>
                                     </template>
-                                    <div class="card-body ps-0 pt-0">
+                                    <div class="p-0">
                                         <!-- Translate buttons (Web setting) -->
                                         <div class="mb-3" v-if="language.is_default && languages.length > 1">
                                             <b-button size="sm" variant="outline-primary" class="mr-2"
@@ -60,7 +62,7 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="form-group col-md-4 mt-0">
+                                            <div class="form-group col-sm-6 col-md-6 col-lg-4 mt-0">
                                                 <label for="site_title">{{ __('site_title') }}</label>
                                                 <i class="text-danger" v-if="language.is_default">*</i>
                                                 <input type="text" name="site_title" id="site_title"
@@ -109,7 +111,7 @@
                                             <div class="form-group col-md-12 col-lg-4">
                                                 <label for="website_mode" class="website_maitenance_mode">{{
                                                     __('website_maitenance_mode') }} <span
-                                                        class="text text-primary font-size-13">( {{ __('enable') }}/{{
+                                                        class="text-muted font-size-13">( {{ __('enable') }}/{{
                                                             __('disable') }}
                                                         ) </span> &nbsp; &nbsp;
                                                     <span class="form-switch">
@@ -128,7 +130,7 @@
                                             </div>
 
                                             <div class="row mt-3 mb-3 align-items-baseline" v-if="language.is_default">
-                                                <div class="form-group col-sm-6 col-md-6 col-lg-4">
+                                                <div class="form-group col-sm-6 col-md-6 col-xl-3">
                                                     <div class="row">
                                                         <div class="col-md-12 col-xxl-12">
                                                             <label for="web_logo">{{ __('light_theme_web_logo') }}</label>
@@ -157,7 +159,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-sm-6 col-md-6 col-lg-4">
+                                                <div class="form-group col-sm-6 col-md-6 col-xl-3">
                                                     <div class="row">
                                                         <div class="col-md-12 col-xxl-12">
                                                             <label for="dark_web_logo">{{ __('dark_theme_web_logo') }}</label>
@@ -186,7 +188,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-sm-6 col-md-6 col-lg-4">
+                                                <div class="form-group col-sm-6 col-md-6 col-xl-3">
                                                     <div class="row">
                                                         <div class="col-md-12 col-xxl-12">
                                                             <label for="favicon">{{ __('favicon_icon') }} </label>
@@ -215,7 +217,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group col-sm-6 col-md-6 col-lg-4">
+                                                <div class="form-group col-sm-6 col-md-6 col-xl-3">
                                                     <div class="row">
                                                         <div class="col-md-12 col-xxl-12">
                                                             <label for="placeholder_image">{{ __('placeholder_image') }}
@@ -260,12 +262,13 @@
                     <div class="card mb-3">
 
                         <div class="card-header">
-                            <h4 class="card-title">
+                            <h4 class="card-title float-none">
                                 {{ __('app_download_section') }}
                                 <small v-if="activeLanguage">
                                     ({{ activeLanguage.name }})
                                 </small>
                             </h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('app_download_section_desc', 'Content and store links shown in the website\'s app download section.') }}</p>
                         </div>
 
                         <div class="card-body" v-if="activeLanguage">
@@ -290,7 +293,7 @@
                                 <div class="col-md-12" v-if="activeLanguage.is_default">
                                     <div class="row">
                                         <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-                                            <div class="border rounded p-3 h-100">
+                                            <div class="app-store-box h-100">
                                                 <div class="mb-3">
                                                     <label>{{ __('android_app') }}</label>
                                                     <div class="form-check form-switch">
@@ -343,7 +346,7 @@
 
                                         <!-- IOS SECTION: half width on lg+, full width on small screens; separate border -->
                                         <div class="col-12 col-lg-6">
-                                            <div class="border rounded p-3 h-100">
+                                            <div class="app-store-box h-100">
                                                 <div class="mb-3">
                                                     <label>{{ __('ios_app') }}</label>
                                                     <div class="form-check form-switch">
@@ -397,7 +400,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer d-flex justify-content-end">
                             <b-button type="submit" variant="primary" :disabled="isLoading">{{ __('update') }}
                                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                             </b-button>
@@ -470,6 +473,7 @@ export default {
     },
 
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         getLanguages() {
             axios.get(this.$apiUrl + '/active_languages').then(response => {
                 this.languages = response.data.data || [];
@@ -900,6 +904,31 @@ export default {
 /* Keep label inline so the * sits beside it, not below */
 .form-group label {
     display: inline;
+}
+/* ...and give the control below it the usual label gap */
+.form-group > .form-control,
+.form-group > .input-group,
+.form-group > .file-input-div,
+.form-group > .form-floating {
+    margin-top: 6px;
+}
+
+/* Upload field labels sit in a nested column (not ".form-group > label"), so give them the form label look */
+.form-group .row > [class*="col-"] > label {
+    color: var(--ui-text);
+    font-size: 13px;
+    font-weight: 400;
+}
+.website_maitenance_mode .font-size-13 {
+    font-size: 12px;
+}
+
+/* Android / iOS app boxes in the App Download section */
+.app-store-box {
+    padding: 16px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-surface-muted);
 }
 
 /* Image preview size - consistent max dimensions for all previews */

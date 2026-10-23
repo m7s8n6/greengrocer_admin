@@ -3,20 +3,18 @@
         <div class="login-wrapper"> 
             <div class="detail-card">
                 <div class="auth-logo">
-                    <a href="javascript:void(0)"
-                       style="display: flex; align-items: center; justify-content: flex-start;">
-                        <img v-if="$appLogo != ''" :src="$storageUrl+$appLogo" style="height: 70px; width: 70px;"
-                             alt='Logo'/>
-                        <img v-else :src="$baseUrl + '/images/logo.png'" style="height: 70px; width: 70px;"
-                             alt='Logo'/>
-                        <h2 style="margin: 10px;">{{ $appName }}</h2>
+                    <a href="javascript:void(0)" class="d-flex align-items-center justify-content-center">
+                        <img class="auth-logo-img login-logo-light" v-if="$appLogo != ''" :src="$storageUrl + $appLogo" alt="Logo" />
+                        <img class="auth-logo-img login-logo-light" v-else :src="$baseUrl + '/images/logo.png'" alt="Logo" />
+                        <img class="auth-logo-img login-logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo" alt="Logo" />
                     </a>
                 </div>
                 <h4>Delivery Boy Complete Profile</h4>
                 <p class="auth-subtitle text-primary">Please Complete the form to complete your registration</p>
                 <form ref="my-form" @submit.prevent="saveRecord">
                     <div class="content">
-                        <h6>Delivery Boy Information</h6>
+                        <div class="register-section">
+                        <h6 class="register-section-title">Delivery Boy Information</h6>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -115,7 +113,7 @@
                                     <input type="text" name="account_name" id="account_name" v-model="deliveryBoys.account_name" required class="form-control" placeholder="Enter bank account name">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 form-group">
                                 <label for="city_name">Select or Search City</label>
                                 <multiselect v-model="city"
                                              :options="cities"
@@ -151,11 +149,14 @@
                             </div>
 
                         </div>
+                        </div>
                     </div>
-                    <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">
-                        Complete
-                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                    </button>
+                    <div class="register-actions">
+                        <button class="btn btn-primary btn-lg">
+                            Complete
+                            <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                        </button>
+                    </div>
 
                 </form>
                 <div class="auth-copyright">
@@ -298,10 +299,71 @@ export default {
 <style scoped>
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
+/* Registration card: wide auth card with grouped form sections (SnapBuy look) */
 .auth {
-    overflow-x: hidden!important;
+    overflow-y: auto !important;
 }
-.auth-logo {
-    padding-bottom: 10px;
+
+.auth .login-wrapper {
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 20px;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+}
+
+.auth .register-breadcrumb .breadcrumb {
+    justify-content: center;
+    font-size: 13px;
+    padding: 0;
+    margin-bottom: 12px;
+    background: transparent;
+}
+
+/* Sections flow with the page; no nested scroll box (overrides common.css + dark-mode .content) */
+.auth .content {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important; /* common.css gives .content a 10px margin; keeps sections aligned with the actions row */
+    border: 0 !important;
+    background: transparent !important;
+}
+
+.auth .content > .card-body {
+    padding: 0;
+}
+
+@media (max-width: 575.98px) {
+    .auth .login-wrapper {
+        padding: 16px;
+    }
+
+    .auth .detail-card {
+        padding: 24px 16px 16px;
+        border-radius: 16px;
+        min-width: 0;
+    }
+
+    .register-section {
+        padding: 16px;
+    }
+
+    .register-actions .btn {
+        width: 100%;
+    }
+}
+
+.login-logo-dark {
+    display: none;
+}
+
+body.theme-dark .login-logo-light {
+    display: none;
+}
+
+body.theme-dark .login-logo-dark {
+    display: block;
 }
 </style>

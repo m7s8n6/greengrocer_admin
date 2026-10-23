@@ -1,8 +1,13 @@
 <template>
     <div id="app">
-        <div class="global-announcement-banner">
+        <div class="global-announcement-banner" role="note">
             <i class="fa fa-exclamation-circle"></i>
-            <span>{{ __('global_attributes_deprecation_notice') || 'Global attributes and custom fields-product are being deprecated in an upcoming update. Sellers will need to create their own attributes and custom fields-product - please replace any global attribute and custom fields-product currently used on your products.' }}</span>
+            <div class="announcement-ticker">
+                <div class="announcement-track">
+                    <span>{{ announcementText }}</span>
+                    <span aria-hidden="true">{{ announcementText }}</span>
+                </div>
+            </div>
         </div>
         <div id="sidebar" class="active">
             <div class="sidebar-wrapper active">
@@ -17,7 +22,6 @@
                                     srcset="" />
                                 <img class="container-logo logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo"
                                     alt='Logo' srcset="" />
-                                {{ $appName }}
                             </router-link>
                         </div>
                     </div>
@@ -44,7 +48,7 @@
                                         <template v-for="sub in item.submenu">
                                             <li class="submenu-item" :class="{ 'active': isActive(sub.url) }"
                                                 :key="sub.key">
-                                                <router-link :to="sub.url">
+                                                <router-link :to="sub.url" @click.native="closeSideBarMenu()">
                                                     {{ sub.name }}
                                                 </router-link>
                                             </li>
@@ -52,7 +56,7 @@
                                     </ul>
                                 </template>
                                 <template v-else>
-                                    <router-link class="sidebar-link" :to="item.url">
+                                    <router-link class="sidebar-link" :to="item.url" @click.native="closeSideBarMenu()">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
                                     </router-link>
@@ -118,6 +122,7 @@ export default {
         '$route': 'checkPermissions'
     },
     mounted() {
+        this.observeBannerHeight();
         //lang
         if (window.localStorage.getItem('lang')) {
             this.lang = window.localStorage.getItem('lang');
@@ -142,12 +147,9 @@ export default {
                 slideToggle(submenu, 300)
             })
         }
-        window.addEventListener('DOMContentLoaded', (event) => {
-            var w = window.innerWidth;
-            if (w < 1200) {
-                document.getElementById('sidebar')?.classList?.remove('active');
-            }
-        });
+        if (window.innerWidth < 1200) {
+            document.getElementById('sidebar')?.classList?.remove('active');
+        }
         // Update backdrop when sidebar opens/closes on small screens - click outside to close
         const updateSidebarBackdrop = () => {
             const sidebar = document.getElementById('sidebar');
@@ -191,9 +193,10 @@ export default {
             });
         }
         // Scroll into active sidebar
-        document.querySelector('.sidebar-item.active').scrollIntoView(false)
+        this.scrollSidebarToActive()
     },
     beforeDestroy() {
+        if (this.bannerObserver) this.bannerObserver.disconnect();
         // Clear the status check interval when component is destroyed
         if (this.statusCheckInterval) {
             clearInterval(this.statusCheckInterval);
@@ -219,9 +222,27 @@ export default {
                 },
                 {
                     name: __('self_pickup_orders'),
-                    icon: 'shopping-cart',
+                    icon: 'box-open',
                     url: '/seller/self_pickup_orders',
                     permission: 'self_pickup_order_list'
+                },
+                {
+                    name: 'Delivery Boy Requests',
+                    icon: 'user-plus',
+                    url: '/seller/delivery_boy_requests',
+                    permission: 'order_list'
+                },
+                {
+                    name: 'My Delivery Boys',
+                    icon: 'motorcycle',
+                    url: '/seller/my_delivery_fleet',
+                    permission: 'order_list'
+                },
+                {
+                    name: 'Delivery Boy Salary',
+                    icon: 'file-invoice-dollar',
+                    url: '/seller/delivery_boy_salary',
+                    permission: 'order_list'
                 },
                 {
                     name: __('categories'),
@@ -279,19 +300,25 @@ export default {
                             icon: 'grid-fill',
                             url: '/seller/attributes'
                         },
-                        {
-                            name: __('custom_fields'),
-                            icon: 'grid-fill',
-                            url: '/seller/custom_fields'
-                        },
-
                     ]
+                },
+                {
+                    name: __('custom_fields'),
+                    icon: 'list-alt',
+                    url: '/seller/custom_fields',
+                    permission: 'product_list',
                 },
                 {
                     name: __('stock_management'),
                     icon: 'cubes',
                     url: '/seller/manage_stock',
                     permission: 'product_list',
+                },
+                {
+                    name: __('abandoned_carts'),
+                    icon: 'shopping-cart',
+                    url: '/seller/carts',
+                    permission: 'order_list',
                 },
                 {
                     name: __('return_requests'),
@@ -313,7 +340,7 @@ export default {
                 },
                 {
                     name: __('wallet_transactions'),
-                    icon: 'credit-card',
+                    icon: 'wallet',
                     url: '/seller/seller_wallet_transactions',
                     permission: 'product_sales_reports',
                 },
@@ -352,6 +379,9 @@ export default {
         }
     },
     computed: {
+        announcementText() {
+            return __('global_attributes_deprecation_notice') || 'Global attributes and custom fields-product are being deprecated in an upcoming update. Sellers will need to create their own attributes and custom fields-product - please replace any global attribute and custom fields-product currently used on your products.';
+        },
         visibleSidebarItems() {
             // Addons only makes sense for the Food Delivery module - a seller's module is fixed
             // at seller_id creation (Auth.js seeds active_module_id from user.seller.module_id
@@ -369,6 +399,38 @@ export default {
         },
     },
     methods: {
+        // Phones / tablets: tapping a final menu item closes the slide-in sidebar.
+        closeSideBarMenu() {
+            if (window.innerWidth < 1200) {
+                document.getElementById('sidebar')?.classList?.remove('active');
+                const backdrop = document.querySelector('.sidebar-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        },
+        // Bring the active menu item into view by scrolling only the sidebar list. scrollIntoView()
+        // also scrolled the page itself, which on phones (off-canvas sidebar) hid the top bar.
+        scrollSidebarToActive() {
+            const item = document.querySelector('#sidebar .sidebar-item.active');
+            const wrapper = document.querySelector('#sidebar .sidebar-wrapper');
+            if (!item || !wrapper) return;
+            const offset = item.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
+            wrapper.scrollTop += offset - wrapper.clientHeight / 2;
+        },
+
+        // The announcement banner wraps to several lines on phones, so its height is not a fixed 40/72px.
+        // Publish the real height as --banner-h so the sidebar and content offsets always clear it.
+        observeBannerHeight() {
+            const banner = document.querySelector('.global-announcement-banner');
+            if (!banner) return;
+            const apply = () => document.documentElement.style.setProperty('--banner-h', banner.offsetHeight + 'px');
+            apply();
+            if (window.ResizeObserver) {
+                this.bannerObserver = new ResizeObserver(apply);
+                this.bannerObserver.observe(banner);
+            } else {
+                window.addEventListener('resize', apply);
+            }
+        },
         subIsActive(item) {
             const paths = Array.isArray(item.submenu) ? item.submenu : [];
             return paths.some(path => {
@@ -376,7 +438,8 @@ export default {
             });
         },
         isActive(url) {
-            if (this.$route.path == url) {
+            // The dashboard menu item links to the panel root, which redirects to its dashboard route.
+            if (this.$route.path == url || (url === '/seller' && this.$route.path === '/seller/dashboard')) {
                 return true;
             }
             return false;
@@ -482,39 +545,8 @@ export default {
     opacity: 0;
 }
 
-.global-announcement-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: var(--figma-primary-light, #FEF5E6);
-    color: var(--figma-primary, #FF9900);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 16px;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    z-index: 1051;
-}
-
-/* body.theme-dark forces color:#F1F5F9 !important on every span/div/p globally (dark-mode
-   typography reset in custom-egrocer.scss) - that beats this banner's own color rule since
-   .global-announcement-banner alone has lower specificity, making the orange text invisible
-   against the near-white banner background. Re-declaring with the same body.theme-dark prefix
-   matches its specificity and wins on source order. */
-body.theme-dark .global-announcement-banner,
-body.theme-dark .global-announcement-banner span,
-body.theme-dark .global-announcement-banner i {
-    color: var(--figma-primary, #FF9900) !important;
-}
-
-body.theme-dark .global-announcement-banner {
-    background: #2A2013 !important;
-}
+/* Announcement banner, sidebar/#main offsets and sticky header: shared, see custom-egrocer.scss
+   ("Announcement ticker & sticky header"). */
 
 .logo-dark {
     display: none;
@@ -526,33 +558,4 @@ body.theme-dark .logo-dark {
     display: block;
 }
 
-.sidebar-wrapper {
-    top: 40px !important;
-    height: calc(100vh - 40px) !important;
-}
-
-#main {
-    margin-top: 40px !important;
-}
-
-/* On narrow screens the message wraps to 2-3 lines - the fixed 40px height above was clipping
-   it and spilling the overflow onto the sidebar below. Let the banner grow with its content
-   instead, and bump the sidebar/#main offsets to match (kept in sync with the banner's own
-   min-height + padding below). */
-@media (max-width: 767px) {
-    .global-announcement-banner {
-        height: auto;
-        min-height: 40px;
-        padding: 8px 16px;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    .sidebar-wrapper {
-        top: 72px !important;
-        height: calc(100vh - 72px) !important;
-    }
-    #main {
-        margin-top: 72px !important;
-    }
-}
 </style>

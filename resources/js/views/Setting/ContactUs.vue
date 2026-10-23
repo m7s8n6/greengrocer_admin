@@ -12,6 +12,7 @@
                                 <li class="breadcrumb-item">
                                     <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                                 </li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active">{{ __('contact_us') }}</li>
                             </ol>
                         </nav>
@@ -23,7 +24,8 @@
                 <form @submit.prevent="saveRecord">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">{{ __('update_information') }}</h4>
+                            <h4 class="card-title float-none">{{ __('update_information') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('contact_us_desc', 'Contact details shown on the Contact Us page of your store, per language.') }}</p>
                         </div>
 
                         <div class="card-body">
@@ -84,13 +86,14 @@
                                 <b-spinner />
                             </div>
 
-                        </div>
+                            <div class="d-flex justify-content-end border-top pt-3 mt-2">
+                                <b-button type="submit" variant="primary" :disabled="isLoading">
+                                    {{ __('update') }}
+                                    <b-spinner v-if="isLoading" small />
+                                </b-button>
 
-                        <div class="card-footer">
-                            <b-button type="submit" variant="primary" :disabled="isLoading">
-                                {{ __('update') }}
-                                <b-spinner v-if="isLoading" small />
-                            </b-button>
+                            </div>
+
                         </div>
 
                     </div>
@@ -132,6 +135,7 @@ export default {
     },
 
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         getEditorConfig() {
             const plugins = (this.$editorPlugins && Array.isArray(this.$editorPlugins))
                 ? this.$editorPlugins

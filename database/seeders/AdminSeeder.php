@@ -66,7 +66,6 @@ class AdminSeeder extends Seeder
         $sellerData['store_description'] = 'WRTeam Store';
         $sellerData['street'] = 'Bhuj';
         $sellerData['status'] = 1;
-        $sellerData['tax_name'] = 1;
         $sellerData['slug'] = '';
         $sellerData['city_id'] = 0;
         Seller::create($sellerData);
@@ -85,7 +84,6 @@ class AdminSeeder extends Seeder
         $deliveryBoyData['name'] = 'Delivery Boy';
         $deliveryBoyData['mobile'] = '9558192002';
         $deliveryBoyData['balance'] = 0;
-        $deliveryBoyData['address'] = "Bhuj";
         // $deliveryBoyData['bonus'] = 0;
         $deliveryBoyData['status'] = 1;
         $deliveryBoyData['city_id'] = 0;

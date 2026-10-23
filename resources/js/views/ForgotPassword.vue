@@ -5,38 +5,16 @@
     >
         <div class="login-wrapper">
             <div class="auth-section">
-                <div class="auth-back">
-                    <router-link to="/login"
-                        ><span class="fa fa-arrow-left"></span
-                    ></router-link>
-                </div>
                 <div class="auth-card">
                     <div class="auth-logo">
-                        <a
-                            href="javascript:void(0)"
-                            style="
-                                display: flex;
-                                align-items: center;
-                                justify-content: flex-start;
-                            "
-                        >
-                            <img
-                                v-if="$appLogo != ''"
-                                :src="$storageUrl + $appLogo"
-                                style="height: 70px; width: 70px"
-                                alt="Logo"
-                            />
-                            <img
-                                v-else
-                                :src="$baseUrl + '/images/logo.png'"
-                                style="height: 70px; width: 70px"
-                                alt="Logo"
-                            />
-                            <h2 style="margin: 10px">{{ $appName }}</h2>
+                        <a href="javascript:void(0)" class="d-flex align-items-center justify-content-center">
+                            <img class="auth-logo-img login-logo-light" v-if="$appLogo != ''" :src="$storageUrl + $appLogo" alt="Logo" />
+                            <img class="auth-logo-img login-logo-light" v-else :src="$baseUrl + '/images/logo.png'" alt="Logo" />
+                            <img class="auth-logo-img login-logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo" alt="Logo" />
                         </a>
                     </div>
                     <h4>{{ __('reset_your_password_here') }}</h4>
-                    <form @submit.prevent="forgetPasswordSendMail()">
+                    <form class="mt-4" @submit.prevent="forgetPasswordSendMail()">
                         <div
                             class="form-group position-relative has-icon-left mb-4"
                         >
@@ -48,7 +26,7 @@
                                 required
                             />
                             <div class="form-control-icon">
-                                <i class="bi bi-person"></i>
+                                <i class="bi bi-envelope"></i>
                             </div>
                         </div>
                         <button
@@ -61,6 +39,10 @@
                                 label="Spinning"
                             ></b-spinner>
                         </button>
+
+                        <hr>
+                        <router-link to="/login" class="btn btn-primary btn-block btn-lg shadow-lg mt-2">
+                            <i class="bi bi-arrow-left me-2"></i>{{ __('login') }}</router-link>
                     </form>
                     <div class="auth-copyright">
                         <a
@@ -132,4 +114,14 @@ export default {
     },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.login-logo-dark {
+    display: none;
+}
+body.theme-dark .login-logo-light {
+    display: none;
+}
+body.theme-dark .login-logo-dark {
+    display: block;
+}
+</style>

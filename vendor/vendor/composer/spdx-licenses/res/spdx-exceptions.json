@@ -38,9 +38,6 @@
     "Classpath-exception-2.0": [
         "Classpath exception 2.0"
     ],
-    "Classpath-exception-2.0-short": [
-        "Classpath exception 2.0 - short"
-    ],
     "CLISP-exception-2.0": [
         "CLISP exception 2.0"
     ],
@@ -131,9 +128,6 @@
     "KiCad-libraries-exception": [
         "KiCad Libraries Exception"
     ],
-    "kvirc-openssl-exception": [
-        "kvirc OpenSSL Exception"
-    ],
     "LGPL-3.0-linking-exception": [
         "LGPL-3.0 Linking Exception"
     ],
@@ -203,9 +197,6 @@
     "RRDtool-FLOSS-exception-2.0": [
         "RRDtool FLOSS exception 2.0"
     ],
-    "rsync-linking-exception": [
-        "rsync Linking Exception"
-    ],
     "SANE-exception": [
         "SANE Exception"
     ],
@@ -214,12 +205,6 @@
     ],
     "SHL-2.1": [
         "Solderpad Hardware License v2.1"
-    ],
-    "Simple-Library-Usage-exception": [
-        "Simple Library Usage Exception"
-    ],
-    "sqlitestudio-OpenSSL-exception": [
-        "sqlitestudio OpenSSL exception"
     ],
     "stunnel-exception": [
         "stunnel Exception"

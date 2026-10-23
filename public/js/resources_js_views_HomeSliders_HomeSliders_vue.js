@@ -169,7 +169,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](function (error) {
         vm.isLoading = false;
-        if (error.request.statusText) {
+        if (error.request && error.request.statusText) {
           _this.showError(error.request.statusText);
         } else if (error.message) {
           _this.showError(error.message);
@@ -200,6 +200,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Edit_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Edit.vue */ "./resources/js/views/HomeSliders/Edit.vue");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -313,11 +314,68 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__["default"]],
   components: {
     VuejsDatatableFactory: vuejs_datatable__WEBPACK_IMPORTED_MODULE_0__.VuejsDatatableFactory,
     'app-edit-record': _Edit_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -466,6 +524,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return translatedCategory;
       });
     },
+    // Grid view rows: translatedSliders with the list view's search + sort applied
+    gridSliders: function gridSliders() {
+      return this.gridFilterSort(this.translatedSliders, this.filterOn);
+    },
     // Computed property to translate sliders for datatable
     translatedSliders: function translatedSliders() {
       var _this3 = this;
@@ -487,6 +549,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   watch: {
     $route: function $route(to, from) {
       this.showCreateModal();
+    },
+    perPage: function perPage() {
+      this.currentPage = 1;
     }
   },
   created: function created() {
@@ -508,6 +573,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   methods: {
+    // Grid view: same client-side search (b-table :filter / :filter-included-fields) and sort as the list view.
     // Fetch active languages and set current language ID
     fetchActiveLanguages: function fetchActiveLanguages() {
       var _this5 = this;
@@ -648,8 +714,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this10.isLoading = true;
@@ -683,6 +749,228 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /***/ }),
 
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-slider-image[data-v-3ee4ab05] {\n    display: block;\n    width: 100%;\n    aspect-ratio: 670 / 370;\n    height: auto;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius-lg);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.slider-thumb[data-v-8ecb6bb0] {\n    width: 96px;\n    aspect-ratio: 670 / 370;\n    height: auto;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius) !important;\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_3ee4ab05_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_3ee4ab05_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_3ee4ab05_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_style_index_0_id_8ecb6bb0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_style_index_0_id_8ecb6bb0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_style_index_0_id_8ecb6bb0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/HomeSliders/Edit.vue":
 /*!*************************************************!*\
   !*** ./resources/js/views/HomeSliders/Edit.vue ***!
@@ -695,15 +983,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _Edit_vue_vue_type_template_id_3ee4ab05_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Edit.vue?vue&type=template&id=3ee4ab05&scoped=true */ "./resources/js/views/HomeSliders/Edit.vue?vue&type=template&id=3ee4ab05&scoped=true");
 /* harmony import */ var _Edit_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Edit.vue?vue&type=script&lang=js */ "./resources/js/views/HomeSliders/Edit.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Edit_vue_vue_type_style_index_0_id_3ee4ab05_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css */ "./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Edit_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
   _Edit_vue_vue_type_template_id_3ee4ab05_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
   _Edit_vue_vue_type_template_id_3ee4ab05_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -731,23 +1021,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HomeSliders.vue?vue&type=template&id=8ecb6bb0 */ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0");
+/* harmony import */ var _HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true */ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true");
 /* harmony import */ var _HomeSliders_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HomeSliders.vue?vue&type=script&lang=js */ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _HomeSliders_vue_vue_type_style_index_0_id_8ecb6bb0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css */ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _HomeSliders_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__.render,
-  _HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "8ecb6bb0",
   null
   
 )
@@ -789,6 +1081,30 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css ***!
+  \*********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_3ee4ab05_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/Edit.vue?vue&type=style&index=0&id=3ee4ab05&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css ***!
+  \****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_style_index_0_id_8ecb6bb0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=style&index=0&id=8ecb6bb0&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/HomeSliders/Edit.vue?vue&type=template&id=3ee4ab05&scoped=true":
 /*!*******************************************************************************************!*\
   !*** ./resources/js/views/HomeSliders/Edit.vue?vue&type=template&id=3ee4ab05&scoped=true ***!
@@ -805,18 +1121,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0":
-/*!**************************************************************************************!*\
-  !*** ./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0 ***!
-  \**************************************************************************************/
+/***/ "./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true ***!
+  \**************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./HomeSliders.vue?vue&type=template&id=8ecb6bb0 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_HomeSliders_vue_vue_type_template_id_8ecb6bb0_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true");
 
 
 /***/ }),
@@ -856,8 +1172,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end flex-wrap gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -876,12 +1205,6 @@ var render = function () {
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
-          ),
         ],
         1
       ),
@@ -899,7 +1222,7 @@ var render = function () {
         },
         [
           _c("div", { staticClass: "row" }, [
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12 col-md-6" }, [
               _c("label", [
                 _vm._v(_vm._s(_vm.__("type")) + " "),
                 _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
@@ -954,7 +1277,7 @@ var render = function () {
             ]),
             _vm._v(" "),
             _vm.type == "category"
-              ? _c("div", { staticClass: "form-group" }, [
+              ? _c("div", { staticClass: "form-group col-12 col-md-6" }, [
                   _c("label", [
                     _vm._v(_vm._s(_vm.__("category")) + " "),
                     _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
@@ -1008,9 +1331,9 @@ var render = function () {
               : _vm._e(),
             _vm._v(" "),
             _vm.type == "product"
-              ? _c("div", { staticClass: "form-group" }, [
+              ? _c("div", { staticClass: "form-group col-12 col-md-6" }, [
                   _c("label", [
-                    _vm._v(" " + _vm._s(_vm.__("products")) + " "),
+                    _vm._v(_vm._s(_vm.__("products")) + " "),
                     _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
                   ]),
                   _vm._v(" "),
@@ -1062,9 +1385,9 @@ var render = function () {
               : _vm._e(),
             _vm._v(" "),
             _vm.type == "slider_url"
-              ? _c("div", { staticClass: "form-group" }, [
+              ? _c("div", { staticClass: "form-group col-12 col-md-6" }, [
                   _c("label", [
-                    _vm._v(" " + _vm._s(_vm.__("link")) + " "),
+                    _vm._v(_vm._s(_vm.__("link")) + " "),
                     _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
                   ]),
                   _vm._v(" "),
@@ -1096,13 +1419,13 @@ var render = function () {
                 ])
               : _vm._e(),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12" }, [
               _c("label", [
-                _vm._v(" " + _vm._s(_vm.__("image")) + " "),
+                _vm._v(_vm._s(_vm.__("image")) + " "),
                 _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
               ]),
               _vm._v(" "),
-              _c("p", { staticClass: "text-muted" }, [
+              _c("p", { staticClass: "text-muted small mb-2" }, [
                 _vm._v(
                   " " +
                     _vm._s(
@@ -1165,8 +1488,8 @@ var render = function () {
               ),
               _vm._v(" "),
               _vm.image_url
-                ? _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-md-6" }, [
+                ? _c("div", { staticClass: "row mt-3" }, [
+                    _c("div", { staticClass: "col-12 col-md-6" }, [
                       _c("img", {
                         staticClass: "custom-slider-image",
                         attrs: {
@@ -1181,7 +1504,7 @@ var render = function () {
             ]),
             _vm._v(" "),
             _vm.id
-              ? _c("div", { staticClass: "form-group" }, [
+              ? _c("div", { staticClass: "form-group col-12" }, [
                   _c("label", [_vm._v(_vm._s(_vm.__("status")))]),
                   _vm._v(" "),
                   _c(
@@ -1229,10 +1552,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0":
-/*!*****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0 ***!
-  \*****************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/HomeSliders/HomeSliders.vue?vue&type=template&id=8ecb6bb0&scoped=true ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1252,7 +1575,7 @@ var render = function () {
           "div",
           {
             staticClass:
-              "page-heading d-flex justify-content-between align-items-center mb-4",
+              "page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
           },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -1291,7 +1614,7 @@ var render = function () {
         ),
         _vm._v(" "),
         _c("section", { staticClass: "section" }, [
-          _c("div", { staticClass: "figma-main-section-card" }, [
+          _c("div", { staticClass: "card figma-main-section-card" }, [
             _c("div", { staticClass: "card-body p-0" }, [
               _c(
                 "div",
@@ -1336,7 +1659,92 @@ var render = function () {
                     ]),
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "d-flex gap-2" }, [
+                  _c("div", { staticClass: "d-flex flex-wrap gap-2" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass: "view-toggle",
+                        attrs: { role: "group", "aria-label": _vm.__("view") },
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass: "view-toggle-btn",
+                            class: { active: _vm.viewMode === "grid" },
+                            attrs: {
+                              type: "button",
+                              title: _vm.__("grid_view"),
+                            },
+                            on: {
+                              click: function ($event) {
+                                return _vm.setViewMode("grid")
+                              },
+                            },
+                          },
+                          [_c("i", { staticClass: "bi bi-grid-3x3-gap-fill" })]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass: "view-toggle-btn",
+                            class: { active: _vm.viewMode === "list" },
+                            attrs: {
+                              type: "button",
+                              title: _vm.__("list_view"),
+                            },
+                            on: {
+                              click: function ($event) {
+                                return _vm.setViewMode("list")
+                              },
+                            },
+                          },
+                          [_c("i", { staticClass: "bi bi-list-ul" })]
+                        ),
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "b-tooltip",
+                            rawName: "v-b-tooltip.hover",
+                            modifiers: { hover: true },
+                          },
+                        ],
+                        staticClass:
+                          "btn btn-figma-columns d-flex align-items-center gap-2",
+                        attrs: { title: _vm.__("refresh") },
+                        on: {
+                          click: function ($event) {
+                            return _vm.getSliders()
+                          },
+                        },
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-refresh" }),
+                        _vm._v(" "),
+                        _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                      ]
+                    ),
+                    _vm._v(" "),
                     _vm.$can("home_slider_image_create")
                       ? _c(
                           "button",
@@ -1356,239 +1764,532 @@ var render = function () {
                           ]
                         )
                       : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        directives: [
-                          {
-                            name: "b-tooltip",
-                            rawName: "v-b-tooltip.hover",
-                            modifiers: { hover: true },
-                          },
-                        ],
-                        staticClass:
-                          "btn btn-figma-filter d-flex align-items-center gap-2",
-                        attrs: { title: _vm.__("refresh") },
-                        on: {
-                          click: function ($event) {
-                            return _vm.getSliders()
-                          },
-                        },
-                      },
-                      [
-                        _c("i", { staticClass: "fa fa-refresh" }),
-                        _vm._v(" "),
-                        _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                      ]
-                    ),
                   ]),
                 ]
               ),
               _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "table-responsive" },
-                [
-                  _c("b-table", {
-                    staticClass: "figma-order-table mb-0",
-                    attrs: {
-                      items: _vm.translatedSliders,
-                      fields: _vm.fields,
-                      "current-page": _vm.currentPage,
-                      "per-page": _vm.perPage,
-                      filter: _vm.filter,
-                      "filter-included-fields": _vm.filterOn,
-                      "sort-by": _vm.sortBy,
-                      "sort-desc": _vm.sortDesc,
-                      "sort-direction": _vm.sortDirection,
-                      bordered: false,
-                      busy: _vm.isLoading,
-                      stacked: "md",
-                      "show-empty": "",
-                      "tbody-tr-class": function () {
-                        return "figma-tr align-middle"
-                      },
-                      small: "",
-                    },
-                    on: {
-                      "update:sortBy": function ($event) {
-                        _vm.sortBy = $event
-                      },
-                      "update:sort-by": function ($event) {
-                        _vm.sortBy = $event
-                      },
-                      "update:sortDesc": function ($event) {
-                        _vm.sortDesc = $event
-                      },
-                      "update:sort-desc": function ($event) {
-                        _vm.sortDesc = $event
-                      },
-                    },
-                    scopedSlots: _vm._u([
-                      {
-                        key: "table-busy",
-                        fn: function () {
-                          return [
-                            _c(
-                              "div",
-                              { staticClass: "text-center text-black my-2" },
-                              [
-                                _c("b-spinner", {
-                                  staticClass: "align-middle",
-                                }),
-                                _vm._v(" "),
-                                _c("strong", [
-                                  _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                                ]),
-                              ],
-                              1
-                            ),
-                          ]
-                        },
-                        proxy: true,
-                      },
-                      {
-                        key: "cell(image)",
-                        fn: function (row) {
-                          return [
-                            _c("img", {
-                              attrs: { src: row.item.image_url, height: "50" },
-                            }),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(type_name)",
-                        fn: function (row) {
-                          return [
-                            _vm._v(
-                              "\n                                " +
-                                _vm._s(_vm.getTranslatedTypeName(row.item)) +
-                                "\n                            "
-                            ),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(status)",
-                        fn: function (row) {
-                          return [
-                            row.item.status === 1
-                              ? _c(
-                                  "span",
-                                  { staticClass: "badge bg-success" },
-                                  [_vm._v(_vm._s(_vm.__("active")))]
-                                )
-                              : _c("span", { staticClass: "badge bg-danger" }, [
-                                  _vm._v(_vm._s(_vm.__("deactive"))),
-                                ]),
-                          ]
-                        },
-                      },
-                      {
-                        key: "cell(actions)",
-                        fn: function (row) {
-                          return [
-                            _c("div", { staticClass: "d-flex gap-2" }, [
-                              _vm.$can("home_slider_image_update")
-                                ? _c(
-                                    "button",
+              _vm.viewMode === "grid"
+                ? _c("div", [
+                    _vm.isLoading
+                      ? _c("div", { staticClass: "item-grid-state" }, [
+                          _c("i", { staticClass: "bi bi-hourglass-split" }),
+                          _vm._v(
+                            _vm._s(_vm.__("loading")) +
+                              "...\n                        "
+                          ),
+                        ])
+                      : !_vm.gridSliders.length
+                      ? _c(
+                          "div",
+                          { staticClass: "item-grid-state" },
+                          [
+                            _vm.filter && _vm.translatedSliders.length
+                              ? [
+                                  _c("i", { staticClass: "bi bi-search" }),
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__("no_records_matching_your_request")
+                                    )
+                                  ),
+                                ]
+                              : [
+                                  _c("i", { staticClass: "bi bi-inbox" }),
+                                  _vm._v(_vm._s(_vm.__("no_records_to_show"))),
+                                ],
+                          ],
+                          2
+                        )
+                      : _c(
+                          "div",
+                          { staticClass: "item-grid item-grid--wide" },
+                          _vm._l(
+                            _vm.pagedItems(_vm.gridSliders),
+                            function (slider) {
+                              return _c(
+                                "div",
+                                { key: slider.id, staticClass: "item-card" },
+                                [
+                                  _c(
+                                    "div",
                                     {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("edit") },
-                                      on: {
-                                        click: function ($event) {
-                                          _vm.edit_record = row.item
-                                        },
-                                      },
-                                    },
-                                    [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "edit icon",
-                                          hoverName: "edit Hover",
-                                          width: "24",
-                                          height: "24",
-                                        },
-                                      }),
-                                    ],
-                                    1
-                                  )
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.$can("home_slider_image_delete")
-                                ? _c(
-                                    "button",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
                                       staticClass:
-                                        "figma-action-btn figma-delete-btn",
-                                      attrs: { title: _vm.__("delete") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.deleteSlider(
-                                            row.index,
-                                            row.item.id
-                                          )
-                                        },
-                                      },
+                                        "item-card-media item-card-media--banner item-card-media--cover",
                                     },
                                     [
-                                      _c("base-icon", {
+                                      _c("img", {
                                         attrs: {
-                                          name: "Type=Default",
-                                          hoverName: "Type=Hover",
-                                          width: "24",
-                                          height: "24",
+                                          src:
+                                            slider.image_url ||
+                                            _vm.$placeholderImage,
+                                          alt: "",
                                         },
                                       }),
-                                    ],
-                                    1
-                                  )
-                                : _vm._e(),
-                            ]),
-                          ]
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "item-card-badges" },
+                                        [
+                                          slider.status === 1
+                                            ? _c(
+                                                "span",
+                                                {
+                                                  staticClass:
+                                                    "badge bg-success",
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    _vm._s(_vm.__("active"))
+                                                  ),
+                                                ]
+                                              )
+                                            : _c(
+                                                "span",
+                                                {
+                                                  staticClass:
+                                                    "badge bg-danger",
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    _vm._s(_vm.__("deactive"))
+                                                  ),
+                                                ]
+                                              ),
+                                        ]
+                                      ),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "item-card-body" }, [
+                                    _c(
+                                      "div",
+                                      { staticClass: "item-card-title" },
+                                      [
+                                        _vm._v(
+                                          _vm._s(
+                                            _vm.getTranslatedTypeName(slider) ||
+                                              _vm.__(slider.type)
+                                          )
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    slider.type === "slider_url" &&
+                                    slider.slider_url
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "item-card-meta" },
+                                          [
+                                            _c(
+                                              "a",
+                                              {
+                                                attrs: {
+                                                  href: slider.slider_url,
+                                                  target: "_blank",
+                                                  rel: "noopener",
+                                                },
+                                              },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(slider.slider_url)
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.getTranslatedTypeName(slider)
+                                      ? _c(
+                                          "div",
+                                          { staticClass: "item-card-stats" },
+                                          [
+                                            _c(
+                                              "span",
+                                              { staticClass: "item-card-chip" },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "bi bi-link-45deg",
+                                                }),
+                                                _vm._v(
+                                                  _vm._s(_vm.__(slider.type))
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-footer" },
+                                    [
+                                      _c(
+                                        "span",
+                                        { staticClass: "item-card-meta" },
+                                        [_vm._v("#" + _vm._s(slider.id))]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "item-card-actions" },
+                                        [
+                                          _vm.$can("home_slider_image_update")
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn",
+                                                  attrs: {
+                                                    title: _vm.__("edit"),
+                                                  },
+                                                  on: {
+                                                    click: function ($event) {
+                                                      _vm.edit_record = slider
+                                                    },
+                                                  },
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass:
+                                                      "bi bi-pencil-square",
+                                                  }),
+                                                ]
+                                              )
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _vm.$can("home_slider_image_delete")
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "figma-action-btn figma-delete-btn",
+                                                  attrs: {
+                                                    title: _vm.__("delete"),
+                                                  },
+                                                  on: {
+                                                    click: function ($event) {
+                                                      _vm.deleteSlider(
+                                                        _vm.translatedSliders.indexOf(
+                                                          slider
+                                                        ),
+                                                        slider.id
+                                                      )
+                                                    },
+                                                  },
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass: "bi bi-trash",
+                                                  }),
+                                                ]
+                                              )
+                                            : _vm._e(),
+                                        ]
+                                      ),
+                                    ]
+                                  ),
+                                ]
+                              )
+                            }
+                          ),
+                          0
+                        ),
+                  ])
+                : _c(
+                    "div",
+                    { staticClass: "table-responsive" },
+                    [
+                      _c("b-table", {
+                        staticClass: "figma-order-table mb-0",
+                        attrs: {
+                          items: _vm.translatedSliders,
+                          fields: _vm.fields,
+                          "current-page": _vm.currentPage,
+                          "per-page": _vm.perPage,
+                          filter: _vm.filter,
+                          "filter-included-fields": _vm.filterOn,
+                          "sort-by": _vm.sortBy,
+                          "sort-desc": _vm.sortDesc,
+                          "sort-direction": _vm.sortDirection,
+                          bordered: false,
+                          busy: _vm.isLoading,
+                          stacked: "md",
+                          "show-empty": "",
+                          "tbody-tr-class": function () {
+                            return "figma-tr align-middle"
+                          },
+                          small: "",
                         },
-                      },
-                    ]),
-                  }),
-                ],
-                1
-              ),
+                        on: {
+                          "update:sortBy": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sort-by": function ($event) {
+                            _vm.sortBy = $event
+                          },
+                          "update:sortDesc": function ($event) {
+                            _vm.sortDesc = $event
+                          },
+                          "update:sort-desc": function ($event) {
+                            _vm.sortDesc = $event
+                          },
+                        },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "table-busy",
+                            fn: function () {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-black my-2",
+                                  },
+                                  [
+                                    _c("b-spinner", {
+                                      staticClass: "align-middle",
+                                    }),
+                                    _vm._v(" "),
+                                    _c("strong", [
+                                      _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                    ]),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
+                            proxy: true,
+                          },
+                          {
+                            key: "empty",
+                            fn: function (scope) {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-muted py-4",
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass:
+                                        "fa fa-inbox fa-2x d-block mb-2",
+                                    }),
+                                    _vm._v(_vm._s(scope.emptyText)),
+                                  ]
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "emptyfiltered",
+                            fn: function (scope) {
+                              return [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "text-center text-muted py-4",
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass:
+                                        "fa fa-search fa-2x d-block mb-2",
+                                    }),
+                                    _vm._v(_vm._s(scope.emptyFilteredText)),
+                                  ]
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(image)",
+                            fn: function (row) {
+                              return [
+                                _c("img", {
+                                  staticClass: "slider-thumb",
+                                  attrs: {
+                                    src:
+                                      row.item.image_url ||
+                                      _vm.$placeholderImage,
+                                    alt: "",
+                                  },
+                                }),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(type_name)",
+                            fn: function (row) {
+                              return [
+                                _vm._v(
+                                  "\n                                " +
+                                    _vm._s(
+                                      _vm.getTranslatedTypeName(row.item)
+                                    ) +
+                                    "\n                            "
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(status)",
+                            fn: function (row) {
+                              return [
+                                row.item.status === 1
+                                  ? _c(
+                                      "span",
+                                      { staticClass: "badge bg-success" },
+                                      [_vm._v(_vm._s(_vm.__("active")))]
+                                    )
+                                  : _c(
+                                      "span",
+                                      { staticClass: "badge bg-danger" },
+                                      [_vm._v(_vm._s(_vm.__("deactive")))]
+                                    ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "cell(actions)",
+                            fn: function (row) {
+                              return [
+                                _c("div", { staticClass: "d-flex gap-2" }, [
+                                  _vm.$can("home_slider_image_update")
+                                    ? _c(
+                                        "button",
+                                        {
+                                          directives: [
+                                            {
+                                              name: "b-tooltip",
+                                              rawName: "v-b-tooltip.hover",
+                                              modifiers: { hover: true },
+                                            },
+                                          ],
+                                          staticClass: "figma-action-btn",
+                                          attrs: { title: _vm.__("edit") },
+                                          on: {
+                                            click: function ($event) {
+                                              _vm.edit_record = row.item
+                                            },
+                                          },
+                                        },
+                                        [
+                                          _c("base-icon", {
+                                            attrs: {
+                                              name: "edit icon",
+                                              hoverName: "edit Hover",
+                                              width: "24",
+                                              height: "24",
+                                            },
+                                          }),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  _vm.$can("home_slider_image_delete")
+                                    ? _c(
+                                        "button",
+                                        {
+                                          directives: [
+                                            {
+                                              name: "b-tooltip",
+                                              rawName: "v-b-tooltip.hover",
+                                              modifiers: { hover: true },
+                                            },
+                                          ],
+                                          staticClass:
+                                            "figma-action-btn figma-delete-btn",
+                                          attrs: { title: _vm.__("delete") },
+                                          on: {
+                                            click: function ($event) {
+                                              _vm.deleteSlider(
+                                                _vm.translatedSliders.indexOf(
+                                                  row.item
+                                                ),
+                                                row.item.id
+                                              )
+                                            },
+                                          },
+                                        },
+                                        [
+                                          _c("base-icon", {
+                                            attrs: {
+                                              name: "Type=Default",
+                                              hoverName: "Type=Hover",
+                                              width: "24",
+                                              height: "24",
+                                            },
+                                          }),
+                                        ],
+                                        1
+                                      )
+                                    : _vm._e(),
+                                ]),
+                              ]
+                            },
+                          },
+                        ]),
+                      }),
+                    ],
+                    1
+                  ),
             ]),
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "figma-table-footer" },
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-2" },
+                  [
+                    _c("label", { staticClass: "showing-results-text mb-0" }, [
+                      _vm._v(_vm._s(_vm.__("per_page"))),
+                    ]),
+                    _vm._v(" "),
+                    _c("b-form-select", {
+                      staticClass: "w-auto",
+                      attrs: { options: _vm.pageOptions, size: "sm" },
+                      model: {
+                        value: _vm.perPage,
+                        callback: function ($$v) {
+                          _vm.perPage = $$v
+                        },
+                        expression: "perPage",
+                      },
+                    }),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",
@@ -1596,6 +2297,10 @@ var render = function () {
                     "total-rows": _vm.totalRows,
                     "per-page": _vm.perPage,
                     align: "right",
+                    "hide-goto-end-buttons": "",
+                    "hide-ellipsis": "",
+                    "prev-text": "<",
+                    "next-text": ">",
                   },
                   model: {
                     value: _vm.currentPage,

@@ -1,11 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop
         no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex flex-wrap justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
@@ -76,7 +76,7 @@
 
                         </div>
 
-                        <div class="row" v-if="deliveryBoys.driving_license_url">
+                        <div class="row mt-2" v-if="deliveryBoys.driving_license_url">
                             <div v-if="isImage(deliveryBoys.driving_license_url)" class="col-md-2">
                                 <img class="custom-image" :src="deliveryBoys.driving_license_url"
                                     title='Driving License' alt='Driving License' />
@@ -109,7 +109,7 @@
                             </template>
                         </div>
 
-                        <div class="row" v-if="deliveryBoys.national_identity_card_url">
+                        <div class="row mt-2" v-if="deliveryBoys.national_identity_card_url">
                             <div v-if="isImage(deliveryBoys.national_identity_card_url)" class="col-md-2">
                                 <img class="custom-image" :src="deliveryBoys.national_identity_card_url"
                                     title='National Identity Card' alt='National Identity Card' />
@@ -159,7 +159,7 @@
                             class="form-control" placeholder="Enter bank account name">
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 form-group">
                     <label for="city_name">{{ __('select_or_search_city') }}</label>
                     <multiselect v-model="city" :options="cities" @close="setCityId" placeholder="Select & Search City"
                         label="name" track-by="name" id="city_name">
@@ -195,14 +195,14 @@
 
                 <div class="col-md-12" v-if="deliveryBoys.id">
                     <div class="form-group">
-                        <label>{{ __('status') }}</label><br>
+                        <label>{{ __('status') }}</label>
                         <b-form-radio-group v-model="deliveryBoys.status" :options="[
                             { text: __('registered'), 'value': 0 },
                             { text: __('active'), 'value': 1 },
                             { text: __('not_approved'), 'value': 2 },
                             { text: __('deactive'), 'value': 3 },
                             { text: __('block'), 'value': 4 },
-                        ]" buttons button-variant="outline-primary" required></b-form-radio-group>
+                        ]" buttons button-variant="outline-primary" class="d-flex flex-wrap db-status-group" required></b-form-radio-group>
 
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                 <!-- Custom Fields -->
                 <template v-if="customFields.length">
                     <div class="col-md-12">
-                        <h6>{{ __('custom_fields') }}</h6>
+                        <h6 class="db-section-title">{{ __('custom_fields') }}</h6>
                     </div>
                     <div class="col-md-6" v-for="field in translatedCustomFields" :key="field.id">
                         <div class="form-group">
@@ -240,13 +240,15 @@
                                     target="_blank" class="badge bg-success mt-1"><i class="fa fa-eye"></i> {{ __('view') || 'View' }}</a>
                             </template>
 
+                            <custom-field-date v-else-if="field.type === 'date'" v-model="customFieldValues[field.id]"
+                                :placeholder="field.name"></custom-field-date>
                             <input v-else :type="field.type === 'number' ? 'number' : 'text'" class="form-control"
                                 v-model="customFieldValues[field.id]" :placeholder="field.name">
                         </div>
                     </div>
                 </template>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -586,4 +588,37 @@ export default {
 
 <style scoped>
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+
+.db-section-title {
+    margin: 8px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.db-status-group {
+    gap: 8px;
+}
+
+.db-status-group ::v-deep .btn {
+    margin: 0;
+    border-radius: var(--ui-radius) !important; /* beat BootstrapVue btn-group joined corners */
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.db-status-group ::v-deep .btn input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.custom-image {
+    width: 100%;
+    max-width: 96px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+}
 </style>

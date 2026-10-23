@@ -107,7 +107,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -261,10 +260,13 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "page-title mb-2" }, [
+      _c("div", { staticClass: "page-title mb-3" }, [
         _c(
           "div",
-          { staticClass: "d-flex justify-content-between align-items-center" },
+          {
+            staticClass:
+              "d-flex justify-content-between align-items-center flex-wrap gap-2",
+          },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("taxes"))),
@@ -303,7 +305,7 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card" }, [
+        _c("div", { staticClass: "card figma-main-section-card" }, [
           _c("div", { staticClass: "card-body p-0" }, [
             _c(
               "div",
@@ -352,7 +354,7 @@ var render = function () {
                         },
                       ],
                       staticClass:
-                        "btn btn-figma-filter d-flex align-items-center gap-2",
+                        "btn btn-figma-columns d-flex align-items-center gap-2",
                       attrs: { title: _vm.__("refresh") },
                       on: {
                         click: function ($event) {
@@ -460,10 +462,10 @@ var render = function () {
                         return [
                           row.item.status == 1
                             ? _c("span", { staticClass: "badge bg-success" }, [
-                                _vm._v(_vm._s(_vm.__("activate"))),
+                                _vm._v(_vm._s(_vm.__("active"))),
                               ])
                             : _c("span", { staticClass: "badge bg-danger" }, [
-                                _vm._v(_vm._s(_vm.__("deactivate"))),
+                                _vm._v(_vm._s(_vm.__("deactive"))),
                               ]),
                         ]
                       },
@@ -473,123 +475,124 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _c(
-                            "button",
+                            "div",
                             {
-                              directives: [
-                                {
-                                  name: "b-tooltip",
-                                  rawName: "v-b-tooltip.hover",
-                                  modifiers: { hover: true },
-                                },
-                              ],
                               staticClass:
-                                "btn btn-sm btn-primary border-0 bg-transparent p-0",
-                              attrs: { title: _vm.__("edit") },
-                              on: {
-                                click: function ($event) {
-                                  _vm.edit_record = row.item
-                                },
-                              },
+                                "d-flex gap-2 justify-content-center",
                             },
                             [
-                              _c("base-icon", {
-                                attrs: {
-                                  name: "edit icon",
-                                  hoverName: "edit Hover",
-                                  width: "32",
-                                  height: "32",
-                                },
-                              }),
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "button",
-                            {
-                              directives: [
+                              _c(
+                                "button",
                                 {
-                                  name: "b-tooltip",
-                                  rawName: "v-b-tooltip.hover",
-                                  modifiers: { hover: true },
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass: "figma-action-btn",
+                                  attrs: { title: _vm.__("edit") },
+                                  on: {
+                                    click: function ($event) {
+                                      _vm.edit_record = row.item
+                                    },
+                                  },
                                 },
-                              ],
-                              staticClass:
-                                "btn btn-sm btn-danger border-0 bg-transparent p-0",
-                              attrs: { title: _vm.__("delete") },
-                              on: {
-                                click: function ($event) {
-                                  return _vm.deleteRecord(
-                                    row.index,
-                                    row.item.id
-                                  )
+                                [
+                                  _c("base-icon", {
+                                    attrs: {
+                                      name: "edit icon",
+                                      hoverName: "edit Hover",
+                                      width: "24",
+                                      height: "24",
+                                    },
+                                  }),
+                                ],
+                                1
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass: "figma-action-btn",
+                                  attrs: { title: _vm.__("delete") },
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.deleteRecord(
+                                        row.index,
+                                        row.item.id
+                                      )
+                                    },
+                                  },
                                 },
-                              },
-                            },
-                            [
-                              _c("base-icon", {
-                                attrs: {
-                                  name: "Type=Default",
-                                  hoverName: "Type=Hover",
-                                  width: "32",
-                                  height: "32",
-                                },
-                              }),
-                            ],
-                            1
+                                [
+                                  _c("base-icon", {
+                                    attrs: {
+                                      name: "Type=Default",
+                                      hoverName: "Type=Hover",
+                                      width: "24",
+                                      height: "24",
+                                    },
+                                  }),
+                                ],
+                                1
+                              ),
+                            ]
                           ),
                         ]
                       },
                     },
                   ]),
                 }),
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
+              [
+                _c("table-count", {
+                  attrs: {
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "total-rows": _vm.totalRows,
+                  },
+                }),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "figma-table-footer flex-wrap gap-3" },
+                  { staticClass: "d-flex align-items-center gap-3" },
                   [
-                    _c("div", { staticClass: "showing-results-text small" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(_vm.__("Showing Result")) +
-                          " : "
-                      ),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.pageStart)),
-                      ]),
-                      _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.totalRows)),
-                      ]),
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      { staticClass: "d-flex align-items-center gap-3" },
-                      [
-                        _c("b-pagination", {
-                          staticClass: "figma-pagination mb-0",
-                          attrs: {
-                            "total-rows": _vm.totalRows,
-                            "per-page": _vm.perPage,
-                            align: "right",
-                            "hide-goto-end-buttons": "",
-                            "hide-ellipsis": "",
-                            "prev-text": "<",
-                            "next-text": ">",
-                          },
-                          model: {
-                            value: _vm.currentPage,
-                            callback: function ($$v) {
-                              _vm.currentPage = $$v
-                            },
-                            expression: "currentPage",
-                          },
-                        }),
-                      ],
-                      1
-                    ),
-                  ]
+                    _c("b-pagination", {
+                      staticClass: "figma-pagination mb-0",
+                      attrs: {
+                        "total-rows": _vm.totalRows,
+                        "per-page": _vm.perPage,
+                        align: "right",
+                        "hide-goto-end-buttons": "",
+                        "hide-ellipsis": "",
+                        "prev-text": "<",
+                        "next-text": ">",
+                      },
+                      model: {
+                        value: _vm.currentPage,
+                        callback: function ($$v) {
+                          _vm.currentPage = $$v
+                        },
+                        expression: "currentPage",
+                      },
+                    }),
+                  ],
+                  1
                 ),
               ],
               1

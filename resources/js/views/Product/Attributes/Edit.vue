@@ -1,13 +1,13 @@
 <template>
   <b-modal :key="id" ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop
-    no-fade static>
+    no-fade static size="lg">
 
-    <div slot="modal-footer">
+    <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+      <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
       <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
         {{ __('save') }}
         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
       </b-button>
-      <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
     </div>
 
     <form ref="my-form" @submit.prevent="saveRecord" novalidate>
@@ -17,8 +17,8 @@
         <b-tab v-for="(lang, index) in languages" :key="lang.id" :title="lang.name" :active="lang.is_default == 1">
 
           <!-- Translate buttons (attribute name only) -->
-          <div class="mb-3" v-if="lang.is_default && languages.length > 1">
-            <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(lang)" v-b-tooltip.hover
+          <div class="d-flex flex-wrap gap-2 mb-3" v-if="lang.is_default && languages.length > 1">
+            <b-button size="sm" variant="outline-primary" @click="translateEmpty(lang)" v-b-tooltip.hover
               :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
               :disabled="loadingEmpty">
               <span v-if="!loadingEmpty">{{ __('translate_empty_fields') }}</span>
@@ -35,41 +35,37 @@
           <!-- Translate buttons END -->
 
           <div class="row">
-            <div class="form-group col-12">
-              <label>{{ __('name') }}</label>
-              <i class="text-danger" v-if="lang.is_default">*</i>
+            <div class="form-group" :class="lang.is_default ? 'col-md-6' : 'col-12'">
+              <label>{{ __('name') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
               <input type="text" class="form-control" v-model="form[lang.id].name" :placeholder="__('enter_name')"
                 :required="lang.is_default ? true : undefined">
             </div>
 
             <!-- Type (not translatable; applies to the whole attribute, not per value) -->
-            <div class="form-group col-12" v-if="lang.is_default">
-              <label>{{ __('type') }}</label>
-              <i class="text-danger">*</i>
-              <select class="form-control" v-model="type" style="max-width: 260px;">
+            <div class="form-group col-md-6" v-if="lang.is_default">
+              <label>{{ __('type') }} <i class="text-danger">*</i></label>
+              <select class="form-control form-select" v-model="type">
                 <option value="text">{{ __('text') }}</option>
                 <option value="color">{{ __('colour') }}</option>
                 <option value="image">{{ __('image') }}</option>
               </select>
-              <small class="text-muted">{{ __('type_applies_to_the_whole_attribute_not_per_value') }}</small>
+              <small class="text-muted d-block mt-1">{{ __('type_applies_to_the_whole_attribute_not_per_value') }}</small>
             </div>
 
             <!-- Values (not translatable; managed on the default language tab) -->
             <div class="form-group col-12" v-if="lang.is_default">
-              <label>{{ __('values') }}</label>
-              <i class="text-danger">*</i>
+              <label>{{ __('values') }} <i class="text-danger">*</i></label>
 
-              <div class="d-flex mb-1" style="gap: 8px;">
-                <small class="text-muted" style="width: 40%;">{{ __('value') }}</small>
-                <small v-if="type === 'text'" class="text-muted flex-grow-1" style="text-align: left;">{{ __('short_code') }}</small>
-                <small v-if="type === 'color'" class="text-muted flex-grow-1" style="text-align: left;">{{ __('colour') }}</small>
-                <small v-if="type === 'image'" class="text-muted flex-grow-1" style="text-align: left;">{{ __('image') }}</small>
-                <span style="width: 38px;"></span>
+              <div class="d-flex mb-1 attr-values-row">
+                <small class="text-muted attr-value-col">{{ __('value') }}</small>
+                <small v-if="type === 'text'" class="text-muted flex-grow-1 text-left">{{ __('short_code') }}</small>
+                <small v-if="type === 'color'" class="text-muted flex-grow-1 text-left">{{ __('colour') }}</small>
+                <small v-if="type === 'image'" class="text-muted flex-grow-1 text-left">{{ __('image') }}</small>
+                <span v-if="values.length > 1" class="attr-remove-spacer"></span>
               </div>
 
-              <div v-for="(val, idx) in values" :key="val.uid" class="d-flex align-items-center mb-2"
-                style="gap: 8px;">
-                <input type="text" class="form-control" style="width: 40%;" v-model="val.value"
+              <div v-for="(val, idx) in values" :key="val.uid" class="d-flex align-items-center mb-2 attr-values-row">
+                <input type="text" class="form-control attr-value-col" v-model="val.value"
                   :placeholder="__('enter_value')" required>
 
                 <input v-if="type === 'text'" type="text" class="form-control flex-grow-1"
@@ -80,12 +76,12 @@
                 </div>
 
                 <div v-if="type === 'image'" class="d-flex align-items-center gap-2 flex-grow-1">
-                  <img v-if="val.image_url" :src="val.image_url" class="img-thumbnail" style="width: 32px; height: 32px; object-fit: cover; flex-shrink: 0;">
+                  <img v-if="val.image_url" :src="val.image_url" class="img-thumbnail attr-value-thumb">
                   <input type="file" accept="image/*" class="form-control form-control-sm"
                     @change="onValueImageChange($event, idx)">
                 </div>
 
-                <b-button v-if="values.length > 1" variant="outline-danger" size="sm" @click="removeValue(idx)"
+                <b-button v-if="values.length > 1" variant="outline-danger" size="sm" class="attr-remove-btn" @click="removeValue(idx)"
                   v-b-tooltip.hover :title="__('delete')">
                   <i class="fa fa-times"></i>
                 </b-button>
@@ -102,7 +98,7 @@
             <div class="form-group col-12" v-if="isSeller && lang.is_default">
               <label>{{ __('categories') }}</label>
               <small class="text-muted d-block mb-1">Assign this attribute to your own categories</small>
-              <div v-if="sellerCategories.length" class="d-flex flex-wrap" style="gap: 10px;">
+              <div v-if="sellerCategories.length" class="d-flex flex-wrap gap-2">
                 <b-form-checkbox v-for="cat in sellerCategories" :key="cat.id" v-model="selectedCategoryIds"
                   :value="cat.id" class="category-checkbox">
                   {{ cat.name }}
@@ -111,9 +107,9 @@
               <small v-else class="text-muted">No categories assigned to you yet - ask admin to assign one.</small>
             </div>
 
-            <div class="form-group col-12" v-if="id && lang.is_default">
-              <label>{{ __('status') }}</label>
-              <div class="col-md-9 text-left mt-1">
+            <div class="form-group col-12 mb-0" v-if="id && lang.is_default">
+              <label class="d-block">{{ __('status') }}</label>
+              <div class="text-left mt-1">
                 <b-form-radio-group v-model="status" :options="[
                   { text: __('deactivate'), 'value': 0 },
                   { text: __('activate'), 'value': 1 }
@@ -249,8 +245,8 @@ export default {
           cancelButtonText: __('cancel'),
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33',
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)',
         }).then(result => {
           if (result.value) this.values.splice(index, 1);
         });
@@ -475,7 +471,7 @@ export default {
               title: __('some_values_were_kept'),
               text: __('these_values_are_used_by_product_variants_and_were_not_removed') + ': ' + keptValues.join(', '),
               icon: 'info',
-              confirmButtonColor: '#37a279',
+              confirmButtonColor: 'var(--theme-primary-500)',
             }).then(() => {
               this.$emit('saved', message);
               this.hideModal();
@@ -509,12 +505,39 @@ export default {
   margin-left: 8px;
 }
 
+.attr-values-row {
+  gap: 8px;
+}
+
+.attr-value-col {
+  flex: 0 0 40%;
+  width: 40%;
+}
+
+.attr-remove-spacer,
+.attr-remove-btn {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attr-value-thumb {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .color-swatch-input {
   width: 64px;
-  height: 30px;
+  height: 40px;
   padding: 0;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
+  border: 1px solid var(--ui-border-strong);
+  border-radius: var(--ui-radius-sm);
   cursor: pointer;
   background: none;
 }

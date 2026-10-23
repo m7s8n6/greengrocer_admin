@@ -12,6 +12,7 @@
                                 <li class="breadcrumb-item">
                                     <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                                 </li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('additional_charge') }}
                                 </li>
                             </ol>
@@ -22,7 +23,8 @@
             <section class="section">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">{{ __('additional_charge') }}</h4>
+                        <h4 class="card-title float-none">{{ __('additional_charge') }}</h4>
+                        <p class="text-muted small mb-0 mt-1">{{ tr('additional_charge_desc', 'Extra charges (packaging, handling, etc.) added to orders at checkout.') }}</p>
                     </div>
                     <div class="card-body">
                         <form @submit.prevent="saveAdditionalCharges">
@@ -55,11 +57,11 @@
                                     </div>
 
                                     <div v-for="(charge, index) in additionalCharges" :key="index"
-                                        class="charge-card mb-3 p-3 border rounded">
+                                        class="charge-card mb-3 p-3">
 
                                         <!-- Row 1: Title + Value -->
                                         <div class="row align-items-end">
-                                            <div class="col-md-4">
+                                            <div class="col-12 col-md-6 col-xl-4">
                                                 <div class="form-group mb-2">
                                                     <label>{{ __('charge_title') }} <span v-if="language.is_default"
                                                             class="text-danger">*</span></label>
@@ -72,7 +74,7 @@
 
                                             <template v-if="language.is_default">
                                                 <!-- Charge Type: Amount or Percentage -->
-                                                <div class="col-md-2">
+                                                <div class="col-6 col-md-3 col-xl-2">
                                                     <div class="form-group mb-2">
                                                         <label>{{ __('charge_type') }}</label>
                                                         <select class="form-control form-select"
@@ -84,7 +86,7 @@
                                                 </div>
 
                                                 <!-- Value field (changes based on type) -->
-                                                <div class="col-md-2">
+                                                <div class="col-6 col-md-3 col-xl-2">
                                                     <div class="form-group mb-2">
                                                         <label>{{ charge.charge_type === 'percentage' ? __('percentage')
                                                             : __('charge_amount') }}</label>
@@ -103,10 +105,10 @@
                                                 </div>
 
                                                 <!-- Refundable Toggle -->
-                                                <div class="col-md-2">
+                                                <div class="col-5 col-md-4 col-xl-2">
                                                     <div class="form-group mb-2">
                                                         <label>{{ __('refundable') }}</label>
-                                                        <div class="form-check form-switch mt-1">
+                                                        <div class="form-check form-switch charge-switch">
                                                             <input class="form-check-input" type="checkbox"
                                                                 :id="'refundable_' + index"
                                                                 v-model="charge.is_refundable">
@@ -119,10 +121,10 @@
                                                 </div>
 
                                                 <!-- Status Toggle -->
-                                                <div class="col-md-1">
+                                                <div class="col-4 col-md-4 col-xl-1">
                                                     <div class="form-group mb-2">
                                                         <label>{{ __('status') }}</label>
-                                                        <div class="form-check form-switch mt-1">
+                                                        <div class="form-check form-switch charge-switch">
                                                             <input class="form-check-input" type="checkbox"
                                                                 :id="'status_' + index" v-model="charge.is_active">
                                                         </div>
@@ -130,7 +132,7 @@
                                                 </div>
 
                                                 <!-- Delete -->
-                                                <div class="col-md-1 d-flex align-items-end mb-2">
+                                                <div class="col-3 col-md-4 col-xl-1 d-flex align-items-end justify-content-end mb-2">
                                                     <button v-if="$can('additional_charges_delete')" type="button"
                                                         class="figma-action-btn figma-delete-btn" @click="removeCharge(index)" v-b-tooltip.hover :title="__('delete')">
                                                         <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
@@ -142,7 +144,7 @@
                                         <!-- Row 2: Applicable On (only for default language) -->
                                         <div class="row mt-1" v-if="language.is_default">
                                             <div class="col-12">
-                                                <label class="me-3">{{ __('applicable_on') }}:</label>
+                                                <label class="mr-3 mb-1">{{ __('applicable_on') }}:</label>
                                                 <div class="form-check form-check-inline">
                                                     <input class="form-check-input" type="checkbox"
                                                         :id="'type_order_' + index" value="order"
@@ -165,18 +167,20 @@
                                 </b-tab>
                             </b-tabs>
 
-                            <div class="mt-3 d-flex justify-content-end">
-                                <button v-if="$can('additional_charges_create')" type="button" class="btn btn-success"
-                                    @click="addCharge">{{
+                            <div class="d-flex justify-content-start">
+                                <button v-if="$can('additional_charges_create')" type="button" class="btn btn-sm btn-outline-primary"
+                                    @click="addCharge"><i class="fas fa-plus mr-1" aria-hidden="true"></i>{{
                                         __('add_charge')
                                     }}</button>
                             </div>
 
-                            <b-button v-if="$can('additional_charges_update')" type="submit" variant="primary"
-                                class="mt-3" :disabled="isLoading">
-                                {{ __('update') }}
-                                <b-spinner v-if="isLoading" small />
-                            </b-button>
+                            <div class="d-flex justify-content-end border-top pt-3 mt-3">
+                                <b-button v-if="$can('additional_charges_update')" type="submit" variant="primary"
+                                    :disabled="isLoading">
+                                    {{ __('update') }}
+                                    <b-spinner v-if="isLoading" small />
+                                </b-button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -202,6 +206,7 @@ export default {
     },
 
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         fetchActiveLanguages() {
             if (this.languages.length) {
                 return Promise.resolve(this.languages);
@@ -280,8 +285,8 @@ export default {
                 text: __('you_wont_be_able_to_revert_this'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: 'var(--theme-error-500)',
+                cancelButtonColor: 'var(--theme-primary-500)',
                 confirmButtonText: __('yes_delete_it'),
                 cancelButtonText: __('cancel'),
             }).then((result) => {
@@ -441,21 +446,29 @@ export default {
 </script>
 <style scoped>
 .charge-card {
-    background: var(--bs-card-bg, #fafbfc);
-    border: 1px solid var(--bs-border-color, #dee2e6) !important;
-    transition: background-color 0.3s ease;
-}
-
-body.theme-dark .charge-card {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    transition: border-color 0.15s ease;
 }
 
 .charge-card:hover {
-    background: #f0f4f8;
+    border-color: var(--ui-border-strong);
 }
 
-body.theme-dark .charge-card:hover {
-    background: #232f42 !important;
+.charge-card label {
+    font-size: 13px;
+}
+
+/* Refundable / Status switches: same height as the inputs so the row lines up */
+.charge-switch {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    margin-bottom: 0;
+}
+.charge-switch .form-check-label {
+    margin-left: 6px;
+    color: var(--ui-text-muted);
 }
 </style>

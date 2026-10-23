@@ -2,14 +2,13 @@
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
         static size="lg">
 
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">
+                {{ __('cancel') }}
+            </b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
                 {{ __('save') }}
                 <b-spinner v-if="isLoading" small></b-spinner>
-            </b-button>
-
-            <b-button variant="secondary" @click="hideModal">
-                {{ __('cancel') }}
             </b-button>
         </div>
         <div v-if="isLoadingData" class="text-center p-5">
@@ -26,8 +25,8 @@
                     </template>
 
                     <!-- Translate buttons -->
-                    <div class="mb-2" v-if="language.is_default && languages.length > 1">
-                        <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(language)"
+                    <div class="mb-3 d-flex flex-wrap gap-2" v-if="language.is_default && languages.length > 1">
+                        <b-button size="sm" variant="outline-primary" @click="translateEmpty(language)"
                             v-b-tooltip.hover
                             :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                             :disabled="loadingEmpty">
@@ -41,7 +40,7 @@
                             <span v-if="!loadingOverwrite">{{ __('translate_and_overwrite') }}</span>
                             <b-spinner v-else small></b-spinner>
                         </b-button>
-                        <div v-if="translateSuccessMessage" class="text-success mt-2 font-weight-bold">
+                        <div v-if="translateSuccessMessage" class="text-success w-100 font-weight-bold">
                             {{ translateSuccessMessage }}
                         </div>
                     </div>
@@ -50,8 +49,7 @@
 
                         <!-- Country Name (Translatable) -->
                         <div class="form-group col-md-12">
-                            <label>{{ __('name') }}</label>
-                            <i v-if="language.is_default" class="text-danger">*</i>
+                            <label>{{ __('name') }} <span v-if="language.is_default" class="text-danger">*</span></label>
                             <input type="text" class="form-control" v-model="translations[language.id].name"
                                 :required="language.is_default == 1 ? true : undefined" :placeholder="__('name')">
 
@@ -72,7 +70,7 @@
 
                             <!-- Logo and Status in flex row (side by side) -->
                             <div class="col-md-12 d-flex flex-wrap gap-3">
-                                <div class="form-group flex-fill" style="min-width: 200px;">
+                                <div class="form-group flex-fill logo-status-col">
                                     <label class="d-block">{{ __('logo') }} <span class="text-danger">*</span></label>
                                     <span v-if="logoError" class="error">{{ logoError }}</span>
                                     <input
@@ -102,7 +100,7 @@
                                         <img :src="logo_url" width="120" class="img-thumbnail custom-image">
                                     </div>
                                 </div>
-                                <div class="form-group flex-fill" style="min-width: 200px;" v-if="id">
+                                <div class="form-group flex-fill logo-status-col" v-if="id">
                                     <label class="d-block">{{ __('status') }}</label>
                                     <b-form-radio-group v-model="status" :options="[
                                         { text: __('deactive'), value: 0 },
@@ -114,9 +112,9 @@
                             
                             <div class="form-group col-md-6" v-if="globalColors && globalColors.country_background_color_mode === 'item-wise'">
                                 <label>{{ __('background_color_for_light_theme') }}</label>
-                                <div class="d-flex" style="gap: 10px; align-items: center; max-width: 500px;">
-                                    <input type="text" class="form-control" v-model="background_color_for_light_theme">
-                                    <input type="color" class="form-control cursor-pointer" style="max-width: 100px;" :value="(background_color_for_light_theme && background_color_for_light_theme.startsWith('#') && (background_color_for_light_theme.length === 4 || background_color_for_light_theme.length === 7 || background_color_for_light_theme.length === 9)) ? background_color_for_light_theme.substring(0, 7) : '#ffffff'" @input="background_color_for_light_theme = $event.target.value">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <input type="text" class="form-control color-text-input" v-model="background_color_for_light_theme">
+                                    <input type="color" class="form-control cursor-pointer color-swatch-input" :value="(background_color_for_light_theme && background_color_for_light_theme.startsWith('#') && (background_color_for_light_theme.length === 4 || background_color_for_light_theme.length === 7 || background_color_for_light_theme.length === 9)) ? background_color_for_light_theme.substring(0, 7) : '#ffffff'" @input="background_color_for_light_theme = $event.target.value">
                                     <b-button size="sm" variant="outline-secondary" @click="background_color_for_light_theme = '#ffffff00'">
                                         {{ __('transparent') || 'Transparent' }}
                                     </b-button>
@@ -125,9 +123,9 @@
                             </div>
                             <div class="form-group col-md-6" v-if="globalColors && globalColors.country_background_color_mode === 'item-wise'">
                                 <label>{{ __('background_color_for_dark_theme') }}</label>
-                                <div class="d-flex" style="gap: 10px; align-items: center; max-width: 500px;">
-                                    <input type="text" class="form-control" v-model="background_color_for_dark_theme">
-                                    <input type="color" class="form-control cursor-pointer" style="max-width: 100px;" :value="(background_color_for_dark_theme && background_color_for_dark_theme.startsWith('#') && (background_color_for_dark_theme.length === 4 || background_color_for_dark_theme.length === 7 || background_color_for_dark_theme.length === 9)) ? background_color_for_dark_theme.substring(0, 7) : '#000000'" @input="background_color_for_dark_theme = $event.target.value">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <input type="text" class="form-control color-text-input" v-model="background_color_for_dark_theme">
+                                    <input type="color" class="form-control cursor-pointer color-swatch-input" :value="(background_color_for_dark_theme && background_color_for_dark_theme.startsWith('#') && (background_color_for_dark_theme.length === 4 || background_color_for_dark_theme.length === 7 || background_color_for_dark_theme.length === 9)) ? background_color_for_dark_theme.substring(0, 7) : '#000000'" @input="background_color_for_dark_theme = $event.target.value">
                                     <b-button size="sm" variant="outline-secondary" @click="background_color_for_dark_theme = '#00000000'">
                                         {{ __('transparent') || 'Transparent' }}
                                     </b-button>
@@ -138,7 +136,7 @@
                     </div>
                 </b-tab>
             </b-tabs>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -471,5 +469,15 @@ export default {
 <style scoped>
 .image_preview {
     margin-top: 5px;
+}
+
+.logo-status-col {
+    flex: 1 1 200px;
+    min-width: 0;
+}
+
+.color-text-input {
+    flex: 1 1 140px;
+    min-width: 0;
 }
 </style>

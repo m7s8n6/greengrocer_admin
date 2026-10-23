@@ -20,11 +20,13 @@
                 </div>
             </div>
 
-            <section class="section">
-                <div class="figma-main-section-card mb-4">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4">{{ __('product_bulk_upload_form') }}</h4>
-                        <div class="alert alert-info border-0 rounded-3 p-3 mb-4">
+            <section class="section bulk-page">
+                <div class="figma-main-section-card bulk-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">{{ __('product_bulk_upload_form') }}</h4>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <div class="alert alert-info mb-4">
                             <div class="d-flex flex-column gap-2">
                                 <p class="mb-0 fw-bold">{{
                                     __('always_download_and_use_new_sample_file_if_you_did_updated_admin_panel_version')
@@ -34,79 +36,8 @@
                                     __('before_uploading_the_file_please_check_all_the_data_fields_are_correct') }}</p>
                             </div>
                         </div>
-                        <div class="figma-main-section-card mb-4 border">
-                            <div class="card-body p-4">
-                                <h5 class="mb-1">{{ __('variant_combo_generator') || 'Variant Combo Generator' }}</h5>
-                                <p class="text-muted mb-3">{{ __('variant_combo_generator_hint') ||
-                                    'Pick a category, choose attribute values, generate every combo, then copy the Attribute Value IDs column straight into your sheet.' }}</p>
-
-                                <div class="form-group mb-3">
-                                    <label class="form-label">{{ __('category') }}</label>
-                                    <select class="form-control form-select" v-model="comboCategoryId"
-                                        @change="loadComboAttributes" v-html="comboCategoryOptions"></select>
-                                </div>
-
-                                <template v-if="comboAttributes.length">
-                                    <div class="form-group mb-3" v-for="attribute in comboAttributes" :key="attribute.id">
-                                        <label class="form-label fw-bold">{{ attribute.name }}</label>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <label v-for="value in attribute.values" :key="value.id"
-                                                class="btn btn-sm"
-                                                :class="isComboValueChecked(attribute.id, value.id) ? 'btn-success' : 'btn-outline-success'">
-                                                <input type="checkbox" class="d-none"
-                                                    :checked="isComboValueChecked(attribute.id, value.id)"
-                                                    @change="toggleComboValue(attribute.id, value.id)">
-                                                {{ value.value }}
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="alert alert-info d-flex justify-content-between align-items-center">
-                                        <span>{{ __('total_variants_to_be_generated') || 'Total variants to be generated' }}: <strong>{{ comboRows.length }}</strong></span>
-                                        <button type="button" class="btn btn-success" @click="selectAllComboValues">
-                                            <i class="fa fa-bolt"></i> {{ __('generate_all_variants') || 'Generate All Variants' }}
-                                        </button>
-                                    </div>
-                                </template>
-                                <p class="text-muted" v-else-if="comboCategoryId && comboCategoryId !== '0'">{{ __('no_attributes_assigned_to_this_category') || 'No attributes are assigned to this category.' }}</p>
-
-                                <div v-if="comboRows.length" class="mt-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="mb-0">{{ __('generated_combos') || 'Generated Combos' }}</h6>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" @click="copyAllCombos">
-                                            <img :src="$baseUrl + '/images/icons/copy.svg'" width="14" height="14" alt="" />
-                                            {{ __('copy_all_attribute_value_ids') || 'Copy All (one per line)' }}
-                                        </button>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm figma-order-table mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{ __('combo') || 'Combo' }}</th>
-                                                    <th class="text-center" style="width: 160px;">{{ __('attribute_value_ids') || 'Attribute Value IDs' }}</th>
-                                                    <th class="text-center" style="width: 90px;">{{ __('action') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="figma-tr" v-for="row in comboRows" :key="row.ids">
-                                                    <td>{{ row.label }}</td>
-                                                    <td class="text-center"><code>{{ row.ids }}</code></td>
-                                                    <td class="text-center">
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                            @click="copyText(row.ids)">
-                                                            <img :src="$baseUrl + '/images/icons/copy.svg'" width="14" height="14" alt="" />
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row" v-if="rowErrors.length">
-                            <div class="col-12">
+                        <div v-if="rowErrors.length">
+                            <div>
                                 <div class="alert alert-danger" ref="rowErrorsAlert">
                                     <p class="mb-2">{{
                                         __('validation_failed_for_some_rows_please_review_and_fix_the_following') }}</p>
@@ -134,15 +65,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <!-- form start -->
+                        <!-- form start -->
                             <form method="post" ref="my-form" @submit.prevent="saveRecord"
                                 enctype="multipart/form-data">
-                                <div class="col-md-12">
-                                    <div class="form-group">
+                                <div>
+                                    <div class="form-group mb-0">
                                         <label for="upload_file">{{ __('upload_file') }} {{ __('excel_file')
                                         }}</label>
-                                        <p class="text-muted mb-1">
+                                        <p class="text-muted small mb-2">
                                             {{ __('supported_formats') }}: XLSX, XLS
                                         </p>
                                         <span v-if="fileError" class="error">{{ fileError }}</span>
@@ -160,27 +90,106 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary" id="submit_btn" name="btnAdd"
-                                        :disabled="isLoading">
-                                        <i class="fa fa-upload" v-if="!isLoading"></i> {{ __('upload') }}
-                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                                    </button>
-                                    <button type="button" class="btn btn btn-secondary" @click="clearForm">
-                                        <i class="fa fa-undo" aria-hidden="true"></i> {{ __('clear') }}
-                                    </button>
-                                    <button type="button" class='btn btn-info' @click="downloadProductDataExcel">
-                                        <em class='fa fa-download'></em>
-                                        {{ __('download_sample_file') }}</button>
-                                    <a :href="instructionsFileurl" class='btn btn-warning' download> <em
-                                            class='fa fa-download'></em>
-                                        {{ __('download_instructions') }}</a>
+                                <div class="bulk-form-actions">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <button type="button" class='btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2' @click="downloadProductDataExcel">
+                                            <em class='fa fa-download'></em>
+                                            <span>{{ __('download_sample_file') }}</span>
+                                        </button>
+                                        <a :href="instructionsFileurl" class='btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2' download>
+                                            <em class='fa fa-download'></em>
+                                            <span>{{ __('download_instructions') }}</span>
+                                        </a>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="button" class="btn btn-outline-secondary" @click="clearForm">
+                                            <i class="fa fa-undo" aria-hidden="true"></i> {{ __('clear') }}
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="submit_btn" name="btnAdd"
+                                            :disabled="isLoading">
+                                            <i class="fa fa-upload" v-if="!isLoading"></i> {{ __('upload') }}
+                                            <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
-                            <!-- form end -->
+                        <!-- form end -->
+                    </div>
+                </div>
+
+                <div class="figma-main-section-card bulk-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">{{ __('variant_combo_generator') || 'Variant Combo Generator' }}</h4>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <p class="text-muted small mb-3">{{ __('variant_combo_generator_hint') ||
+                            'Pick a category, choose attribute values, generate every combo, then copy the Attribute Value IDs column straight into your sheet.' }}</p>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">{{ __('category') }}</label>
+                            <select class="form-control form-select" v-model="comboCategoryId"
+                                @change="loadComboAttributes" v-html="comboCategoryOptions"></select>
+                        </div>
+
+                        <template v-if="comboAttributes.length">
+                            <div class="form-group mb-3" v-for="attribute in comboAttributes" :key="attribute.id">
+                                <label class="form-label fw-bold">{{ attribute.name }}</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <label v-for="value in attribute.values" :key="value.id"
+                                        class="btn btn-sm"
+                                        :class="isComboValueChecked(attribute.id, value.id) ? 'btn-primary' : 'btn-outline-primary'">
+                                        <input type="checkbox" class="d-none"
+                                            :checked="isComboValueChecked(attribute.id, value.id)"
+                                            @change="toggleComboValue(attribute.id, value.id)">
+                                        {{ value.value }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <span>{{ __('total_variants_to_be_generated') || 'Total variants to be generated' }}: <strong>{{ comboRows.length }}</strong></span>
+                                <button type="button" class="btn btn-sm btn-primary" @click="selectAllComboValues">
+                                    <i class="fa fa-bolt"></i> {{ __('generate_all_variants') || 'Generate All Variants' }}
+                                </button>
+                            </div>
+                        </template>
+                        <p class="text-muted" v-else-if="comboCategoryId && comboCategoryId !== '0'">{{ __('no_attributes_assigned_to_this_category') || 'No attributes are assigned to this category.' }}</p>
+
+                        <div v-if="comboRows.length" class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                <h6 class="mb-0 bulk-subtitle">{{ __('generated_combos') || 'Generated Combos' }}</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" @click="copyAllCombos">
+                                    <i class="bi bi-files"></i>
+                                    {{ __('copy_all_attribute_value_ids') || 'Copy All (one per line)' }}
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm figma-order-table mb-0 bulk-combo-table">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ __('combo') || 'Combo' }}</th>
+                                            <th class="text-center" style="width: 160px;">{{ __('attribute_value_ids') || 'Attribute Value IDs' }}</th>
+                                            <th class="text-center" style="width: 90px;">{{ __('action') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="figma-tr" v-for="row in comboRows" :key="row.ids">
+                                            <td>{{ row.label }}</td>
+                                            <td class="text-center"><code>{{ row.ids }}</code></td>
+                                            <td class="text-center">
+                                                <button type="button" class="figma-action-btn bulk-copy-btn"
+                                                    @click="copyText(row.ids)">
+                                                    <i class="bi bi-files"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </section>
         </div>
     </div>
@@ -438,3 +447,67 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.bulk-card > .card-header {
+    padding: 14px 20px !important;
+    border-bottom: 1px solid var(--ui-border);
+    background: transparent;
+}
+
+.bulk-card > .card-header .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.bulk-subtitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.bulk-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.bulk-form-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* !important: legacy global .figma-action-btn forces 40px with !important */
+.bulk-copy-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+.bulk-combo-table code {
+    font-size: 12px;
+    color: var(--theme-primary-700);
+    background: var(--ui-primary-soft);
+    padding: 2px 6px;
+    border-radius: var(--ui-radius-sm);
+}
+
+@media (max-width: 575.98px) {
+    .bulk-form-actions > .d-flex {
+        width: 100%;
+    }
+
+    .bulk-form-actions > .d-flex > .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+</style>

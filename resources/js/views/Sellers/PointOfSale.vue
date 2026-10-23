@@ -5,11 +5,11 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="d-flex align-items-center justify-content-between">
-                            <button class="btn btn-danger me-3 mt-1" @click="confirmExit">
+                            <button class="btn btn-outline-danger me-3" @click="confirmExit">
                                 <i class="fas fa-arrow-left"></i> {{__('exit_pos')}}
                             </button>
-                            <h5>{{__('pos_billing')}}</h5>
-                            <h5>{{ storeName }}</h5>
+                            <h5 class="pos-fs-title">{{__('pos_billing')}}</h5>
+                            <h5 class="pos-fs-store">{{ storeName }}</h5>
                         </div>
                     </div>
                 </div>
@@ -69,26 +69,27 @@
         <div class="row">
             <!-- Left Side: Product Selection -->
             <div class="col-lg-8 col-12">
-                <div class="card">
+                <div class="card pos-panel">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <h4 class="mb-0">{{ __('products') }}</h4>
-                            <div class="d-flex flex-wrap gap-2 flex-grow-1 justify-content-end">
+                            <h4 class="mb-0 pos-panel-title">{{ __('products') }}</h4>
+                            <div class="d-flex flex-wrap gap-2 flex-grow-1 align-items-center">
+                                <!-- Search Input -->
+                                <div class="pos-filter-item pos-search-input figma-search-container">
+                                    <i class="fa fa-search"></i>
+                                    <input type="text" class="form-control figma-search-input" v-model="searchTerm"
+                                        :placeholder="__('products')" @input="debounceSearch">
+                                </div>
+
                                 <!-- Category Filter -->
                                 <div class="pos-filter-item">
-                                    <select class="form-select" style="min-width: 160px;" v-model="selectedCategory"
+                                    <select class="form-select pos-category-select" v-model="selectedCategory"
                                         @change="getProducts">
                                         <option value="">{{ __('all_categories') }}</option>
                                         <option v-for="category in categories" :key="category.id" :value="category.id">
                                             {{ category.name }}
                                         </option>
                                     </select>
-                                </div>
-
-                                <!-- Search Input -->
-                                <div class="pos-filter-item pos-search-input">
-                                    <input type="text" class="form-control" v-model="searchTerm"
-                                        :placeholder="__('products')" @input="debounceSearch">
                                 </div>
                             </div>
                         </div>
@@ -102,7 +103,8 @@
                         </div>
 
                         <!-- No Products Found -->
-                        <div v-else-if="products.length === 0" class="text-center p-5">
+                        <div v-else-if="products.length === 0" class="text-center p-5 pos-empty">
+                            <i class="bi bi-box-seam d-block mb-2"></i>
                             <p class="mb-0">{{ __('no_products_found') }}</p>
                         </div>
 
@@ -210,9 +212,7 @@
                         <!-- Pagination -->
                         <div class="figma-table-footer flex-wrap gap-3 mt-4">
                             <div class="d-flex align-items-center flex-wrap gap-2">
-                                <div class="showing-results-text small text-nowrap">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ paginationInfo.to }}</span> {{ __('of') }} <span class="showing-bold">{{ paginationInfo.total }}</span>
-                                </div>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="paginationInfo.total"></table-count>
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination 
@@ -234,25 +234,25 @@
             </div>
 
             <div class="col-lg-4 col-12">
-                <div class="row g-3 mb-4 mt-1">
+                <div class="row g-2 mb-3">
                     <div class="col-6">
-                        <button class="btn btn-primary w-100 py-2 figma-btn-standard" @click="showDiscountModal" :disabled="cart.length === 0">
+                        <button class="btn btn-figma-filter w-100 d-flex align-items-center justify-content-center gap-2 pos-side-btn" @click="showDiscountModal" :disabled="cart.length === 0">
                             <i class="fas fa-percentage me-1"></i>{{ __('add_discount') }}
                         </button>
                     </div>
                     <div class="col-6">
-                        <button class="btn btn-primary w-100 py-2 figma-btn-standard" @click="showAdditionalChargeModal" :disabled="cart.length === 0">
+                        <button class="btn btn-figma-filter w-100 d-flex align-items-center justify-content-center gap-2 pos-side-btn" @click="showAdditionalChargeModal" :disabled="cart.length === 0">
                             <i class="fas fa-plus-circle me-1"></i>{{ __('add_additional_charges') }}
                         </button>
                     </div>
                 </div>
 
-                <div class="card mb-4 customer-details-card">
-                    <div class="card-header py-3">
-                        <h4 class="mb-0">{{ __('customer_details') }}</h4>
+                <div class="card mb-3 customer-details-card pos-panel">
+                    <div class="card-header">
+                        <h4 class="mb-0 pos-panel-title">{{ __('customer_details') }}</h4>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="row g-3 align-items-stretch mt-1">
+                    <div class="card-body">
+                        <div class="row g-2 align-items-stretch">
                             <div class="col-sm-8 col-12">
                                 <div class="search-select">
                                     <input type="text" class="form-control py-2 h-100" v-model="customerSearchTerm"
@@ -269,7 +269,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-4 col-12">
-                                <button class="btn btn-primary w-100 py-2 h-100" @click="showRegisterModal">
+                                <button class="btn btn-outline-primary w-100 h-100 pos-register-btn" @click="showRegisterModal">
                                     {{ __('register_user') }}
                                 </button>
                             </div>
@@ -277,22 +277,23 @@
                     </div>
                 </div>
                 <!-- Cart -->
-                <div class="card">
+                <div class="card pos-panel pos-cart">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4>{{ __('cart') }}</h4>
+                        <h4 class="mb-0 pos-panel-title">{{ __('cart') }}</h4>
                         <button v-if="cart.length > 0" class="btn btn-sm btn-outline-danger" @click="clearCart">
                             {{ __('clear_cart') }}
                         </button>
                     </div>
                     <div class="card-body">
-                        <div v-if="cart.length === 0" class="text-center p-4">
-                            <p>{{ __('cart_empty') }}</p>
+                        <div v-if="cart.length === 0" class="text-center p-4 pos-empty">
+                            <i class="bi bi-cart3 d-block mb-2"></i>
+                            <p class="mb-0">{{ __('cart_empty') }}</p>
                         </div>
                         <div v-else>
                             <div class="cart-items">
                                 <div class="cart-item" v-for="(item, index) in cart" :key="index">
                                     <div class="item-image">
-                                        <img :src="item.image || '/assets/img/placeholder.png'" :alt="item.name"
+                                        <img :src="item.image || $placeholderImage" :alt="item.name"
                                             class="img-fluid rounded">
                                     </div>
                                     <div class="item-details">
@@ -345,7 +346,7 @@
                                     <span>{{ $currency }} {{ parseFloat(charge.amount).toFixed(2) }}</span>
                                 </div>
 
-                                <div class="d-flex justify-content-between mb-2 pt-2 border-top fw-bold">
+                                <div class="d-flex justify-content-between pt-2 border-top fw-bold pos-grand-total">
                                     <span>{{ __('total') }}:</span>
                                     <span>{{ $currency }} {{ calculateFinalTotal().toFixed(2) }}</span>
                                 </div>
@@ -363,12 +364,12 @@
                                 </div>
 
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-primary flex-grow-1" @click="placeOrderAndPrint"
+                                    <button class="btn btn-outline-primary flex-grow-1 pos-checkout-btn" @click="placeOrderAndPrint"
                                         :disabled="cart.length === 0">
                                         <i class="fas fa-print me-1"></i> {{ __('save_and_print_bill') }}
                                     </button>
 
-                                    <button class="btn btn-primary flex-grow-1" @click="placeOrder(false)"
+                                    <button class="btn btn-primary flex-grow-1 pos-checkout-btn" @click="placeOrder(false)"
                                         :disabled="cart.length === 0">
                                         {{ __('place_order') }}
                                     </button>
@@ -401,7 +402,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="closeRegisterModal">{{ __('cancel')
+                        <button type="button" class="btn btn-outline-secondary" @click="closeRegisterModal">{{ __('cancel')
                             }}</button>
                         <button type="button" class="btn btn-primary" @click="registerUser">{{ __('register')
                             }}</button>
@@ -504,7 +505,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('cancel') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('cancel') }}</button>
                         <button type="button" class="btn btn-primary" @click="confirmAddonSelection">{{ __('add_to_cart') }}</button>
                     </div>
                 </div>
@@ -549,9 +550,9 @@
                         </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('cancel')
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('cancel')
                             }}</button>
-                        <button type="button" class="btn btn-danger" @click="clearDiscount">{{ __('clear_discount')
+                        <button type="button" class="btn btn-outline-danger" @click="clearDiscount">{{ __('clear_discount')
                             }}</button>
                         <button type="button" class="btn btn-primary" @click="applyDiscount">{{ __('apply_discount')
                             }}</button>
@@ -605,15 +606,15 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-outline-success w-100 mt-2"
+                        <button type="button" class="btn btn-outline-primary w-100 mt-2"
                             @click.stop.prevent="addNewCharge">
                             <i class="fas fa-plus me-1"></i>{{ __('add_another_charge') }}
                         </button>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('cancel')
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('cancel')
                             }}</button>
-                        <button type="button" class="btn btn-danger" @click="clearAdditionalCharges">{{
+                        <button type="button" class="btn btn-outline-danger" @click="clearAdditionalCharges">{{
                             __('clear_all_charges')
                             }}</button>
                         <button type="button" class="btn btn-primary" @click="applyAdditionalCharges">{{
@@ -1851,8 +1852,8 @@ export default {
                 text: `Are you sure you want to ${actionText} the order?`,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
                 confirmButtonText: `Yes, ${actionText} it`,
                 cancelButtonText: 'Cancel'
             }).then((result) => {
@@ -2220,20 +2221,20 @@ body.pos-active #main {
 
 <style scoped>
 .product-card {
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--ui-border);
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.3s ease;
     cursor: pointer;
     height: 100%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--ui-shadow);
     display: flex;
     flex-direction: column;
 }
 
 .product-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--ui-shadow-lg);
 }
 
 .product-image {
@@ -2242,7 +2243,7 @@ body.pos-active #main {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background-color: #f8f9fa;
+    background-color: var(--theme-neutral-100, #f8f9fa);
     padding: 10px;
 }
 
@@ -2276,7 +2277,7 @@ body.pos-active #main {
 
 .single-variant {
     font-size: 0.75rem;
-    color: #6c757d;
+    color: var(--theme-neutral-500, #6c757d);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -2293,10 +2294,11 @@ body.pos-active #main {
 
 .product-card .product-info select.form-select.mini-select.short-select {
     font-size: 0.75rem !important;
-    padding: 0.2rem 1.5rem 0.2rem 0.4rem !important;
+    padding: 0.2rem 0.4rem !important;
+    padding-inline-end: 1.5rem !important; /* room for the caret (left side in RTL) */
     height: 25px !important;
     line-height: 1.2 !important;
-    color: #1E293B !important;
+    color: var(--theme-neutral-800, #1E293B) !important;
 }
 
 .short-select {
@@ -2324,13 +2326,13 @@ body.pos-active #main {
 
 .product-price {
     font-weight: bold;
-    color: #435ebe;
+    color: var(--theme-primary-500, #435ebe);
     margin-bottom: 5px;
 }
 
 .original-price {
     text-decoration: line-through;
-    color: #6c757d;
+    color: var(--theme-neutral-500, #6c757d);
     font-size: 11px;
     font-weight: normal;
     margin-left: 4px;
@@ -2342,12 +2344,12 @@ body.pos-active #main {
 }
 
 .product-price .discounted {
-    color: #dc3545;
+    color: var(--theme-error-500, #dc3545);
 }
 
 .product-price .original-price {
     text-decoration: line-through;
-    color: #6c757d;
+    color: var(--theme-neutral-500, #6c757d);
     font-size: 12px;
     margin-left: 5px;
 }
@@ -2362,7 +2364,7 @@ body.pos-active #main {
     flex-wrap: wrap;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--theme-neutral-200, #e9ecef);
     position: relative;
 }
 
@@ -2372,7 +2374,7 @@ body.pos-active #main {
     overflow: hidden;
     border-radius: 4px;
     margin-right: 10px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--theme-neutral-200, #e9ecef);
 }
 
 .item-image img {
@@ -2395,14 +2397,14 @@ body.pos-active #main {
 
 .item-details p.variant-info {
     font-size: 12px;
-    color: #6c757d;
+    color: var(--theme-neutral-500, #6c757d);
     margin-bottom: 5px;
     font-weight: 600;
 }
 
 .item-details .price {
     font-weight: bold;
-    color: #435ebe;
+    color: var(--theme-primary-500, #435ebe);
     font-size: 13px;
 }
 
@@ -2435,11 +2437,11 @@ body.pos-active #main {
 .figma-qty-selector {
     display: flex;
     align-items: center;
-    border: 1px solid #EDEDED;
+    border: 1px solid var(--theme-neutral-200, #EDEDED);
     border-radius: 8px;
     overflow: hidden;
     width: fit-content;
-    background: #FFFFFF;
+    background: var(--ui-surface);
 }
 
 .figma-qty-btn {
@@ -2449,8 +2451,8 @@ body.pos-active #main {
     align-items: center;
     justify-content: center;
     border: none;
-    background: #F7F7F7;
-    color: #333333;
+    background: var(--theme-neutral-100, #F7F7F7);
+    color: var(--theme-neutral-700, #333333);
     font-size: 18px;
     font-weight: 500;
     transition: all 0.2s ease;
@@ -2459,21 +2461,21 @@ body.pos-active #main {
 }
 
 .figma-qty-btn:hover {
-    background: #EDEDED;
-    color: #000000;
+    background: var(--theme-neutral-200, #EDEDED);
+    color: var(--theme-neutral-950, #000000);
 }
 
 .figma-qty-input {
     width: 44px;
     height: 36px;
     border: none !important;
-    border-left: 1px solid #EDEDED !important;
-    border-right: 1px solid #EDEDED !important;
+    border-left: 1px solid var(--theme-neutral-200, #EDEDED) !important;
+    border-right: 1px solid var(--theme-neutral-200, #EDEDED) !important;
     text-align: center;
     font-weight: 700;
     font-size: 14px;
-    color: #333333;
-    background: #FFFFFF;
+    color: var(--theme-neutral-700, #333333);
+    background: var(--ui-surface);
     border-radius: 0 !important;
     padding: 0 !important;
 }
@@ -2495,25 +2497,25 @@ body.pos-active #main {
 
 /* Dark Mode Overrides for Quantity Selector */
 body.theme-dark .figma-qty-selector {
-    background-color: #0F172A !important;
-    border-color: #334155 !important;
+    background-color: var(--theme-neutral-900, #0F172A) !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
 }
 
 body.theme-dark .figma-qty-btn {
-    background-color: #1E293B !important;
-    color: #F8FAFC !important;
+    background-color: var(--theme-neutral-800, #1E293B) !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
 }
 
 body.theme-dark .figma-qty-btn:hover {
-    background-color: #334155 !important;
+    background-color: var(--theme-neutral-700, #334155) !important;
     color: #FFFFFF !important;
 }
 
 body.theme-dark .figma-qty-input {
-    background-color: #0F172A !important;
-    color: #F8FAFC !important;
-    border-left-color: #334155 !important;
-    border-right-color: #334155 !important;
+    background-color: var(--theme-neutral-900, #0F172A) !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
+    border-left-color: var(--theme-neutral-700, #334155) !important;
+    border-right-color: var(--theme-neutral-700, #334155) !important;
 }
 
 @media (min-width: 768px) {
@@ -2594,7 +2596,7 @@ body.theme-dark .figma-qty-input {
 }
 
 .fullscreen-header {
-    background: #e2e3e7;
+    background: var(--theme-neutral-200, #e2e3e7);
     color: white;
     margin-bottom: 15px;
 }
@@ -2604,10 +2606,10 @@ body.theme-dark .figma-qty-input {
 }
 
 .pos-tabs-container {
-    background: #fff;
+    background: var(--ui-surface);
     padding: 10px;
     border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--ui-shadow);
 }
 
 .pos-tabs-wrapper {
@@ -2630,8 +2632,8 @@ body.theme-dark .figma-qty-input {
     width: auto;
     flex: 0 0 auto;
     padding: 10px 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background-color: var(--theme-neutral-100, #f8f9fa);
+    border: 1px solid var(--theme-neutral-300, #dee2e6);
     border-radius: 8px;
     cursor: pointer;
     display: flex;
@@ -2641,13 +2643,13 @@ body.theme-dark .figma-qty-input {
 }
 
 .pos-tab:hover {
-    background-color: #e9ecef;
+    background-color: var(--theme-neutral-200, #e9ecef);
 }
 
 .pos-tab.active {
-    background-color: #37a279;
+    background-color: var(--theme-primary-500, #37a279);
     color: white;
-    border-color: #37a279;
+    border-color: var(--theme-primary-500, #37a279);
 }
 
 .pos-tab-close {
@@ -2657,7 +2659,7 @@ body.theme-dark .figma-qty-input {
 }
 
 .pos-tab-close:hover {
-    color: #dc3545;
+    color: var(--theme-error-500, #dc3545);
 }
 
 @media (max-width: 575.98px) {
@@ -2700,9 +2702,9 @@ body.theme-dark .figma-qty-input {
 }
 
 .previous-bill-tab {
-    background-color: #007bff !important;
+    background-color: var(--theme-primary-500, #007bff) !important;
     color: white !important;
-    border-color: #007bff !important;
+    border-color: var(--theme-primary-500, #007bff) !important;
     position: relative;
 }
 
@@ -2711,7 +2713,7 @@ body.theme-dark .figma-qty-input {
     position: absolute;
     top: -8px;
     right: 5px;
-    background-color: #dc3545;
+    background-color: var(--theme-error-500, #dc3545);
     color: white;
     font-size: 10px;
     padding: 2px 5px;
@@ -2722,11 +2724,11 @@ body.theme-dark .figma-qty-input {
 .disabled-tab {
     opacity: 0.6;
     cursor: not-allowed;
-    background-color: #f0f0f0 !important;
+    background-color: var(--theme-neutral-100, #f0f0f0) !important;
 }
 
 .disabled-tab:hover {
-    background-color: #f0f0f0 !important;
+    background-color: var(--theme-neutral-100, #f0f0f0) !important;
 }
 
 .previous-bill-badge {
@@ -2751,7 +2753,7 @@ body.theme-dark .figma-qty-input {
 }
 
 .previous-bill-indicator {
-    border-left: 4px solid #0d6efd;
+    border-left: 4px solid var(--theme-info-500, #0d6efd);
 }
 
 .badge {
@@ -2770,19 +2772,19 @@ body.theme-dark .figma-qty-input {
     left: 0;
     right: 0;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--theme-neutral-200, #ddd);
     border-radius: 0 0 12px 12px;
     max-height: 250px;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
     z-index: 99999 !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--ui-shadow-lg);
 }
 
 .search-option {
     padding: 12px 16px !important;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--theme-neutral-100, #f0f0f0);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -2807,76 +2809,76 @@ body.theme-dark .figma-qty-input {
     font-size: 0.75rem;
     padding: 0.4rem 0.6rem;
     font-weight: 600;
-    background-color: #dc3545 !important;
+    background-color: var(--theme-error-500, #dc3545) !important;
     color: white;
     border-radius: 4px;
 }
 
 /* Dark Mode Alignment & Padding Fixes */
 body.theme-dark .product-card {
-    border-color: #334155 !important;
-    background-color: #1E293B !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
+    background-color: var(--theme-neutral-800, #1E293B) !important;
 }
 
 body.theme-dark .product-image {
-    background-color: #0F172A !important;
+    background-color: var(--theme-neutral-900, #0F172A) !important;
 }
 
 body.theme-dark .search-results {
-    background-color: #1E293B !important;
-    border-color: #334155 !important;
-    color: #F8FAFC !important;
+    background-color: var(--theme-neutral-800, #1E293B) !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
 }
 
 body.theme-dark .product-card .product-info select.form-select.mini-select.short-select {
-    background-color: #0F172A !important;
-    border-color: #334155 !important;
-    color: #F8FAFC !important;
+    background-color: var(--theme-neutral-900, #0F172A) !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
 }
 
 body.theme-dark .search-option {
-    border-bottom-color: #334155 !important;
-    color: #E2E8F0 !important;
+    border-bottom-color: var(--theme-neutral-700, #334155) !important;
+    color: var(--theme-neutral-200, #E2E8F0) !important;
 }
 
 body.theme-dark .search-option:hover {
-    background-color: #334155 !important;
+    background-color: var(--theme-neutral-700, #334155) !important;
     color: #FFFFFF !important;
 }
 
 body.theme-dark .cart-item {
-    border-bottom-color: #334155 !important;
+    border-bottom-color: var(--theme-neutral-700, #334155) !important;
 }
 
 body.theme-dark .item-image {
-    border-color: #334155 !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
 }
 
 body.theme-dark .item-details h5,
 body.theme-dark .item-details .price,
 body.theme-dark .item-total {
-    color: #F8FAFC !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
 }
 
 body.theme-dark .variant-info {
-    color: #94A3B8 !important;
+    color: var(--theme-neutral-400, #94A3B8) !important;
 }
 
 body.theme-dark .figma-table-footer {
-    background-color: #1E293B !important;
-    border-top-color: #334155 !important;
+    background-color: var(--theme-neutral-800, #1E293B) !important;
+    border-top-color: var(--theme-neutral-700, #334155) !important;
 }
 
 body.theme-dark .pos-tab {
-    background-color: #0F172A !important;
-    border-color: #334155 !important;
-    color: #94A3B8 !important;
+    background-color: var(--theme-neutral-900, #0F172A) !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
+    color: var(--theme-neutral-400, #94A3B8) !important;
 }
 
 body.theme-dark .pos-tab.active {
-    background-color: #37a279 !important;
+    background-color: var(--theme-primary-500, #37a279) !important;
     color: #FFFFFF !important;
-    border-color: #37a279 !important;
+    border-color: var(--theme-primary-500, #37a279) !important;
 }
 
 
@@ -2907,28 +2909,262 @@ body.theme-dark .pos-tab.active {
 }
 
 body.theme-dark .search-results {
-    background-color: #1E293B !important;
-    border-color: #334155 !important;
-    color: #F8FAFC !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    background-color: var(--theme-neutral-800, #1E293B) !important;
+    border-color: var(--theme-neutral-700, #334155) !important;
+    color: var(--theme-neutral-100, #F8FAFC) !important;
+    box-shadow: var(--ui-shadow-lg);
 }
 
 body.theme-dark .card-header {
-    border-bottom: 1px solid #334155 !important;
+    border-bottom: 1px solid var(--theme-neutral-700, #334155) !important;
 }
 
 body.theme-dark .fullscreen-header {
-    background-color: #111827 !important;
-    border-bottom: 1px solid #334155 !important;
+    background-color: var(--theme-neutral-900, #111827) !important;
+    border-bottom: 1px solid var(--theme-neutral-700, #334155) !important;
 }
 
 .search-option i {
     width: 20px;
     text-align: center;
-    color: #64748B;
+    color: var(--theme-neutral-500, #64748B);
 }
 
 body.theme-dark .search-option i {
-    color: #94A3B8;
+    color: var(--theme-neutral-400, #94A3B8);
+}
+
+/* ===== SnapBuy look: panels, toolbar, product tiles, cart summary ===== */
+.pos-panel {
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius-lg) !important;
+    box-shadow: var(--ui-shadow) !important;
+    background: var(--ui-surface) !important;
+}
+
+.pos-panel > .card-header {
+    padding: 14px 20px !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--ui-border) !important;
+}
+
+.pos-panel > .card-body {
+    padding: 16px 20px;
+}
+
+.pos-panel-title {
+    font-family: var(--ui-font);
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: var(--ui-heading) !important;
+}
+
+.pos-category-select {
+    min-width: 160px;
+    height: 38px;
+    font-size: 13px;
+    border-radius: var(--ui-radius);
+}
+
+.pos-search-input {
+    flex: 1 1 220px;
+    max-width: 320px;
+}
+
+.pos-empty {
+    color: var(--ui-text-muted);
+    font-size: 13px;
+}
+
+.pos-empty i {
+    font-size: 28px;
+    color: var(--ui-text-subtle);
+}
+
+/* Product tiles: flat card, primary border on hover (no lift / heavy shadow) */
+.product-card {
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: none;
+    background: var(--ui-surface);
+}
+
+.product-card:hover {
+    transform: none;
+    border-color: var(--theme-primary-300);
+    box-shadow: var(--ui-shadow);
+}
+
+.product-image {
+    background-color: var(--ui-surface-muted);
+}
+
+.product-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--theme-primary-600);
+}
+
+.product-actions .btn {
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+}
+
+.out-of-stock .badge {
+    background: var(--theme-error-50) !important;
+    color: var(--theme-error-700) !important;
+    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent);
+    border-radius: var(--ui-radius-sm);
+    font-size: 11px;
+}
+
+/* Side actions + customer search */
+.pos-side-btn {
+    height: 40px !important;
+}
+
+.customer-details-card .form-control,
+.pos-register-btn {
+    min-height: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+}
+
+/* Cart */
+.item-image {
+    border-radius: var(--ui-radius);
+    border-color: var(--ui-border);
+}
+
+.item-details h5 {
+    color: var(--ui-heading);
+}
+
+.item-details .price {
+    color: var(--theme-primary-600);
+}
+
+.item-total {
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.cart-item {
+    border-bottom-color: var(--ui-border);
+}
+
+.cart-summary {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--ui-text);
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+}
+
+.cart-summary .pos-grand-total {
+    margin-top: 6px;
+    font-size: 16px;
+    font-weight: 700 !important;
+    color: var(--ui-heading);
+    border-top-color: var(--ui-border) !important;
+}
+
+.pos-cart label.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-text);
+}
+
+.pos-checkout-btn {
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--ui-radius);
+}
+
+/* Full-screen POS header + bill tabs */
+.fullscreen-header {
+    padding: 10px 0;
+    background: var(--ui-surface);
+    color: var(--ui-heading);
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.fullscreen-header h5 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.pos-fs-store {
+    color: var(--ui-text-muted) !important;
+    font-weight: 600 !important;
+}
+
+.pos-tabs-container {
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: none;
+}
+
+.pos-tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-text);
+    background-color: var(--ui-surface);
+    border-color: var(--ui-border-strong);
+}
+
+.pos-tab:hover {
+    background-color: var(--ui-primary-soft);
+}
+
+.pos-tab.active {
+    background-color: var(--theme-primary-500);
+    border-color: var(--theme-primary-500);
+    color: var(--theme-neutral-50);
+}
+
+/* Modals (bootstrap markup) */
+.modal-content {
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--ui-border);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+@media (max-width: 575.98px) {
+    .pos-search-input {
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .pos-filter-item,
+    .pos-category-select {
+        width: 100%;
+    }
+
+    .pos-panel > .card-body {
+        padding: 12px;
+    }
 }
 </style>

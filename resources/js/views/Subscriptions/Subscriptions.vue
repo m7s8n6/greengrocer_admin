@@ -1,129 +1,131 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('manage_subscriptions') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('manage_subscriptions') }}</li>
-                        </ol>
-                    </nav>
-                </div>
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('manage_subscriptions') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link>
+                        </li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('manage_subscriptions') }}</li>
+                    </ol>
+                </nav>
             </div>
 
             <div class="row">
                 <div class="col-12 col-md-12 order-md-1 order-last">
-                    <div class="figma-main-section-card">
+                    <div class="card figma-main-section-card">
                         <div class="card-body p-0">
                             <div
                                 class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
-                                <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
-                                    <div class="figma-search-container" style="min-width: 250px;">
+                                <div class="flex-grow-1">
+                                    <div class="figma-search-container">
                                         <i class="fa fa-search text-muted"></i>
                                         <input v-model="filter" type="text" class="figma-search-input"
                                             :placeholder="__('search')" @input="currentPage = 1; getPlans()">
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="figma-search-container" style="min-width: 200px;">
+                                </div>
+                                <div class="d-flex align-items-center gap-2 plan-name-editor">
+                                        <div class="figma-search-container">
+                                            <i class="fa fa-tag"></i>
                                             <input v-model="subscriptionName" type="text" class="figma-search-input"
                                                 :placeholder="__('enter_subscription_name')">
                                         </div>
-                                        <button class="btn btn-figma-filter p-2" style="min-width: 40px; height: 40px;"
+                                        <button class="btn btn-figma-filter plan-name-save"
                                             @click="updateSubscriptionName" :disabled="isUpdatingName" v-b-tooltip.hover
                                             :title="__('update')">
                                             <i class="fa fa-save" v-if="!isUpdatingName"></i>
                                             <i class="fa fa-spinner fa-spin" v-else></i>
                                         </button>
-                                    </div>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                        @click="getPlans()" v-b-tooltip.hover :title="__('refresh')">
+                                        <i class="fa fa-refresh"></i>
+                                        <span>{{ __('refresh') }}</span>
+                                    </button>
                                     <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                         @click="openAddModal" v-b-tooltip.hover v-if="$can('subscription_create')">
                                         <i class="fa fa-plus"></i>
                                         <span>{{ __('add_subscription') }}</span>
                                     </button>
-                                    <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                        @click="getPlans()" v-b-tooltip.hover :title="__('refresh')">
-                                        <i class="fa fa-refresh"></i>
-                                        <span>{{ __('refresh') }}</span>
-                                    </button>
                                 </div>
                             </div>
 
-                            <div class="table-responsive">
-                                <b-table :items="translatedPlans" :fields="fields" :sort-by.sync="sortBy"
-                                    :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
-                                    :busy="isLoading" stacked="md" show-empty small class="figma-table mb-0"
-                                    :tbody-tr-class="() => 'figma-tr align-middle'">
-                                    <template #table-busy>
-                                        <div class="text-center text-black my-2">
-                                            <b-spinner class="align-middle"></b-spinner>
-                                            <strong>{{ __('loading') }}...</strong>
+                            <div class="plan-grid">
+                                <div v-if="isLoading" class="text-center text-muted py-5">
+                                    <b-spinner class="align-middle"></b-spinner>
+                                    <strong>{{ __('loading') }}...</strong>
+                                </div>
+                                <div v-else-if="!translatedPlans.length" class="text-center text-muted py-5">
+                                    <i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ __('no_records_to_show') }}
+                                </div>
+                                <div v-else class="row">
+                                    <div class="col-12 col-sm-6 col-xl-4 mb-3"
+                                        v-for="row in translatedPlans.map((item, index) => ({ item, index })).sort((a, b) => sortDesc ? b.item.id - a.item.id : a.item.id - b.item.id)"
+                                        :key="row.item.id">
+                                        <div class="plan-card h-100">
+                                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                                <div class="min-w-0">
+                                                    <div class="plan-name">{{ row.item.name }}</div>
+                                                    <div class="plan-id">#{{ row.item.id }}</div>
+                                                </div>
+                                                <span class='badge bg-success' v-if="row.item.status == 1">{{ __('active') }}</span>
+                                                <span class='badge bg-danger' v-if="row.item.status == 0">{{ __('deactive') }}</span>
+                                            </div>
+
+                                            <div class="plan-price">
+                                                <template v-if="row.item.discounted_price">
+                                                    <span class="plan-price-value">{{ $currency }}{{ parseFloat(row.item.discounted_price).toFixed(2) }}</span>
+                                                    <span class="plan-price-old">{{ $currency }}{{ parseFloat(row.item.price).toFixed(2) }}</span>
+                                                </template>
+                                                <span v-else class="plan-price-value">{{ $currency }}{{ parseFloat(row.item.price).toFixed(2) }}</span>
+                                                <span class="plan-price-period">/ {{ row.item.days }} {{ __('days') }}</span>
+                                            </div>
+
+                                            <ul class="plan-features">
+                                                <li>
+                                                    <i class="fa fa-calendar"></i>
+                                                    <span>{{ __('days') }}</span>
+                                                    <strong>{{ row.item.days }}</strong>
+                                                </li>
+                                                <li>
+                                                    <i class="fa fa-truck"></i>
+                                                    <span>{{ __('free_delivery_above') }}</span>
+                                                    <strong v-if="row.item.free_delivery_above">{{ $currency }}{{ parseFloat(row.item.free_delivery_above).toFixed(2) }}</strong>
+                                                    <strong v-else class="text-muted">-</strong>
+                                                </li>
+                                            </ul>
+
+                                            <div class="plan-actions">
+                                                <div class="form-check form-switch plan-status-switch mb-0"
+                                                    v-if="$can('subscription_update')" v-b-tooltip.hover
+                                                    :title="row.item.status == 1 ? __('active') : __('deactive')">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        :checked="row.item.status == 1"
+                                                        @click.prevent="togglePlanStatus(row.item)">
+                                                </div>
+                                                <button class="figma-action-btn" @click="editPlan(row.item)"
+                                                    v-if="$can('subscription_update')" v-b-tooltip.hover
+                                                    :title="__('edit')">
+                                                    <base-icon name="edit icon" hoverName="edit Hover" width="24"
+                                                        height="24" />
+                                                </button>
+                                                <button class="figma-action-btn figma-delete-btn"
+                                                    @click="deletePlan(row.index, row.item.id)"
+                                                    v-if="$can('subscription_delete')" v-b-tooltip.hover
+                                                    :title="__('delete')">
+                                                    <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
+                                                        height="24" />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </template>
-
-                                    <template #cell(name)="row">
-                                        <strong>{{ row.item.name }}</strong>
-                                    </template>
-
-                                    <template #cell(days)="row">
-                                        <span>{{ row.item.days }} {{ __('days') }}</span>
-                                    </template>
-
-                                    <template #cell(price)="row">
-                                        <span>{{ parseFloat(row.item.price).toFixed(2) }}</span>
-                                    </template>
-
-                                    <template #cell(discounted_price)="row">
-                                        <span v-if="row.item.discounted_price">{{
-                                            parseFloat(row.item.discounted_price).toFixed(2) }}</span>
-                                        <span v-else class="text-muted">-</span>
-                                    </template>
-
-                                    <template #cell(free_delivery_above)="row">
-                                        <span v-if="row.item.free_delivery_above">{{
-                                            parseFloat(row.item.free_delivery_above).toFixed(2) }}</span>
-                                        <span v-else class="text-muted">-</span>
-                                    </template>
-
-                                    <template #cell(status)="row">
-                                        <span class='badge bg-success' v-if="row.item.status == 1">{{ __('active')
-                                        }}</span>
-                                        <span class='badge bg-danger' v-if="row.item.status == 0">{{ __('deactive')
-                                        }}</span>
-                                    </template>
-
-                                    <template #cell(actions)="row">
-                                        <div class="d-flex gap-2">
-                                            <button class="figma-action-btn" @click="editPlan(row.item)"
-                                                v-if="$can('subscription_update')" v-b-tooltip.hover
-                                                :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24"
-                                                    height="24" />
-                                            </button>
-                                            <button class="figma-action-btn figma-delete-btn"
-                                                @click="deletePlan(row.index, row.item.id)"
-                                                v-if="$can('subscription_delete')" v-b-tooltip.hover
-                                                :title="__('delete')">
-                                                <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
-                                                    height="24" />
-                                            </button>
-                                        </div>
-                                    </template>
-                                </b-table>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span
-                                        class="showing-bold">{{ totalRows
-                                        }}</span>
-                                </div>
+                            <div class="figma-table-footer flex-wrap gap-3">
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                         align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
@@ -177,8 +179,7 @@
                         <!-- PLAN NAME -->
                         <div class="form-group" v-if="form.translations && form.translations[language.id]">
                             <!-- Only default language is logically required (handled in validateDefaultLanguage) -->
-                            <i class="text-danger" v-if="language.is_default">*</i>
-                            <label>{{ __('plan_name') }}</label>
+                            <label>{{ __('plan_name') }} <i class="text-danger" v-if="language.is_default">*</i></label>
 
                             <input type="text" class="form-control" :id="'plan_name_' + language.id"
                                 v-model="form.translations[language.id].name" :placeholder="__('enter_plan_name')" />
@@ -189,13 +190,13 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="days">{{ __('days') }} <span class="text-danger">*</span></label>
+                                    <label for="days" class="d-block">{{ __('days') }} <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" v-model="form.days" min="1"
                                         :placeholder="__('days')" required />
                                 </div>
 
-                                <div class="col-md-6 mt-3 mb-3">
-                                    <label>{{ __('status') }} <span class="text-danger">*</span></label>
+                                <div class="col-md-6 mb-3">
+                                    <label class="d-block">{{ __('status') }} <span class="text-danger">*</span></label>
                                     <b-form-radio-group v-model="form.status" :options="[
                                         { text: __('deactive'), value: 0 },
                                         { text: __('active'), value: 1 }
@@ -266,9 +267,9 @@
                     </b-tab>
                 </b-tabs>
 
-                <div class="form-group d-flex justify-content-end gap-2">
+                <div class="d-flex justify-content-end gap-2 pt-3 mt-2 border-top modal-form-actions">
 
-                    <button type="button" class="btn btn-secondary" @click="closeModal">
+                    <button type="button" class="btn btn-outline-secondary" @click="closeModal">
                         {{ __('cancel') }}
                     </button>
 
@@ -652,6 +653,57 @@ export default {
                 });
         },
 
+        // Active / deactive switch on the card. Turning a plan ON is blocked while free-delivery time
+        // slots exist (same rule as creating / editing a plan); turning it OFF is always allowed.
+        async togglePlanStatus(plan) {
+            const newStatus = plan.status == 1 ? 0 : 1;
+
+            if (newStatus === 1 && await this.checkFreeDeliveryTimeSlots()) {
+                this.$swal.fire({
+                    title: __('cannot_create_subscription_plan'),
+                    html: `
+                        <div class="text-left">
+                            <p>${__('free_delivery_time_slots_exist_message')}</p>
+                            <p class="mt-3"><strong>${__('please_remove_free_delivery_time_slots_first')}</strong></p>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    confirmButtonText: __('ok'),
+                    confirmButtonColor: 'var(--theme-primary-500)',
+                    width: '600px'
+                });
+                return;
+            }
+
+            // Same API and payload as the edit form's Save (subscription_plans/update/{id}); only the
+            // status differs, everything else is the plan's current data.
+            const payload = {
+                days: plan.days,
+                price: plan.price,
+                discounted_price: plan.discounted_price || null,
+                free_delivery_above: plan.free_delivery_above || null,
+                ios_product_id: plan.ios_product_id || null,
+                status: newStatus,
+                translations: (plan.translations || []).map(t => ({ language_id: t.language_id, name: t.name || '' }))
+            };
+
+            this.isLoading = true;
+            axios.post(this.$apiUrl + `/subscription_plans/update/${plan.id}`, payload)
+                .then((response) => {
+                    if (response.data.status === 1) {
+                        this.showMessage('success', response.data.message);
+                        this.getPlans();
+                    } else {
+                        this.isLoading = false;
+                        this.showError(response.data.message);
+                    }
+                })
+                .catch(() => {
+                    this.isLoading = false;
+                    this.showError(__('something_went_wrong'));
+                });
+        },
+
         // Edit plan - populate form with plan data and check for conflicts
         async editPlan(plan) {
             this.activeLanguageTab = 0;
@@ -676,7 +728,7 @@ export default {
                     `,
                     icon: 'warning',
                     confirmButtonText: __('ok'),
-                    confirmButtonColor: '#37a279',
+                    confirmButtonColor: 'var(--theme-primary-500)',
                     width: '600px'
                 });
                 return;
@@ -726,8 +778,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true;
@@ -798,7 +850,7 @@ export default {
                     `,
                     icon: 'warning',
                     confirmButtonText: __('ok'),
-                    confirmButtonColor: '#37a279',
+                    confirmButtonColor: 'var(--theme-primary-500)',
                     width: '600px'
                 });
                 return;
@@ -853,3 +905,160 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+/* Subscription name editor in the toolbar */
+.plan-name-editor .figma-search-container {
+    width: 220px;
+}
+
+.plan-name-save {
+    width: 38px;
+    padding: 0 !important;
+    justify-content: center;
+}
+
+/* Plan cards */
+.plan-grid {
+    padding: 20px 20px 4px;
+}
+
+.plan-status-switch {
+    margin-right: auto;
+}
+
+.plan-status-switch .form-check-input {
+    cursor: pointer;
+    margin-top: 0;
+}
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 14px;
+    padding: 18px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: var(--ui-shadow);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.plan-card:hover {
+    border-color: var(--theme-primary-300);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.plan-card .min-w-0 {
+    min-width: 0;
+}
+
+.plan-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    word-break: break-word;
+}
+
+.plan-id {
+    font-size: 12px;
+    color: var(--ui-text-subtle);
+}
+
+.plan-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    padding: 12px 14px;
+    background: var(--ui-primary-soft);
+    border-radius: var(--ui-radius);
+}
+
+.plan-price-value {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--theme-primary-700);
+}
+
+.plan-price-old {
+    font-size: 13px;
+    color: var(--ui-text-subtle);
+    text-decoration: line-through;
+}
+
+.plan-price-period {
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.plan-features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.plan-features li i {
+    width: 16px;
+    text-align: center;
+    color: var(--theme-primary-500);
+}
+
+.plan-features li strong {
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--ui-text);
+}
+
+.plan-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.modal-form-actions {
+    border-color: var(--ui-border) !important;
+}
+
+@media (max-width: 575.98px) {
+    .plan-grid {
+        padding: 16px 16px 0;
+    }
+
+    /* the toolbar's phone grid rule treats this group as buttons (it holds one); keep it a row:
+       name box fills the width, save button stays a 38px square */
+    .figma-action-bar-row > .plan-name-editor {
+        display: flex !important;
+        width: 100%;
+        overflow: visible;
+    }
+
+    .plan-name-editor .plan-name-save {
+        flex: 0 0 38px;
+        width: 38px;
+        min-width: 38px !important;
+    }
+
+    .plan-name-editor .figma-search-container {
+        flex: 1 1 auto;
+        width: auto;
+    }
+}
+</style>

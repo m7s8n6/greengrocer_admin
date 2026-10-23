@@ -129,8 +129,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
 
 
 
@@ -375,7 +373,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-ade73204] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-ade73204] {\n    transition: transform 0s;\n}\n.ghost[data-v-ade73204] {\n    opacity: 0.5;\n    background: #c8ebfb;\n}\n.list-group[data-v-ade73204] {\n    min-height: 20px;\n}\n.list-group-item[data-v-ade73204] {\n    cursor: move;\n}\n.list-group-item i[data-v-ade73204] {\n    cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-ade73204] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-ade73204] {\n    transition: transform 0s;\n}\n.ghost[data-v-ade73204] {\n    opacity: 0.5;\n    background: var(--theme-info-100);\n}\n.list-group[data-v-ade73204] {\n    min-height: 20px;\n}\n.list-group-item[data-v-ade73204] {\n    cursor: move;\n}\n.list-group-item i[data-v-ade73204] {\n    cursor: pointer;\n}\n.product-order-card > .card-header[data-v-ade73204] {\n    padding: 14px 20px !important;\n    border-bottom: 1px solid var(--ui-border);\n    background: transparent;\n}\n.product-order-card > .card-header .card-title[data-v-ade73204] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n\n/* Sortable list: bordered, scrolls inside its own box */\n.product-order-scroll[data-v-ade73204] {\n    max-height: 420px;\n    overflow-y: auto;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    background: var(--ui-surface);\n}\n.product-order-scroll .list-group[data-v-ade73204] {\n    margin: 0;\n    padding: 0;\n}\n.product-order-scroll[data-v-ade73204]  .product-order-item {\n    gap: 12px;\n    padding: 10px 14px;\n    border: 0;\n    border-bottom: 1px solid var(--ui-border);\n    border-radius: 0;\n    background: var(--ui-surface);\n    font-size: 13px;\n    color: var(--ui-text);\n}\n.product-order-scroll[data-v-ade73204]  .product-order-item:last-child {\n    border-bottom: 0;\n}\n.product-order-scroll[data-v-ade73204]  .product-order-item:hover {\n    background: var(--ui-primary-soft);\n}\n.product-order-scroll[data-v-ade73204]  .order-number {\n    min-width: 28px;\n    height: 24px;\n    padding: 0 6px;\n    margin-inline-end: 10px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: var(--ui-radius-sm);\n    background: var(--ui-surface-muted);\n    color: var(--ui-text-muted);\n    font-size: 12px;\n    font-weight: 600;\n}\n.product-order-scroll[data-v-ade73204]  .product-id {\n    min-width: 44px;\n    margin-inline-end: 10px;\n    font-size: 12px;\n    color: var(--ui-text-subtle);\n}\n.product-order-scroll[data-v-ade73204]  .product-image-container {\n    width: 40px;\n    height: 40px;\n    flex: 0 0 40px;\n    margin-inline-end: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    overflow: hidden;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    background: var(--ui-surface-muted);\n}\n.product-order-scroll[data-v-ade73204]  .product-image-container img {\n    width: 100%;\n    height: 100%;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.product-order-scroll[data-v-ade73204]  .product-name {\n    font-weight: 600;\n    min-width: 0;\n    overflow-wrap: anywhere;\n}\n.product-order-scroll[data-v-ade73204]  .drag-handle {\n    color: var(--ui-text-subtle);\n    font-size: 16px;\n    cursor: grab;\n}\n.product-order-empty[data-v-ade73204] {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 8px;\n    padding: 32px 16px;\n    color: var(--ui-text-muted);\n    font-size: 13px;\n    text-align: center;\n}\n.product-order-empty i[data-v-ade73204] {\n    font-size: 28px;\n    color: var(--ui-text-subtle);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -559,437 +557,388 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card mb-4" }, [
-          _c(
-            "div",
-            { staticClass: "card-body p-4" },
-            [
-              _c("h4", { staticClass: "card-title mb-4" }, [
+        _c(
+          "div",
+          { staticClass: "figma-main-section-card mb-4 product-order-card" },
+          [
+            _c("div", { staticClass: "card-header" }, [
+              _c("h4", { staticClass: "card-title mb-0" }, [
                 _vm._v(_vm._s(_vm.__("products_order_list"))),
               ]),
-              _vm._v(" "),
-              _c(
-                "b-row",
-                { staticClass: "mb-4" },
-                [
-                  _c("b-col", { attrs: { md: "6", lg: "5" } }, [
-                    _c("div", { staticClass: "figma-filter-group mb-2" }, [
-                      _c("label", { staticClass: "figma-filter-label" }, [
-                        _vm._v(_vm._s(_vm.__("categories")) + " "),
-                        _c("span", { staticClass: "text-danger" }, [
-                          _vm._v("*"),
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "card-body p-3 p-md-4" },
+              [
+                _c(
+                  "b-row",
+                  { staticClass: "mb-4" },
+                  [
+                    _c("b-col", { attrs: { md: "6", lg: "5" } }, [
+                      _c("div", { staticClass: "figma-filter-group mb-2" }, [
+                        _c("label", { staticClass: "figma-filter-label" }, [
+                          _vm._v(_vm._s(_vm.__("categories")) + " "),
+                          _c("span", { staticClass: "text-danger" }, [
+                            _vm._v("*"),
+                          ]),
                         ]),
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.category_id,
-                              expression: "category_id",
-                            },
-                          ],
-                          staticClass: "form-select modern-select",
-                          on: {
-                            change: [
-                              function ($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function (o) {
-                                    return o.selected
-                                  })
-                                  .map(function (o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.category_id = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              },
-                              function ($event) {
-                                return _vm.getProducts()
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.category_id,
+                                expression: "category_id",
                               },
                             ],
+                            staticClass: "form-select modern-select",
+                            on: {
+                              change: [
+                                function ($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function (o) {
+                                      return o.selected
+                                    })
+                                    .map(function (o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.category_id = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                },
+                                function ($event) {
+                                  return _vm.getProducts()
+                                },
+                              ],
+                            },
                           },
-                        },
-                        [
-                          _c("option", { attrs: { value: "0" } }, [
-                            _vm._v(_vm._s(_vm.__("select_category"))),
-                          ]),
-                          _vm._v(" "),
-                          _vm._l(_vm.translatedCategories, function (category) {
-                            return _c(
-                              "option",
-                              { domProps: { value: category.id } },
-                              [
-                                _vm._v(
-                                  "\n                                        " +
-                                    _vm._s(category.name) +
-                                    "\n                                    "
-                                ),
-                              ]
-                            )
-                          }),
-                        ],
-                        2
-                      ),
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "span",
-                      { staticClass: "text-danger d-block font-size-13 mt-2" },
-                      [
-                        _vm._v(
-                          _vm._s(
-                            _vm.__(
-                              "select_a_categories_for_update_products_order_list"
-                            )
-                          )
-                        ),
-                      ]
-                    ),
-                  ]),
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _vm.list.length > 0
-                ? _c(
-                    "b-row",
-                    { staticClass: "mb-4" },
-                    [
-                      _c("b-col", { attrs: { md: "6" } }, [
-                        _c(
-                          "div",
-                          { staticClass: "d-flex align-items-center gap-4" },
                           [
-                            _c(
-                              "div",
-                              { staticClass: "form-check form-switch mb-0" },
-                              [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.editable,
-                                      expression: "editable",
-                                    },
-                                  ],
-                                  staticClass: "form-check-input",
-                                  attrs: {
-                                    type: "checkbox",
-                                    id: "enableDragDrop",
-                                  },
-                                  domProps: {
-                                    checked: Array.isArray(_vm.editable)
-                                      ? _vm._i(_vm.editable, null) > -1
-                                      : _vm.editable,
-                                  },
-                                  on: {
-                                    change: function ($event) {
-                                      var $$a = _vm.editable,
-                                        $$el = $event.target,
-                                        $$c = $$el.checked ? true : false
-                                      if (Array.isArray($$a)) {
-                                        var $$v = null,
-                                          $$i = _vm._i($$a, $$v)
-                                        if ($$el.checked) {
-                                          $$i < 0 &&
-                                            (_vm.editable = $$a.concat([$$v]))
-                                        } else {
-                                          $$i > -1 &&
-                                            (_vm.editable = $$a
-                                              .slice(0, $$i)
-                                              .concat($$a.slice($$i + 1)))
-                                        }
-                                      } else {
-                                        _vm.editable = $$c
-                                      }
-                                    },
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _c(
-                                  "label",
-                                  {
-                                    staticClass: "form-check-label ms-1",
-                                    attrs: { for: "enableDragDrop" },
-                                  },
+                            _c("option", { attrs: { value: "0" } }, [
+                              _vm._v(_vm._s(_vm.__("select_category"))),
+                            ]),
+                            _vm._v(" "),
+                            _vm._l(
+                              _vm.translatedCategories,
+                              function (category) {
+                                return _c(
+                                  "option",
+                                  { domProps: { value: category.id } },
                                   [
                                     _vm._v(
                                       "\n                                        " +
-                                        _vm._s(_vm.__("enable_drag_and_drop")) +
+                                        _vm._s(category.name) +
                                         "\n                                    "
                                     ),
                                   ]
-                                ),
-                              ]
+                                )
+                              }
                             ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-sm btn-figma-filter px-3",
-                                attrs: { type: "button" },
-                                on: { click: _vm.orderList },
-                              },
-                              [
-                                _c("i", { staticClass: "fa fa-sort me-1" }),
-                                _vm._v(
-                                  "\n                                    " +
-                                    _vm._s(_vm.__("sort_by_original_order")) +
-                                    "\n                                "
-                                ),
-                              ]
-                            ),
-                          ]
+                          ],
+                          2
                         ),
                       ]),
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.list.length > 0
-                ? _c(
-                    "div",
-                    [
+                      _vm._v(" "),
                       _c(
-                        "b-row",
+                        "span",
+                        { staticClass: "text-muted d-block small mt-1" },
                         [
+                          _vm._v(
+                            _vm._s(
+                              _vm.__(
+                                "select_a_categories_for_update_products_order_list"
+                              )
+                            )
+                          ),
+                        ]
+                      ),
+                    ]),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _vm.list.length > 0
+                  ? _c(
+                      "b-row",
+                      { staticClass: "mb-3" },
+                      [
+                        _c("b-col", { attrs: { lg: "8" } }, [
                           _c(
-                            "b-col",
+                            "div",
                             {
-                              staticStyle: {
-                                "overflow-y": "scroll",
-                                height: "300px",
-                              },
-                              attrs: { md: "6" },
+                              staticClass:
+                                "d-flex align-items-center justify-content-between flex-wrap gap-3",
                             },
                             [
+                              _c("reorder-toggle", {
+                                model: {
+                                  value: _vm.editable,
+                                  callback: function ($$v) {
+                                    _vm.editable = $$v
+                                  },
+                                  expression: "editable",
+                                },
+                              }),
+                              _vm._v(" "),
                               _c(
-                                "ul",
+                                "button",
                                 {
-                                  staticClass: "list-group",
-                                  attrs: { id: "sortable-row" },
+                                  staticClass:
+                                    "btn btn-sm btn-outline-secondary",
+                                  attrs: { type: "button" },
+                                  on: { click: _vm.orderList },
                                 },
                                 [
+                                  _c("i", { staticClass: "fa fa-sort me-1" }),
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(_vm.__("sort_by_original_order")) +
+                                      "\n                                "
+                                  ),
+                                ]
+                              ),
+                            ],
+                            1
+                          ),
+                        ]),
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.list.length > 0
+                  ? _c(
+                      "div",
+                      [
+                        _c(
+                          "b-row",
+                          [
+                            _c("b-col", { attrs: { lg: "8" } }, [
+                              _c(
+                                "div",
+                                { staticClass: "product-order-scroll" },
+                                [
                                   _c(
-                                    "draggable",
-                                    _vm._b(
-                                      {
-                                        staticClass: "list-group",
-                                        attrs: {
-                                          tag: "ul",
-                                          move: _vm.onMove,
-                                          options: { animation: 200 },
-                                        },
-                                        on: {
-                                          start: function ($event) {
-                                            _vm.isDragging = true
+                                    "ul",
+                                    {
+                                      staticClass: "list-group",
+                                      attrs: { id: "sortable-row" },
+                                    },
+                                    [
+                                      _c(
+                                        "draggable",
+                                        _vm._b(
+                                          {
+                                            staticClass: "list-group",
+                                            attrs: {
+                                              tag: "ul",
+                                              move: _vm.onMove,
+                                              options: { animation: 200 },
+                                            },
+                                            on: {
+                                              start: function ($event) {
+                                                _vm.isDragging = true
+                                              },
+                                              end: function ($event) {
+                                                _vm.isDragging = false
+                                              },
+                                              change: function ($event) {
+                                                return _vm.updateList()
+                                              },
+                                            },
+                                            model: {
+                                              value: _vm.list,
+                                              callback: function ($$v) {
+                                                _vm.list = $$v
+                                              },
+                                              expression: "list",
+                                            },
                                           },
-                                          end: function ($event) {
-                                            _vm.isDragging = false
-                                          },
-                                          change: function ($event) {
-                                            return _vm.updateList()
-                                          },
-                                        },
-                                        model: {
-                                          value: _vm.list,
-                                          callback: function ($$v) {
-                                            _vm.list = $$v
-                                          },
-                                          expression: "list",
-                                        },
-                                      },
-                                      "draggable",
-                                      _vm.dragOptions,
-                                      false
-                                    ),
-                                    _vm._l(_vm.list, function (product) {
-                                      return _c(
-                                        "li",
-                                        {
-                                          key: product.row_order,
-                                          staticClass:
-                                            "list-group-item d-flex justify-content-between align-items-center py-2 px-3",
-                                        },
-                                        [
-                                          _c(
-                                            "div",
+                                          "draggable",
+                                          _vm.dragOptions,
+                                          false
+                                        ),
+                                        _vm._l(_vm.list, function (product) {
+                                          return _c(
+                                            "li",
                                             {
+                                              key: product.row_order,
                                               staticClass:
-                                                "d-flex align-items-center flex-grow-1",
+                                                "list-group-item product-order-item d-flex justify-content-between align-items-center",
                                             },
                                             [
-                                              _c(
-                                                "span",
-                                                {
-                                                  staticClass:
-                                                    "order-number text-muted font-weight-bold text-end",
-                                                  staticStyle: {
-                                                    width: "30px",
-                                                    "margin-right": "8px",
-                                                  },
-                                                },
-                                                [
-                                                  _vm._v(
-                                                    _vm._s(product.row_order)
-                                                  ),
-                                                ]
-                                              ),
-                                              _vm._v(" "),
-                                              _c(
-                                                "span",
-                                                {
-                                                  staticClass: "text-muted",
-                                                  staticStyle: {
-                                                    "margin-right": "8px",
-                                                  },
-                                                },
-                                                [_vm._v("-")]
-                                              ),
-                                              _vm._v(" "),
-                                              _c(
-                                                "span",
-                                                {
-                                                  staticClass:
-                                                    "product-id text-muted text-end",
-                                                  staticStyle: {
-                                                    width: "35px",
-                                                    "margin-right": "12px",
-                                                  },
-                                                },
-                                                [_vm._v(_vm._s(product.id))]
-                                              ),
-                                              _vm._v(" "),
                                               _c(
                                                 "div",
                                                 {
                                                   staticClass:
-                                                    "product-image-container d-flex align-items-center justify-content-center",
-                                                  staticStyle: {
-                                                    width: "35px",
-                                                    height: "35px",
-                                                    "margin-right": "12px",
-                                                    overflow: "hidden",
-                                                    "background-color":
-                                                      "transparent",
-                                                  },
+                                                    "d-flex align-items-center flex-grow-1",
                                                 },
                                                 [
-                                                  _c("img", {
-                                                    staticStyle: {
-                                                      "max-width": "100%",
-                                                      "max-height": "100%",
-                                                      "object-fit": "contain",
+                                                  _c(
+                                                    "span",
+                                                    {
+                                                      staticClass:
+                                                        "order-number",
                                                     },
-                                                    attrs: {
-                                                      src: product.image_url,
+                                                    [
+                                                      _vm._v(
+                                                        _vm._s(
+                                                          product.row_order
+                                                        )
+                                                      ),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "span",
+                                                    {
+                                                      staticClass: "product-id",
                                                     },
-                                                  }),
+                                                    [
+                                                      _vm._v(
+                                                        "#" + _vm._s(product.id)
+                                                      ),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "div",
+                                                    {
+                                                      staticClass:
+                                                        "product-image-container",
+                                                    },
+                                                    [
+                                                      _c("img", {
+                                                        attrs: {
+                                                          src: product.image_url,
+                                                          alt: "",
+                                                        },
+                                                      }),
+                                                    ]
+                                                  ),
+                                                  _vm._v(" "),
+                                                  _c(
+                                                    "span",
+                                                    {
+                                                      staticClass:
+                                                        "product-name font-weight-semibold text-start flex-grow-1",
+                                                    },
+                                                    [
+                                                      _vm._v(
+                                                        _vm._s(
+                                                          _vm.getTranslatedProductName(
+                                                            product
+                                                          )
+                                                        )
+                                                      ),
+                                                    ]
+                                                  ),
                                                 ]
                                               ),
                                               _vm._v(" "),
                                               _c(
                                                 "span",
-                                                {
-                                                  staticClass:
-                                                    "product-name font-weight-semibold text-start flex-grow-1",
-                                                },
+                                                { staticClass: "drag-handle" },
                                                 [
-                                                  _vm._v(
-                                                    _vm._s(
-                                                      _vm.getTranslatedProductName(
-                                                        product
-                                                      )
-                                                    )
-                                                  ),
+                                                  _c("i", {
+                                                    staticClass:
+                                                      "bi bi-grip-vertical",
+                                                  }),
                                                 ]
                                               ),
                                             ]
-                                          ),
-                                          _vm._v(" "),
-                                          _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "drag-handle text-muted",
-                                            },
-                                            [
-                                              _c("i", {
-                                                staticClass: "fa fa-arrows",
-                                              }),
-                                            ]
-                                          ),
-                                        ]
-                                      )
-                                    }),
-                                    0
+                                          )
+                                        }),
+                                        0
+                                      ),
+                                    ],
+                                    1
                                   ),
-                                ],
-                                1
+                                ]
                               ),
-                            ]
-                          ),
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "d-flex justify-content-end mt-4" },
-                        [
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-primary px-5",
-                              attrs: {
-                                type: "button",
-                                disabled: _vm.isLoading,
+                            ]),
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "b-row",
+                          [
+                            _c(
+                              "b-col",
+                              {
+                                staticClass: "d-flex justify-content-end mt-3",
+                                attrs: { lg: "8" },
                               },
-                              on: {
-                                click: function ($event) {
-                                  return _vm.updateProductsOrder()
-                                },
-                              },
-                            },
-                            [
-                              !_vm.isLoading
-                                ? _c("i", { staticClass: "fa fa-save me-2" })
-                                : _vm._e(),
-                              _vm._v(
-                                "\n                                " +
-                                  _vm._s(_vm.__("save_order")) +
-                                  "\n                                "
-                              ),
-                              _vm.isLoading
-                                ? _c("b-spinner", {
-                                    staticClass: "ms-2",
-                                    attrs: { small: "", label: "Spinning" },
-                                  })
-                                : _vm._e(),
-                            ],
-                            1
-                          ),
-                        ]
-                      ),
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.list.length == 0 && _vm.category_id > 0
-                ? [_c("span", [_vm._v(_vm._s(_vm.__("no_products_found")))])]
-                : _vm._e(),
-            ],
-            2
-          ),
-        ]),
+                              [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-primary",
+                                    attrs: {
+                                      type: "button",
+                                      disabled: _vm.isLoading,
+                                    },
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.updateProductsOrder()
+                                      },
+                                    },
+                                  },
+                                  [
+                                    !_vm.isLoading
+                                      ? _c("i", {
+                                          staticClass: "fa fa-save me-2",
+                                        })
+                                      : _vm._e(),
+                                    _vm._v(
+                                      "\n                                " +
+                                        _vm._s(_vm.__("save_order")) +
+                                        "\n                                "
+                                    ),
+                                    _vm.isLoading
+                                      ? _c("b-spinner", {
+                                          staticClass: "ms-2",
+                                          attrs: {
+                                            small: "",
+                                            label: "Spinning",
+                                          },
+                                        })
+                                      : _vm._e(),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            ),
+                          ],
+                          1
+                        ),
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.list.length == 0 && _vm.category_id > 0
+                  ? [
+                      _c("div", { staticClass: "product-order-empty" }, [
+                        _c("i", { staticClass: "bi bi-box-seam" }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.__("no_products_found"))),
+                        ]),
+                      ]),
+                    ]
+                  : _vm._e(),
+              ],
+              2
+            ),
+          ]
+        ),
       ]),
     ]),
   ])

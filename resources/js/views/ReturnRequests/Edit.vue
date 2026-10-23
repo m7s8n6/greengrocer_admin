@@ -1,25 +1,22 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" no-fade static size="lg">
-        <div slot="modal-footer">
-            <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
+        <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" class="rr-btn" @click="hideModal">{{ __('cancel') }}</b-button>
+            <b-button variant="primary" class="rr-btn" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="form-label fw-bold mb-3">{{ __('status') }} <span
-                                class="text-danger">*</span></label>
 
                         <!-- Customer Details for Delivery Boy -->
                         <div v-if="login_user.role_id == 4 && order_details"
-                            class="mb-4 p-3 rounded-3 bg-light border border-secondary border-opacity-10">
-                            <h6 class="fw-bold mb-3">
+                            class="rr-section mb-3">
+                            <h6 class="rr-section-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg" class="me-2 text-primary"
-                                    style="display: inline-block; vertical-align: middle;">
+                                    xmlns="http://www.w3.org/2000/svg" class="me-2 text-primary d-inline-block align-middle">
                                     <path d="M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
@@ -47,11 +44,10 @@
                         </div>
 
                         <!-- Return Item Summary -->
-                        <div class="mb-4 p-3 rounded-3 bg-light border border-secondary border-opacity-10">
-                            <h6 class="fw-bold mb-3">
+                        <div class="rr-section mb-3">
+                            <h6 class="rr-section-title">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg" class="me-2 text-primary"
-                                    style="display: inline-block; vertical-align: middle;">
+                                    xmlns="http://www.w3.org/2000/svg" class="me-2 text-primary d-inline-block align-middle">
                                     <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round" />
                                     <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"
@@ -72,48 +68,50 @@
                             </div>
                         </div>
 
+                        <label class="form-label rr-label mb-2">{{ __('status') }} <span
+                                class="text-danger">*</span></label>
                         <!-- Seller Statuses (role_id: 3) - Only show Pending, Delivery Boy Assigned, Approve, Reject -->
                         <div v-if="login_user.role_id == 3" class="row g-2">
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '1' ? 'border-warning bg-warning bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '1'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#8635;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-arrow-repeat rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('pending') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '4' ? 'border-info bg-info bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '4'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128100;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-person rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('delivery_boy_assigned') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '2' ? 'border-success bg-success bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '2'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#9989;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-check-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('approve') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '3' ? 'border-danger bg-danger bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '3'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#10060;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-x-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('reject') }}</div>
                                     </div>
                                 </div>
@@ -122,46 +120,46 @@
 
                         <!-- Delivery Boy Statuses (role_id: 4) - Only show Out for Pickup, Received from Customer, Return to Seller, Cancelled -->
                         <div v-else-if="login_user.role_id == 4" class="row g-2">
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '5' ? 'border-primary bg-primary bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '5'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128666;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-truck rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('out_for_pickup') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '6' ? 'border-secondary bg-secondary bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '6'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128230;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-box-seam rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('received_from_customer') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '8' ? 'border-dark bg-dark bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '8'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#127980;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-shop rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('return_to_seller') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '7' ? 'border-danger bg-danger bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '7'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128683;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-slash-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('cancelled') }}</div>
                                     </div>
                                 </div>
@@ -170,90 +168,90 @@
 
                         <!-- All Other Roles (not 3 and not 4) - Show all statuses -->
                         <div v-else class="row g-2">
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '1' ? 'border-warning bg-warning bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '1'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#8635;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-arrow-repeat rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('pending') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '4' ? 'border-info bg-info bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '4'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128100;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-person rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('delivery_boy_assigned') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '5' ? 'border-primary bg-primary bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '5'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128666;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-truck rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('out_for_pickup') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '6' ? 'border-secondary bg-secondary bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '6'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128230;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-box-seam rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('received_from_customer') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '8' ? 'border-dark bg-dark bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '8'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#127980;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-shop rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('return_to_seller') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '2' ? 'border-success bg-success bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '2'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#9989;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-check-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('approve') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '3' ? 'border-danger bg-danger bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '3'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#10060;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-x-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('reject') }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+                            <div class="col-lg-3 col-md-4 col-6 mb-2">
                                 <div class="card h-100 border-2 status-card"
                                     :class="returnRequest.status == '7' ? 'border-danger bg-danger bg-opacity-10' : 'border-light'"
                                     @click="returnRequest.status = '7'">
                                     <div
-                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center p-3">
-                                        <div class="mb-2 fs-4">&#128683;</div>
+                                        class="card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body">
+                                        <i class="bi bi-slash-circle rr-status-icon"></i>
                                         <div class="fw-bold small">{{ __('cancelled') }}</div>
                                     </div>
                                 </div>
@@ -265,7 +263,7 @@
 
                     <!-- Show delivery boy assignment only if user is not delivery boy and status is Delivery Boy Assigned -->
                     <div class="form-group mt-4" v-if="returnRequest.status == 4 && login_user.role_id != 4">
-                        <label for="delivery_boy_id" class="form-label fw-bold">{{ __('assign_delivery_boy') }} <span
+                        <label for="delivery_boy_id" class="form-label rr-label">{{ __('assign_delivery_boy') }} <span
                                 class="text-danger">*</span></label>
                         <select id="delivery_boy_id" name="delivery_boy_id" class="form-control form-select"
                             v-model="returnRequest.delivery_boy_id" required>
@@ -277,7 +275,7 @@
 
                     <!-- Show cancellation reason only if status is Cancelled -->
                     <div class="form-group mt-4" v-if="returnRequest.status == 7">
-                        <label for="cancellation_reason" class="form-label fw-bold">{{ __('cancellation_reason') }}
+                        <label for="cancellation_reason" class="form-label rr-label">{{ __('cancellation_reason') }}
                             <span class="text-danger">*</span></label>
                         <textarea name="cancellation_reason" id="cancellation_reason"
                             v-model="returnRequest.cancellation_reason" class="form-control"
@@ -287,13 +285,13 @@
 
                 <div class="col-md-12 mt-4">
                     <div class="form-group">
-                        <label for="remark" class="form-label fw-bold">{{ __('remark') }}</label>
+                        <label for="remark" class="form-label rr-label">{{ __('remark') }}</label>
                         <textarea name="remark" id="remark" v-model="returnRequest.remark" class="form-control"
                             placeholder="Enter Remark" rows="3"></textarea>
                     </div>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -425,64 +423,114 @@ export default {
 </script>
 
 <style scoped>
+/* Section blocks (same look as order detail cards) */
+.rr-section {
+    padding: 14px 16px;
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    font-size: 13px;
+}
+
+.rr-section-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-family: var(--ui-font);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ui-heading);
+}
+
+.rr-label {
+    font-family: var(--ui-font);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ui-heading);
+}
+
+.rr-btn {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+}
+
 .status-card {
     cursor: pointer !important;
     transition: all 0.2s ease-in-out !important;
-    border: 1px solid #EDEDED !important;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius) !important;
 }
 
 .status-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: var(--ui-shadow) !important;
+}
+
+.rr-status-body {
+    padding: 10px 8px;
+    gap: 4px;
+}
+
+.rr-status-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.rr-status-body .small {
+    font-size: 12px;
+    line-height: 16px;
 }
 
 /* Active status overrides to combat .card !important rules in global CSS */
 .status-card.bg-warning {
-    background-color: rgba(255, 193, 7, 0.15) !important;
-    border: 2px solid #ffc107 !important;
-    color: #856404 !important;
+    background-color: color-mix(in srgb, var(--theme-warn-500) 15%, transparent) !important;
+    border: 2px solid var(--theme-warn-500) !important;
+    color: var(--theme-warn-800) !important;
 }
 
 .status-card.bg-info {
-    background-color: rgba(13, 202, 240, 0.15) !important;
-    border: 2px solid #0dcaf0 !important;
-    color: #087990 !important;
+    background-color: color-mix(in srgb, var(--theme-info-400) 15%, transparent) !important;
+    border: 2px solid var(--theme-info-500) !important;
+    color: var(--theme-info-700) !important;
 }
 
 .status-card.bg-success {
-    background-color: rgba(25, 135, 84, 0.15) !important;
-    border: 2px solid #198754 !important;
-    color: #0f5132 !important;
+    background-color: color-mix(in srgb, var(--theme-success-500) 15%, transparent) !important;
+    border: 2px solid var(--theme-success-500) !important;
+    color: var(--theme-success-800) !important;
 }
 
 .status-card.bg-danger {
-    background-color: rgba(220, 53, 69, 0.15) !important;
-    border: 2px solid #dc3545 !important;
-    color: #842029 !important;
+    background-color: color-mix(in srgb, var(--theme-error-500) 15%, transparent) !important;
+    border: 2px solid var(--theme-error-500) !important;
+    color: var(--theme-error-800) !important;
 }
 
 .status-card.bg-primary {
-    background-color: rgba(55, 162, 121, 0.15) !important;
-    border: 2px solid var(--figma-primary, #37a279) !important;
-    color: var(--figma-primary, #37a279) !important;
+    background-color: color-mix(in srgb, var(--theme-primary-500) 15%, transparent) !important;
+    border: 2px solid var(--theme-primary-500) !important;
+    color: var(--theme-primary-700) !important;
 }
 
 .status-card.bg-secondary {
-    background-color: rgba(108, 117, 125, 0.15) !important;
-    border: 2px solid #6c757d !important;
-    color: #495057 !important;
+    background-color: color-mix(in srgb, var(--theme-neutral-500) 15%, transparent) !important;
+    border: 2px solid var(--theme-neutral-500) !important;
+    color: var(--theme-neutral-700) !important;
 }
 
 .status-card.bg-dark {
-    background-color: rgba(33, 37, 41, 0.15) !important;
-    border: 2px solid #212529 !important;
-    color: #212529 !important;
+    background-color: color-mix(in srgb, var(--theme-neutral-900) 15%, transparent) !important;
+    border: 2px solid var(--theme-neutral-900) !important;
+    color: var(--theme-neutral-900) !important;
 }
 
 /* Inactive states / fallback border-light styling */
 .status-card.border-light {
-    border: 1px solid #EDEDED !important;
-    background-color: #FFFFFF !important;
-    color: #333333 !important;
+    border: 1px solid var(--ui-border) !important;
+    background-color: var(--ui-surface) !important;
+    color: var(--ui-text) !important;
 }
 </style>

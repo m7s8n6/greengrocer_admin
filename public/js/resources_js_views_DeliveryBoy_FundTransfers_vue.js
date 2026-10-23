@@ -128,6 +128,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -141,38 +154,31 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'opening_balance',
         label: __('opening_balance'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'closing_balance',
         label: __('closing_balance'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'amount',
         label: __('amount'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'type',
         label: __('type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'message',
         label: __('message'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'status',
         label: __('status'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'created_at',
         label: __('date_created'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }],
       totalRows: 1,
       currentPage: 1,
@@ -327,10 +333,13 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "page-title mb-2" }, [
+      _c("div", { staticClass: "page-title mb-4" }, [
         _c(
           "div",
-          { staticClass: "d-flex justify-content-between align-items-center" },
+          {
+            staticClass:
+              "d-flex justify-content-between align-items-center flex-wrap gap-2",
+          },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("fund_transfers"))),
@@ -410,29 +419,6 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "d-flex gap-2" }, [
-                  _vm.$can("fund_transfers_create")
-                    ? _c(
-                        "button",
-                        {
-                          staticClass:
-                            "btn btn-primary d-flex align-items-center gap-2",
-                          on: {
-                            click: function ($event) {
-                              _vm.create_new = true
-                            },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-plus" }),
-                          _vm._v(
-                            " " +
-                              _vm._s(_vm.__("add_fund_transfers")) +
-                              "\n                            "
-                          ),
-                        ]
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
                   _c(
                     "button",
                     {
@@ -457,8 +443,32 @@ var render = function () {
                         staticClass: "fa fa-refresh",
                         attrs: { "aria-hidden": "true" },
                       }),
+                      _vm._v(" "),
+                      _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
                     ]
                   ),
+                  _vm._v(" "),
+                  _vm.$can("fund_transfers_create")
+                    ? _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn btn-figma-filter d-flex align-items-center gap-2",
+                          on: {
+                            click: function ($event) {
+                              _vm.create_new = true
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-plus" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("add_fund_transfers"))),
+                          ]),
+                        ]
+                      )
+                    : _vm._e(),
                 ]),
               ]
             ),
@@ -504,6 +514,40 @@ var render = function () {
                   },
                   scopedSlots: _vm._u([
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "table-busy",
                       fn: function () {
                         return [
@@ -512,8 +556,7 @@ var render = function () {
                             { staticClass: "text-center py-4" },
                             [
                               _c("b-spinner", {
-                                staticClass: "align-middle",
-                                attrs: { variant: "dark" },
+                                staticClass: "align-middle text-muted",
                               }),
                             ],
                             1
@@ -527,14 +570,14 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                                " +
+                            "\n                                    " +
                               _vm._s(
                                 _vm.__("opening_balance") +
                                   " (" +
                                   _vm.$currency +
                                   ")"
                               ) +
-                              "\n                            "
+                              "\n                                "
                           ),
                         ]
                       },
@@ -544,14 +587,14 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                                " +
+                            "\n                                    " +
                               _vm._s(
                                 _vm.__("closing_balance") +
                                   " (" +
                                   _vm.$currency +
                                   ")"
                               ) +
-                              "\n                            "
+                              "\n                                "
                           ),
                         ]
                       },
@@ -561,11 +604,11 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                                " +
+                            "\n                                    " +
                               _vm._s(
                                 _vm.__("amount") + " (" + _vm.$currency + ")"
                               ) +
-                              "\n                            "
+                              "\n                                "
                           ),
                         ]
                       },
@@ -634,20 +677,45 @@ var render = function () {
             _vm._v(" "),
             _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
               _c("div", { staticClass: "d-flex align-items-center gap-4" }, [
-                _c("div", { staticClass: "showing-results-text small" }, [
-                  _vm._v(
-                    "\n                                " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-3 flex-wrap" },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "d-flex align-items-center gap-2" },
+                      [
+                        _c(
+                          "label",
+                          { staticClass: "showing-results-text mb-0" },
+                          [_vm._v(_vm._s(_vm.__("per_page")))]
+                        ),
+                        _vm._v(" "),
+                        _c("b-form-select", {
+                          staticClass: "w-auto",
+                          attrs: { options: _vm.pageOptions, size: "sm" },
+                          model: {
+                            value: _vm.perPage,
+                            callback: function ($$v) {
+                              _vm.perPage = $$v
+                            },
+                            expression: "perPage",
+                          },
+                        }),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
               ]),
               _vm._v(" "),
               _c(

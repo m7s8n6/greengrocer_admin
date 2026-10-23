@@ -82,6 +82,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -112,6 +123,10 @@ __webpack_require__.r(__webpack_exports__);
     this.getSettings();
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     // ================= LOAD SETTINGS =================
     getSettings: function getSettings() {
       var _this = this;
@@ -185,7 +200,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-image[data-v-7d055d3d] {\n    height: auto;\n    width: 60%;\n    border: 1px solid #ddd;\n    padding: 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.custom-image[data-v-7d055d3d] {\n    height: auto;\n    width: 60%;\n    max-width: 200px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    padding: 5px;\n    background: var(--ui-surface);\n}\n.thermal-paper-group[data-v-7d055d3d] {\n    margin-top: 2px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -321,15 +336,65 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "row mb-3" }, [
-        _c("div", { staticClass: "col-12" }, [
-          _c("h3", [_vm._v(_vm._s(_vm.__("thermal_print_settings")))]),
+      _c("div", { staticClass: "page-title" }, [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
+            _c("h3", [_vm._v(_vm._s(_vm.__("thermal_print_settings")))]),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+            _c(
+              "nav",
+              {
+                staticClass: "breadcrumb-header float-start float-lg-end",
+                attrs: { "aria-label": "breadcrumb" },
+              },
+              [
+                _c("ol", { staticClass: "breadcrumb" }, [
+                  _c(
+                    "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c(
+                        "router-link",
+                        { attrs: { to: "/seller/dashboard" } },
+                        [_vm._v(_vm._s(_vm.__("dashboard")))]
+                      ),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
+                    {
+                      staticClass: "breadcrumb-item active",
+                      attrs: { "aria-current": "page" },
+                    },
+                    [_vm._v(_vm._s(_vm.__("thermal_print_settings")))]
+                  ),
+                ]),
+              ]
+            ),
+          ]),
         ]),
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "card" }, [
         _c("div", { staticClass: "card-header" }, [
-          _c("h4", [_vm._v(_vm._s(_vm.__("thermal_print_settings")))]),
+          _c("h4", { staticClass: "card-title float-none" }, [
+            _vm._v(_vm._s(_vm.__("thermal_print_settings"))),
+          ]),
+          _vm._v(" "),
+          _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+            _vm._v(
+              _vm._s(
+                _vm.tr(
+                  "thermal_print_settings_desc",
+                  "Logo and paper width used when printing thermal invoices."
+                )
+              )
+            ),
+          ]),
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "card-body" }, [
@@ -347,7 +412,7 @@ var render = function () {
               _c(
                 "div",
                 {
-                  staticClass: "file-input-div bg-gray-100",
+                  staticClass: "file-input-div",
                   on: {
                     click: function ($event) {
                       return _vm.$refs.file_thermal_logo.click()
@@ -400,6 +465,7 @@ var render = function () {
                 _c("label", [_vm._v(_vm._s(_vm.__("thermal_paper_width")))]),
                 _vm._v(" "),
                 _c("b-form-radio-group", {
+                  staticClass: "d-flex flex-wrap thermal-paper-group",
                   attrs: {
                     options: _vm.paperOptions,
                     buttons: "",
@@ -421,7 +487,7 @@ var render = function () {
         _vm._v(" "),
         _c(
           "div",
-          { staticClass: "card-footer" },
+          { staticClass: "card-footer d-flex justify-content-end" },
           [
             _c(
               "b-button",

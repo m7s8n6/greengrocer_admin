@@ -72,6 +72,7 @@ class RemoteFilesystem
      * @param IOInterface $io         The IO instance
      * @param Config      $config     The config
      * @param mixed[]     $options    The options
+     * @param AuthHelper  $authHelper
      */
     public function __construct(IOInterface $io, Config $config, array $options = [], bool $disableTls = false, ?AuthHelper $authHelper = null)
     {
@@ -250,10 +251,6 @@ class RemoteFilesystem
             throw new \RuntimeException("RemoteFilesystem doesn't support the 'prevent_ip_access_callable' config.");
         }
 
-        if (isset($options['prevent_url_access_callable'])) {
-            throw new \RuntimeException("RemoteFilesystem doesn't support the 'prevent_url_access_callable' config.");
-        }
-
         if (isset($options['gitlab-token'])) {
             $fileUrl .= (false === strpos($fileUrl, '?') ? '?' : '&') . 'access_token='.$options['gitlab-token'];
             unset($options['gitlab-token']);
@@ -320,7 +317,7 @@ class RemoteFilesystem
             $contentLength = !empty($http_response_header[0]) ? Response::findHeaderValue($http_response_header, 'content-length') : null;
             if ($contentLength && Platform::strlen($result) < $contentLength) {
                 // alas, this is not possible via the stream callback because STREAM_NOTIFY_COMPLETED is documented, but not implemented anywhere in PHP
-                $e = new TransportException('Content-Length mismatch, received '.Platform::strlen($result).' bytes out of the expected '.$contentLength.' for '.Url::sanitize($fileUrl));
+                $e = new TransportException('Content-Length mismatch, received '.Platform::strlen($result).' bytes out of the expected '.$contentLength);
                 $e->setHeaders($http_response_header);
                 $e->setStatusCode(self::findStatusCode($http_response_header));
                 try {
@@ -537,7 +534,7 @@ class RemoteFilesystem
         }
 
         if ($result !== false && $maxFileSize !== null && Platform::strlen($result) >= $maxFileSize) {
-            throw new MaxFileSizeExceededException('Maximum allowed download size reached. Downloaded ' . Platform::strlen($result) . ' of allowed ' .  $maxFileSize . ' bytes for ' . Url::sanitize($fileUrl));
+            throw new MaxFileSizeExceededException('Maximum allowed download size reached. Downloaded ' . Platform::strlen($result) . ' of allowed ' .  $maxFileSize . ' bytes');
         }
 
         // https://www.php.net/manual/en/reserved.variables.httpresponseheader.php
@@ -640,13 +637,13 @@ class RemoteFilesystem
             $headers[] = 'Connection: close';
         }
 
-        if (isset($options['http']['header']) && !is_array($options['http']['header'])) {
-            $options['http']['header'] = explode("\r\n", trim($options['http']['header'], "\r\n"));
-        }
-        $options = $this->authHelper->addAuthenticationOptions($options, $originUrl, $this->fileUrl);
+        $headers = $this->authHelper->addAuthenticationHeader($headers, $originUrl, $this->fileUrl);
 
         $options['http']['follow_location'] = 0;
 
+        if (isset($options['http']['header']) && !is_array($options['http']['header'])) {
+            $options['http']['header'] = explode("\r\n", trim($options['http']['header'], "\r\n"));
+        }
         foreach ($headers as $header) {
             $options['http']['header'][] = $header;
         }
@@ -684,10 +681,6 @@ class RemoteFilesystem
         }
 
         if (!empty($targetUrl)) {
-            if (!Url::isAllowedRedirect($targetUrl)) {
-                throw new TransportException('Could not follow the redirect to "'.Url::sanitize($targetUrl).'" because only http and https redirects are supported.');
-            }
-
             $this->redirects++;
 
             $this->io->writeError('', true, IOInterface::DEBUG);

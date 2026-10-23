@@ -446,6 +446,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
 
 
 
@@ -496,6 +499,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     getLanguages: function getLanguages() {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/active_languages').then(function (response) {
@@ -941,7 +948,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Keep label inline so the * sits beside it, not below */\n.form-group label[data-v-3c6bd370] {\n    display: inline;\n}\n\n/* Image preview size - consistent max dimensions for all previews */\n.image-preview[data-v-3c6bd370] {\n    max-width: 150px;\n    max-height: 150px;\n    height: auto;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n\n/* Form-floating labels styling for Bootstrap 4 support in both light and dark modes */\n.form-floating[data-v-3c6bd370] {\n    position: relative;\n}\n.form-floating > .form-control[data-v-3c6bd370] {\n    height: calc(3.5rem + 2px);\n    padding: 1rem 0.75rem;\n}\n.form-floating > textarea.form-control[data-v-3c6bd370] {\n    height: auto !important;\n    min-height: calc(3.5rem + 2px);\n}\n.form-floating > label[data-v-3c6bd370] {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    padding: 1rem 0.75rem;\n    overflow: hidden;\n    text-align: start;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    pointer-events: none;\n    border: 1px solid transparent;\n    transform-origin: 0 0;\n    transition: opacity .1s ease-in-out, transform .1s ease-in-out;\n}\n.form-floating > .form-control[data-v-3c6bd370]::-moz-placeholder {\n    color: transparent !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]::placeholder {\n    color: transparent !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]:not(:-moz-placeholder-shown) {\n    padding-top: 1.625rem !important;\n    padding-bottom: .625rem !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]:focus,\n.form-floating > .form-control[data-v-3c6bd370]:not(:placeholder-shown) {\n    padding-top: 1.625rem !important;\n    padding-bottom: .625rem !important;\n}\n.form-floating > .form-control:not(:-moz-placeholder-shown) ~ label[data-v-3c6bd370] {\n    opacity: .65;\n    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);\n}\n.form-floating > .form-control:focus ~ label[data-v-3c6bd370],\n.form-floating > .form-control:not(:placeholder-shown) ~ label[data-v-3c6bd370] {\n    opacity: .65;\n    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Keep label inline so the * sits beside it, not below */\n.form-group label[data-v-3c6bd370] {\n    display: inline;\n}\n/* ...and give the control below it the usual label gap */\n.form-group > .form-control[data-v-3c6bd370],\n.form-group > .input-group[data-v-3c6bd370],\n.form-group > .file-input-div[data-v-3c6bd370],\n.form-group > .form-floating[data-v-3c6bd370] {\n    margin-top: 6px;\n}\n\n/* Upload field labels sit in a nested column (not \".form-group > label\"), so give them the form label look */\n.form-group .row > [class*=\"col-\"] > label[data-v-3c6bd370] {\n    color: var(--ui-text);\n    font-size: 13px;\n    font-weight: 400;\n}\n.website_maitenance_mode .font-size-13[data-v-3c6bd370] {\n    font-size: 12px;\n}\n\n/* Android / iOS app boxes in the App Download section */\n.app-store-box[data-v-3c6bd370] {\n    padding: 16px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    background: var(--ui-surface-muted);\n}\n\n/* Image preview size - consistent max dimensions for all previews */\n.image-preview[data-v-3c6bd370] {\n    max-width: 150px;\n    max-height: 150px;\n    height: auto;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n\n/* Form-floating labels styling for Bootstrap 4 support in both light and dark modes */\n.form-floating[data-v-3c6bd370] {\n    position: relative;\n}\n.form-floating > .form-control[data-v-3c6bd370] {\n    height: calc(3.5rem + 2px);\n    padding: 1rem 0.75rem;\n}\n.form-floating > textarea.form-control[data-v-3c6bd370] {\n    height: auto !important;\n    min-height: calc(3.5rem + 2px);\n}\n.form-floating > label[data-v-3c6bd370] {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    padding: 1rem 0.75rem;\n    overflow: hidden;\n    text-align: start;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    pointer-events: none;\n    border: 1px solid transparent;\n    transform-origin: 0 0;\n    transition: opacity .1s ease-in-out, transform .1s ease-in-out;\n}\n.form-floating > .form-control[data-v-3c6bd370]::-moz-placeholder {\n    color: transparent !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]::placeholder {\n    color: transparent !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]:not(:-moz-placeholder-shown) {\n    padding-top: 1.625rem !important;\n    padding-bottom: .625rem !important;\n}\n.form-floating > .form-control[data-v-3c6bd370]:focus,\n.form-floating > .form-control[data-v-3c6bd370]:not(:placeholder-shown) {\n    padding-top: 1.625rem !important;\n    padding-bottom: .625rem !important;\n}\n.form-floating > .form-control:not(:-moz-placeholder-shown) ~ label[data-v-3c6bd370] {\n    opacity: .65;\n    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);\n}\n.form-floating > .form-control:focus ~ label[data-v-3c6bd370],\n.form-floating > .form-control:not(:placeholder-shown) ~ label[data-v-3c6bd370] {\n    opacity: .65;\n    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1111,6 +1118,17 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
                     {
                       staticClass: "breadcrumb-item active",
                       attrs: { "aria-current": "page" },
@@ -1148,8 +1166,19 @@ var render = function () {
           [
             _c("div", { staticClass: "card mb-3" }, [
               _c("div", { staticClass: "card-header" }, [
-                _c("h4", { staticClass: "card-title" }, [
+                _c("h4", { staticClass: "card-title float-none" }, [
                   _vm._v(_vm._s(_vm.__("header_settings"))),
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.tr(
+                        "header_settings_desc",
+                        "Website title, SEO meta, maintenance mode, logos and favicon."
+                      )
+                    )
+                  ),
                 ]),
               ]),
               _vm._v(" "),
@@ -1211,7 +1240,7 @@ var render = function () {
                         },
                         [
                           _vm._v(" "),
-                          _c("div", { staticClass: "card-body ps-0 pt-0" }, [
+                          _c("div", { staticClass: "p-0" }, [
                             language.is_default && _vm.languages.length > 1
                               ? _c(
                                   "div",
@@ -1333,7 +1362,10 @@ var render = function () {
                             _c("div", { staticClass: "row" }, [
                               _c(
                                 "div",
-                                { staticClass: "form-group col-md-4 mt-0" },
+                                {
+                                  staticClass:
+                                    "form-group col-sm-6 col-md-6 col-lg-4 mt-0",
+                                },
                                 [
                                   _c(
                                     "label",
@@ -1652,7 +1684,7 @@ var render = function () {
                                         "span",
                                         {
                                           staticClass:
-                                            "text text-primary font-size-13",
+                                            "text-muted font-size-13",
                                         },
                                         [
                                           _vm._v(
@@ -1825,7 +1857,7 @@ var render = function () {
                                         "div",
                                         {
                                           staticClass:
-                                            "form-group col-sm-6 col-md-6 col-lg-4",
+                                            "form-group col-sm-6 col-md-6 col-xl-3",
                                         },
                                         [
                                           _c("div", { staticClass: "row" }, [
@@ -1968,7 +2000,7 @@ var render = function () {
                                         "div",
                                         {
                                           staticClass:
-                                            "form-group col-sm-6 col-md-6 col-lg-4",
+                                            "form-group col-sm-6 col-md-6 col-xl-3",
                                         },
                                         [
                                           _c("div", { staticClass: "row" }, [
@@ -2114,7 +2146,7 @@ var render = function () {
                                         "div",
                                         {
                                           staticClass:
-                                            "form-group col-sm-6 col-md-6 col-lg-4",
+                                            "form-group col-sm-6 col-md-6 col-xl-3",
                                         },
                                         [
                                           _c("div", { staticClass: "row" }, [
@@ -2252,7 +2284,7 @@ var render = function () {
                                         "div",
                                         {
                                           staticClass:
-                                            "form-group col-sm-6 col-md-6 col-lg-4",
+                                            "form-group col-sm-6 col-md-6 col-xl-3",
                                         },
                                         [
                                           _c("div", { staticClass: "row" }, [
@@ -2411,7 +2443,7 @@ var render = function () {
             _vm._v(" "),
             _c("div", { staticClass: "card mb-3" }, [
               _c("div", { staticClass: "card-header" }, [
-                _c("h4", { staticClass: "card-title" }, [
+                _c("h4", { staticClass: "card-title float-none" }, [
                   _vm._v(
                     "\n                            " +
                       _vm._s(_vm.__("app_download_section")) +
@@ -2426,6 +2458,17 @@ var render = function () {
                         ),
                       ])
                     : _vm._e(),
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.tr(
+                        "app_download_section_desc",
+                        "Content and store links shown in the website's app download section."
+                      )
+                    )
+                  ),
                 ]),
               ]),
               _vm._v(" "),
@@ -2529,7 +2572,7 @@ var render = function () {
                                 [
                                   _c(
                                     "div",
-                                    { staticClass: "border rounded p-3 h-100" },
+                                    { staticClass: "app-store-box h-100" },
                                     [
                                       _c("div", { staticClass: "mb-3" }, [
                                         _c("label", [
@@ -2796,7 +2839,7 @@ var render = function () {
                               _c("div", { staticClass: "col-12 col-lg-6" }, [
                                 _c(
                                   "div",
-                                  { staticClass: "border rounded p-3 h-100" },
+                                  { staticClass: "app-store-box h-100" },
                                   [
                                     _c("div", { staticClass: "mb-3" }, [
                                       _c("label", [
@@ -3049,7 +3092,7 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "card-footer" },
+                { staticClass: "card-footer d-flex justify-content-end" },
                 [
                   _c(
                     "b-button",

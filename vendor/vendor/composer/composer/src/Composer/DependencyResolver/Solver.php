@@ -17,7 +17,6 @@ use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterInterface;
 use Composer\IO\IOInterface;
 use Composer\Package\BasePackage;
-use Composer\Semver\Constraint\Constraint;
 
 /**
  * @author Nils Adermann <naderman@naderman.de>
@@ -50,7 +49,7 @@ class Solver
     protected $problems = [];
     /** @var array<Rule[]> */
     protected $learnedPool = [];
-    /** @var array<int, int> */
+    /** @var array<string, int> */
     protected $learnedWhy = [];
 
     /** @var bool */
@@ -173,32 +172,6 @@ class Solver
         }
     }
 
-    /**
-     * Surface a SolverProblemsException for locked packages the pool dropped
-     * via a policy filter list (typically the malware list at install time).
-     *
-     * Each emitted Problem carries a single GenericRule of type
-     * RULE_LOCKED_FILTER_LIST_REMOVED; Problem::getMissingLockedPackageReason
-     * renders neutral wording ("Package X 1.0 (in the lock file) was not
-     * loaded, because it was flagged as malware ..."). RuleSetGeneratorTest
-     * and ProblemTest lock the wiring in.
-     */
-    protected function checkForFilterListRemovedLockedPackages(Request $request): void
-    {
-        foreach ($request->getLockedPackages() as $package) {
-            $constraint = new Constraint(Constraint::STR_OP_EQ, $package->getVersion());
-            if (!$this->pool->isFilterListRemovedPackageVersion($package->getName(), $constraint)) {
-                continue;
-            }
-
-            $problem = new Problem();
-            $problem->addRule(new GenericRule([], Rule::RULE_LOCKED_FILTER_LIST_REMOVED, [
-                'package' => $package,
-            ]));
-            $this->problems[] = $problem;
-        }
-    }
-
     public function solve(Request $request, ?PlatformRequirementFilterInterface $platformRequirementFilter = null): LockTransaction
     {
         $platformRequirementFilter = $platformRequirementFilter ?? PlatformRequirementFilterFactory::ignoreNothing();
@@ -210,10 +183,6 @@ class Solver
         $this->rules = $ruleSetGenerator->getRulesFor($request, $platformRequirementFilter);
         unset($ruleSetGenerator);
         $this->checkForRootRequireProblems($request, $platformRequirementFilter);
-        // Must run after RuleSetGenerator: the generator silently skips locked
-        // packages whose pool entry was filter-list-removed, so this check is
-        // what actually surfaces the resulting SolverProblem to the user.
-        $this->checkForFilterListRemovedLockedPackages($request);
         $this->decisions = new Decisions($this->pool);
         $this->watchGraph = new RuleWatchGraph;
 
@@ -340,7 +309,7 @@ class Solver
 
             $this->rules->add($newRule, RuleSet::TYPE_LEARNED);
 
-            $this->learnedWhy[spl_object_id($newRule)] = $why;
+            $this->learnedWhy[spl_object_hash($newRule)] = $why;
 
             $ruleNode = new RuleWatchNode($newRule);
             $ruleNode->watch2OnHighest($this->decisions);
@@ -518,11 +487,11 @@ class Solver
     }
 
     /**
-     * @param array<int, true> $ruleSeen
+     * @param array<string, true> $ruleSeen
      */
     private function analyzeUnsolvableRule(Problem $problem, Rule $conflictRule, array &$ruleSeen): void
     {
-        $why = spl_object_id($conflictRule);
+        $why = spl_object_hash($conflictRule);
         $ruleSeen[$why] = true;
 
         if ($conflictRule->getType() === RuleSet::TYPE_LEARNED) {
@@ -530,7 +499,7 @@ class Solver
             $problemRules = $this->learnedPool[$learnedWhy];
 
             foreach ($problemRules as $problemRule) {
-                if (!isset($ruleSeen[spl_object_id($problemRule)])) {
+                if (!isset($ruleSeen[spl_object_hash($problemRule)])) {
                     $this->analyzeUnsolvableRule($problem, $problemRule, $ruleSeen);
                 }
             }

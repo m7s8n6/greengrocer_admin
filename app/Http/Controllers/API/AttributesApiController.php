@@ -121,11 +121,6 @@ class AttributesApiController extends Controller
                     'pickup_store_timings_array', 'translations',
                 ]);
             }
-
-            
-            foreach ($attribute->categories as $category) {
-                $category->makeHidden(['has_child', 'has_active_child', 'translations', 'image_url']);
-            }
         });
 
         return CommonHelper::responseWithData($attributes, $total);

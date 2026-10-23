@@ -1,13 +1,11 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('manage_city') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
+            <div class="page-title mb-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <h3 class="mb-0">{{ __('manage_city') }}</h3>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
                                 <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                             </li>
@@ -25,14 +23,15 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6 col-sm-12 order-md-1 order-last">
-                    <div class="card h-100">
+                <div class="col-12 col-xl-6 mb-3">
+                    <div class="card h-100 mb-0">
                         <div class="card-header">
-                            <h4>
+                            <h4 class="card-title mb-0 float-none">
                                 <template v-if="city.id">{{ __('edit') }}</template>
                                 <template v-else>{{ __('create') }}</template>
                                 {{ __('city') }}
                             </h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('city_details_desc', 'Search the city, then set its zone, travel time and delivery charges.') }}</p>
                         </div>
                         <div class="card-body">
                             <form ref="my-form" @submit.prevent="saveRecord" novalidate>
@@ -47,9 +46,9 @@
                                         </template>
 
                                         <!-- Translate buttons (skip if no language.name) -->
-                                        <div class="mb-3"
+                                        <div class="mb-3 d-flex flex-wrap gap-2"
                                             v-if="language.is_default && languages.length > 1 && language.name">
-                                            <b-button size="sm" variant="outline-primary" class="mr-2"
+                                            <b-button size="sm" variant="outline-primary"
                                                 @click="translateEmpty(language)" v-b-tooltip.hover
                                                 :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                                                 :disabled="loadingEmpty">
@@ -67,32 +66,48 @@
                                             </b-button>
 
                                             <div v-if="translateSuccessMessage"
-                                                class="text-success mt-2 font-weight-bold">
+                                                class="text-success w-100 font-weight-bold">
                                                 {{ translateSuccessMessage }}
                                             </div>
                                         </div>
                                         <!-- Translate buttons END -->
 
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="form-group" v-if="language.is_default && mapProvider === 'google'">
                                             <label for="city_name"> {{ __('search_city') }}</label>
-                                            <GmapAutocomplete type="search" class="form-control"
-                                                :placeholder="__('search_city_on_map')" @place_changed="setPlace"
-                                                :options="{ fields: ['address_components', 'formatted_address', 'geometry', 'name', 'place_id', 'plus_code', 'types'], strictBounds: false }"
-                                                id="city_name">
-                                            </GmapAutocomplete>
+                                            <google-place-search :placeholder="__('search_city_on_map')"
+                                                @place_changed="setPlace" input-id="city_name">
+                                            </google-place-search>
                                             <input type="hidden" v-model="city.formatted_address">
-                                            <span class="text text-primary">{{
+                                            <small class="form-text text-muted">{{
                                                 __('search_your_city_where_you_will_deliver_the_food_and_to_find_co_ordinates')
-                                                }}</span>
+                                                }}</small>
+                                        </div>
+                                        <div class="form-group position-relative" v-if="language.is_default && mapProvider === 'osm'">
+                                            <label for="osm_city_name"> {{ __('search_city') }}</label>
+                                            <input type="search" class="form-control" id="osm_city_name"
+                                                :placeholder="__('search_city_on_map')" :value="osmCityQuery"
+                                                @input="onOsmCityQueryInput($event.target.value)" autocomplete="off">
+                                            <ul v-if="osmCitySuggestions.length" class="list-group osm-suggestions">
+                                                <li v-for="s in osmCitySuggestions" :key="s.placePrediction.placeId"
+                                                    class="list-group-item list-group-item-action osm-suggestion-item"
+                                                    @mousedown.prevent="selectOsmCitySuggestion(s)">
+                                                    {{ s.placePrediction.text.text }}
+                                                </li>
+                                            </ul>
+                                            <input type="hidden" v-model="city.formatted_address">
+                                            <small class="form-text text-muted">{{
+                                                __('search_your_city_where_you_will_deliver_the_food_and_to_find_co_ordinates')
+                                                }}</small>
                                         </div>
 
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="row">
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="latitude">{{ __('latitude') }} <span
                                                     class="text-danger text-sm">*</span></label>
                                             <input type="text" class="form-control" name="latitude" id="latitude"
                                                 v-model="city.latitude" :placeholder="__('latitude')" required readonly>
                                         </div>
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="longitude"> {{ __('longitude') }}<span
                                                     class="text-danger text-sm">*</span></label>
                                             <input type="text" class="form-control" name="longitude" id="longitude"
@@ -100,21 +115,21 @@
                                                 readonly>
                                         </div>
 
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="name"> {{ __('city_name') }}<span
                                                     class="text-danger text-sm">*</span></label>
                                             <input type="text" class="form-control" name="name" id="name"
                                                 v-model="city.name" :placeholder="__('city_name')" required readonly>
                                         </div>
 
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="state"> {{ __('state_name') }}<span
                                                     class="text-danger text-sm">*</span></label>
                                             <input type="text" class="form-control" name="state" id="state"
                                                 v-model="city.state" :placeholder="__('state_name')" required readonly>
                                         </div>
 
-                                        <div class="form-group">
+                                        <div class="form-group col-12" :class="{ 'col-md-6': language.is_default }">
                                             <label :for="'zone_' + language.id"> {{ __('zone_name') }}<span
                                                     v-if="language.is_default"
                                                     class="text-danger text-sm">*</span></label>
@@ -124,8 +139,7 @@
                                                 :placeholder="__('zone_name')">
                                         </div>
 
-                                        <div class="form-group" v-if="language.is_default">
-
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="time_to_travel">{{ __('time_to_travel_1km') }} <span
                                                     class="text-danger text-sm">*</span> <small>(
                                                     {{ __('enter_in_minutes') }})</small>
@@ -136,7 +150,7 @@
                                                 required>
                                         </div>
 
-                                        <div class="form-group" v-if="language.is_default">
+                                        <div class="form-group col-12 col-md-6" v-if="language.is_default">
                                             <label for="min_amount_for_free_delivery">{{
                                                 __('minimum_amount_for_free_delivery')
                                                 }}<span class="text-danger text-xs">*</span> <small>[ {{ $currency }}
@@ -157,9 +171,10 @@
                                                 placeholder="Enter Delivarable Maximum Distance in km" min="0"
                                                 max="999999999">
                                         </div>
+                                        </div>
 
                                         <div class="form-group" v-if="language.is_default">
-                                            <label for="delivery_charge_method" class=" col-12 col-form-label">{{
+                                            <label for="delivery_charge_method">{{
                                                 __('delivery_charge_methods') }} <span
                                                     class="text-danger text-sm">*</span></label>
                                             <select class="form-control form-select" name="delivery_charge_method"
@@ -197,44 +212,44 @@
                                                     :placeholder="__('boundary_points')">
                                             </div>
 
-                                            <div class="form-group col-sm-12"
+                                            <div class="form-group"
                                                 v-if="city.delivery_charge_method === 'range_wise_charges'">
                                                 <label>{{ __('range_wise_delivery_charges') }}<span
                                                         class="text-danger text-sm">*
-                                                    </span> <span class="text-secondary text-sm">{{ __('set_proper_ranges_for_delivery_charge_do_not_repeat_the_range_value_to_next_range_for_e_g_1_3_4_6') }}</span>
+                                                    </span> <small class="d-block text-muted">{{ __('set_proper_ranges_for_delivery_charge_do_not_repeat_the_range_value_to_next_range_for_e_g_1_3_4_6') }}</small>
                                                 </label>
-                                                <div class="form-group row"
+                                                <div class="row g-2 align-items-center range-row"
                                                     v-for="(range, index) in city.range_wise_charges"
                                                     :key="key = index + 1">
-                                                    <div class="col-sm-1">{{ key }}.</div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col-auto range-index">{{ key }}.</div>
+                                                    <div class="col">
                                                         <input type="number" class="form-control" name="from_range[]"
                                                             id="from_range" v-model="range.from_range"
                                                             :placeholder="__('from_range')" min="0" max="999999999">
                                                     </div>
-                                                    <div class="col-sm-1 btn btn-secondary">{{ __('to') }}</div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col-auto range-to">{{ __('to') }}</div>
+                                                    <div class="col">
                                                         <input type="number" class="form-control" name="to_range[]"
                                                             id="to_range" v-model="range.to_range"
                                                             :placeholder="__('to_range')" min="0" max="999999999">
                                                     </div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col">
                                                         <input type="number" class="form-control" name="price[]"
                                                             id="price" v-model="range.price" :placeholder="__('price')" min="0"
                                                             max="999999999" step="any">
                                                     </div>
 
-                                                    <div class="col-sm-1" v-if="index === 0">
-                                                        <a v-b-tooltip.hover :title="__('add_row')" style="cursor: pointer;"
-                                                            @click="addRow">
-                                                            <i class="fa fa-plus-square fa-2x"></i>
+                                                    <div class="col-auto" v-if="index === 0">
+                                                        <a v-b-tooltip.hover :title="__('add_row')" class="figma-action-btn range-btn"
+                                                            role="button" @click="addRow">
+                                                            <i class="fa fa-plus"></i>
                                                         </a>
                                                     </div>
 
-                                                    <div class="col-sm-1" v-if="index !== 0">
-                                                        <a v-b-tooltip.hover :title="__('remove_row')" style="cursor: pointer;"
-                                                            @click="remove(index)">
-                                                            <i class="fa fa-times fa-2x"></i>
+                                                    <div class="col-auto" v-if="index !== 0">
+                                                        <a v-b-tooltip.hover :title="__('remove_row')" class="figma-action-btn figma-delete-btn range-btn"
+                                                            role="button" @click="remove(index)">
+                                                            <i class="fa fa-times"></i>
                                                         </a>
                                                     </div>
 
@@ -243,29 +258,30 @@
                                             </div>
                                         </div>
                                     </b-tab></b-tabs>
-                                <div class="form-group">
+                                <div class="form-actions d-flex justify-content-end gap-2">
+                                    <button type="reset" class="btn btn-outline-secondary">{{ __('clear') }}</button>
                                     <button type="submit" class="btn btn-primary"> {{ __('save') }}</button>
-                                    <button type="reset" class="btn btn-secondary">{{ __('clear') }}</button>
                                 </div>
 
                             </form>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <div class="card h-100">
+                <div class="col-12 col-xl-6 mb-3">
+                    <div class="card h-100 mb-0">
                         <div class="card-header">
-                            <h4>{{ __('map_view') }}</h4>
+                            <h4 class="card-title mb-0 float-none">{{ __('map_view') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('city_map_view_desc', 'Draw the delivery boundary of the city on the map.') }}</p>
                         </div>
                         <div class="card-body">
-                            <div class="offset-3 mt-1">
-                                <button type="button" id="remove-line" class="badge bg-primary">{{ __('remove_newly_added_line') }}</button>
-                                <button type="button" id="clear-line" class="badge bg-danger">{{ __('clear_map') }}</button>
-                                <button type="button" id="add-line" class="badge bg-success">{{ __('restore_old_map') }}</button>
+                            <div class="d-flex flex-wrap gap-2 mb-3" v-if="mapProvider === 'google'">
+                                <button type="button" id="remove-line" class="btn btn-sm btn-outline-primary">{{ __('remove_newly_added_line') }}</button>
+                                <button type="button" id="clear-line" class="btn btn-sm btn-outline-danger">{{ __('clear_map') }}</button>
+                                <button type="button" id="add-line" class="btn btn-sm btn-outline-success">{{ __('restore_old_map') }}</button>
                             </div>
-                            <div id="map" style="position: relative; overflow: hidden;">
+                            <div id="map" class="city-map city-map--google" v-if="mapProvider === 'google'">
                                 <GmapMap :zoom="13" :center="center" :mapTypeControl=true :drawingControl=true
-                                    style="width: 100%; height: 700px; margin-top: 5px" ref="mapRef">
+                                    class="city-gmap" ref="mapRef">
                                     <GmapMarker :key="index" v-for="(m, index) in markers"
                                         :position="google && m.position" @click="center = m.position" :clickable="true"
                                         :draggable="true" />
@@ -278,8 +294,18 @@
                                     </gmap-info-window>
                                 </GmapMap>
                             </div>
-                            <div v-if="city.formatted_address">
-                                <span class="title font-weight-bolder">{{ city.formatted_address }}</span>
+                            <div id="osm_map" class="city-map" v-else>
+                                <osm-map-picker ref="osmCityMap" :lat="city.latitude" :lng="city.longitude" height="700px"
+                                    :show-search-box="false" :click-to-place="false" :draggable-marker="false"
+                                    :enable-drawing="true"
+                                    @location-selected="onOsmLocationSelected"
+                                    @suggestions-updated="osmCitySuggestions = $event"
+                                    @boundary-changed="onOsmBoundaryChanged">
+                                </osm-map-picker>
+                            </div>
+                            <div v-if="city.formatted_address" class="city-address mt-3">
+                                <i class="fa fa-map-marker"></i>
+                                <span class="title">{{ city.formatted_address }}</span>
                             </div>
                             <div class="form-group d-none">
                                 <label for="vertices" class="control-label">{{ __('boundry_points') }}<span
@@ -310,6 +336,8 @@ export default {
             center: { lat: 0, lng: 0 },
             currentPlace: null,
             markers: [],
+            osmCityQuery: '',
+            osmCitySuggestions: [],
             city: {
                 id: "",
                 latitude: "",
@@ -414,6 +442,9 @@ export default {
     computed: {
         google() {
             return gmapApi(); // This will return the google object once the API is loaded
+        },
+        mapProvider() {
+            return window.mapProvider === 'osm' ? 'osm' : 'google';
         }
     },
     created: function () {
@@ -435,6 +466,10 @@ export default {
 
     },
     methods: {
+        tr(key, fallback) {
+            const v = this.__(key);
+            return v && v !== key ? v : fallback;
+        },
         fetchActiveLanguages() {
             return axios.get(this.$apiUrl + '/active_languages')
                 .then(response => {
@@ -553,6 +588,40 @@ export default {
                 this.infoWindow.template = `<b>${this.city.name}</b><br>${this.city.formatted_address}`
                 this.infoWindow.open = true;
                 this.currentPlace = null;
+            }
+        },
+
+        onOsmLocationSelected(payload) {
+            this.city.latitude = payload.lat;
+            this.city.longitude = payload.lng;
+            this.city.name = payload.name || this.city.name;
+
+            let addressArr = (payload.formatted_address || '').split(",");
+            this.city.state = addressArr[addressArr.length - 2] || this.city.state;
+
+            this.city.formatted_address = payload.formatted_address;
+        },
+        onOsmCityQueryInput(text) {
+            this.osmCityQuery = text;
+            if (this.$refs.osmCityMap) {
+                this.$refs.osmCityMap.setQueryAndSearch(text);
+            }
+        },
+        selectOsmCitySuggestion(suggestion) {
+            this.osmCityQuery = suggestion.placePrediction.text.text;
+            this.osmCitySuggestions = [];
+            if (this.$refs.osmCityMap) {
+                this.$refs.osmCityMap.selectSuggestion(suggestion);
+            }
+        },
+        onOsmBoundaryChanged(payload) {
+            this.geolocation_type = payload.geolocation_type || 'polygon';
+            this.radius = payload.radius;
+
+            if (payload.geolocation_type === 'circle') {
+                this.vertices = JSON.stringify(payload.vertices);
+            } else {
+                this.vertices = payload.vertices;
             }
         },
 
@@ -691,6 +760,40 @@ export default {
             this.infoWindow.position = marker;
             this.infoWindow.template = `<b>${this.city.name}</b><br>${this.city.formatted_address}`;
             this.infoWindow.open = true;
+
+            if (this.mapProvider === 'osm') {
+                if (!this.city.boundary_points || !this.city.id) {
+                    return;
+                }
+                let osmBoundaryPoints = this.city.boundary_points;
+                if (typeof osmBoundaryPoints === 'string') {
+                    try {
+                        osmBoundaryPoints = JSON.parse(osmBoundaryPoints);
+                    } catch (e) {
+                        return;
+                    }
+                }
+                if (!osmBoundaryPoints || typeof osmBoundaryPoints !== 'object') {
+                    return;
+                }
+                const osmPoints = Array.isArray(osmBoundaryPoints) ? osmBoundaryPoints : [osmBoundaryPoints];
+                if (osmPoints.length === 0) return;
+
+                this.geolocation_type = this.city.geolocation_type || 'polygon';
+                this.radius = this.city.radius;
+                this.vertices = this.city.geolocation_type === 'circle' ? this.city.boundary_points : osmPoints;
+
+                this.$nextTick(() => {
+                    if (this.$refs.osmCityMap) {
+                        this.$refs.osmCityMap.restoreBoundary({
+                            geolocation_type: this.city.geolocation_type || 'polygon',
+                            vertices: osmPoints,
+                            radius: this.city.radius,
+                        });
+                    }
+                });
+                return;
+            }
 
             if (!this.map || !this.city.boundary_points || !this.city.id) {
                 return;
@@ -848,3 +951,101 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.osm-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border-strong);
+    border-top: none;
+    border-radius: 0 0 var(--ui-radius) var(--ui-radius);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.osm-suggestion-item {
+    cursor: pointer;
+}
+
+.city-map--google {
+    position: relative;
+    overflow: hidden;
+}
+
+.city-gmap {
+    width: 100%;
+    height: 700px;
+    margin-top: 5px;
+}
+
+.osm-suggestions .list-group-item {
+    font-size: 13px;
+    color: var(--ui-text);
+    background: var(--ui-surface);
+    border-color: var(--ui-border);
+}
+
+.form-actions {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.range-row {
+    margin-bottom: 10px;
+}
+
+.range-row .col {
+    min-width: 0;
+}
+
+.range-index,
+.range-to {
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.range-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.city-map {
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+}
+
+.city-address {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+    background: var(--ui-surface-muted);
+    border-radius: var(--ui-radius);
+}
+
+.city-address i {
+    color: var(--theme-primary-600);
+    margin-top: 2px;
+}
+
+@media (max-width: 767.98px) {
+    /* shorter map on phones */
+    .city-gmap,
+    #map ::v-deep .vue-map-container {
+        height: 420px;
+    }
+}
+</style>

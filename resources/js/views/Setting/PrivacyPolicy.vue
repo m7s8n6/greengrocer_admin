@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
+            <div class="page-title"><div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>{{ __('privacy_policy_terms_conditions') }}</h3>
                 </div>
@@ -11,23 +11,21 @@
                             <li class="breadcrumb-item">
                                 <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                             </li>
+                            <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('privacy_policy_terms_conditions') }}</li>
                         </ol>
                     </nav>
                 </div>
-            </div>
+            </div></div>
 
             <section class="section">
                 <form @submit.prevent="saveRecord">
-                    <div class="figma-main-section-card">
-                        <div class="card-body p-0">
-                            <div class="figma-action-bar-row">
-                                <h4 class="card-title mb-0">
-                                    {{ __('update_privacy_policy') }}
-                                </h4>
-                            </div>
-
-                            <div class="p-4">
+                    <div class="card settings-editor-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('update_privacy_policy') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('customer_policies_desc', 'Customer-facing policies shown in the app and website, per language.') }}</p>
+                        </div>
+                        <div class="card-body">
 
                             <!-- LANGUAGE TABS -->
                             <div v-if="languages.length">
@@ -69,12 +67,12 @@
                                         <!-- POLICY EDITORS -->
                                         <div v-for="(label, variable) in policyLabels" :key="variable"
                                             class="form-group">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <label>
+                                            <div class="d-flex justify-content-between align-items-center mb-2 settings-editor-label-row">
+                                                <label class="form-label mb-0">
                                                     {{ label }}
                                                     <i class="text-danger" v-if="language.is_default">*</i>
                                                 </label>
-                                                <a :href="$baseUrl+'/'+policyUrls[variable]+'?lang=' + language.code" v-b-tooltip.hover :title="label" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                                <a :href="$baseUrl+'/'+policyUrls[variable]+'?lang=' + language.code" v-b-tooltip.hover :title="label" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fa fa-eye"></i></a>
                                             </div>
 
                                             <editor v-model="translations[language.id][variable]"
@@ -89,15 +87,15 @@
                                 <b-spinner />
                             </div>
 
-                            </div>
+                                <div class="d-flex justify-content-end border-top pt-3 mt-2">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading">
+                                        {{ __('update') }}
+                                        <b-spinner v-if="isLoading" small />
+                                    </b-button>
 
-                            <div class="figma-action-bar-row border-top">
-                                <b-button type="submit" variant="primary" :disabled="isLoading" class="btn-figma-action px-5">
-                                    {{ __('update') }}
-                                    <b-spinner v-if="isLoading" small />
-                                </b-button>
+                                </div>
+
                             </div>
-                        </div>
                     </div>
                 </form>
             </section>
@@ -154,6 +152,7 @@ export default {
     },
 
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
 
         getEditorConfig() {
             const plugins = (this.$editorPlugins && Array.isArray(this.$editorPlugins))
@@ -312,3 +311,17 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.settings-editor-label-row label {
+    margin-bottom: 0;
+}
+.settings-subsection-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin: 24px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+</style>

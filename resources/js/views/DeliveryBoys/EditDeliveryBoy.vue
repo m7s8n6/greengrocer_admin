@@ -43,18 +43,19 @@
                 </div>
             </div>
 
+        </div>
             <div class="row">
                 <div class="col-12 col-md-12 order-md-1 order-last">
-                    <div class="card">
-                        <div class="card-header" v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
-                            <h4>{{ __('delivery_boy') }}</h4>
-                            <span class="pull-right">
-                                <router-link to="/delivery_boys" class="btn btn-primary" v-b-tooltip.hover
-                                    title="View Delivery boys">{{ __('view_delivery_boys') }}</router-link>
+                        <form ref="my-form" @submit.prevent="saveRecord">
+                    <div class="card db-form-card">
+                        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2" v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
+                            <h4 class="db-section-title mb-0">{{ __('delivery_boy') }}</h4>
+                            <span>
+                                <router-link to="/delivery_boys" class="btn btn-sm btn-outline-secondary" v-b-tooltip.hover
+                                    title="View Delivery boys"><i class="fa fa-list me-1"></i>{{ __('view_delivery_boys') }}</router-link>
                             </span>
                         </div>
 
-                        <form ref="my-form" @submit.prevent="saveRecord">
                             <div class="card-body">
 
                                 <!-- Language Tabs for Translatable Fields -->
@@ -70,8 +71,8 @@
                                         </template>
 
                                         <!-- Translate buttons -->
-                                        <div class="mb-3" v-if="lang.is_default && languages.length > 1">
-                                            <b-button size="sm" variant="outline-primary" class="mr-2"
+                                        <div class="mb-3 d-flex flex-wrap gap-2" v-if="lang.is_default && languages.length > 1">
+                                            <b-button size="sm" variant="outline-primary"
                                                 @click="translateEmpty(lang)" v-b-tooltip.hover
                                                 :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                                                 :disabled="loadingEmpty">
@@ -89,7 +90,7 @@
                                             </b-button>
 
                                             <div v-if="translateSuccessMessage"
-                                                class="text-success mt-2 font-weight-bold">
+                                                class="text-success w-100 small font-weight-bold">
                                                 {{ translateSuccessMessage }}
                                             </div>
                                         </div>
@@ -125,7 +126,7 @@
                                     <!-- Personal Information Section -->
                                     <div class="row mt-3">
                                         <!-- Name (Default Language) -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="name">{{ __('name') }}<span
                                                         class="text-danger text-xs">*</span></label>
@@ -136,7 +137,7 @@
                                         </div>
 
                                         <!-- Date Of Birth -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="dob">{{ __('date_of_birth') }} <span
                                                         class="text-danger text-xs">*</span></label>
@@ -149,7 +150,7 @@
                                         </div>
 
                                         <!-- Mobile -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="mobile">{{ __('mobile') }}<span
                                                         class="text-danger text-xs">*</span></label>
@@ -162,7 +163,7 @@
                                         </div>
 
                                         <!-- Email -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="email">{{ __('email') }}<span
                                                         class="text-danger text-xs">*</span></label>
@@ -173,7 +174,7 @@
                                         </div>
 
                                         <!-- Password (only for admin) -->
-                                        <div class="col-md-4"
+                                        <div class="col-md-6"
                                             v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
                                             <div class="form-group">
                                                 <label for="password">{{ __('password') }}<span
@@ -183,19 +184,19 @@
                                                         id="password" v-model="deliveryBoys.password"
                                                         class="form-control" :placeholder="__('password')">
                                                     <button type="button" v-on:click="showPassword = !showPassword"
-                                                        class="btn btn-primary font-bold">
+                                                        class="btn btn-outline-secondary db-pw-toggle">
                                                         <img v-if="showPassword"
                                                             :src="$baseUrl + '/images/icons/show_password.svg'"
-                                                            style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                            class="db-pw-icon" />
                                                         <img v-else :src="$baseUrl + '/images/icons/hide_password.svg'"
-                                                            style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                            class="db-pw-icon" />
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <!-- Confirm Password (only for admin) -->
-                                        <div class="col-md-4"
+                                        <div class="col-md-6"
                                             v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
                                             <div class="form-group">
                                                 <label for="confirm_password">{{ __('confirm_password') }}<span
@@ -208,32 +209,26 @@
                                                         :placeholder="__('confirm_password')">
                                                     <button type="button"
                                                         v-on:click="showConfirmPassword = !showConfirmPassword"
-                                                        class="btn btn-primary font-bold">
+                                                        class="btn btn-outline-secondary db-pw-toggle">
                                                         <img v-if="showConfirmPassword"
                                                             :src="$baseUrl + '/images/icons/show_password.svg'"
-                                                            style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                            class="db-pw-icon" />
                                                         <img v-else :src="$baseUrl + '/images/icons/hide_password.svg'"
-                                                            style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                            class="db-pw-icon" />
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row">
                                         <!-- Select or Search City -->
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="city_name">{{ __('select_or_search_city') }}<span
                                                         class="text-danger text-xs">*</span></label>
-                                                <multiselect v-model="city" :options="cities" @close="setCityId"
+                                                <multiselect v-model="city" :options="cities" @close="setCityId" :multiple="true"
+                                                    :close-on-select="false" :clear-on-select="false" :hide-selected="true"
                                                     :placeholder="__('select_or_search_city')" label="name"
-                                                    track-by="name" id="city_name" required>
-                                                    <template slot="singleLabel" slot-scope="props">
-                                                        <span class="option__desc">
-                                                            <span class="option__title">{{ props.option.name }}</span>
-                                                        </span>
-                                                    </template>
+                                                    track-by="id" id="city_name">
                                                     <template slot="option" slot-scope="props">
                                                         <div class="option__desc">
                                                             <span class="option__title">{{
@@ -243,25 +238,32 @@
                                                 </multiselect>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="list-group-item m-2">
-                                        <div class="d-flex justify-content-between align-content-center">
-                                            <h6>{{ __('delivery_boy_bonus_details') }}</h6>
-                                            <b-button-group v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
+                    <div v-if="!languages.length || (defaultLanguage && getCurrentLanguage() && getCurrentLanguage().is_default)">
+                                    <!-- Bonus Details Section -->
+                                    <div class="card db-form-card">
+                                        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                            <h4 class="db-section-title mb-0">{{ __('delivery_boy_bonus_details') }}</h4>
+                                            <div class="d-flex flex-wrap gap-2" v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
+                                                <b-button @click="resetBonus" v-if="deliveryBoys.id" type="button"
+                                                    variant="outline-secondary" size="sm">
+                                                    {{ __('reset_bonus') }}
+                                                </b-button>
                                                 <b-button @click="getBonusSettings"
                                                     v-if="$deliveryBoyBonusSettings == 1" type="button"
                                                     variant="primary" size="sm">
                                                     {{ __('add_default_bonus') }}
                                                 </b-button>
-                                                <b-button @click="resetBonus" v-if="deliveryBoys.id" type="button"
-                                                    size="sm">
-                                                    {{ __('reset_bonus') }}
-                                                </b-button>
-                                            </b-button-group>
+                                            </div>
                                         </div>
-                                        <div class="row mt-2">
-                                            <div class="col-md-3">
+                                        <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 col-xl-3">
                                                 <div class="form-group">
                                                     <label for="bonus_type">{{ __('bonus_type') }}<span
                                                             class="text-danger text-xs">*</span></label>
@@ -275,7 +277,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-3">
+                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-6 col-xl-3">
                                                 <div class="form-group">
                                                     <label for="bonus_percentage">{{ __('bonus_percentage') }}<span
                                                             class="text-danger text-xs">*</span></label>
@@ -286,7 +288,7 @@
                                                         :readonly="this.$roleDeliveryBoy === this.login_user.role.name">
                                                 </div>
                                             </div>
-                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-3">
+                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-6 col-xl-3">
                                                 <div class="form-group">
                                                     <label for="bonus_min_amount">{{ __('minimum_bonus_amount')
                                                     }}</label>
@@ -296,14 +298,14 @@
                                                         placeholder='Minimum bonus amount'
                                                         :readonly="this.$roleDeliveryBoy === this.login_user.role.name"
                                                         @input="validateBonusMinAmount" />
-                                                    <span class="text text-primary font-size-13"
+                                                    <span class="form-text text-muted small d-block"
                                                         v-if="this.$roleDeliveryBoy !== this.login_user.role.name">{{
                                                             __('set_0_if_you_want_to_remove_limit') }}</span>
                                                     <span v-if="bonusMinAmountValidationError" class="error">{{
                                                         bonusMinAmountValidationError }}</span>
                                                 </div>
                                             </div>
-                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-3">
+                                            <div v-if="deliveryBoys.bonus_type == 1" class="col-md-6 col-xl-3">
                                                 <div class="form-group">
                                                     <label for="bonus_max_amount">{{ __('maximum_bonus_amount')
                                                     }}</label>
@@ -313,7 +315,7 @@
                                                         :placeholder="__('maximum_bonus_amount')"
                                                         :readonly="this.$roleDeliveryBoy === this.login_user.role.name"
                                                         @input="validateBonusMaxAmount" />
-                                                    <span class="text text-primary font-size-13"
+                                                    <span class="form-text text-muted small d-block"
                                                         v-if="this.$roleDeliveryBoy !== this.login_user.role.name">{{
                                                             __('set_0_if_you_want_to_remove_limit') }}</span>
                                                     <span v-if="bonusMaxAmountValidationError" class="error">{{
@@ -321,15 +323,21 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        </div>
                                     </div>
 
                                     <!-- Status Section (only for edit mode) -->
-                                    <div class="row"
+                                    <div class="card db-form-card"
                                         v-if="deliveryBoys.id && this.$roleDeliveryBoy !== this.login_user.role.name">
-                                        <div class="col-md-8">
+                                        <div class="card-header">
+                                            <h4 class="db-section-title mb-0">{{ __('status') }}</h4>
+                                        </div>
+                                        <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-8">
                                             <div class="form-group">
                                                 <label>{{ __('status') }}<span
-                                                        class="text-danger text-xs">*</span></label><br>
+                                                        class="text-danger text-xs">*</span></label>
                                                 <b-form-radio-group v-model="deliveryBoys.status" :options="[
                                                     { text: __('registered'), 'value': 0 },
                                                     { text: __('active'), 'value': 1 },
@@ -337,11 +345,11 @@
                                                     { text: __('deactive'), 'value': 3 },
                                                     { text: __('block'), 'value': 4 },
                                                 ]" buttons button-variant="outline-primary"
-                                                    class="d-flex flex-wrap flex-md-nowrap"
+                                                    class="d-flex flex-wrap db-status-group"
                                                     required></b-form-radio-group>
                                             </div>
                                         </div>
-                                        <div class="col-md-4" v-if="[2, 3, 4].includes(deliveryBoys.status)">
+                                        <div class="col-lg-4" v-if="[2, 3, 4].includes(deliveryBoys.status)">
                                             <div class="form-group">
                                                 <label for="remark">{{ __('remark') }}<span
                                                         class="text-danger text-xs">*</span></label>
@@ -351,13 +359,17 @@
                                             </div>
                                         </div>
                                     </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Custom Fields -->
-                                    <div class="row mt-3" v-if="customFields.length">
-                                        <div class="col-12">
-                                            <h5 class="text-primary">{{ __('custom_fields') }}</h5>
+                                    <div class="card db-form-card" v-if="customFields.length">
+                                        <div class="card-header">
+                                            <h4 class="db-section-title mb-0">{{ __('custom_fields') }}</h4>
                                         </div>
-                                        <div class="col-md-4" v-for="field in translatedCustomFields" :key="field.id">
+                                        <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6" v-for="field in translatedCustomFields" :key="field.id">
                                             <div class="form-group">
                                                 <label>{{ field.name }}
                                                     <span v-if="field.is_required" class="text-danger">*</span></label>
@@ -382,18 +394,21 @@
                                                         class="badge bg-success mt-1"><i class="fa fa-eye"></i> {{ __('view') || 'View' }}</a>
                                                 </template>
 
+                                                <custom-field-date v-else-if="field.type === 'date'" v-model="customFieldValues[field.id]"
+                                                    :placeholder="field.name"></custom-field-date>
                                                 <input v-else :type="field.type === 'number' ? 'number' : 'text'"
                                                     class="form-control" v-model="customFieldValues[field.id]"
                                                     :placeholder="field.name">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                        </div>
+                                    </div>
+                    </div>
                             <!-- End of Main Form Fields (only visible on default language tab) -->
 
                             <!-- Action Buttons -->
-                            <div class="card-footer">
+                            <div class="db-form-actions">
                                 <template v-if="deliveryBoys.id">
                                     <b-button type="submit" variant="primary" :disabled="isLoading">
                                         {{ __('update') }}
@@ -401,22 +416,20 @@
                                     </b-button>
                                 </template>
                                 <template v-else>
+                                    <button v-if="this.$roleDeliveryBoy !== this.login_user.role.name" type="reset"
+                                        class="btn btn-outline-secondary">{{ __('clear') }}</button>
+                                    <button v-else type="button" class="btn btn-outline-secondary" @click="$router.go(-1)">{{
+                                        __('back') }}</button>
                                     <b-button type="submit" variant="primary" :disabled="isLoading">
                                         {{ __('save') }}
                                         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                     </b-button>
-                                    <button v-if="this.$roleDeliveryBoy !== this.login_user.role.name" type="reset"
-                                        class="btn btn-danger">{{ __('clear') }}</button>
-                                    <button v-else type="button" class="btn btn-danger" @click="$router.go(-1)">{{
-                                        __('back') }}</button>
                                 </template>
                             </div>
                         </form>
-                    </div>
 
                 </div>
             </div>
-        </div>
     </div>
 </template>
 <script>
@@ -450,7 +463,7 @@ export default {
             showPassword: false,
             showConfirmPassword: false,
             record: null,
-            city: "",
+            city: [],
             cities: [],
             id: null,
             bonusSettings: null,
@@ -742,14 +755,21 @@ export default {
                     const list = (raw && raw.cities) ? raw.cities : raw;
                     this.cities = Array.isArray(list) ? list : (list && typeof list === 'object' ? Object.values(list) : []);
 
-                    if (this.deliveryBoys.id && this.record?.city_id && Array.isArray(this.cities)) {
-                        const matched = this.cities.filter((item) => item.id === this.record.city_id);
-                        this.city = matched.length ? matched[0] : null;
+                    if (this.deliveryBoys.id && this.record && Array.isArray(this.cities)) {
+                        this.selectRecordCities();
                     }
                 });
         },
         setCityId() {
-            this.deliveryBoys.city_id = (this.city && this.city.id != null) ? this.city.id : '';
+            this.deliveryBoys.city_id = this.city.length ? this.city[0].id : '';
+        },
+        // Pre-select every city the driver serves (city_ids), falling back to the single city_id.
+        selectRecordCities() {
+            const ids = (this.record.city_ids && this.record.city_ids.length)
+                ? this.record.city_ids
+                : (this.record.city_id ? [this.record.city_id] : []);
+            this.city = this.cities.filter(item => ids.includes(item.id));
+            this.setCityId();
         },
 
         getDeliveryBoy() {
@@ -790,8 +810,7 @@ export default {
                         this.deliveryBoys.confirm_password = "";
 
                         if (Array.isArray(this.cities)) {
-                            const matched = this.cities.find((item) => item.id === this.record.city_id);
-                            this.city = matched || null;
+                            this.selectRecordCities();
                         }
                         this.deliveryBoys.city_id = emptyIfNull(this.record?.city_id);
 
@@ -915,6 +934,7 @@ export default {
                 fd.append('mobile', this.deliveryBoys.mobile);
                 fd.append('email', this.deliveryBoys.email);
                 fd.append('city_id', this.deliveryBoys.city_id);
+                this.city.forEach(c => fd.append('city_ids[]', c.id));
                 fd.append('status', this.deliveryBoys.status);
                 fd.append('remark', this.deliveryBoys.remark ?? '');
                 fd.append('bonus_type', this.deliveryBoys.bonus_type);
@@ -1006,4 +1026,63 @@ export default {
 </script>
 <style scoped>
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+
+/* Sectioned form cards */
+.db-form-card {
+    margin-bottom: 20px;
+}
+
+.db-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.db-pw-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+    border-color: var(--ui-border-strong);
+    background: var(--ui-surface);
+}
+
+.db-pw-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
+}
+
+/* Status choices: hide the native radio dot inside the button-style options */
+.db-status-group {
+    gap: 8px;
+}
+
+.db-status-group ::v-deep .btn {
+    margin: 0;
+    border-radius: var(--ui-radius) !important; /* beat BootstrapVue btn-group joined corners */
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.db-status-group ::v-deep .btn input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.db-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 575.98px) {
+    .db-form-actions .btn {
+        flex: 1 1 0;
+    }
+}
 </style>

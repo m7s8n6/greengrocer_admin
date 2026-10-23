@@ -334,6 +334,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -553,8 +584,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: this.__('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this3.isLoadingUstatus = true;
@@ -695,8 +726,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           cancelButtonText: this.__('cancel'),
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33'
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)'
         }).then(function (result) {
           if (result.value) {
             var ids = uniqueSelectedItems.toString();
@@ -779,8 +810,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         showCancelButton: true,
         confirmButtonText: this.__('yes_sure'),
         cancelButtonText: this.__('no'),
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)',
         icon: 'warning',
         inputValidator: function inputValidator(value) {
           if (!value || !value.trim()) {
@@ -835,7 +866,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.th-width[data-v-794f4f14] {\n    width: 170px;\n    background-color: #F8F9FA !important;\n}\n.card[data-v-794f4f14] {\n    border: 1px solid #EDEDED !important;\n    border-radius: 12px !important;\n    overflow: hidden;\n    margin-bottom: 24px;\n}\n.card-header[data-v-794f4f14] {\n    border-bottom: 1px solid #EDEDED !important;\n    background-color: #FFFFFF !important;\n    padding: 1rem 1.25rem !important;\n}\n.card-body[data-v-794f4f14] {\n    padding: 1.5rem !important;\n}\n.table-responsive[data-v-794f4f14] {\n    border: none !important;\n    background: transparent !important;\n}\n.table[data-v-794f4f14] {\n    margin-bottom: 0 !important;\n}\n.table-bordered[data-v-794f4f14],\n.table-bordered th[data-v-794f4f14],\n.table-bordered td[data-v-794f4f14] {\n    border: 1px solid #EDEDED !important;\n}\n.table thead th[data-v-794f4f14] {\n    background-color: #F8F9FA !important;\n    border-bottom-width: 1px !important;\n}\n.cancel-item-btn[data-v-794f4f14] {\n    top: 5px;\n    right: 5px;\n    z-index: 2;\n    width: 28px;\n    height: 28px;\n    padding: 0;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.2s;\n}\n.cancel-item-btn[data-v-794f4f14]:hover {\n    opacity: 1;\n}\n\n/* Dark Mode Styles */\nbody.theme-dark .card[data-v-794f4f14] {\n    background-color: #1e293b !important;\n    border-color: #334155 !important;\n}\nbody.theme-dark .card-header[data-v-794f4f14] {\n    background-color: #1e293b !important;\n    border-bottom-color: #334155 !important;\n}\nbody.theme-dark .card-header h4[data-v-794f4f14] {\n    color: #f1f5f9 !important;\n}\nbody.theme-dark .table-bordered[data-v-794f4f14],\nbody.theme-dark .table-bordered th[data-v-794f4f14],\nbody.theme-dark .table-bordered td[data-v-794f4f14] {\n    border-color: #334155 !important;\n    background-color: #1e293b !important;\n    color: #f1f5f9 !important;\n}\nbody.theme-dark .th-width[data-v-794f4f14] {\n    background-color: #334155 !important;\n}\nbody.theme-dark .table thead th[data-v-794f4f14] {\n    background-color: #334155 !important;\n    color: #f1f5f9 !important;\n}\nbody.theme-dark h4[data-v-794f4f14],\nbody.theme-dark b[data-v-794f4f14] {\n    color: #f1f5f9 !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* ===== Order detail (SnapBuy layout) ===== */\n.modern-page-title[data-v-794f4f14] {\n    font-family: var(--ui-font);\n    font-weight: 700;\n    font-size: 20px;\n    line-height: 28px;\n    color: var(--ui-heading);\n}\n.order-meta-bar[data-v-794f4f14] {\n    width: 100%;\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px 24px;\n    padding-top: 12px;\n    border-top: 1px solid var(--ui-border);\n    font-family: var(--ui-font);\n    font-size: 13px;\n    line-height: 20px;\n}\n.order-meta-date[data-v-794f4f14],\n.order-meta-seller[data-v-794f4f14] {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 6px;\n}\n.order-meta-bar i[data-v-794f4f14] {\n    color: var(--ui-text-muted);\n    font-size: 13px;\n}\n.card[data-v-794f4f14] {\n    border: 1px solid var(--ui-border) !important;\n    border-radius: var(--ui-radius-lg) !important;\n    overflow: hidden;\n    margin-bottom: 24px;\n}\n.item-count-badge[data-v-794f4f14] {\n    display: inline-flex;\n    align-items: center;\n    height: 26px;\n    padding: 0 10px;\n    border-radius: var(--ui-radius-sm);\n    background-color: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    color: var(--ui-text);\n    font-weight: 600;\n    font-size: 12px;\n    white-space: nowrap;\n}\nbody.theme-dark .item-count-badge[data-v-794f4f14] {\n    background-color: var(--theme-neutral-700) !important;\n    border-color: var(--theme-neutral-600) !important;\n    color: var(--theme-neutral-100) !important;\n}\n.cancel-item-btn[data-v-794f4f14] {\n    width: 32px;\n    height: 32px;\n    border-radius: var(--ui-radius);\n    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;\n    background: var(--theme-error-50);\n    color: var(--theme-error-500);\n}\n.cancel-item-btn[data-v-794f4f14]:hover {\n    background: color-mix(in srgb, var(--theme-error-500) 18%, transparent);\n}\n.delivery-time-box[data-v-794f4f14] {\n    padding: 10px 12px;\n    background: var(--theme-error-50);\n    border: 1px solid var(--theme-error-200);\n    border-radius: var(--ui-radius);\n}\nbody.theme-dark .delivery-time-box[data-v-794f4f14] {\n    background: color-mix(in srgb, var(--theme-error-500) 15%, transparent) !important;\n    border-color: color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;\n}\n.order-notes-box[data-v-794f4f14] {\n    background-color: var(--theme-info-50);\n    border-inline-start: 3px solid var(--theme-info-500);\n    border-radius: var(--ui-radius);\n    padding: 12px 14px;\n    text-align: start;\n}\n.order-notes-text[data-v-794f4f14] {\n    font-size: 13px;\n    line-height: 20px;\n    color: var(--ui-text);\n}\n@media (max-width: 575.98px) {\n.order-header-card[data-v-794f4f14] {\n        padding: 14px 16px;\n}\n.od-print-btn[data-v-794f4f14] {\n        width: 100%;\n        justify-content: center;\n}\n.od-card-body[data-v-794f4f14] {\n        padding: 16px;\n}\n.od-card-header[data-v-794f4f14] {\n        padding: 12px 16px;\n}\n}\n\n\n/* Self-pickup specific */\n.od-status-pill[data-v-794f4f14] {\n    background: var(--ui-primary-soft);\n    color: var(--theme-primary-700);\n    border: 1px solid color-mix(in srgb, var(--theme-primary-500) 30%, transparent) !important;\n}\n.od-pill-danger[data-v-794f4f14] {\n    background: var(--theme-error-50);\n    color: var(--theme-error-700);\n    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;\n}\n.od-head-btn[data-v-794f4f14] {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    height: 38px;\n    padding: 0 14px;\n    font-size: 13px;\n    font-weight: 600;\n    border-radius: var(--ui-radius);\n}\n.od-row-actions[data-v-794f4f14] {\n    display: inline-flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    flex-wrap: nowrap;\n}\n.od-row-btn[data-v-794f4f14] {\n    height: 32px;\n    padding: 0 10px;\n    font-size: 12px;\n    font-weight: 600;\n    border-radius: var(--ui-radius);\n    white-space: nowrap;\n}\n.payable-total-box[data-v-794f4f14] {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n.od-info-value[data-v-794f4f14] {\n    margin-left: 0;\n}\n.od-info-value--muted[data-v-794f4f14] {\n    font-weight: 400;\n    color: var(--ui-text-muted);\n}\n.od-items-table[data-v-794f4f14] {\n    min-width: 640px;\n}\n@media (max-width: 575.98px) {\n.od-header-actions[data-v-794f4f14],\n    .od-head-btn[data-v-794f4f14] {\n        width: 100%;\n        justify-content: center;\n}\n}\n\n/* Dark Mode Styles */\nbody.theme-dark .card[data-v-794f4f14] {\n    background-color: var(--theme-neutral-800) !important;\n    border-color: var(--theme-neutral-700) !important;\n}\nbody.theme-dark .order-header-card[data-v-794f4f14],\nbody.theme-dark .od-card-header[data-v-794f4f14] {\n    background-color: var(--theme-neutral-800) !important;\n    border-color: var(--theme-neutral-700) !important;\n}\nbody.theme-dark .od-card-title[data-v-794f4f14],\nbody.theme-dark .od-order-id[data-v-794f4f14],\nbody.theme-dark .od-product-name[data-v-794f4f14],\nbody.theme-dark .od-info-value[data-v-794f4f14],\nbody.theme-dark .od-meta-value[data-v-794f4f14],\nbody.theme-dark .payable-total-box[data-v-794f4f14] {\n    color: var(--theme-neutral-100) !important;\n}\nbody.theme-dark .od-items-table thead th[data-v-794f4f14] {\n    background-color: var(--theme-neutral-700) !important;\n}\nbody.theme-dark .od-items-table tbody td[data-v-794f4f14] {\n    background-color: var(--theme-neutral-800) !important;\n    color: var(--theme-neutral-100) !important;\n    border-color: var(--theme-neutral-700) !important;\n}\nbody.theme-dark .order-notes-box[data-v-794f4f14] {\n    background-color: color-mix(in srgb, var(--theme-info-500) 15%, transparent) !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -972,22 +1003,27 @@ var render = function () {
   return _c("div", [
     _c(
       "div",
-      { staticClass: "page-heading view_order" },
+      { staticClass: "view_order" },
       [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("view_self_pickup_order")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+        _c(
+          "div",
+          {
+            staticClass:
+              "page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4",
+          },
+          [
+            _c("h3", { staticClass: "mb-0" }, [
+              _vm._v(_vm._s(_vm.__("view_self_pickup_order"))),
+            ]),
+            _vm._v(" "),
             _c(
               "nav",
               {
-                staticClass: "breadcrumb-header float-start float-lg-end",
+                staticClass: "breadcrumb-header",
                 attrs: { "aria-label": "breadcrumb" },
               },
               [
-                _c("ol", { staticClass: "breadcrumb" }, [
+                _c("ol", { staticClass: "breadcrumb mb-0" }, [
                   _c(
                     "li",
                     { staticClass: "breadcrumb-item" },
@@ -1020,827 +1056,918 @@ var render = function () {
                     },
                     [
                       _vm._v(
-                        "\n                            " +
+                        "\n                        " +
                           _vm._s(_vm.__("order_details")) +
-                          "\n                        "
+                          "\n                    "
                       ),
                     ]
                   ),
                 ]),
               ]
             ),
-          ]),
-        ]),
+          ]
+        ),
         _vm._v(" "),
         _vm.order
-          ? _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-md-6" }, [
-                _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", [_vm._v(_vm._s(_vm.__("order_details")))]),
+          ? _c("div", { staticClass: "order-details-wrapper" }, [
+              _c("div", { staticClass: "mb-4 order-header-card" }, [
+                _c("div", { staticClass: "od-header-top" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "d-flex flex-wrap align-items-center gap-2",
+                    },
+                    [
+                      _c("h2", { staticClass: "od-order-id mb-0" }, [
+                        _vm._v(
+                          _vm._s(_vm.__("order_id")) +
+                            " #" +
+                            _vm._s(_vm.order.order_id)
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "span",
+                        { staticClass: "figma-status-pill od-status-pill" },
+                        [
+                          _vm._v(
+                            "\n                            " +
+                              _vm._s(
+                                _vm.getDisplayName(
+                                  _vm.order.status_name_translation
+                                ) || _vm.order.status_name
+                              ) +
+                              "\n                        "
+                          ),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "d-flex flex-wrap gap-2 od-header-actions" },
+                    [
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass: "btn btn-outline-secondary od-head-btn",
+                          attrs: {
+                            title: _vm.__("download_invoice"),
+                            disabled: _vm.isLoading,
+                          },
+                          on: { click: _vm.downloadInvoice },
+                        },
+                        [
+                          _vm.isLoading
+                            ? [
+                                _c("b-spinner", {
+                                  attrs: { small: "", label: "Spinning" },
+                                }),
+                                _vm._v(
+                                  " " +
+                                    _vm._s(_vm.__("downloading")) +
+                                    "...\n                            "
+                                ),
+                              ]
+                            : [
+                                _c("i", { staticClass: "fa fa-download" }),
+                                _vm._v(
+                                  " " +
+                                    _vm._s(_vm.__("download_invoice")) +
+                                    "\n                            "
+                                ),
+                              ],
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "router-link",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass: "btn btn-outline-primary od-head-btn",
+                          attrs: {
+                            to: _vm.invoiceRoute,
+                            title: _vm.__("generate_invoice"),
+                          },
+                        },
+                        [
+                          _c("i", {
+                            staticClass: "fa fa-file",
+                            attrs: { "aria-hidden": "true" },
+                          }),
+                          _vm._v(
+                            " " +
+                              _vm._s(_vm.__("generate_invoice")) +
+                              "\n                        "
+                          ),
+                        ]
+                      ),
+                    ],
+                    1
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "order-meta-bar" }, [
+                  _c("div", { staticClass: "order-meta-date" }, [
+                    _c("i", { staticClass: "far fa-calendar-alt" }),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "od-meta-label" }, [
+                      _vm._v(_vm._s(_vm.__("order_date")) + " :"),
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "od-meta-value" }, [
+                      _vm._v(_vm._s(_vm.order.orders_created_at)),
+                    ]),
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "table-responsive" }, [
-                      _c("table", { staticClass: "table table-bordered" }, [
-                        _c("tbody", [
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("order_id"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.order_id))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("email"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.user_email))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("order_note"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.order_note))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("status"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "\n                                            " +
-                                  _vm._s(
-                                    _vm.getDisplayName(
-                                      _vm.order.status_name_translation
-                                    ) || _vm.order.status_name
-                                  ) +
-                                  "\n                                        "
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("name"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.user_name))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("mobile"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm._f("mobileMask")(_vm.order.user_mobile)
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("pickup_store"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.getDisplayName(
-                                    _vm.order.store_name_translation
-                                  ) || _vm.order.store_name
-                                ) + "\n                                        "
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("store_address"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.getPickupAddress(_vm.order.pickup_address)
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("store_timings"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.getPickupTimings(_vm.order.pickup_address)
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("update_status"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c(
-                                "form",
-                                {
-                                  ref: "my-form",
-                                  staticClass: "row g-3 align-items-center",
-                                  on: {
-                                    submit: function ($event) {
-                                      $event.preventDefault()
-                                      return _vm.updateStatus.apply(
-                                        null,
-                                        arguments
-                                      )
-                                    },
-                                  },
-                                },
-                                [
-                                  _c("div", { staticClass: "input-group" }, [
-                                    _c(
-                                      "label",
-                                      {
-                                        staticClass: "visually-hidden",
-                                        attrs: { for: "status" },
-                                      },
-                                      [_vm._v(_vm._s(_vm.__("status")))]
+                  _c("div", { staticClass: "order-meta-date" }, [
+                    _c("i", { staticClass: "far fa-credit-card" }),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "od-meta-label" }, [
+                      _vm._v(_vm._s(_vm.__("payment_method")) + " :"),
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "od-meta-value" }, [
+                      _vm._v(_vm._s(_vm.order.payment_method)),
+                    ]),
+                  ]),
+                ]),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "row g-4" }, [
+                _c("div", { staticClass: "col-lg-8" }, [
+                  _c("div", { staticClass: "card od-card" }, [
+                    _c(
+                      "div",
+                      { staticClass: "od-card-header justify-content-between" },
+                      [
+                        _c("h5", { staticClass: "od-card-title" }, [
+                          _c("i", {
+                            staticClass: "fa fa-box me-2 text-primary",
+                          }),
+                          _vm._v(
+                            "\n                                " +
+                              _vm._s(_vm.__("list_of_order_items")) +
+                              "\n                            "
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "item-count-badge" }, [
+                          _vm._v(_vm._s(_vm.order_items.length)),
+                        ]),
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body p-0" }, [
+                      _c(
+                        "div",
+                        { staticClass: "table-responsive od-table-wrap" },
+                        [
+                          _c(
+                            "table",
+                            {
+                              staticClass:
+                                "table align-middle mb-0 od-items-table",
+                            },
+                            [
+                              _c("thead", [
+                                _c("tr", [
+                                  _c("th", { staticClass: "text-start" }, [
+                                    _vm._v(_vm._s(_vm.__("name"))),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("th", { staticClass: "text-center" }, [
+                                    _vm._v(_vm._s(_vm.__("quantity"))),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("th", { staticClass: "text-end" }, [
+                                    _vm._v(
+                                      _vm._s(_vm.__("subtotal")) +
+                                        " (" +
+                                        _vm._s(_vm.$currency) +
+                                        ")"
                                     ),
-                                    _vm._v(" "),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("th", { staticClass: "text-center" }, [
+                                    _vm._v(_vm._s(_vm.__("status"))),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("th", { staticClass: "text-end" }),
+                                ]),
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "tbody",
+                                _vm._l(_vm.order_items, function (item) {
+                                  return _c("tr", { key: item.id }, [
                                     _c(
-                                      "select",
-                                      {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.order_status_id,
-                                            expression: "order_status_id",
-                                          },
-                                        ],
-                                        staticClass: "form-control form-select",
-                                        attrs: { id: "status", name: "status" },
-                                        on: {
-                                          change: function ($event) {
-                                            var $$selectedVal =
-                                              Array.prototype.filter
-                                                .call(
-                                                  $event.target.options,
-                                                  function (o) {
-                                                    return o.selected
-                                                  }
-                                                )
-                                                .map(function (o) {
-                                                  var val =
-                                                    "_value" in o
-                                                      ? o._value
-                                                      : o.value
-                                                  return val
-                                                })
-                                            _vm.order_status_id = $event.target
-                                              .multiple
-                                              ? $$selectedVal
-                                              : $$selectedVal[0]
-                                          },
-                                        },
-                                      },
+                                      "td",
+                                      { staticClass: "text-start" },
                                       [
-                                        _c("option", { attrs: { value: "" } }, [
-                                          _vm._v(
-                                            _vm._s(
-                                              _vm.__("select_order_status")
-                                            )
-                                          ),
-                                        ]),
+                                        _c(
+                                          "div",
+                                          { staticClass: "od-product-name" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                item.product_name +
+                                                  " (" +
+                                                  item.variant_name +
+                                                  ")"
+                                              )
+                                            ),
+                                          ]
+                                        ),
                                         _vm._v(" "),
-                                        _vm._l(_vm.statuses, function (status) {
-                                          return _c(
-                                            "option",
-                                            { domProps: { value: status.id } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.getStatusDisplayName(
-                                                    status
-                                                  )
-                                                )
+                                        _c(
+                                          "div",
+                                          { staticClass: "od-product-sub" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("variant")) +
+                                                ": " +
+                                                _vm._s(item.variant_name)
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        item.prescriptions &&
+                                        item.prescriptions.length > 0
+                                          ? [
+                                              _c(
+                                                "div",
+                                                {
+                                                  staticClass:
+                                                    "od-product-sub mt-1",
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    _vm._s(
+                                                      _vm.__("prescriptions") ||
+                                                        "Prescriptions"
+                                                    )
+                                                  ),
+                                                ]
+                                              ),
+                                              _vm._v(" "),
+                                              _c(
+                                                "div",
+                                                {
+                                                  staticClass:
+                                                    "d-flex flex-wrap gap-1 mt-1",
+                                                },
+                                                _vm._l(
+                                                  item.prescriptions,
+                                                  function (pUrl, pIdx) {
+                                                    return _c(
+                                                      "div",
+                                                      {
+                                                        key: pIdx,
+                                                        staticClass:
+                                                          "od-prescription-thumb position-relative border rounded p-1",
+                                                        on: {
+                                                          click: function (
+                                                            $event
+                                                          ) {
+                                                            return _vm.showPrescription(
+                                                              pUrl
+                                                            )
+                                                          },
+                                                        },
+                                                      },
+                                                      [
+                                                        _c("img", {
+                                                          staticClass:
+                                                            "w-100 h-100 object-fit-cover rounded",
+                                                          attrs: { src: pUrl },
+                                                        }),
+                                                      ]
+                                                    )
+                                                  }
+                                                ),
+                                                0
                                               ),
                                             ]
-                                          )
-                                        }),
+                                          : _vm._e(),
                                       ],
                                       2
                                     ),
                                     _vm._v(" "),
-                                    _vm.$can("self_pickup_order_update")
-                                      ? _c(
-                                          "div",
-                                          { staticClass: "input-group-append" },
-                                          [
-                                            _c(
-                                              "button",
-                                              {
-                                                staticClass: "btn btn-primary",
-                                                attrs: {
-                                                  type: "submit",
-                                                  disabled:
-                                                    _vm.order_status_id ===
-                                                      "" ||
-                                                    _vm.isLoadingUstatus,
-                                                },
-                                              },
-                                              [
-                                                _vm.isLoadingUstatus
-                                                  ? [
-                                                      _c("b-spinner", {
-                                                        attrs: {
-                                                          small: "",
-                                                          label: "Spinning",
-                                                        },
-                                                      }),
-                                                    ]
-                                                  : _vm._e(),
-                                                _vm._v(
-                                                  "\n                                                            " +
-                                                    _vm._s(_vm.__("update")) +
-                                                    "\n                                                        "
-                                                ),
-                                              ],
-                                              2
-                                            ),
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                  ]),
-                                ]
-                              ),
-                            ]),
-                          ]),
-                        ]),
-                      ]),
-                    ]),
-                  ]),
-                ]),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-md-6" }, [
-                _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", [_vm._v(_vm._s(_vm.__("billing_details")))]),
-                    _vm._v(" "),
-                    _c(
-                      "span",
-                      { staticClass: "pull-right" },
-                      [
-                        _c(
-                          "button",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass: "btn btn-secondary btn-sm",
-                            attrs: {
-                              title: _vm.__("download_invoice"),
-                              disabled: _vm.isLoading,
-                            },
-                            on: { click: _vm.downloadInvoice },
-                          },
-                          [
-                            _vm.isLoading
-                              ? [
-                                  _c("b-spinner", {
-                                    attrs: { small: "", label: "Spinning" },
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.__("downloading")) +
-                                      "...\n                                "
-                                  ),
-                                ]
-                              : [
-                                  _c("i", { staticClass: "fa fa-download" }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.__("download_invoice")) +
-                                      "\n                                "
-                                  ),
-                                ],
-                          ],
-                          2
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "router-link",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass: "btn btn-primary btn-sm",
-                            attrs: {
-                              to: _vm.invoiceRoute,
-                              title: _vm.__("generate_invoice"),
-                            },
-                          },
-                          [
-                            _c("i", {
-                              staticClass: "fa fa-file",
-                              attrs: { "aria-hidden": "true" },
-                            }),
-                            _vm._v(
-                              " " +
-                                _vm._s(_vm.__("generate_invoice")) +
-                                "\n                            "
-                            ),
-                          ]
-                        ),
-                      ],
-                      1
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "table-responsive" }, [
-                      _c("table", { staticClass: "table table-bordered" }, [
-                        _c("tbody", [
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("order_date"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(" " + _vm._s(_vm.order.orders_created_at)),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("total")) +
-                                  " (" +
-                                  _vm._s(_vm.$currency) +
-                                  ")"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.total))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("disc")) +
-                                  " " +
-                                  _vm._s(_vm.$currency) +
-                                  "( % )"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.discount_in_rupees +
-                                    " ( " +
-                                    _vm.order.discount +
-                                    "% )"
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("wallet_used")) +
-                                  " (" +
-                                  _vm._s(_vm.$currency) +
-                                  ")"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(_vm.order.wallet_balance)),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("promo_discount")) +
-                                  " (" +
-                                  _vm._s(_vm.$currency) +
-                                  ")"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(_vm.order.promo_discount)),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("promo_code"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(_vm.order.promo_code))]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("delivery_charge")) +
-                                  " (" +
-                                  _vm._s(_vm.$currency) +
-                                  ")"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(_vm.order.delivery_charge)),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _vm.getAdditionalChargesTotal(
-                            _vm.order.additional_charges
-                          ) > 0
-                            ? _c("tr", [
-                                _c("th", { staticClass: "th-width" }, [
-                                  _vm._v(
-                                    _vm._s(_vm.__("additional_charges")) +
-                                      " (" +
-                                      _vm._s(_vm.$currency) +
-                                      ")"
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("td", [
-                                  _vm._v(
-                                    _vm._s(
-                                      _vm.getAdditionalChargesTotal(
-                                        _vm.order.additional_charges
-                                      )
-                                    )
-                                  ),
-                                ]),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(
-                                _vm._s(_vm.__("payable_total")) +
-                                  " ( " +
-                                  _vm._s(_vm.$currency) +
-                                  " )"
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("span", { staticClass: "fw-bold" }, [
-                                _vm._v(_vm._s(_vm.order.remaining_final)),
-                              ]),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("tr", [
-                            _c("th", { staticClass: "th-width" }, [
-                              _vm._v(_vm._s(_vm.__("payment_method"))),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(_vm.order.payment_method)),
-                            ]),
-                          ]),
-                        ]),
-                      ]),
-                    ]),
-                  ]),
-                ]),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-12 col-md-12 mt-4" }, [
-                _c("h4", [_vm._v(_vm._s(_vm.__("list_of_order_items")))]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "row" },
-                  _vm._l(_vm.order_items, function (item) {
-                    return _c(
-                      "div",
-                      { key: item.id, staticClass: "col-md-4" },
-                      [
-                        _c("div", { staticClass: "card position-relative" }, [
-                          item.active_status == 7 || item.active_status == 8
-                            ? _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "badge bg-danger position-absolute",
-                                  staticStyle: { top: "10px", right: "10px" },
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                " +
-                                      _vm._s(
-                                        _vm.getDisplayName(
-                                          item.status_name_translation
-                                        ) || item.status_name
-                                      ) +
-                                      "\n                            "
-                                  ),
-                                ]
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.canCancelItem(item)
-                            ? _c(
-                                "button",
-                                {
-                                  directives: [
-                                    {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      modifiers: { hover: true },
-                                    },
-                                  ],
-                                  staticClass:
-                                    "btn btn-sm btn-danger cancel-item-btn position-absolute border-0 bg-transparent p-0",
-                                  attrs: {
-                                    title: _vm.__("cancel_item"),
-                                    disabled: _vm.isLoadingCancel,
-                                  },
-                                  on: {
-                                    click: function ($event) {
-                                      return _vm.cancelOrderItem(item)
-                                    },
-                                  },
-                                },
-                                [
-                                  _c("base-icon", {
-                                    attrs: {
-                                      name: "XCircle",
-                                      width: "32",
-                                      height: "32",
-                                    },
-                                  }),
-                                ],
-                                1
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "card-body" },
-                            [
-                              _c("b", [
-                                _vm._v(_vm._s(_vm.__("name")) + " :- "),
-                              ]),
-                              _vm._v(
-                                _vm._s(
-                                  item.product_name +
-                                    " (" +
-                                    item.variant_name +
-                                    ")"
-                                ) + "\n                                "
-                              ),
-                              _c("br"),
-                              _vm._v(" "),
-                              _c("b", [
-                                _vm._v(_vm._s(_vm.__("quantity")) + " :- "),
-                              ]),
-                              _vm._v(
-                                _vm._s(item.quantity) +
-                                  "\n                                "
-                              ),
-                              _c("br"),
-                              _vm._v(" "),
-                              _c("b", [
-                                _vm._v(_vm._s(_vm.__("variant")) + " :- "),
-                              ]),
-                              _vm._v(
-                                _vm._s(item.variant_name) +
-                                  "\n                                "
-                              ),
-                              _c("br"),
-                              _vm._v(" "),
-                              _c("b", [
-                                _vm._v(
-                                  _vm._s(_vm.__("subtotal")) +
-                                    " ( " +
-                                    _vm._s(_vm.$currency) +
-                                    " ) :- "
-                                ),
-                              ]),
-                              _vm._v(
-                                _vm._s(item.sub_total) +
-                                  "\n                                "
-                              ),
-                              _c("br"),
-                              _vm._v(" "),
-                              _c("b", [
-                                _vm._v(_vm._s(_vm.__("status")) + " :- "),
-                              ]),
-                              _vm._v(
-                                _vm._s(
-                                  _vm.getDisplayName(
-                                    item.status_name_translation
-                                  ) || item.status_name
-                                ) + "\n                                "
-                              ),
-                              item.prescriptions &&
-                              item.prescriptions.length > 0
-                                ? [
-                                    _c("br"),
-                                    _vm._v(" "),
-                                    _c("b", [
-                                      _vm._v(
-                                        _vm._s(
-                                          _vm.__("prescriptions") ||
-                                            "Prescriptions"
-                                        ) + " :- "
-                                      ),
+                                    _c("td", { staticClass: "text-center" }, [
+                                      _vm._v(_vm._s(item.quantity)),
                                     ]),
                                     _vm._v(" "),
                                     _c(
-                                      "div",
+                                      "td",
                                       {
-                                        staticClass:
-                                          "d-flex flex-wrap gap-1 mt-2",
+                                        staticClass: "text-end od-cell-strong",
                                       },
-                                      _vm._l(
-                                        item.prescriptions,
-                                        function (pUrl, pIdx) {
-                                          return _c(
-                                            "div",
+                                      [_vm._v(_vm._s(item.sub_total))]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("td", { staticClass: "text-center" }, [
+                                      _c(
+                                        "span",
+                                        {
+                                          staticClass: "figma-status-pill",
+                                          class:
+                                            item.active_status == 7 ||
+                                            item.active_status == 8
+                                              ? "od-pill-danger"
+                                              : "od-status-pill",
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                                    " +
+                                              _vm._s(
+                                                _vm.getDisplayName(
+                                                  item.status_name_translation
+                                                ) || item.status_name
+                                              ) +
+                                              "\n                                                "
+                                          ),
+                                        ]
+                                      ),
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("td", { staticClass: "text-end" }, [
+                                      _c(
+                                        "div",
+                                        { staticClass: "od-row-actions" },
+                                        [
+                                          _c(
+                                            "b-button",
                                             {
-                                              key: pIdx,
+                                              directives: [
+                                                {
+                                                  name: "b-tooltip",
+                                                  rawName: "v-b-tooltip.hover",
+                                                  modifiers: { hover: true },
+                                                },
+                                              ],
                                               staticClass:
-                                                "position-relative border rounded p-1",
-                                              staticStyle: {
-                                                width: "40px",
-                                                height: "40px",
-                                                cursor: "pointer",
+                                                "btn btn-outline-primary od-row-btn",
+                                              attrs: {
+                                                title: "View Item Details",
                                               },
                                               on: {
                                                 click: function ($event) {
-                                                  return _vm.showPrescription(
-                                                    pUrl
-                                                  )
+                                                  return _vm.sendInfo(item)
                                                 },
                                               },
                                             },
                                             [
-                                              _c("img", {
-                                                staticClass:
-                                                  "w-100 h-100 object-fit-cover rounded",
-                                                attrs: { src: pUrl },
-                                              }),
+                                              _vm._v(
+                                                "\n                                                        " +
+                                                  _vm._s(
+                                                    _vm.__("view_item_details")
+                                                  ) +
+                                                  "\n                                                    "
+                                              ),
                                             ]
-                                          )
-                                        }
+                                          ),
+                                          _vm._v(" "),
+                                          _vm.canReturnProduct(item)
+                                            ? [
+                                                _vm.$can(
+                                                  "self_pickup_order_update"
+                                                )
+                                                  ? _c(
+                                                      "b-button",
+                                                      {
+                                                        directives: [
+                                                          {
+                                                            name: "b-tooltip",
+                                                            rawName:
+                                                              "v-b-tooltip.hover",
+                                                            modifiers: {
+                                                              hover: true,
+                                                            },
+                                                          },
+                                                        ],
+                                                        staticClass:
+                                                          "btn btn-outline-secondary od-row-btn",
+                                                        attrs: {
+                                                          title:
+                                                            "Return this product",
+                                                          disabled:
+                                                            _vm.isLoadingUstatus,
+                                                        },
+                                                        on: {
+                                                          click: function (
+                                                            $event
+                                                          ) {
+                                                            return _vm.updateStatus(
+                                                              item,
+                                                              8
+                                                            )
+                                                          },
+                                                        },
+                                                      },
+                                                      [
+                                                        _vm.isLoadingUstatus
+                                                          ? [
+                                                              _c("b-spinner", {
+                                                                attrs: {
+                                                                  small: "",
+                                                                },
+                                                              }),
+                                                              _vm._v(
+                                                                " " +
+                                                                  _vm._s(
+                                                                    _vm.__(
+                                                                      "returning"
+                                                                    )
+                                                                  ) +
+                                                                  "...\n                                                            "
+                                                              ),
+                                                            ]
+                                                          : [
+                                                              _vm._v(
+                                                                "\n                                                                " +
+                                                                  _vm._s(
+                                                                    _vm.__(
+                                                                      "return"
+                                                                    )
+                                                                  ) +
+                                                                  "\n                                                            "
+                                                              ),
+                                                            ],
+                                                      ],
+                                                      2
+                                                    )
+                                                  : _vm._e(),
+                                              ]
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _vm.canCancelItem(item)
+                                            ? _c(
+                                                "button",
+                                                {
+                                                  directives: [
+                                                    {
+                                                      name: "b-tooltip",
+                                                      rawName:
+                                                        "v-b-tooltip.hover",
+                                                      modifiers: {
+                                                        hover: true,
+                                                      },
+                                                    },
+                                                  ],
+                                                  staticClass:
+                                                    "btn cancel-item-btn",
+                                                  attrs: {
+                                                    title:
+                                                      _vm.__("cancel_item"),
+                                                    disabled:
+                                                      _vm.isLoadingCancel,
+                                                  },
+                                                  on: {
+                                                    click: function ($event) {
+                                                      return _vm.cancelOrderItem(
+                                                        item
+                                                      )
+                                                    },
+                                                  },
+                                                },
+                                                [
+                                                  _c("i", {
+                                                    staticClass: "fa fa-times",
+                                                  }),
+                                                ]
+                                              )
+                                            : _vm._e(),
+                                        ],
+                                        2
                                       ),
-                                      0
+                                    ]),
+                                  ])
+                                }),
+                                0
+                              ),
+                            ]
+                          ),
+                        ]
+                      ),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card od-card" }, [
+                    _c("div", { staticClass: "od-card-header" }, [
+                      _c("h5", { staticClass: "od-card-title" }, [
+                        _c("i", { staticClass: "fa fa-receipt me-2" }),
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.__("billing_details")) +
+                            "\n                            "
+                        ),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body od-card-body" }, [
+                      _c("div", { staticClass: "od-sum-row od-sum-row--sub" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("total")) +
+                              " (" +
+                              _vm._s(_vm.$currency) +
+                              ")"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", [_vm._v(_vm._s(_vm.order.total))]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-sum-row" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("disc")) +
+                              " " +
+                              _vm._s(_vm.$currency) +
+                              "( % )"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "od-sum-val" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.discount_in_rupees +
+                                " ( " +
+                                _vm.order.discount +
+                                "% )"
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-sum-row" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("wallet_used")) +
+                              " (" +
+                              _vm._s(_vm.$currency) +
+                              ")"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "od-sum-val" }, [
+                          _vm._v(_vm._s(_vm.order.wallet_balance)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-sum-row" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("promo_discount")) +
+                              " (" +
+                              _vm._s(_vm.$currency) +
+                              ")"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "od-sum-val" }, [
+                          _vm._v(_vm._s(_vm.order.promo_discount)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-sum-row" }, [
+                        _c("span", [_vm._v(_vm._s(_vm.__("promo_code")))]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "od-sum-val" }, [
+                          _vm._v(_vm._s(_vm.order.promo_code)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-sum-row" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("delivery_charge")) +
+                              " (" +
+                              _vm._s(_vm.$currency) +
+                              ")"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "od-sum-val" }, [
+                          _vm._v(_vm._s(_vm.order.delivery_charge)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _vm.getAdditionalChargesTotal(
+                        _vm.order.additional_charges
+                      ) > 0
+                        ? _c("div", { staticClass: "od-sum-row" }, [
+                            _c("span", [
+                              _vm._v(
+                                _vm._s(_vm.__("additional_charges")) +
+                                  " (" +
+                                  _vm._s(_vm.$currency) +
+                                  ")"
+                              ),
+                            ]),
+                            _vm._v(" "),
+                            _c("span", { staticClass: "od-sum-val" }, [
+                              _vm._v(
+                                _vm._s(
+                                  _vm.getAdditionalChargesTotal(
+                                    _vm.order.additional_charges
+                                  )
+                                )
+                              ),
+                            ]),
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "payable-total-box" }, [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(_vm.__("payable_total")) +
+                              " ( " +
+                              _vm._s(_vm.$currency) +
+                              " )"
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "fw-bold" }, [
+                          _vm._v(_vm._s(_vm.order.remaining_final)),
+                        ]),
+                      ]),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card od-card" }, [
+                    _c("div", { staticClass: "od-card-header" }, [
+                      _c("h5", { staticClass: "od-card-title" }, [
+                        _c("i", { staticClass: "far fa-check-circle me-2" }),
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.__("update_status")) +
+                            "\n                            "
+                        ),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body od-card-body" }, [
+                      _c(
+                        "form",
+                        {
+                          ref: "my-form",
+                          staticClass: "od-inline-form",
+                          on: {
+                            submit: function ($event) {
+                              $event.preventDefault()
+                              return _vm.updateStatus.apply(null, arguments)
+                            },
+                          },
+                        },
+                        [
+                          _c(
+                            "label",
+                            {
+                              staticClass: "visually-hidden",
+                              attrs: { for: "status" },
+                            },
+                            [_vm._v(_vm._s(_vm.__("status")))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.order_status_id,
+                                  expression: "order_status_id",
+                                },
+                              ],
+                              staticClass: "form-control form-select",
+                              attrs: { id: "status", name: "status" },
+                              on: {
+                                change: function ($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function (o) {
+                                      return o.selected
+                                    })
+                                    .map(function (o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.order_status_id = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                },
+                              },
+                            },
+                            [
+                              _c("option", { attrs: { value: "" } }, [
+                                _vm._v(_vm._s(_vm.__("select_order_status"))),
+                              ]),
+                              _vm._v(" "),
+                              _vm._l(_vm.statuses, function (status) {
+                                return _c(
+                                  "option",
+                                  { domProps: { value: status.id } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(_vm.getStatusDisplayName(status))
                                     ),
                                   ]
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "row mt-3" }, [
-                                _c(
-                                  "div",
-                                  { staticClass: "col-6" },
-                                  [
-                                    _c(
-                                      "b-button",
-                                      {
-                                        directives: [
-                                          {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
-                                          },
-                                        ],
-                                        staticClass:
-                                          "btn btn-block btn-primary",
-                                        attrs: { title: "View Item Details" },
-                                        on: {
-                                          click: function ($event) {
-                                            return _vm.sendInfo(item)
-                                          },
-                                        },
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n                                            " +
-                                            _vm._s(
-                                              _vm.__("view_item_details")
-                                            ) +
-                                            "\n                                        "
-                                        ),
-                                      ]
-                                    ),
-                                  ],
-                                  1
-                                ),
-                                _vm._v(" "),
-                                _vm.canReturnProduct(item)
-                                  ? _c(
-                                      "div",
-                                      { staticClass: "col-6" },
-                                      [
-                                        _vm.$can("self_pickup_order_update")
-                                          ? _c(
-                                              "b-button",
-                                              {
-                                                directives: [
-                                                  {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
-                                                  },
-                                                ],
-                                                staticClass:
-                                                  "btn btn-block btn-primary",
-                                                attrs: {
-                                                  title: "Return this product",
-                                                  disabled:
-                                                    _vm.isLoadingUstatus,
-                                                },
-                                                on: {
-                                                  click: function ($event) {
-                                                    return _vm.updateStatus(
-                                                      item,
-                                                      8
-                                                    )
-                                                  },
-                                                },
-                                              },
-                                              [
-                                                _vm.isLoadingUstatus
-                                                  ? [
-                                                      _c("b-spinner", {
-                                                        attrs: { small: "" },
-                                                      }),
-                                                      _vm._v(
-                                                        " " +
-                                                          _vm._s(
-                                                            _vm.__("returning")
-                                                          ) +
-                                                          "...\n                                            "
-                                                      ),
-                                                    ]
-                                                  : [
-                                                      _vm._v(
-                                                        "\n                                                " +
-                                                          _vm._s(
-                                                            _vm.__("return")
-                                                          ) +
-                                                          "\n                                            "
-                                                      ),
-                                                    ],
-                                              ],
-                                              2
-                                            )
-                                          : _vm._e(),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ]),
+                                )
+                              }),
                             ],
                             2
                           ),
+                          _vm._v(" "),
+                          _vm.$can("self_pickup_order_update")
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary od-form-btn",
+                                  attrs: {
+                                    type: "submit",
+                                    disabled:
+                                      _vm.order_status_id === "" ||
+                                      _vm.isLoadingUstatus,
+                                  },
+                                },
+                                [
+                                  _vm.isLoadingUstatus
+                                    ? [
+                                        _c("b-spinner", {
+                                          attrs: {
+                                            small: "",
+                                            label: "Spinning",
+                                          },
+                                        }),
+                                      ]
+                                    : _vm._e(),
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(_vm.__("update")) +
+                                      "\n                                "
+                                  ),
+                                ],
+                                2
+                              )
+                            : _vm._e(),
+                        ]
+                      ),
+                    ]),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-lg-4" }, [
+                  _c("div", { staticClass: "card od-card" }, [
+                    _c("div", { staticClass: "od-card-header" }, [
+                      _c("h5", { staticClass: "od-card-title" }, [
+                        _c("i", { staticClass: "far fa-user me-2" }),
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.__("order_details")) +
+                            "\n                            "
+                        ),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body od-card-body" }, [
+                      _c("div", { staticClass: "od-info-row" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("name"))),
                         ]),
-                      ]
-                    )
-                  }),
-                  0
-                ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "od-info-value" }, [
+                          _vm._v(_vm._s(_vm.order.user_name)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-info-row" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("email"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "od-info-value" }, [
+                          _vm._v(_vm._s(_vm.order.user_email)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-info-row mb-0" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("mobile"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "od-info-value" }, [
+                          _vm._v(
+                            _vm._s(_vm._f("mobileMask")(_vm.order.user_mobile))
+                          ),
+                        ]),
+                      ]),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card od-card" }, [
+                    _c("div", { staticClass: "od-card-header" }, [
+                      _c("h5", { staticClass: "od-card-title" }, [
+                        _c("i", { staticClass: "fa fa-store me-2" }),
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.__("pickup_store")) +
+                            "\n                            "
+                        ),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body od-card-body" }, [
+                      _c("div", { staticClass: "od-info-row" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("pickup_store"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "od-info-value" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.getDisplayName(
+                                _vm.order.store_name_translation
+                              ) || _vm.order.store_name
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-info-row" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("store_address"))),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "od-info-value od-info-value--muted" },
+                          [
+                            _vm._v(
+                              _vm._s(
+                                _vm.getPickupAddress(_vm.order.pickup_address)
+                              )
+                            ),
+                          ]
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "od-info-row mb-0" }, [
+                        _c("div", { staticClass: "od-info-label" }, [
+                          _vm._v(_vm._s(_vm.__("store_timings"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "od-info-value" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.getPickupTimings(_vm.order.pickup_address)
+                            )
+                          ),
+                        ]),
+                      ]),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _vm.order.order_note
+                    ? _c("div", { staticClass: "card od-card" }, [
+                        _c("div", { staticClass: "od-card-header" }, [
+                          _c("h5", { staticClass: "od-card-title" }, [
+                            _c("i", { staticClass: "far fa-sticky-note me-2" }),
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(_vm.__("order_note")) +
+                                "\n                            "
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "card-body od-card-body" }, [
+                          _c("div", { staticClass: "order-notes-box" }, [
+                            _c("p", { staticClass: "mb-0 order-notes-text" }, [
+                              _vm._v(_vm._s(_vm.order.order_note)),
+                            ]),
+                          ]),
+                        ]),
+                      ])
+                    : _vm._e(),
+                ]),
               ]),
             ])
           : _vm._e(),
@@ -1908,24 +2035,13 @@ var render = function () {
                                   modifiers: { hover: true },
                                 },
                               ],
-                              staticClass:
-                                "btn btn-primary btn-sm pull-right border-0 bg-transparent p-0",
+                              staticClass: "figma-action-btn float-end",
                               attrs: {
                                 to: _vm.viewProductRoute,
                                 title: "View",
                               },
                             },
-                            [
-                              _c("base-icon", {
-                                attrs: {
-                                  name: "Eye",
-                                  hoverName: "Type=Hover (1)",
-                                  width: "32",
-                                  height: "32",
-                                },
-                              }),
-                            ],
-                            1
+                            [_c("i", { staticClass: "bi bi-eye" })]
                           )
                         : _vm._e(),
                     ],

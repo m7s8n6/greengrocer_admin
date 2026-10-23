@@ -153,8 +153,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
 
 
 
@@ -324,8 +322,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: inUse ? '#d33' : '#37a279',
-        cancelButtonColor: inUse ? '#37a279' : '#d33'
+        confirmButtonColor: inUse ? 'var(--theme-error-500)' : 'var(--theme-primary-500)',
+        cancelButtonColor: inUse ? 'var(--theme-primary-500)' : 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this5.isLoading = true;
@@ -365,10 +363,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Auth_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../Auth.js */ "./resources/js/Auth.js");
 /* harmony import */ var _mixins_TranslationHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../mixins/TranslationHelper.js */ "./resources/js/mixins/TranslationHelper.js");
-//
-//
-//
-//
 //
 //
 //
@@ -623,8 +617,8 @@ __webpack_require__.r(__webpack_exports__);
           cancelButtonText: __('cancel'),
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33'
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)'
         }).then(function (result) {
           if (result.value) _this3.values.splice(index, 1);
         });
@@ -849,7 +843,7 @@ __webpack_require__.r(__webpack_exports__);
             title: __('some_values_were_kept'),
             text: __('these_values_are_used_by_product_variants_and_were_not_removed') + ': ' + keptValues.join(', '),
             icon: 'info',
-            confirmButtonColor: '#37a279'
+            confirmButtonColor: 'var(--theme-primary-500)'
           }).then(function () {
             _this9.$emit('saved', message);
             _this9.hideModal();
@@ -1192,7 +1186,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.figma-action-btn.is-disabled[data-v-39198fe0],\n.figma-action-btn[data-v-39198fe0]:disabled {\n    opacity: 0.35;\n    cursor: not-allowed;\n    pointer-events: auto;\n    /* keep pointer events so the \"why\" tooltip still shows on hover */\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.attr-chip[data-v-39198fe0] {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    padding: 2px 8px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-sm);\n    background: var(--ui-surface-muted);\n    color: var(--ui-text);\n    font-size: 11px;\n    font-weight: 600;\n    line-height: 18px;\n    white-space: nowrap;\n}\n.attr-chip-dot[data-v-39198fe0] {\n    display: inline-block;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n    border: 1px solid var(--ui-border-strong);\n}\n.attr-value-img[data-v-39198fe0] {\n    width: 16px;\n    height: 16px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: 4px;\n}\n.figma-action-btn.is-disabled[data-v-39198fe0],\n.figma-action-btn[data-v-39198fe0]:disabled {\n    opacity: 0.35;\n    cursor: not-allowed;\n    pointer-events: auto;\n    /* keep pointer events so the \"why\" tooltip still shows on hover */\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1215,7 +1209,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Strip the browser's default color-input padding/border so the fill sits centered\n   and evenly inset, instead of the native swatch floating off-center in a big box. */\n.category-checkbox[data-v-06ab285a]  .custom-control-label {\n  margin-left: 8px;\n}\n.color-swatch-input[data-v-06ab285a] {\n  width: 64px;\n  height: 30px;\n  padding: 0;\n  border: 1px solid #ced4da;\n  border-radius: 6px;\n  cursor: pointer;\n  background: none;\n}\n.color-swatch-input[data-v-06ab285a]::-webkit-color-swatch-wrapper {\n  padding: 3px;\n}\n.color-swatch-input[data-v-06ab285a]::-webkit-color-swatch {\n  border: none;\n  border-radius: 4px;\n}\n.color-swatch-input[data-v-06ab285a]::-moz-color-swatch {\n  border: none;\n  border-radius: 4px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Strip the browser's default color-input padding/border so the fill sits centered\n   and evenly inset, instead of the native swatch floating off-center in a big box. */\n.category-checkbox[data-v-06ab285a]  .custom-control-label {\n  margin-left: 8px;\n}\n.attr-values-row[data-v-06ab285a] {\n  gap: 8px;\n}\n.attr-value-col[data-v-06ab285a] {\n  flex: 0 0 40%;\n  width: 40%;\n}\n.attr-remove-spacer[data-v-06ab285a],\n.attr-remove-btn[data-v-06ab285a] {\n  flex: 0 0 38px;\n  width: 38px;\n  height: 38px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.attr-value-thumb[data-v-06ab285a] {\n  width: 32px;\n  height: 32px;\n  padding: 0;\n  -o-object-fit: cover;\n     object-fit: cover;\n  flex-shrink: 0;\n}\n.color-swatch-input[data-v-06ab285a] {\n  width: 64px;\n  height: 40px;\n  padding: 0;\n  border: 1px solid var(--ui-border-strong);\n  border-radius: var(--ui-radius-sm);\n  cursor: pointer;\n  background: none;\n}\n.color-swatch-input[data-v-06ab285a]::-webkit-color-swatch-wrapper {\n  padding: 3px;\n}\n.color-swatch-input[data-v-06ab285a]::-webkit-color-swatch {\n  border: none;\n  border-radius: 4px;\n}\n.color-swatch-input[data-v-06ab285a]::-moz-color-swatch {\n  border: none;\n  border-radius: 4px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1469,7 +1463,7 @@ var render = function () {
           "div",
           {
             staticClass:
-              "page-heading d-flex justify-content-between align-items-center mb-4",
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
           },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -1511,7 +1505,7 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card" }, [
+        _c("div", { staticClass: "card figma-main-section-card" }, [
           _c(
             "div",
             { staticClass: "card-body p-0" },
@@ -1559,7 +1553,35 @@ var render = function () {
                     ]),
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "d-flex gap-2" }, [
+                  _c("div", { staticClass: "d-flex flex-wrap gap-2" }, [
+                    _c(
+                      "button",
+                      {
+                        directives: [
+                          {
+                            name: "b-tooltip",
+                            rawName: "v-b-tooltip.hover",
+                            modifiers: { hover: true },
+                          },
+                        ],
+                        staticClass:
+                          "btn btn-figma-columns d-flex align-items-center gap-2",
+                        attrs: { title: _vm.__("refresh") },
+                        on: {
+                          click: function ($event) {
+                            return _vm.getRecords()
+                          },
+                        },
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-refresh" }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
+                        ]),
+                      ]
+                    ),
+                    _vm._v(" "),
                     _c(
                       "button",
                       {
@@ -1575,34 +1597,6 @@ var render = function () {
                         _c("i", { staticClass: "fa fa-plus" }),
                         _vm._v(" "),
                         _c("span", [_vm._v(_vm._s(_vm.__("add_attribute")))]),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        directives: [
-                          {
-                            name: "b-tooltip",
-                            rawName: "v-b-tooltip.hover",
-                            modifiers: { hover: true },
-                          },
-                        ],
-                        staticClass:
-                          "btn btn-figma-filter d-flex align-items-center gap-2",
-                        attrs: { title: _vm.__("refresh") },
-                        on: {
-                          click: function ($event) {
-                            return _vm.getRecords()
-                          },
-                        },
-                      },
-                      [
-                        _c("i", { staticClass: "fa fa-refresh" }),
-                        _vm._v(" "),
-                        _c("span", [
-                          _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
-                        ]),
                       ]
                     ),
                   ]),
@@ -1714,31 +1708,17 @@ var render = function () {
                             _vm._l(row.item.values, function (value) {
                               return _c(
                                 "span",
-                                {
-                                  key: value.id,
-                                  staticClass:
-                                    "badge bg-light text-dark border d-inline-flex align-items-center gap-1",
-                                },
+                                { key: value.id, staticClass: "attr-chip" },
                                 [
                                   row.item.type === "color" && value.color_code
                                     ? _c("span", {
-                                        staticClass: "rounded-circle border",
-                                        style: {
-                                          background: value.color_code,
-                                          width: "12px",
-                                          height: "12px",
-                                          display: "inline-block",
-                                        },
+                                        staticClass: "attr-chip-dot",
+                                        style: { background: value.color_code },
                                       })
                                     : row.item.type === "image" &&
                                       value.image_url
                                     ? _c("img", {
-                                        staticClass: "rounded",
-                                        staticStyle: {
-                                          width: "16px",
-                                          height: "16px",
-                                          "object-fit": "cover",
-                                        },
+                                        staticClass: "attr-value-img",
                                         attrs: { src: value.image_url },
                                       })
                                     : _vm._e(),
@@ -1797,7 +1777,7 @@ var render = function () {
                                 _vm._v("ID - " + _vm._s(row.item.seller_id)),
                               ]),
                             ])
-                          : _c("span", { staticClass: "badge bg-success" }, [
+                          : _c("span", { staticClass: "badge bg-primary" }, [
                               _vm._v(_vm._s(_vm.__("global") || "Global")),
                             ]),
                       ]
@@ -1866,10 +1846,6 @@ var render = function () {
                                         },
                                       ],
                                       staticClass: "figma-action-btn",
-                                      style:
-                                        _vm.isSeller && _vm.isInUse(row.item)
-                                          ? "opacity: 0.5; cursor: not-allowed;"
-                                          : "",
                                       attrs: {
                                         disabled:
                                           _vm.isSeller && _vm.isInUse(row.item),
@@ -1935,7 +1911,7 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("b-form-select", {
-                  staticStyle: { width: "auto" },
+                  staticClass: "w-auto",
                   attrs: { options: _vm.pageOptions, size: "sm" },
                   model: {
                     value: _vm.perPage,
@@ -1943,6 +1919,14 @@ var render = function () {
                       _vm.perPage = $$v
                     },
                     expression: "perPage",
+                  },
+                }),
+                _vm._v(" "),
+                _c("table-count", {
+                  attrs: {
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "total-rows": _vm.totalRows,
                   },
                 }),
               ],
@@ -2027,6 +2011,7 @@ var render = function () {
         "no-close-on-backdrop": "",
         "no-fade": "",
         static: "",
+        size: "lg",
       },
       on: {
         hidden: function ($event) {
@@ -2037,8 +2022,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end flex-wrap gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -2056,12 +2054,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -2105,7 +2097,7 @@ var render = function () {
                       lang.is_default && _vm.languages.length > 1
                         ? _c(
                             "div",
-                            { staticClass: "mb-3" },
+                            { staticClass: "d-flex flex-wrap gap-2 mb-3" },
                             [
                               _c(
                                 "b-button",
@@ -2117,7 +2109,6 @@ var render = function () {
                                       modifiers: { hover: true },
                                     },
                                   ],
-                                  staticClass: "mr-2",
                                   attrs: {
                                     size: "sm",
                                     variant: "outline-primary",
@@ -2189,52 +2180,61 @@ var render = function () {
                         : _vm._e(),
                       _vm._v(" "),
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "form-group col-12" }, [
-                          _c("label", [_vm._v(_vm._s(_vm.__("name")))]),
-                          _vm._v(" "),
-                          lang.is_default
-                            ? _c("i", { staticClass: "text-danger" }, [
-                                _vm._v("*"),
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.form[lang.id].name,
-                                expression: "form[lang.id].name",
+                        _c(
+                          "div",
+                          {
+                            staticClass: "form-group",
+                            class: lang.is_default ? "col-md-6" : "col-12",
+                          },
+                          [
+                            _c("label", [
+                              _vm._v(_vm._s(_vm.__("name")) + " "),
+                              lang.is_default
+                                ? _c("i", { staticClass: "text-danger" }, [
+                                    _vm._v("*"),
+                                  ])
+                                : _vm._e(),
+                            ]),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.form[lang.id].name,
+                                  expression: "form[lang.id].name",
+                                },
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "text",
+                                placeholder: _vm.__("enter_name"),
+                                required: lang.is_default ? true : undefined,
                               },
-                            ],
-                            staticClass: "form-control",
-                            attrs: {
-                              type: "text",
-                              placeholder: _vm.__("enter_name"),
-                              required: lang.is_default ? true : undefined,
-                            },
-                            domProps: { value: _vm.form[lang.id].name },
-                            on: {
-                              input: function ($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.$set(
-                                  _vm.form[lang.id],
-                                  "name",
-                                  $event.target.value
-                                )
+                              domProps: { value: _vm.form[lang.id].name },
+                              on: {
+                                input: function ($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.form[lang.id],
+                                    "name",
+                                    $event.target.value
+                                  )
+                                },
                               },
-                            },
-                          }),
-                        ]),
+                            }),
+                          ]
+                        ),
                         _vm._v(" "),
                         lang.is_default
-                          ? _c("div", { staticClass: "form-group col-12" }, [
-                              _c("label", [_vm._v(_vm._s(_vm.__("type")))]),
-                              _vm._v(" "),
-                              _c("i", { staticClass: "text-danger" }, [
-                                _vm._v("*"),
+                          ? _c("div", { staticClass: "form-group col-md-6" }, [
+                              _c("label", [
+                                _vm._v(_vm._s(_vm.__("type")) + " "),
+                                _c("i", { staticClass: "text-danger" }, [
+                                  _vm._v("*"),
+                                ]),
                               ]),
                               _vm._v(" "),
                               _c(
@@ -2248,8 +2248,7 @@ var render = function () {
                                       expression: "type",
                                     },
                                   ],
-                                  staticClass: "form-control",
-                                  staticStyle: { "max-width": "260px" },
+                                  staticClass: "form-control form-select",
                                   on: {
                                     change: function ($event) {
                                       var $$selectedVal = Array.prototype.filter
@@ -2285,15 +2284,19 @@ var render = function () {
                                 ]
                               ),
                               _vm._v(" "),
-                              _c("small", { staticClass: "text-muted" }, [
-                                _vm._v(
-                                  _vm._s(
-                                    _vm.__(
-                                      "type_applies_to_the_whole_attribute_not_per_value"
+                              _c(
+                                "small",
+                                { staticClass: "text-muted d-block mt-1" },
+                                [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__(
+                                        "type_applies_to_the_whole_attribute_not_per_value"
+                                      )
                                     )
-                                  )
-                                ),
-                              ]),
+                                  ),
+                                ]
+                              ),
                             ])
                           : _vm._e(),
                         _vm._v(" "),
@@ -2302,24 +2305,24 @@ var render = function () {
                               "div",
                               { staticClass: "form-group col-12" },
                               [
-                                _c("label", [_vm._v(_vm._s(_vm.__("values")))]),
-                                _vm._v(" "),
-                                _c("i", { staticClass: "text-danger" }, [
-                                  _vm._v("*"),
+                                _c("label", [
+                                  _vm._v(_vm._s(_vm.__("values")) + " "),
+                                  _c("i", { staticClass: "text-danger" }, [
+                                    _vm._v("*"),
+                                  ]),
                                 ]),
                                 _vm._v(" "),
                                 _c(
                                   "div",
                                   {
-                                    staticClass: "d-flex mb-1",
-                                    staticStyle: { gap: "8px" },
+                                    staticClass: "d-flex mb-1 attr-values-row",
                                   },
                                   [
                                     _c(
                                       "small",
                                       {
-                                        staticClass: "text-muted",
-                                        staticStyle: { width: "40%" },
+                                        staticClass:
+                                          "text-muted attr-value-col",
                                       },
                                       [_vm._v(_vm._s(_vm.__("value")))]
                                     ),
@@ -2329,10 +2332,7 @@ var render = function () {
                                           "small",
                                           {
                                             staticClass:
-                                              "text-muted flex-grow-1",
-                                            staticStyle: {
-                                              "text-align": "left",
-                                            },
+                                              "text-muted flex-grow-1 text-left",
                                           },
                                           [_vm._v(_vm._s(_vm.__("short_code")))]
                                         )
@@ -2343,10 +2343,7 @@ var render = function () {
                                           "small",
                                           {
                                             staticClass:
-                                              "text-muted flex-grow-1",
-                                            staticStyle: {
-                                              "text-align": "left",
-                                            },
+                                              "text-muted flex-grow-1 text-left",
                                           },
                                           [_vm._v(_vm._s(_vm.__("colour")))]
                                         )
@@ -2357,18 +2354,17 @@ var render = function () {
                                           "small",
                                           {
                                             staticClass:
-                                              "text-muted flex-grow-1",
-                                            staticStyle: {
-                                              "text-align": "left",
-                                            },
+                                              "text-muted flex-grow-1 text-left",
                                           },
                                           [_vm._v(_vm._s(_vm.__("image")))]
                                         )
                                       : _vm._e(),
                                     _vm._v(" "),
-                                    _c("span", {
-                                      staticStyle: { width: "38px" },
-                                    }),
+                                    _vm.values.length > 1
+                                      ? _c("span", {
+                                          staticClass: "attr-remove-spacer",
+                                        })
+                                      : _vm._e(),
                                   ]
                                 ),
                                 _vm._v(" "),
@@ -2378,8 +2374,7 @@ var render = function () {
                                     {
                                       key: val.uid,
                                       staticClass:
-                                        "d-flex align-items-center mb-2",
-                                      staticStyle: { gap: "8px" },
+                                        "d-flex align-items-center mb-2 attr-values-row",
                                     },
                                     [
                                       _c("input", {
@@ -2391,8 +2386,8 @@ var render = function () {
                                             expression: "val.value",
                                           },
                                         ],
-                                        staticClass: "form-control",
-                                        staticStyle: { width: "40%" },
+                                        staticClass:
+                                          "form-control attr-value-col",
                                         attrs: {
                                           type: "text",
                                           placeholder: _vm.__("enter_value"),
@@ -2501,13 +2496,7 @@ var render = function () {
                                               val.image_url
                                                 ? _c("img", {
                                                     staticClass:
-                                                      "img-thumbnail",
-                                                    staticStyle: {
-                                                      width: "32px",
-                                                      height: "32px",
-                                                      "object-fit": "cover",
-                                                      "flex-shrink": "0",
-                                                    },
+                                                      "img-thumbnail attr-value-thumb",
                                                     attrs: {
                                                       src: val.image_url,
                                                     },
@@ -2545,6 +2534,7 @@ var render = function () {
                                                   modifiers: { hover: true },
                                                 },
                                               ],
+                                              staticClass: "attr-remove-btn",
                                               attrs: {
                                                 variant: "outline-danger",
                                                 size: "sm",
@@ -2614,10 +2604,7 @@ var render = function () {
                               _vm.sellerCategories.length
                                 ? _c(
                                     "div",
-                                    {
-                                      staticClass: "d-flex flex-wrap",
-                                      staticStyle: { gap: "10px" },
-                                    },
+                                    { staticClass: "d-flex flex-wrap gap-2" },
                                     _vm._l(
                                       _vm.sellerCategories,
                                       function (cat) {
@@ -2656,38 +2643,47 @@ var render = function () {
                           : _vm._e(),
                         _vm._v(" "),
                         _vm.id && lang.is_default
-                          ? _c("div", { staticClass: "form-group col-12" }, [
-                              _c("label", [_vm._v(_vm._s(_vm.__("status")))]),
-                              _vm._v(" "),
-                              _c(
-                                "div",
-                                { staticClass: "col-md-9 text-left mt-1" },
-                                [
-                                  _c("b-form-radio-group", {
-                                    attrs: {
-                                      options: [
-                                        {
-                                          text: _vm.__("deactivate"),
-                                          value: 0,
-                                        },
-                                        { text: _vm.__("activate"), value: 1 },
-                                      ],
-                                      buttons: "",
-                                      "button-variant": "outline-primary",
-                                      required: "",
-                                    },
-                                    model: {
-                                      value: _vm.status,
-                                      callback: function ($$v) {
-                                        _vm.status = $$v
+                          ? _c(
+                              "div",
+                              { staticClass: "form-group col-12 mb-0" },
+                              [
+                                _c("label", { staticClass: "d-block" }, [
+                                  _vm._v(_vm._s(_vm.__("status"))),
+                                ]),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "text-left mt-1" },
+                                  [
+                                    _c("b-form-radio-group", {
+                                      attrs: {
+                                        options: [
+                                          {
+                                            text: _vm.__("deactivate"),
+                                            value: 0,
+                                          },
+                                          {
+                                            text: _vm.__("activate"),
+                                            value: 1,
+                                          },
+                                        ],
+                                        buttons: "",
+                                        "button-variant": "outline-primary",
+                                        required: "",
                                       },
-                                      expression: "status",
-                                    },
-                                  }),
-                                ],
-                                1
-                              ),
-                            ])
+                                      model: {
+                                        value: _vm.status,
+                                        callback: function ($$v) {
+                                          _vm.status = $$v
+                                        },
+                                        expression: "status",
+                                      },
+                                    }),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            )
                           : _vm._e(),
                       ]),
                     ]

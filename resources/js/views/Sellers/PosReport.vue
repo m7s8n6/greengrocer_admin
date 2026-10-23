@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('pos_orders_report') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -14,6 +14,17 @@
             </div>
 
             <section class="section">
+                <div class="row g-3 mb-3 report-kpis justify-content-start">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-green"><i class="bi bi-receipt"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_amount') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ totalAmount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="figma-main-section-card">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -63,11 +74,7 @@
                                                     :ranges="dateRangePickerRanges"
                                                     class="w-100"
                                                 ></date-range-picker>
-                                                <button v-if="dateRange.startDate" type="button"
-                                                    class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                    style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                    @click.stop="clearDate()"
-                                                    v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                                <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                     <i class="fa fa-times-circle text-muted"></i>
                                                 </button>
                                                 <base-icon name="CalendarDots" width="24" height="24" class="figma-filter-icon-right" useCurrentColor />
@@ -79,17 +86,15 @@
                         </b-collapse>
 
                         <div class="table-responsive mb-0">
-
-                        <div class="table-responsive">
-                            <table class="table figma-order-table">
+                            <table class="table figma-order-table mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">{{ __('order_id') }}</th>
-                                        <th class="text-center">{{ __('customer') }}</th>
-                                        <th class="text-center">{{ __('mobile') }}</th>
-                                        <th class="text-center">{{ __('date') }}</th>
-                                        <th class="text-center">{{ __('total_amount') }}</th>
-                                        <th class="text-center">{{ __('payment_method') }}</th>
+                                        <th>{{ __('order_id') }}</th>
+                                        <th>{{ __('customer') }}</th>
+                                        <th>{{ __('mobile') }}</th>
+                                        <th>{{ __('date') }}</th>
+                                        <th class="text-end">{{ __('total_amount') }}</th>
+                                        <th>{{ __('payment_method') }}</th>
                                         <th class="text-center">{{ __('invoice') }}</th>
                                     </tr>
                                 </thead>
@@ -101,40 +106,41 @@
                                         </td>
                                     </tr>
                                     <tr v-else-if="filteredItems.length === 0">
-                                        <td colspan="7" class="text-center">{{ __('no_records_matching_your_request') }}</td>
+                                        <td colspan="7" class="text-center report-empty">
+                                            <i class="fa fa-inbox d-block mb-2 report-empty-icon" aria-hidden="true"></i>
+                                            {{ __('no_records_matching_your_request') }}
+                                        </td>
                                     </tr>
                                     <template v-else>
                                         <tr v-for="item in paginatedItems" :key="item.id">
-                                            <td class="text-center">{{ item.id }}</td>
-                                            <td class="text-center">{{ item.customer_name }}</td>
-                                            <td class="text-center">{{ item.customer_mobile || '-' }}</td>
-                                            <td class="text-center">{{ item.created_at }}</td>
-                                            <td class="text-center">{{ $currency }} {{ item.total_amount }}</td>
-                                            <td class="text-center">{{ item.payment_method }}</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-primary mr-1"
-                                                    @click="viewInvoice(item.id)">
-                                                    <i class="fa fa-print"></i>
-                                                </button>
-
-                                                <button class="btn btn-sm btn-secondary"
-                                                    @click="openThermalModal(item.id)">
-                                                    <img src="https://img.icons8.com/?size=100&id=80268&format=png&color=ffffff"
-                                                        alt="Thermal" style="width:16px; height:16px;">
-                                                </button>
-
-
+                                            <td class="fw-semibold">#{{ item.id }}</td>
+                                            <td>{{ item.customer_name }}</td>
+                                            <td>{{ item.customer_mobile || '-' }}</td>
+                                            <td>{{ item.created_at }}</td>
+                                            <td class="text-end">{{ $currency }} {{ item.total_amount }}</td>
+                                            <td><span class="figma-status-pill bg-info">{{ item.payment_method }}</span></td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <button class="figma-action-btn" v-b-tooltip.hover :title="__('invoice')"
+                                                        @click="viewInvoice(item.id)">
+                                                        <i class="fa fa-print"></i>
+                                                    </button>
+                                                    <button class="figma-action-btn" v-b-tooltip.hover :title="__('thermal_preview')"
+                                                        @click="openThermalModal(item.id)">
+                                                        <i class="fa fa-receipt"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     </template>
                                 </tbody>
                                 <tfoot>
-                                    <tr class="font-weight-bold">
-                                        <td class="text-center">{{ __('total') }}</td>
+                                    <tr class="report-total-row">
+                                        <td>{{ __('total') }}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td class="text-center">{{ $currency }} {{ footerTotal }}</td>
+                                        <td class="text-end">{{ $currency }} {{ footerTotal }}</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
@@ -142,30 +148,23 @@
                             </table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="d-flex align-items-center gap-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageStart }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
-                                <div class="d-flex gap-3 text-success small border-start ps-4">
-                                    <span>{{ __('total_amount') }}: <strong>{{ $currency }} {{ totalAmount }}</strong></span>
-                                </div>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" @change="onPageChange" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                             </div>
                         </div>
                     </div>
                 </div>
-           </div> </section>
+            </section>
         </div>
         <!-- Invoice Modal -->
         <b-modal id="invoice-modal" size="xl" :title="__('pos_invoice')" hide-footer>
             <div class="invoice-container">
                 <iframe :src="invoiceUrl" frameborder="0" style="width: 100%; height: 80vh;"></iframe>
             </div>
-            <div class="text-center mt-3">
-                <button class="btn btn-secondary" @click="$bvModal.hide('invoice-modal')">{{ __('close') }}</button>
-                <button class="btn btn-primary ml-2" @click="printInvoice">{{ __('print') }}</button>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-outline-secondary" @click="$bvModal.hide('invoice-modal')">{{ __('close') }}</button>
+                <button class="btn btn-primary" @click="printInvoice"><i class="fa fa-print me-1"></i>{{ __('print') }}</button>
             </div>
         </b-modal>
         <!-- Thermal Print Modal -->
@@ -242,9 +241,9 @@
                 </div>
             </div>
 
-            <div class="modal-footer-custom text-center mt-3">
-                <button class="btn btn-secondary" @click="$bvModal.hide('thermal-modal')">{{ __('close') }}</button>
-                <button class="btn btn-success ml-2" @click="printThermal">
+            <div class="modal-footer-custom d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-outline-secondary" @click="$bvModal.hide('thermal-modal')">{{ __('close') }}</button>
+                <button class="btn btn-primary" @click="printThermal">
                     <i class="fa fa-print"></i> {{ __('print_now') }}
                 </button>
             </div>
@@ -524,11 +523,28 @@ export default {
 .total-amount-display {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #435ebe;
+    color: var(--theme-primary-500, #435ebe);
 }
 
 .invoice-action-cell {
     min-width: 100px;
+}
+
+.report-total-row td {
+    font-weight: 700;
+    color: var(--ui-heading);
+    background: var(--ui-surface-muted);
+    border-top: 1px solid var(--ui-border);
+}
+
+.report-empty {
+    color: var(--ui-text-muted) !important;
+    padding: 32px 16px !important;
+}
+
+.report-empty-icon {
+    font-size: 28px;
+    color: var(--ui-text-subtle);
 }
 
 /* THERMAL PRINT STYLES */
@@ -537,7 +553,7 @@ export default {
 .preview-wrapper {
     display: flex;
     justify-content: center;
-    background: #eee;
+    background: var(--theme-neutral-200, #eee);
     padding: 20px;
 }
 
@@ -547,7 +563,7 @@ export default {
     padding: 4mm;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     font-family: 'Courier New', Courier, monospace;
-    color: #000;
+    color: var(--theme-neutral-950, #000);
     font-size: 11px;
     line-height: 1.2;
 }
@@ -572,7 +588,7 @@ export default {
 /* Column Widths (Fixed Balance) */
 .col-item {
     width: 35%;
-    text-align: left;
+    text-align: start;
 }
 
 .col-rate {
@@ -625,20 +641,20 @@ export default {
 .grand-total {
     font-size: 13px;
     font-weight: bold;
-    border-top: 1px dashed #000;
-    border-bottom: 1px dashed #000;
+    border-top: 1px dashed var(--theme-neutral-950, #000);
+    border-bottom: 1px dashed var(--theme-neutral-950, #000);
     padding: 4px 0;
     margin-top: 4px;
 }
 
 /* 6. Lines */
 .dashed-line {
-    border-top: 1px dashed #000;
+    border-top: 1px dashed var(--theme-neutral-950, #000);
     margin: 6px 0;
 }
 
 .dashed-line-thin {
-    border-top: 1px dotted #888;
+    border-top: 1px dotted var(--theme-neutral-500, #888);
     margin: 3px 0;
 }
 

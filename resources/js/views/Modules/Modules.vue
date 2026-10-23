@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title mb-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('modules') || 'Modules' }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2 align-items-center flex-wrap">
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getRecords()"
+                            <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getRecords()"
                                 v-b-tooltip.hover :title="__('refresh')">
                                 <i class="fa fa-refresh"></i>
                                 <span>{{ __('refresh') || 'Refresh' }}</span>
@@ -37,121 +37,103 @@
                         </div>
                     </div>
 
-                    <div v-if="isLoading" class="text-center text-black my-3">
+                    <div v-if="isLoading" class="text-center text-muted my-4">
                         <b-spinner class="align-middle"></b-spinner>
                         <strong>{{ __('loading') }}...</strong>
                     </div>
 
-                    <div v-else-if="!canReorder" class="table-responsive mb-0">
-                        <b-table :key="tableKey" :items="translatedModules" :fields="fields" :filter="filter"
-                            :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                            :sort-direction="sortDirection" :bordered="false"
-                            show-empty small class="mb-0">
-                            <template #cell(id)="row">
-                                {{ row.item.id }}
-                            </template>
-
-                            <template #cell(image)="row">
-                                <p v-if="!row.item.image_url" class="mb-0 text-muted">{{ __('no_image') }}</p>
-                                <img :src="row.item.image_url" height="50" class="rounded" v-else
-                                    style="object-fit: cover; width: 50px;" />
-                            </template>
-
-                            <template #cell(description)="row">
-                                <p class="mb-0 text-truncate text-center mx-auto" style="max-width: 250px;" v-b-tooltip.hover
-                                    :title="row.item.description || __('no_description')">
-                                    {{ row.item.description || __('no_description') }}
-                                </p>
-                            </template>
-
-                            <template #cell(is_default)="row">
-                                <span v-if="row.item.is_default" class="badge bg-success">{{ __('yes') || 'Yes' }}</span>
-                                <span v-else class="badge bg-danger">{{ __('no') || 'No' }}</span>
-                            </template>
-
-                            <template #cell(status)="row">
-                                <div class="form-check form-switch d-flex justify-content-center">
-                                    <input class="form-check-input" type="checkbox" :id="'status-' + row.item.id"
-                                        style="cursor: pointer" :checked="isModuleActive(row.item.id)"
-                                        @change="onStatusToggle(row.item.id, $event.target.checked, $event)">
+                    <div v-else-if="!canReorder" class="module-grid">
+                        <div v-if="!translatedModules.length" class="module-empty">
+                            <i class="fa fa-cubes"></i>
+                            <span>{{ __('no_records_to_show') }}</span>
+                        </div>
+                        <div v-else class="row" :key="tableKey">
+                            <div class="col-12 col-md-6 col-xl-4 mb-3" v-for="row in translatedModules" :key="row.id">
+                                <div class="module-card h-100">
+                                    <div class="module-card__top">
+                                        <div class="module-card__icon">
+                                            <module-icon v-if="row.image_url" :src="row.image_url" :size="24" :alt="row.name"></module-icon>
+                                            <i v-else class="fa fa-cubes"></i>
+                                        </div>
+                                        <div class="module-card__title">
+                                            <h6 class="mb-0 text-truncate">{{ row.name }}</h6>
+                                            <small class="text-muted">#{{ row.id }}</small>
+                                        </div>
+                                        <span v-if="row.is_default" class="figma-status-pill bg-primary">{{ __('default') || 'Default' }}</span>
+                                    </div>
+                                    <p class="module-card__desc" v-b-tooltip.hover :title="row.description || __('no_description')">
+                                        {{ row.description || __('no_description') }}
+                                    </p>
+                                    <div class="module-card__foot">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check form-switch m-0">
+                                                <input class="form-check-input module-card__switch" type="checkbox" :id="'status-' + row.id"
+                                                    :true-value="1" :false-value="0" v-model="row.status"
+                                                    @change="toggleStatus(row)">
+                                            </div>
+                                            <span class="figma-status-pill" :class="row.status == 1 ? 'bg-success' : 'bg-danger'">
+                                                {{ row.status == 1 ? __('active') : __('inactive') }}
+                                            </span>
+                                        </div>
+                                        <button class="figma-action-btn" @click="editRecord(row)" v-b-tooltip.hover
+                                            :title="__('edit')">
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        </button>
+                                    </div>
                                 </div>
-                            </template>
-
-                            <template #cell(actions)="row">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button class="figma-action-btn" @click="editRecord(row.item)" v-b-tooltip.hover
-                                        :title="__('edit')">
-                                        <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
-                                    </button>
-                                </div>
-                            </template>
-                        </b-table>
+                            </div>
+                        </div>
                     </div>
 
-                    <div v-else class="table-responsive mb-0">
-                        <table class="table b-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-center" style="width: 40px;"></th>
-                                    <th class="text-center">{{ __('id') }}</th>
-                                    <th class="text-center">{{ __('name') }}</th>
-                                    <th class="text-center">{{ __('image') }}</th>
-                                    <th class="text-center">{{ __('description') }}</th>
-                                    <th class="text-center">{{ __('default') || 'Default' }}</th>
-                                    <th class="text-center">{{ __('status') }}</th>
-                                    <th class="text-center">{{ __('actions') }}</th>
-                                </tr>
-                            </thead>
-                            <draggable tag="tbody" v-model="modules" animation="200" handle=".drag-handle"
-                                :move="onModuleMove" @end="updateModulesOrder">
-                                <tr v-for="module in modules" :key="module.id">
-                                    <td class="text-center" :class="{ 'drag-handle': !module.is_default }"
-                                        :style="{ cursor: module.is_default ? 'not-allowed' : 'move' }">
-                                        <i v-if="!module.is_default" class="fas fa-arrows-alt text-muted"></i>
-                                    </td>
-                                    <td class="text-center">{{ module.id }}</td>
-                                    <td class="text-center">{{ getModuleName(module) }}</td>
-                                    <td class="text-center">
-                                        <p v-if="!module.image_url" class="mb-0 text-muted">{{ __('no_image') }}</p>
-                                        <img :src="module.image_url" height="50" class="rounded mx-auto" v-else
-                                            style="object-fit: cover; width: 50px;" />
-                                    </td>
-                                    <td class="text-center">
-                                        <p class="mb-0 text-truncate mx-auto" style="max-width: 250px;" v-b-tooltip.hover
-                                            :title="getModuleDescription(module) || __('no_description')">
-                                            {{ getModuleDescription(module) || __('no_description') }}
-                                        </p>
-                                    </td>
-                                    <td class="text-center">
-                                        <span v-if="module.is_default" class="badge bg-success">{{ __('yes') || 'Yes' }}</span>
-                                        <span v-else class="badge bg-danger">{{ __('no') || 'No' }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="form-check form-switch d-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox" :id="'status-' + module.id"
-                                                style="cursor: pointer" :checked="isModuleActive(module.id)"
-                                                @change="onStatusToggle(module.id, $event.target.checked, $event)">
+                    <div v-else class="module-grid">
+                        <div v-if="!modules.length" class="module-empty">
+                            <i class="fa fa-cubes"></i>
+                            <span>{{ __('no_records_to_show') }}</span>
+                        </div>
+                        <draggable v-else tag="div" class="row" v-model="modules" animation="200" handle=".drag-handle"
+                            :move="onModuleMove" @end="updateModulesOrder">
+                            <div class="col-12 col-md-6 col-xl-4 mb-3" v-for="module in modules" :key="module.id">
+                                <div class="module-card h-100">
+                                    <div class="module-card__top">
+                                        <div class="module-card__icon">
+                                            <module-icon v-if="module.image_url" :src="module.image_url" :size="24" :alt="getModuleName(module)"></module-icon>
+                                            <i v-else class="fa fa-cubes"></i>
                                         </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <button class="figma-action-btn" @click="editRecord(module)" v-b-tooltip.hover
-                                                :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
-                                            </button>
+                                        <div class="module-card__title">
+                                            <h6 class="mb-0 text-truncate">{{ getModuleName(module) }}</h6>
+                                            <small class="text-muted">#{{ module.id }}</small>
                                         </div>
-                                    </td>
-                                </tr>
-                            </draggable>
-                        </table>
+                                        <span v-if="module.is_default" class="figma-status-pill bg-primary">{{ __('default') || 'Default' }}</span>
+                                        <span v-if="!module.is_default" class="module-card__drag drag-handle">
+                                            <i class="fas fa-arrows-alt"></i>
+                                        </span>
+                                    </div>
+                                    <p class="module-card__desc" v-b-tooltip.hover :title="getModuleDescription(module) || __('no_description')">
+                                        {{ getModuleDescription(module) || __('no_description') }}
+                                    </p>
+                                    <div class="module-card__foot">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check form-switch m-0">
+                                                <input class="form-check-input module-card__switch" type="checkbox" :id="'status-' + module.id"
+                                                    :true-value="1" :false-value="0" v-model="module.status"
+                                                    @change="toggleStatus(module)">
+                                            </div>
+                                            <span class="figma-status-pill" :class="module.status == 1 ? 'bg-success' : 'bg-danger'">
+                                                {{ module.status == 1 ? __('active') : __('inactive') }}
+                                            </span>
+                                        </div>
+                                        <button class="figma-action-btn" @click="editRecord(module)" v-b-tooltip.hover
+                                            :title="__('edit')">
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </draggable>
                     </div>
 
                     <div class="figma-table-footer flex-wrap gap-3">
-                        <div class="showing-results-text small">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{
-                                __('of') || 'of'
-                            }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <div class="d-flex align-items-center gap-3">
                             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                                 class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
@@ -165,11 +147,13 @@
         <b-modal id="editModuleModal" ref="edit-modal" :title="__('edit_module') || 'Edit Module'" scrollable
             no-close-on-backdrop no-fade static>
             <template #modal-footer>
-                <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isSaving">
-                    {{ __('save') }}
-                    <b-spinner v-if="isSaving" small label="Saving"></b-spinner>
-                </b-button>
-                <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+                <div class="d-flex justify-content-end gap-2 w-100">
+                    <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+                    <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isSaving">
+                        {{ __('save') }}
+                        <b-spinner v-if="isSaving" small label="Saving"></b-spinner>
+                    </b-button>
+                </div>
             </template>
 
             <form ref="edit-form" @submit.prevent="saveRecord" novalidate>
@@ -178,8 +162,8 @@
                         :active="lang.is_default == 1">
 
                         <!-- Translate buttons -->
-                        <div class="mb-3" v-if="lang.is_default && languages.length > 1">
-                            <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(lang)"
+                        <div class="mb-3 d-flex flex-wrap gap-2" v-if="lang.is_default && languages.length > 1">
+                            <b-button size="sm" variant="outline-primary" @click="translateEmpty(lang)"
                                 v-b-tooltip.hover
                                 :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                                 :disabled="loadingEmpty">
@@ -236,8 +220,7 @@
                                 </label>
 
                                 <div v-if="image_url" class="mt-2 text-center">
-                                    <img :src="image_url" class="img-thumbnail"
-                                        style="max-height: 150px; object-fit: contain;" />
+                                    <img :src="image_url" class="img-thumbnail module-preview" />
                                 </div>
                             </div>
 
@@ -261,7 +244,7 @@
                         </template>
                     </b-tab>
                 </b-tabs>
-                <button ref="dummy_submit" style="display:none;"></button>
+                <button ref="dummy_submit" class="d-none"></button>
             </form>
         </b-modal>
     </div>
@@ -553,36 +536,23 @@ export default {
                 this.image_url = URL.createObjectURL(file);
             }
         },
-        isModuleActive(id) {
-            const module = this.modules.find(m => m.id === id);
-            return !!module && module.status === 1;
-        },
-        onStatusToggle(id, checked, event) {
-            const module = this.modules.find(m => m.id === id);
-            if (!module) {
-                return;
-            }
-
-            if (!checked) {
-                const otherActiveModules = this.modules.filter(m => m.id !== id && m.status === 1);
-                if (otherActiveModules.length === 0 || module.is_default) {
-                    // Reject before touching module.status - undoes the browser's own optimistic
-                    // toggle on the native checkbox immediately, instead of relying on Vue's
-                    // reactive repaint to race the (synchronously painted) error modal.
-                    if (event && event.target) {
-                        event.target.checked = true;
-                    }
+        toggleStatus(item) {
+            if (item.status === 0) {
+                const otherActiveModules = this.modules.filter(m => m.id !== item.id && m.status === 1);
+                if (otherActiveModules.length === 0 || item.is_default) {
                     this.showError(otherActiveModules.length === 0
                         ? (__('at_least_one_module_must_be_on') || 'At least one module must be active')
-                        : (__('default_module_must_be_active') || 'Default module must be active. Please set another module as default first before disabling this one.'));
+                        : (__('default_module_must_be_active') || 'Default module must be active'));
+                    item.status = 1;
+                    const originalModule = this.modules.find(m => m.id === item.id);
+                    if (originalModule) {
+                        originalModule.status = 1;
+                    }
+                    this.tableKey++; // Force table re-render
                     return;
                 }
             }
 
-            module.status = checked ? 1 : 0;
-            this.toggleStatus(module);
-        },
-        toggleStatus(item) {
             let fd = new FormData();
             fd.append('id', item.id);
             fd.append('name', item.name);
@@ -595,6 +565,11 @@ export default {
                     if (response.data.status === 1) {
                         this.showMessage('success', response.data.message || 'Status updated successfully');
                         this.$eventBus.$emit('modulesUpdated');
+
+                        const originalModule = this.modules.find(m => m.id === item.id);
+                        if (originalModule) {
+                            originalModule.status = item.status;
+                        }
 
                         const activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
                         if (item.id === activeModuleId && item.status === 0) {
@@ -609,11 +584,21 @@ export default {
                     } else {
                         this.showError(response.data.message);
                         item.status = 1;
+                        const originalModule = this.modules.find(m => m.id === item.id);
+                        if (originalModule) {
+                            originalModule.status = 1;
+                        }
+                        this.tableKey++; // Force table re-render
                         this.getRecords();
                     }
                 }).catch(() => {
                     this.showError(__('something_went_wrong'));
                     item.status = 1;
+                    const originalModule = this.modules.find(m => m.id === item.id);
+                    if (originalModule) {
+                        originalModule.status = 1;
+                    }
+                    this.tableKey++; // Force table re-render
                     this.getRecords();
                 });
         },
@@ -748,9 +733,138 @@ export default {
 </script>
 
 <style scoped>
+.module-grid {
+    padding: 20px 20px 4px;
+}
+
+.module-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: var(--ui-shadow);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.module-card:hover {
+    border-color: var(--theme-primary-300);
+    box-shadow: var(--ui-shadow-lg);
+}
+
+.module-card__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.module-card__icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--ui-primary-soft);
+    color: var(--theme-primary-600);
+    overflow: hidden;
+}
+
+.module-card__icon img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+.module-card__title {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.module-card__title h6 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.module-card__title small {
+    font-size: 12px;
+}
+
+.module-card__drag {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    color: var(--ui-text-subtle);
+    cursor: move;
+}
+
+.module-card__drag:hover {
+    color: var(--theme-primary-600);
+    border-color: var(--theme-primary-300);
+}
+
+.module-card__desc {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 13px;
+    color: var(--ui-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.module-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.module-card__switch {
+    cursor: pointer;
+}
+
+.module-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 40px 16px 56px;
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.module-empty i {
+    font-size: 28px;
+    color: var(--ui-text-subtle);
+}
+
+.module-preview {
+    max-height: 150px;
+    object-fit: contain;
+}
+
+@media (max-width: 575.98px) {
+    .module-grid {
+        padding: 16px 16px 4px;
+    }
+}
+
 .file-input-div {
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
+    border: 2px dashed var(--ui-border-strong);
+    border-radius: var(--ui-radius);
     padding: 20px;
     text-align: center;
     cursor: pointer;
@@ -759,7 +873,7 @@ export default {
 }
 
 .file-input-div:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    background-color: var(--ui-surface-muted);
+    border-color: var(--theme-primary-300);
 }
 </style>

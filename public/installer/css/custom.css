@@ -21,7 +21,7 @@
     align-items: center;
 }
 .header {
-    background-color: #FF9900;
+    background-color: #37a279;
     padding: 30px 30px 40px;
     border-radius: 3px 3px 0 0;
     text-align: center;
@@ -35,15 +35,15 @@
     background-color: #146c43;
 }
 .list .list__item.list__title.success span {
-    color: #FF9900;
+    color: #37a279;
 }
 .list .list__item.list__title.success .fa:before {
-    color: #FF9900;
+    color: #37a279;
 }
 
 .button, .button--light {
     color: #fff;
-    background-color: #FF9900;
+    background-color: #37a279;
 }
 .button:hover {
     color: #fff;
@@ -61,7 +61,7 @@
 }
 a {
     color: #fff;
-    background-color: #FF9900;
+    background-color: #37a279;
 }
 a:hover {
     color: #fff;
@@ -69,11 +69,11 @@ a:hover {
 }*/
 
 select option {
-    background-color: #FF9900;
+    background-color: #37a279;
     color: #ffffff;
 }
 input[type="radio"] {
-    accent-color: #FF9900;
+    accent-color: #37a279;
 }
 input:focus {
     background: #daf7ea;
@@ -86,5 +86,5 @@ input:focus {
     background: #0b452a;
 }
 .block input[type='radio']+label:checked {
-    background: #FF9900;
+    background: #37a279;
 }

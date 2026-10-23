@@ -96,6 +96,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -108,18 +117,15 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'product_name',
         label: __('product'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'total_qty',
         label: __('quantity'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'seller_name',
         label: __('seller'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'actions',
         label: __('actions')
@@ -323,41 +329,31 @@ var render = function () {
                       "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
                   },
                   [
-                    _c(
-                      "div",
-                      {
-                        staticClass: "figma-search-container",
-                        staticStyle: { "min-width": "250px" },
-                      },
-                      [
-                        _c("i", { staticClass: "fa fa-search text-muted" }),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.filter,
-                              expression: "filter",
-                            },
-                          ],
-                          staticClass: "figma-search-input",
-                          attrs: {
-                            type: "text",
-                            placeholder: _vm.__("search"),
+                    _c("div", { staticClass: "figma-search-container" }, [
+                      _c("i", { staticClass: "fa fa-search text-muted" }),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.filter,
+                            expression: "filter",
                           },
-                          domProps: { value: _vm.filter },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.filter = $event.target.value
-                            },
+                        ],
+                        staticClass: "figma-search-input",
+                        attrs: { type: "text", placeholder: _vm.__("search") },
+                        domProps: { value: _vm.filter },
+                        on: {
+                          input: function ($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.filter = $event.target.value
                           },
-                        }),
-                      ]
-                    ),
+                        },
+                      }),
+                    ]),
                   ]
                 ),
                 _vm._v(" "),
@@ -436,12 +432,46 @@ var render = function () {
                   },
                   scopedSlots: _vm._u([
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "table-busy",
                       fn: function () {
                         return [
                           _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "text-center text-muted my-3" },
                             [
                               _c("b-spinner", { staticClass: "align-middle" }),
                               _vm._v(" "),
@@ -459,13 +489,13 @@ var render = function () {
                       key: "cell(created_at)",
                       fn: function (row) {
                         return [
-                          _vm._v(
-                            "\n                                " +
+                          _c("span", { staticClass: "text-nowrap" }, [
+                            _vm._v(
                               _vm._s(
                                 new Date(row.item.created_at).toLocaleString()
-                              ) +
-                              "\n                            "
-                          ),
+                              )
+                            ),
+                          ]),
                         ]
                       },
                     },
@@ -519,53 +549,74 @@ var render = function () {
               1
             ),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
-              [
-                _c("div", { staticClass: "showing-results-text small" }, [
-                  _vm._v(
-                    "\n                            " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-flex align-items-center gap-3" },
-                  [
-                    _c("b-pagination", {
-                      staticClass: "figma-pagination mb-0",
-                      attrs: {
-                        "total-rows": _vm.totalRows,
-                        "per-page": _vm.perPage,
-                        align: "right",
-                        "hide-goto-end-buttons": "",
-                        "hide-ellipsis": "",
-                        "prev-text": "<",
-                        "next-text": ">",
-                      },
-                      model: {
-                        value: _vm.currentPage,
-                        callback: function ($$v) {
-                          _vm.currentPage = $$v
+            _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
+              _c(
+                "div",
+                { staticClass: "d-flex align-items-center gap-3 flex-wrap" },
+                [
+                  _c(
+                    "div",
+                    { staticClass: "d-flex align-items-center gap-2" },
+                    [
+                      _c(
+                        "label",
+                        { staticClass: "showing-results-text mb-0" },
+                        [_vm._v(_vm._s(_vm.__("per_page")))]
+                      ),
+                      _vm._v(" "),
+                      _c("b-form-select", {
+                        staticClass: "w-auto",
+                        attrs: { options: _vm.pageOptions, size: "sm" },
+                        model: {
+                          value: _vm.perPage,
+                          callback: function ($$v) {
+                            _vm.perPage = $$v
+                          },
+                          expression: "perPage",
                         },
-                        expression: "currentPage",
+                      }),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
+                    },
+                  }),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "d-flex align-items-center gap-3" },
+                [
+                  _c("b-pagination", {
+                    staticClass: "figma-pagination mb-0",
+                    attrs: {
+                      "total-rows": _vm.totalRows,
+                      "per-page": _vm.perPage,
+                      align: "right",
+                      "hide-goto-end-buttons": "",
+                      "hide-ellipsis": "",
+                      "prev-text": "<",
+                      "next-text": ">",
+                    },
+                    model: {
+                      value: _vm.currentPage,
+                      callback: function ($$v) {
+                        _vm.currentPage = $$v
                       },
-                    }),
-                  ],
-                  1
-                ),
-              ]
-            ),
+                      expression: "currentPage",
+                    },
+                  }),
+                ],
+                1
+              ),
+            ]),
           ]),
         ]),
       ]),

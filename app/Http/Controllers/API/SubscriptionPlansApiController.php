@@ -249,7 +249,8 @@ class SubscriptionPlansApiController extends Controller
 
             $endDate = Carbon::parse($userSubscription->end_date);
             $today = Carbon::now();
-            $daysRemaining = $today->diffInDays($endDate, false);
+           // $daysRemaining = $today->diffInDays($endDate, false);
+            $daysRemaining = (int) $today->diffInDays($endDate, false);
             $deliveriesNumber = Order::where('subscription_id', $userSubscription->id)->count();
             if ($daysRemaining < 0) {
                 $daysRemaining = 0;

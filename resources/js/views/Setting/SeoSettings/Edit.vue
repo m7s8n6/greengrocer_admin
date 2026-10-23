@@ -1,12 +1,12 @@
 <template>
   <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
-    static>
-    <div slot="modal-footer">
+    static size="lg">
+    <div slot="modal-footer" class="d-flex justify-content-end">
+      <b-button variant="outline-secondary" class="mr-2" @click="hideModal">{{ __('cancel') }}</b-button>
       <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
         {{ __('save') }}
         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
       </b-button>
-      <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
     </div>
 
     <form ref="my-form" @submit.prevent="saveRecord">
@@ -47,14 +47,14 @@
               </select>
             </div>
 
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
               <label>{{ __('meta_title') }}</label>
               <i class="text-danger" v-if="language.is_default">*</i>
               <input type="text" class="form-control" v-model="translations[language.id].meta_title"
                 :placeholder="__('enter_meta_title')" :required="language.is_default == 1 ? true : undefined">
             </div>
 
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
               <label>{{ __('meta_keyword') }}</label>
               <i class="text-danger" v-if="language.is_default">*</i>
               <input type="text" class="form-control" v-model="translations[language.id].meta_keyword"
@@ -64,10 +64,16 @@
             <div class="form-group col-md-12">
               <label>
                 {{ __('schema_markup') }}
-                <small class="d-inline-flex px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary rounded-2"
-                  v-b-tooltip.hover="{ html: true, title: schemaMarkupHelpHtml, boundary: 'window' }">
+                <small :id="'schema_markup'"
+                  class="d-inline-flex ml-1 text-muted">
                   <i class="fa fa-info-circle"></i>
                 </small>
+                <b-popover :target="'schema_markup'" triggers="hover" placement="left">
+                  <p>Schema markup helps search engines understand your content. Generate markup using
+                    <a href="https://www.rankranger.com/schema-markup-generator" target="_blank">this
+                      tool</a>.
+                  </p>
+                </b-popover>
               </label>
               <i class="text-danger" v-if="language.is_default">*</i>
               <textarea class="form-control" v-model="translations[language.id].schema_markup"
@@ -80,9 +86,9 @@
               <textarea class="form-control" v-model="translations[language.id].meta_description"
                 :placeholder="__('enter_meta_description')" rows="4" :required="language.is_default == 1 ? true : undefined"></textarea>
             </div>
-            <div class="form-group" v-if="language.is_default">
+            <div class="form-group col-12" v-if="language.is_default">
               <label>{{ __('og_image') }}</label><i class="text-danger">*</i>
-              <p class="text-muted">{{ __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px') }}</p>
+              <p class="text-muted small mb-2">{{ __('please_choose_square_image_of_larger_than_350px_350px_and_smaller_than_550px_550px') }}</p>
               <span v-if="error" class="error">{{ error }}</span>
 
               <input type="file" name="og_image" accept="image/*" ref="file_image_default" @change="handleFileUpload"
@@ -108,7 +114,7 @@
           </div>
         </b-tab></b-tabs>
 
-      <button ref="dummy_submit" style="display: none;"></button>
+      <button ref="dummy_submit" class="d-none"></button>
     </form>
   </b-modal>
 </template>
@@ -158,10 +164,6 @@ export default {
   },
 
   computed: {
-    schemaMarkupHelpHtml() {
-      return '<p>' + __('schema_markup_helps_search_engines_understand_your_content') + ' '
-        + '<a href="https://www.rankranger.com/schema-markup-generator" target="_blank">' + __('this_tool') + '</a>.</p>';
-    },
     modal_title: function () {
       return this.id ? __('edit_seo_setting') : __('add_seo_setting');
 

@@ -68,6 +68,19 @@ class Order extends Model
                     'user_type' => $userType,
                 ];
                 \App\Helpers\CommonHelper::setOrderStatus($orderStatus);
+
+                // Auto-assign delivery boy (docs/auto-assign-delivery-boy-plan.md). Fully
+                // guarded inside the service itself (no-op unless the order's module has
+                // explicitly turned auto_assign_enabled on) and wrapped here so any
+                // exception in it can never break saving the order/its status.
+                // Auto-assign delivery boy feature disabled
+                // try {
+                //     dispatch(function () use ($order) {
+                //         \App\Services\AutoAssignDeliveryBoyService::maybeStart($order->id);
+                //     })->afterResponse();
+                // } catch (\Throwable $e) {
+                //     \Illuminate\Support\Facades\Log::error('[AutoAssign] maybeStart dispatch failed: ' . $e->getMessage());
+                // }
             }
         });
     }

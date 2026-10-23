@@ -13,10 +13,9 @@ class Offer extends Model
     protected $hidden = ['created_at','updated_at'];
     public function getImageUrlAttribute(){
         if($this->image){
-            $image_url = asset('storage/'.$this->image);
-            return $image_url;
+            return asset('storage/'.$this->image);
         }
-        return $this->image;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
     public function category(){
         return $this->belongsTo(Category::class,'type_id','id')->select('id', 'name','slug');

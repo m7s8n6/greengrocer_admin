@@ -56,14 +56,14 @@ class LanguageApiController extends Controller
                 $total = $language->count();
                 return CommonHelper::responseWithData($language, $total);
             }else{
-                return CommonHelper::responseSuccess('language_not_found');
+                return CommonHelper::responseError('language_not_found');
             }
         }
 
         // Include supported_language_id to find admin lang for FCM
         $languages = $query->orderBy('id','ASC')->get(['languages.id','languages.supported_language_id','name','code','type','system_type','is_default','display_name']);
         if(count($languages) == 0){
-            return CommonHelper::responseSuccess('language_not_found');
+            return CommonHelper::responseError('language_not_found');
         }
         
         foreach($languages as $lang){

@@ -320,10 +320,9 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     finish: function finish() {
-      window.location.reload();
-      this.$router.push({
-        path: '/login'
-      });
+      // Full page load straight to the login page. The old code reloaded the current URL
+      // (/install): by now the app counts as installed, so the router sends /install to /404.
+      window.location.href = this.$baseUrl + '/login';
     }
   }
 });
@@ -346,7 +345,30 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nspan.error[data-v-ca351768]{\n    color:#e74c3c;\n    font-size:20px;\n    display:flex;\n    justify-content:center;\n}\na[data-v-ca351768]{\n    color: rgb(55, 162, 121);\n}\n.auth[data-v-ca351768] {\n    overflow-y: auto !important;\n}\n.login-wrapper[data-v-ca351768] {\n    height: auto !important;\n    min-height: 100vh !important;\n    padding: 20px 10% !important;\n    overflow-y: auto !important;\n    align-items: flex-start !important;\n}\n.install-wizard-section.auth-section[data-v-ca351768] {\n    max-width: 700px !important;\n    width: 100% !important;\n    max-height: none !important;\n    overflow-y: visible !important;\n    margin-top: 2rem !important;\n    margin-bottom: 2rem !important;\n}\n.auth-card[data-v-ca351768] {\n    max-width: 700px !important;\n    width: 100% !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nspan.error[data-v-ca351768]{\n    color:var(--theme-error-500);\n    font-size:14px;\n    font-weight:600;\n    display:flex;\n    justify-content:center;\n    margin-top:12px;\n}\na[data-v-ca351768]{\n    color: var(--theme-primary-500);\n}\n.auth[data-v-ca351768] {\n    overflow-y: auto !important;\n}\n.login-wrapper[data-v-ca351768] {\n    height: auto !important;\n    min-height: 100vh !important;\n    padding: 20px 10% !important;\n    overflow-y: auto !important;\n    /* Same placement as the login page: card on the right, vertically centred. */\n    align-items: center !important;\n    justify-content: flex-end !important;\n}\n.install-wizard-section.auth-section[data-v-ca351768] {\n    max-width: 700px !important;\n    width: 100% !important;\n    max-height: none !important;\n    overflow-y: visible !important;\n    margin-top: 2rem !important;\n    margin-bottom: 2rem !important;\n}\n.auth-card[data-v-ca351768] {\n    max-width: 700px !important;\n    width: 100% !important;\n}\n\n/* Requirement / permission tables: compact SnapBuy table look */\n.auth-card .table[data-v-ca351768] {\n    font-size: 13px;\n    color: var(--ui-text);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    border-collapse: separate;\n    border-spacing: 0;\n    overflow: hidden;\n}\n.auth-card .table thead th[data-v-ca351768] {\n    font-size: 12px;\n    font-weight: 600;\n    text-transform: uppercase;\n    letter-spacing: 0.03em;\n    color: var(--ui-text-muted);\n    background: var(--ui-surface-muted);\n    border-bottom: 1px solid var(--ui-border);\n    padding: 10px 14px;\n}\n.auth-card .table tbody td[data-v-ca351768] {\n    padding: 8px 14px;\n    border-color: var(--ui-border);\n    vertical-align: middle;\n}\n#app .auth .auth-card .table .form-control[data-v-ca351768] {\n    height: 38px !important;\n    min-height: 38px;\n    font-size: 13px !important;\n}\n.auth-card .form-label[data-v-ca351768] {\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-text);\n}\n@media (max-width: 575.98px) {\n.login-wrapper[data-v-ca351768] {\n        padding: 16px !important;\n        justify-content: center !important;\n}\n.install-wizard-section.auth-section[data-v-ca351768] {\n        margin-top: 0 !important;\n        margin-bottom: 1rem !important;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.install-wizard-section .vue-form-wizard .wizard-icon-circle:not(.checked) {\n    background-color: var(--ui-surface-muted) !important;\n}\n.install-wizard-section .vue-form-wizard .wizard-icon-circle:not(.checked) .wizard-icon-container .wizard-icon,\n.install-wizard-section .vue-form-wizard .wizard-icon-circle:not(.checked) .wizard-icon {\n    color: var(--ui-text-muted) !important;\n}\n.install-wizard-section .vue-form-wizard .stepTitle {\n    color: var(--ui-text-muted);\n}\n.install-wizard-section .vue-form-wizard .stepTitle.active {\n    color: var(--ui-text);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -382,6 +404,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Install_vue_vue_type_style_index_1_id_ca351768_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Install.vue?vue&type=style&index=1&id=ca351768&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Install_vue_vue_type_style_index_1_id_ca351768_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Install_vue_vue_type_style_index_1_id_ca351768_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Install.vue":
 /*!****************************************!*\
   !*** ./resources/js/views/Install.vue ***!
@@ -395,16 +446,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Install_vue_vue_type_template_id_ca351768_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Install.vue?vue&type=template&id=ca351768&scoped=true */ "./resources/js/views/Install.vue?vue&type=template&id=ca351768&scoped=true");
 /* harmony import */ var _Install_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Install.vue?vue&type=script&lang=js */ "./resources/js/views/Install.vue?vue&type=script&lang=js");
 /* harmony import */ var _Install_vue_vue_type_style_index_0_id_ca351768_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Install.vue?vue&type=style&index=0&id=ca351768&scoped=true&lang=css */ "./resources/js/views/Install.vue?vue&type=style&index=0&id=ca351768&scoped=true&lang=css");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Install_vue_vue_type_style_index_1_id_ca351768_lang_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Install.vue?vue&type=style&index=1&id=ca351768&lang=css */ "./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
 ;
 
 
+
 /* normalize component */
 
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_4__["default"])(
   _Install_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
   _Install_vue_vue_type_template_id_ca351768_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
   _Install_vue_vue_type_template_id_ca351768_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -445,6 +498,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Install_vue_vue_type_style_index_0_id_ca351768_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Install.vue?vue&type=style&index=0&id=ca351768&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=0&id=ca351768&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css":
+/*!************************************************************************************!*\
+  !*** ./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Install_vue_vue_type_style_index_1_id_ca351768_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Install.vue?vue&type=style&index=1&id=ca351768&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Install.vue?vue&type=style&index=1&id=ca351768&lang=css");
 
 
 /***/ }),
@@ -507,8 +572,8 @@ var render = function () {
                   {
                     attrs: {
                       shape: "circle",
-                      color: "#FF9900",
-                      "error-color": "#e74c3c",
+                      color: "var(--theme-primary-500)",
+                      "error-color": "var(--theme-error-500)",
                       title: "",
                       subtitle: "",
                     },
@@ -1264,7 +1329,7 @@ var render = function () {
                                       "button",
                                       {
                                         staticClass:
-                                          "btn btn-primary font-bold",
+                                          "btn btn-outline-secondary pw-toggle-btn",
                                         attrs: { type: "button" },
                                         on: {
                                           click: function ($event) {
@@ -1276,29 +1341,19 @@ var render = function () {
                                       [
                                         _vm.showAdminPassword
                                           ? _c("img", {
-                                              staticStyle: {
-                                                filter:
-                                                  "brightness(0) invert(1)",
-                                                width: "20px",
-                                                height: "20px",
-                                              },
                                               attrs: {
                                                 src:
                                                   _vm.$baseUrl +
                                                   "/images/icons/show_password.svg",
+                                                alt: "toggle-password",
                                               },
                                             })
                                           : _c("img", {
-                                              staticStyle: {
-                                                filter:
-                                                  "brightness(0) invert(1)",
-                                                width: "20px",
-                                                height: "20px",
-                                              },
                                               attrs: {
                                                 src:
                                                   _vm.$baseUrl +
                                                   "/images/icons/hide_password.svg",
+                                                alt: "toggle-password",
                                               },
                                             }),
                                       ]

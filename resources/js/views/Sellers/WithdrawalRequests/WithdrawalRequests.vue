@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('manage_withdrawal_requests') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -24,7 +24,7 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2 align-items-center">
-                                <select @change="getWthdrawalRequests()" v-model="status" class="form-select modern-select">
+                                <select @change="getWthdrawalRequests()" v-model="status" class="form-select modern-select toolbar-select">
                                     <option value="">{{ __('all_statuses') }}</option>
                                     <option value="0">{{ __('pending') }}</option>
                                     <option value="1">{{ __('approved') }}</option>
@@ -34,7 +34,7 @@
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
                                 </button>
-                                <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="create_new = true">
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="create_new = true">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_withdrawal_request') }}</span>
                                 </button>
@@ -45,9 +45,16 @@
                             <b-table :items="withdrawalRequests" :fields="fields"
                                 :current-page="currentPage" :per-page="perPage" :filter="filter"
                                 :sort-direction="sortDirection" :bordered="false" :busy="isLoading" stacked="md"
-                                show-empty small class="w-100 mb-0">
+                                show-empty small class="figma-table w-100 mb-0" :tbody-tr-class="() => 'figma-tr align-middle'">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -57,32 +64,39 @@
                                 </template>
 
                                 <template #cell(status)="row">
-                                    <span v-if="row.item.status === 0" class="badge bg-warning">{{ __('pending')
+                                    <span v-if="row.item.status === 0" class="figma-status-pill bg-warning">{{ __('pending')
                                         }}</span>
-                                    <span v-else-if="row.item.status === 1" class="badge bg-success">{{ __('approved')
+                                    <span v-else-if="row.item.status === 1" class="figma-status-pill bg-success">{{ __('approved')
                                         }}</span>
-                                    <span v-else-if="row.item.status === 2" class="badge bg-danger">{{ __('rejected')
+                                    <span v-else-if="row.item.status === 2" class="figma-status-pill bg-danger">{{ __('rejected')
                                         }}</span>
-                                    <span v-else class="badge bg-danger">{{ __('undefine') }}</span>
+                                    <span v-else class="figma-status-pill bg-danger">{{ __('undefine') }}</span>
                                 </template>
                                 <template #cell(receipt_image)="row">
-                                    <img :src="row.item.receipt_image_url" height="50" />
+                                    <img :src="row.item.receipt_image_url" class="border" height="40" width="40" />
                                 </template>
                                 <template #cell(created_at)="row">
                                     {{ row.item.created_at }}
                                 </template>
                                 <template #cell(message)="row">
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
-                                        v-b-tooltip.hover :title="row.item.message">
+                                    <small :id="'bonus' + row.item.id"
+                                        class="d-inline-flex px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
+                                    <b-popover :target="'bonus' + row.item.id" triggers="hover" placement="left">
+                                        {{ row.item.message }}
+                                    </b-popover>
                                 </template>
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageStart }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                             </div>
@@ -106,13 +120,13 @@ export default {
     data: function () {
         return {
             fields: [
-                { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc', class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'remark', label: __('remark'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
+                { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc', thClass: 'text-nowrap' },
+                { key: 'amount', label: __('amount'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'message', label: __('message'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'status', label: __('status'), sortable: true, thClass: 'text-nowrap' },
+                { key: 'remark', label: __('remark'), sortable: true, thClass: 'text-nowrap' },
                 { key: 'receipt_image', label: __('receipt_image'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
-                { key: 'created_at', label: __('date'), sortable: true, class: 'text-center', thClass: 'text-nowrap' },
+                { key: 'created_at', label: __('date'), sortable: true, thClass: 'text-nowrap' },
 
             ],
             totalRows: 1,
@@ -190,3 +204,16 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* Status filter in the toolbar: compact, same height as the toolbar buttons
+   (the global .figma-action-bar-row .modern-select rule is 40px / 16px with a dark border) */
+.figma-action-bar-row .toolbar-select {
+    height: 38px !important;
+    min-width: 150px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 13px !important;
+    border-color: var(--ui-border-strong) !important;
+}
+</style>

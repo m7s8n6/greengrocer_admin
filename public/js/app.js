@@ -3083,6 +3083,1285 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _Auth_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Auth.js */ "./resources/js/Auth.js");
+/* harmony import */ var _utils_settingsCatalog_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/settingsCatalog.js */ "./resources/js/utils/settingsCatalog.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/**
+ * Command palette (Ctrl+K / ⌘K): jump to a menu entry or setting of the panel the user is in.
+ * Menu entries are exactly the sidebar of the current panel (admin / seller / delivery boy, same
+ * visibility as the sidebar), so a page that exists in the router but not in that panel's menu
+ * (e.g. the seller's POS Reports in admin) is never offered; settings come from the shared settings
+ * catalog (Store Settings sections included).
+ * Each item's `sub` (menu group / description) is used for matching only, not shown.
+ * Open it from anywhere with the shortcut, or this.$root.$emit('open-command-palette').
+ */
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'CommandPalette',
+  data: function data() {
+    return {
+      open: false,
+      q: '',
+      active: 0
+    };
+  },
+  computed: {
+    roleName: function roleName() {
+      return _Auth_js__WEBPACK_IMPORTED_MODULE_0__["default"].user && _Auth_js__WEBPACK_IMPORTED_MODULE_0__["default"].user.role ? _Auth_js__WEBPACK_IMPORTED_MODULE_0__["default"].user.role.name : '';
+    },
+    // Sidebar entries of the current panel (admin / seller / delivery boy), same visibility as the sidebar.
+    menuItems: function menuItems() {
+      var _this = this;
+      var c = this.$parent;
+      while (c && !['modulesSidebarItems', 'generalSidebarItems', 'visibleSidebarItems', 'sidebarItems'].some(function (k) {
+        return Array.isArray(c[k]);
+      })) {
+        c = c.$parent;
+      }
+      if (!c) return [];
+      // exactly the lists the sidebar renders (already filtered per module, e.g. Addons only in
+      // Food Delivery) — never the raw, unfiltered sidebarItems when a filtered list exists
+      var lists = Array.isArray(c.modulesSidebarItems) ? [c.modulesSidebarItems, c.generalSidebarItems] : Array.isArray(c.visibleSidebarItems) ? [c.visibleSidebarItems] : [c.sidebarItems];
+      lists.splice.apply(lists, [0, lists.length].concat(_toConsumableArray(lists.filter(Array.isArray))));
+      var visible = function visible(e) {
+        return e.role === true ? _this.$role('Super Admin') : !e.permission || _this.$can(e.permission);
+      };
+      var group = this.tr('menu', 'Menu');
+      var out = [];
+      lists.forEach(function (list) {
+        return list.forEach(function (item) {
+          if (Array.isArray(item.submenu) && item.submenu.length) {
+            item.submenu.forEach(function (sub) {
+              if (sub.url && visible(sub)) out.push({
+                key: 'm' + sub.url,
+                group: group,
+                title: sub.name,
+                sub: item.name + ' · ' + sub.url,
+                to: sub.url,
+                icon: _this.iconFor(sub.url, sub.name)
+              });
+            });
+          } else if (item.url && visible(item)) {
+            out.push({
+              key: 'm' + item.url,
+              group: group,
+              title: item.name,
+              sub: item.url,
+              to: item.url,
+              icon: _this.iconFor(item.url, item.name)
+            });
+          }
+        });
+      });
+      return out;
+    },
+    settingItems: function settingItems() {
+      var _this2 = this;
+      if (this.roleName === 'Seller' || this.roleName === 'Delivery Boy') return [];
+      var out = [];
+      (0,_utils_settingsCatalog_js__WEBPACK_IMPORTED_MODULE_1__.settingsCatalog)(this).forEach(function (g) {
+        return g.cards.forEach(function (card) {
+          if (!(0,_utils_settingsCatalog_js__WEBPACK_IMPORTED_MODULE_1__.canSeeSetting)(_this2, card)) return;
+          out.push({
+            key: 's' + card.key,
+            group: _this2.tr('settings', 'Settings'),
+            title: card.title,
+            sub: g.title + ' · ' + card.desc,
+            to: card.to,
+            icon: card.icon
+          });
+        });
+      });
+      return out;
+    },
+    results: function results() {
+      // one entry per destination: settings (with description) > sidebar
+      var seen = new Set();
+      var keyOf = function keyOf(to) {
+        return typeof to === 'string' ? to.replace(/\/$/, '') : JSON.stringify(to);
+      };
+      var all = [];
+      this.settingItems.concat(this.menuItems).forEach(function (item) {
+        var k = keyOf(item.to);
+        if (!seen.has(k)) {
+          seen.add(k);
+          all.push(item);
+        }
+      });
+      var order = [this.tr('menu', 'Menu'), this.tr('pages', 'Pages'), this.tr('settings', 'Settings')];
+      all.sort(function (a, b) {
+        return order.indexOf(a.group) - order.indexOf(b.group);
+      });
+      var q = this.q.trim().toLowerCase();
+      if (!q) return all;
+      var words = q.split(/\s+/);
+      return all.map(function (item) {
+        var title = String(item.title).toLowerCase();
+        var hay = (title + ' ' + item.sub + ' ' + item.group).toLowerCase();
+        if (!words.every(function (w) {
+          return hay.includes(w);
+        })) return null;
+        var score = title === q ? 0 : title.startsWith(q) ? 1 : title.includes(q) ? 2 : 3;
+        return {
+          item: item,
+          score: score
+        };
+      }).filter(Boolean).sort(function (a, b) {
+        return a.score - b.score || a.item.group.localeCompare(b.item.group);
+      }).map(function (x) {
+        return x.item;
+      }).slice(0, 60);
+    }
+  },
+  watch: {
+    q: function q() {
+      this.active = 0;
+    }
+  },
+  mounted: function mounted() {
+    var _this3 = this;
+    document.body.appendChild(this.$el);
+    this._onKey = function (e) {
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && String(e.key).toLowerCase() === 'k') {
+        e.preventDefault();
+        _this3.open ? _this3.close() : _this3.show();
+      }
+    };
+    window.addEventListener('keydown', this._onKey);
+    this.$root.$on('open-command-palette', this.show);
+  },
+  beforeDestroy: function beforeDestroy() {
+    if (this.$el && this.$el.parentNode) this.$el.parentNode.removeChild(this.$el);
+    window.removeEventListener('keydown', this._onKey);
+    this.$root.$off('open-command-palette', this.show);
+  },
+  methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
+    iconFor: function iconFor(path, title) {
+      var t = (path + ' ' + title).toLowerCase();
+      if (/create|add/.test(t)) return 'bi bi-plus-circle';
+      if (/setting|theme|config/.test(t)) return 'bi bi-gear';
+      if (/order/.test(t)) return 'bi bi-receipt';
+      if (/categor/.test(t)) return 'bi bi-diagram-3';
+      if (/product|stock|media|brand|tax|unit|attribute/.test(t)) return 'bi bi-box-seam';
+      if (/seller|customer|user|delivery|rider|boy/.test(t)) return 'bi bi-people';
+      if (/report|dashboard|transaction|wallet|withdraw/.test(t)) return 'bi bi-graph-up';
+      return 'bi bi-arrow-right-short';
+    },
+    show: function show() {
+      var _this4 = this;
+      this.open = true;
+      this.q = '';
+      this.active = 0;
+      this.$nextTick(function () {
+        return _this4.$refs.input && _this4.$refs.input.focus();
+      });
+    },
+    close: function close() {
+      this.open = false;
+    },
+    move: function move(step) {
+      var _this5 = this;
+      var n = this.results.length;
+      if (!n) return;
+      this.active = (this.active + step + n) % n;
+      this.$nextTick(function () {
+        var el = _this5.$refs.list && _this5.$refs.list.querySelector('[data-idx="' + _this5.active + '"]');
+        if (el) el.scrollIntoView({
+          block: 'nearest'
+        });
+      });
+    },
+    go: function go(item) {
+      if (!item) return;
+      this.close();
+      this.$router.push(item.to)["catch"](function () {});
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js":
+/*!*********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js ***!
+  \*********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vue2_daterange_picker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-daterange-picker */ "./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.umd.min.js");
+/* harmony import */ var vue2_daterange_picker__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vue2_daterange_picker__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vue2_daterange_picker_dist_vue2_daterange_picker_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-daterange-picker/dist/vue2-daterange-picker.css */ "./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+// The store's date format (Store Settings) is fetched once and shared by every instance.
+var formatPromise = null;
+var loadFormat = function loadFormat(apiUrl) {
+  if (!formatPromise) {
+    formatPromise = axios__WEBPACK_IMPORTED_MODULE_0___default().get(apiUrl + '/custom_fields/date_format').then(function (res) {
+      return res.data.data || 'd-m-Y';
+    })["catch"](function () {
+      return 'd-m-Y';
+    });
+  }
+  return formatPromise;
+};
+
+// PHP date() tokens -> moment tokens
+var toMomentFormat = function toMomentFormat(php) {
+  return php.replace(/d|m|M|Y/g, function (t) {
+    return {
+      d: 'DD',
+      m: 'MM',
+      M: 'MMM',
+      Y: 'YYYY'
+    }[t];
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    DateRangePicker: (vue2_daterange_picker__WEBPACK_IMPORTED_MODULE_2___default())
+  },
+  // value is stored as YYYY-MM-DD; only the display follows the store format
+  props: {
+    value: {
+      "default": ''
+    },
+    placeholder: {
+      type: String,
+      "default": ''
+    }
+  },
+  data: function data() {
+    return {
+      format: 'DD-MM-YYYY'
+    };
+  },
+  computed: {
+    range: {
+      get: function get() {
+        var d = this.value ? moment__WEBPACK_IMPORTED_MODULE_1___default()(this.value, 'YYYY-MM-DD').toDate() : null;
+        return {
+          startDate: d,
+          endDate: d
+        };
+      },
+      set: function set() {}
+    },
+    display: function display() {
+      return this.value ? moment__WEBPACK_IMPORTED_MODULE_1___default()(this.value, 'YYYY-MM-DD').format(this.format) : '';
+    },
+    localeData: function localeData() {
+      return {
+        applyLabel: __('apply'),
+        cancelLabel: __('cancel')
+      };
+    }
+  },
+  created: function created() {
+    var _this = this;
+    loadFormat(this.$apiUrl).then(function (f) {
+      _this.format = toMomentFormat(f);
+    });
+  },
+  methods: {
+    onUpdate: function onUpdate(val) {
+      this.$emit('input', val && val.startDate ? moment__WEBPACK_IMPORTED_MODULE_1___default()(val.startDate).format('YYYY-MM-DD') : '');
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/**
+ * Shared list table: <b-table> with the standard look, loading row, empty states and the
+ * footer (per page, item count, pagination). Pages pass their fields/items and cell slots.
+ *
+ *   <data-table :items="rows" :fields="fields" :busy="isLoading" :total-rows="totalRows"
+ *       :current-page.sync="currentPage" :per-page.sync="perPage">
+ *       <template #cell(actions)="row">...</template>
+ *   </data-table>
+ *
+ * Server-side paging (API returns one page): default. Client-side paging (all rows loaded):
+ * add `local-paging`. Any other b-table prop/event (filter, sort-by.sync, @filtered, ...) passes through.
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'DataTable',
+  inheritAttrs: false,
+  props: {
+    items: {
+      type: [Array, Function],
+      "default": function _default() {
+        return [];
+      }
+    },
+    fields: {
+      type: Array,
+      "default": null
+    },
+    busy: {
+      type: Boolean,
+      "default": false
+    },
+    totalRows: {
+      type: [Number, String],
+      "default": 0
+    },
+    currentPage: {
+      type: [Number, String],
+      "default": 1
+    },
+    perPage: {
+      type: [Number, String],
+      "default": 10
+    },
+    pageOptions: {
+      type: Array,
+      "default": null
+    },
+    localPaging: {
+      type: Boolean,
+      "default": false
+    },
+    hideFooter: {
+      type: Boolean,
+      "default": false
+    },
+    stacked: {
+      type: [String, Boolean],
+      "default": 'md'
+    },
+    small: {
+      type: Boolean,
+      "default": true
+    },
+    tableClass: {
+      type: [String, Array, Object],
+      "default": ''
+    },
+    tbodyTrClass: {
+      type: [String, Array, Object, Function],
+      "default": function _default() {
+        return 'figma-tr align-middle';
+      }
+    },
+    emptyText: {
+      type: String,
+      "default": ''
+    },
+    emptyFilteredText: {
+      type: String,
+      "default": ''
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/**
+ * Address search for the admin/seller map pages when the Map Provider is Google.
+ *
+ * Replaces vue2-google-maps' <GmapAutocomplete>, which uses the browser-side
+ * google.maps.places.Autocomplete widget - Google no longer offers that to new customers. This
+ * one asks the server instead (the same /map/places_autocomplete and /map/places_details calls the
+ * OSM search uses; the server talks to Google's Places API (New)).
+ *
+ * It emits `place_changed` with an object shaped like a Google Place result (name,
+ * formatted_address, address_components, geometry.location.lat()/lng()), so the existing
+ * setPlace / setPickupPlace handlers on the pages work unchanged.
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'GooglePlaceSearch',
+  props: {
+    placeholder: {
+      type: String,
+      "default": ''
+    },
+    inputId: {
+      type: String,
+      "default": null
+    }
+  },
+  data: function data() {
+    return {
+      query: '',
+      suggestions: [],
+      showSuggestions: false,
+      timer: null,
+      sessionToken: this.newToken()
+    };
+  },
+  beforeDestroy: function beforeDestroy() {
+    if (this.timer) clearTimeout(this.timer);
+  },
+  methods: {
+    newToken: function newToken() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
+      });
+    },
+    onInput: function onInput() {
+      if (this.timer) clearTimeout(this.timer);
+      if (this.query.trim().length < 2) {
+        this.suggestions = [];
+        this.showSuggestions = false;
+        return;
+      }
+      this.timer = setTimeout(this.fetchSuggestions, 350);
+    },
+    fetchSuggestions: function fetchSuggestions() {
+      var _this = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/map/places_autocomplete', {
+        input: this.query,
+        language: 'en',
+        sessiontoken: this.sessionToken,
+        source: 'web'
+      }).then(function (response) {
+        var data = response.data && response.data.data ? response.data.data : null;
+        _this.suggestions = data && data.suggestions || [];
+        _this.showSuggestions = _this.suggestions.length > 0;
+      })["catch"](function () {
+        _this.suggestions = [];
+        _this.showSuggestions = false;
+      });
+    },
+    select: function select(suggestion) {
+      var _this2 = this;
+      var prediction = suggestion.placePrediction;
+      this.query = prediction.text.text;
+      this.showSuggestions = false;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.$apiUrl + '/map/places_details', {
+        place_id: prediction.placeId,
+        language: 'en',
+        sessiontoken: this.sessionToken,
+        source: 'web'
+      }).then(function (response) {
+        var d = response.data && response.data.data ? response.data.data : null;
+        if (!d || !d.location) {
+          return;
+        }
+        var _lat = Number(d.location.latitude);
+        var _lng = Number(d.location.longitude);
+        _this2.$emit('place_changed', {
+          name: d.displayName && d.displayName.text || prediction.structuredFormat && prediction.structuredFormat.mainText.text || '',
+          formatted_address: d.formattedAddress || prediction.text.text,
+          address_components: (d.addressComponents || []).map(function (c) {
+            return {
+              long_name: c.longText,
+              short_name: c.shortText,
+              types: c.types || []
+            };
+          }),
+          geometry: {
+            location: {
+              lat: function lat() {
+                return _lat;
+              },
+              lng: function lng() {
+                return _lng;
+              }
+            }
+          },
+          place_id: d.id,
+          types: d.types || []
+        });
+        // A finished search ends the billing session - the next search starts a new one.
+        _this2.sessionToken = _this2.newToken();
+      })["catch"](function () {});
+    },
+    hideSoon: function hideSoon() {
+      var _this3 = this;
+      setTimeout(function () {
+        _this3.showSuggestions = false;
+      }, 150);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+
+/**
+ * Module icon in the theme colour: the uploaded icon (SVG/PNG) is used as a mask, so its shape
+ * is filled with the current text colour (primary by default) instead of its own colours.
+ *   <module-icon :src="mod.image_url" :size="22"></module-icon>
+ *   <module-icon :src="row.image_url" :size="20" tile></module-icon>   (tinted square behind it)
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'ModuleIcon',
+  props: {
+    src: {
+      type: String,
+      "default": ''
+    },
+    size: {
+      type: [Number, String],
+      "default": 22
+    },
+    tile: {
+      type: Boolean,
+      "default": false
+    },
+    alt: {
+      type: String,
+      "default": ''
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ "./node_modules/leaflet/dist/leaflet.css");
+/* harmony import */ var leaflet_draw__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet-draw */ "./node_modules/leaflet-draw/dist/leaflet.draw.js");
+/* harmony import */ var leaflet_draw__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(leaflet_draw__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var leaflet_draw_dist_leaflet_draw_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! leaflet-draw/dist/leaflet.draw.css */ "./node_modules/leaflet-draw/dist/leaflet.draw.css");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_4__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+delete (leaflet__WEBPACK_IMPORTED_MODULE_0___default().Icon).Default.prototype._getIconUrl;
+leaflet__WEBPACK_IMPORTED_MODULE_0___default().Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png'
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'OsmMapPicker',
+  props: {
+    lat: {
+      type: [Number, String],
+      "default": 23.0225
+    },
+    lng: {
+      type: [Number, String],
+      "default": 72.5714
+    },
+    zoom: {
+      type: Number,
+      "default": 13
+    },
+    height: {
+      type: String,
+      "default": '400px'
+    },
+    placeholder: {
+      type: String,
+      "default": 'Search location on map'
+    },
+    draggableMarker: {
+      type: Boolean,
+      "default": true
+    },
+    clickToPlace: {
+      type: Boolean,
+      "default": true
+    },
+    showSearchBox: {
+      type: Boolean,
+      "default": true
+    },
+    enableDrawing: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  data: function data() {
+    return {
+      map: null,
+      marker: null,
+      query: '',
+      suggestions: [],
+      showSuggestions: false,
+      debounceTimer: null,
+      drawnItems: null,
+      activeDrawer: null,
+      drawingActive: false,
+      boundaryType: null,
+      boundaryVertices: [],
+      boundaryRadius: null
+    };
+  },
+  watch: {
+    lat: function lat() {
+      this.syncMarkerToProps();
+    },
+    lng: function lng() {
+      this.syncMarkerToProps();
+    }
+  },
+  mounted: function mounted() {
+    this.initMap();
+  },
+  beforeDestroy: function beforeDestroy() {
+    if (this.map) {
+      this.map.remove();
+    }
+  },
+  methods: {
+    syncMarkerToProps: function syncMarkerToProps() {
+      var lat = parseFloat(this.lat);
+      var lng = parseFloat(this.lng);
+      if (!this.map || !this.marker || isNaN(lat) || isNaN(lng)) return;
+      var cur = this.marker.getLatLng();
+      if (cur.lat === lat && cur.lng === lng) return;
+      this.setMarker(lat, lng);
+    },
+    initMap: function initMap() {
+      var _this = this;
+      var startLat = parseFloat(this.lat) || 23.0225;
+      var startLng = parseFloat(this.lng) || 72.5714;
+      this.map = leaflet__WEBPACK_IMPORTED_MODULE_0___default().map(this.$refs.mapEl).setView([startLat, startLng], this.zoom);
+      leaflet__WEBPACK_IMPORTED_MODULE_0___default().tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(this.map);
+      this.marker = leaflet__WEBPACK_IMPORTED_MODULE_0___default().marker([startLat, startLng], {
+        draggable: this.draggableMarker
+      }).addTo(this.map);
+      if (this.draggableMarker) {
+        this.marker.on('dragend', function () {
+          var pos = _this.marker.getLatLng();
+          _this.reverseGeocode(pos.lat, pos.lng);
+        });
+      }
+      if (this.clickToPlace) {
+        this.map.on('click', function (e) {
+          _this.setMarker(e.latlng.lat, e.latlng.lng);
+          _this.reverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+      }
+      if (this.enableDrawing) {
+        this.drawnItems = new (leaflet__WEBPACK_IMPORTED_MODULE_0___default().FeatureGroup)();
+        this.map.addLayer(this.drawnItems);
+        this.map.on((leaflet__WEBPACK_IMPORTED_MODULE_0___default().Draw).Event.CREATED, function (e) {
+          return _this.onShapeCreated(e);
+        });
+      }
+      setTimeout(function () {
+        if (_this.map) {
+          _this.map.invalidateSize();
+        }
+      }, 300);
+    },
+    startDrawPolygon: function startDrawPolygon() {
+      this.clearBoundary();
+      this.activeDrawer = new (leaflet__WEBPACK_IMPORTED_MODULE_0___default().Draw).Polygon(this.map, {
+        allowIntersection: false,
+        showArea: false
+      });
+      this.activeDrawer.enable();
+      this.drawingActive = true;
+      this.boundaryType = 'polygon';
+    },
+    startDrawCircle: function startDrawCircle() {
+      this.clearBoundary();
+      this.activeDrawer = new (leaflet__WEBPACK_IMPORTED_MODULE_0___default().Draw).Circle(this.map);
+      this.activeDrawer.enable();
+      this.drawingActive = true;
+      this.boundaryType = 'circle';
+    },
+    finishDrawing: function finishDrawing() {
+      if (this.activeDrawer && typeof this.activeDrawer.completeShape === 'function') {
+        this.activeDrawer.completeShape();
+      }
+    },
+    deleteLastPoint: function deleteLastPoint() {
+      if (this.activeDrawer && typeof this.activeDrawer.deleteLastVertex === 'function') {
+        this.activeDrawer.deleteLastVertex();
+      }
+    },
+    cancelDrawing: function cancelDrawing() {
+      if (this.activeDrawer) {
+        this.activeDrawer.disable();
+      }
+      this.activeDrawer = null;
+      this.drawingActive = false;
+      this.boundaryType = this.boundaryVertices.length ? this.boundaryType : null;
+    },
+    onShapeCreated: function onShapeCreated(e) {
+      this.drawnItems.clearLayers();
+      this.drawnItems.addLayer(e.layer);
+      this.drawingActive = false;
+      this.activeDrawer = null;
+      if (e.layerType === 'circle') {
+        var center = e.layer.getLatLng();
+        this.boundaryType = 'circle';
+        this.boundaryVertices = [{
+          lat: center.lat,
+          lng: center.lng
+        }];
+        this.boundaryRadius = e.layer.getRadius();
+      } else {
+        this.boundaryType = 'polygon';
+        var latlngs = e.layer.getLatLngs()[0];
+        this.boundaryVertices = latlngs.map(function (p) {
+          return {
+            lat: p.lat,
+            lng: p.lng
+          };
+        });
+        this.boundaryRadius = null;
+      }
+      this.emitBoundaryChanged();
+    },
+    clearBoundary: function clearBoundary() {
+      if (this.drawnItems) {
+        this.drawnItems.clearLayers();
+      }
+      this.boundaryType = null;
+      this.boundaryVertices = [];
+      this.boundaryRadius = null;
+      this.emitBoundaryChanged();
+    },
+    emitBoundaryChanged: function emitBoundaryChanged() {
+      this.$emit('boundary-changed', {
+        geolocation_type: this.boundaryType,
+        vertices: this.boundaryVertices,
+        radius: this.boundaryRadius
+      });
+    },
+    restoreBoundary: function restoreBoundary(payload) {
+      if (!this.drawnItems || !payload) return;
+      this.drawnItems.clearLayers();
+      var vertices = payload.vertices;
+      if (!vertices || !vertices.length) return;
+      if (payload.geolocation_type === 'circle') {
+        var c = vertices[0];
+        var radius = payload.radius ? Math.sqrt(parseFloat(payload.radius)) * 100 : 1000;
+        var layer = leaflet__WEBPACK_IMPORTED_MODULE_0___default().circle([parseFloat(c.lat), parseFloat(c.lng)], {
+          radius: radius,
+          color: '#FF0000',
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+        this.drawnItems.addLayer(layer);
+        this.map.fitBounds(layer.getBounds());
+        this.boundaryType = 'circle';
+        this.boundaryVertices = [{
+          lat: parseFloat(c.lat),
+          lng: parseFloat(c.lng)
+        }];
+        this.boundaryRadius = payload.radius;
+      } else {
+        var latlngs = vertices.map(function (p) {
+          return [parseFloat(p.lat), parseFloat(p.lng)];
+        });
+        var _layer = leaflet__WEBPACK_IMPORTED_MODULE_0___default().polygon(latlngs, {
+          color: '#FF0000',
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+        this.drawnItems.addLayer(_layer);
+        this.map.fitBounds(_layer.getBounds());
+        this.boundaryType = 'polygon';
+        this.boundaryVertices = vertices;
+        this.boundaryRadius = null;
+      }
+    },
+    setMarker: function setMarker(lat, lng) {
+      var panTo = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+      if (!this.marker) return;
+      this.marker.setLatLng([lat, lng]);
+      if (panTo) {
+        this.map.setView([lat, lng], this.map.getZoom());
+      }
+    },
+    onQueryInput: function onQueryInput(text) {
+      this.setQueryAndSearch(text);
+    },
+    setQueryAndSearch: function setQueryAndSearch(text) {
+      var _this2 = this;
+      this.query = text;
+      clearTimeout(this.debounceTimer);
+      if (!text || text.length < 3) {
+        this.suggestions = [];
+        this.showSuggestions = false;
+        this.$emit('suggestions-updated', []);
+        return;
+      }
+      this.debounceTimer = setTimeout(function () {
+        _this2.fetchSuggestions();
+      }, 400);
+    },
+    fetchSuggestions: function fetchSuggestions() {
+      var _this3 = this;
+      axios__WEBPACK_IMPORTED_MODULE_4___default().post(this.$apiUrl + '/map/places_autocomplete', {
+        input: this.query,
+        language: 'en',
+        source: 'web'
+      }).then(function (response) {
+        var data = response.data && response.data.data ? response.data.data : response.data;
+        _this3.suggestions = data && data.suggestions || [];
+        _this3.showSuggestions = _this3.suggestions.length > 0;
+        _this3.$emit('suggestions-updated', _this3.suggestions);
+      })["catch"](function () {
+        _this3.suggestions = [];
+        _this3.showSuggestions = false;
+        _this3.$emit('suggestions-updated', []);
+      });
+    },
+    selectSuggestion: function selectSuggestion(suggestion) {
+      var _this4 = this;
+      this.showSuggestions = false;
+      this.query = suggestion.placePrediction.text.text;
+      var osmExtra = suggestion.placePrediction._osm;
+      if (osmExtra && osmExtra.lat && osmExtra.lon) {
+        this.applyPlace({
+          lat: parseFloat(osmExtra.lat),
+          lng: parseFloat(osmExtra.lon),
+          formatted_address: osmExtra.display_name || suggestion.placePrediction.text.text,
+          name: osmExtra.name || suggestion.placePrediction.text.text,
+          address_components: []
+        });
+        return;
+      }
+      axios__WEBPACK_IMPORTED_MODULE_4___default().post(this.$apiUrl + '/map/places_details', {
+        place_id: suggestion.placePrediction.placeId,
+        language: 'en',
+        source: 'web'
+      }).then(function (response) {
+        var data = response.data && response.data.data ? response.data.data : response.data;
+        if (!data || !data.location) return;
+        _this4.applyPlace({
+          lat: data.location.latitude,
+          lng: data.location.longitude,
+          formatted_address: data.formattedAddress || data.displayName || '',
+          name: data.displayName || '',
+          address_components: data.addressComponents || []
+        });
+      });
+    },
+    reverseGeocode: function reverseGeocode(lat, lng) {
+      var _this5 = this;
+      axios__WEBPACK_IMPORTED_MODULE_4___default().post(this.$apiUrl + '/map/geocode', {
+        latitude: lat,
+        longitude: lng,
+        source: 'web'
+      }).then(function (response) {
+        var data = response.data && response.data.data ? response.data.data : response.data;
+        var result = data && data.results && data.results[0];
+        _this5.$emit('location-selected', {
+          lat: lat,
+          lng: lng,
+          formatted_address: result ? result.formatted_address : '',
+          name: result ? result.formatted_address : '',
+          address_components: result ? result.address_components : []
+        });
+      })["catch"](function () {
+        _this5.$emit('location-selected', {
+          lat: lat,
+          lng: lng,
+          formatted_address: '',
+          name: '',
+          address_components: []
+        });
+      });
+    },
+    applyPlace: function applyPlace(payload) {
+      this.setMarker(payload.lat, payload.lng);
+      this.$emit('location-selected', payload);
+    },
+    setView: function setView(lat, lng) {
+      this.setMarker(lat, lng);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js":
+/*!*******************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/**
+ * Shared "drag & drop to reorder" toggle for list toolbars.
+ *   <reorder-toggle v-model="enableDragDrop"></reorder-toggle>
+ *   <reorder-toggle v-model="editable" :label="__('enable_drag_and_drop')" icon="bi bi-sort-down"></reorder-toggle>
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'ReorderToggle',
+  props: {
+    value: {
+      type: Boolean,
+      "default": false
+    },
+    label: {
+      type: String,
+      "default": ''
+    },
+    onHint: {
+      type: String,
+      "default": ''
+    },
+    icon: {
+      type: String,
+      "default": 'bi bi-arrows-move'
+    },
+    disabled: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  methods: {
+    toggle: function toggle() {
+      this.$emit('input', !this.value);
+      this.$emit('change', !this.value);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'TableCount',
+  props: {
+    currentPage: {
+      type: [Number, String],
+      "default": 1
+    },
+    perPage: {
+      type: [Number, String],
+      "default": 10
+    },
+    totalRows: {
+      type: [Number, String],
+      "default": 0
+    }
+  },
+  computed: {
+    current: function current() {
+      var p = parseInt(this.currentPage, 10);
+      return isNaN(p) || p < 1 ? 1 : p;
+    },
+    size: function size() {
+      var s = parseInt(this.perPage, 10);
+      return isNaN(s) || s < 1 ? 10 : s;
+    },
+    total: function total() {
+      var t = parseInt(this.totalRows, 10);
+      return isNaN(t) || t < 0 ? 0 : t;
+    },
+    from: function from() {
+      if (this.total === 0) return 0;
+      return Math.min((this.current - 1) * this.size + 1, this.total);
+    },
+    to: function to() {
+      if (this.total === 0) return 0;
+      return Math.min(this.current * this.size, this.total);
+    },
+    labelShowing: function labelShowing() {
+      return this.__('showing') !== 'showing' ? this.__('showing') : this.__('Showing Result') || 'Showing';
+    },
+    labelOf: function labelOf() {
+      return this.__('of') !== 'of' ? this.__('of') : 'of';
+    },
+    labelItems: function labelItems() {
+      return this.__('items') !== 'items' ? this.__('items') : this.__('Items') || 'items';
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/mixins/Permissions.vue?vue&type=script&lang=js":
 /*!*************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/mixins/Permissions.vue?vue&type=script&lang=js ***!
@@ -3120,9 +4399,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _IntendedUrl_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./IntendedUrl.js */ "./resources/js/IntendedUrl.js");
+/* harmony import */ var _ThemePalette__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ThemePalette */ "./resources/js/ThemePalette.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
 
 var Auth = /*#__PURE__*/function () {
   function Auth() {
@@ -3148,6 +4431,10 @@ var Auth = /*#__PURE__*/function () {
       }
       window.UserPermissions = JSON.stringify(user.allPermissions); //Fix Login Issue for Permission
       window.Role = user.role.name; //Fix Login Issue for Permission
+
+      // The theme was painted on the login page, before the user's module was known (a seller's
+      // module is seeded just above). Repaint with the right palette now, not only after a refresh.
+      (0,_ThemePalette__WEBPACK_IMPORTED_MODULE_2__.loadTheme)(window.baseUrl);
       this.validate();
     }
   }, {
@@ -3164,6 +4451,8 @@ var Auth = /*#__PURE__*/function () {
       window.localStorage.removeItem('user');
       window.localStorage.removeItem('loginCheck');
       window.localStorage.removeItem('active_module_id');
+      (0,_IntendedUrl_js__WEBPACK_IMPORTED_MODULE_1__.clearIntended)(); // a deliberate logout should not bounce back to the last page
+
       if (role_id === 3) {
         window.location.replace('/seller/login');
       } else if (role_id === 4) {
@@ -3181,7 +4470,7 @@ var Auth = /*#__PURE__*/function () {
       if (currentRoute) {
         currentPathName = currentRoute;
       }
-      var ignoreRoutes = ["/install", "/purchase_code", "/login", "/seller/login", "/delivery_boy/login", "/seller/register", "/delivery_boy/register", "/forgot-password"];
+      var ignoreRoutes = ["/purchase_code", "/login", "/seller/login", "/delivery_boy/login", "/seller/register", "/delivery_boy/register", "/forgot-password"];
       if (!purchase_code && !ignoreRoutes.includes(currentPathName)) {
         window.location.href = '/purchase_code';
         /*axios.get('api/validate').then((res) => {
@@ -3200,6 +4489,336 @@ var Auth = /*#__PURE__*/function () {
 
 /***/ }),
 
+/***/ "./resources/js/EditorTheme.js":
+/*!*************************************!*\
+  !*** ./resources/js/EditorTheme.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   installEditorTheme: () => (/* binding */ installEditorTheme)
+/* harmony export */ });
+// Makes every TinyMCE editor in the panel follow the light / dark theme (and the module's theme palette).
+//
+// The editor chrome (toolbar, menus, dialogs, status bar) is styled from theme tokens in
+// custom-egrocer.scss ("TinyMCE editor"). The editing area is an iframe that can't see the page's CSS
+// variables, so its colours are copied in here: once when each editor starts, and again whenever the
+// theme is switched (the header toggles theme-light / theme-dark on <body> without a reload).
+// Only colours are set; the editor's own content fonts (e.g. a page's content_style) are left alone.
+
+var STYLE_ID = 'ui-theme-content-style';
+function themeColors() {
+  var css = getComputedStyle(document.body);
+  var v = function v(name) {
+    return css.getPropertyValue(name).trim();
+  };
+  return {
+    dark: document.body.classList.contains('theme-dark'),
+    bg: v('--ui-surface'),
+    text: v('--ui-text'),
+    muted: v('--ui-text-subtle'),
+    border: v('--ui-border-strong'),
+    link: v('--theme-primary-600'),
+    selection: v('--ui-primary-soft')
+  };
+}
+function applyToEditor(editor) {
+  var doc = editor && editor.getDoc && editor.getDoc();
+  if (!doc || !doc.head) return;
+  var c = themeColors();
+  var style = doc.getElementById(STYLE_ID);
+  if (!style) {
+    style = doc.createElement('style');
+    style.id = STYLE_ID;
+    doc.head.appendChild(style);
+  }
+  style.textContent = "\n        html, body { background: ".concat(c.bg, " !important; color: ").concat(c.text, " !important; }\n        a { color: ").concat(c.link, "; }\n        table, table td, table th { border-color: ").concat(c.border, "; }\n        hr { border-color: ").concat(c.border, "; }\n        ::selection { background: ").concat(c.selection, "; }\n        .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before { color: ").concat(c.muted, " !important; }\n    ");
+  doc.documentElement.classList.toggle('theme-dark', c.dark);
+  if (doc.body) doc.body.style.colorScheme = c.dark ? 'dark' : 'light';
+}
+function applyToAll() {
+  var tinymce = window.tinymce;
+  if (!tinymce || !tinymce.get) return;
+  tinymce.get().forEach(applyToEditor);
+}
+function installEditorTheme() {
+  var tinymce = window.tinymce;
+  if (!tinymce || tinymce.__uiThemeInstalled) return;
+  tinymce.__uiThemeInstalled = true;
+  var originalInit = tinymce.init.bind(tinymce);
+  tinymce.init = function () {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var pageSetup = config.setup;
+    return originalInit(Object.assign({}, config, {
+      setup: function setup(editor) {
+        editor.on('init', function () {
+          return applyToEditor(editor);
+        });
+        if (typeof pageSetup === 'function') pageSetup(editor);
+      }
+    }));
+  };
+
+  // Theme switch (and module palette changes) -> re-colour open editors.
+  new MutationObserver(applyToAll).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
+  new MutationObserver(applyToAll).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['style']
+  });
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  installEditorTheme: installEditorTheme
+});
+
+/***/ }),
+
+/***/ "./resources/js/IntendedUrl.js":
+/*!*************************************!*\
+  !*** ./resources/js/IntendedUrl.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   afterLoginPath: () => (/* binding */ afterLoginPath),
+/* harmony export */   clearIntended: () => (/* binding */ clearIntended),
+/* harmony export */   loginPathFor: () => (/* binding */ loginPathFor),
+/* harmony export */   panelOf: () => (/* binding */ panelOf),
+/* harmony export */   rememberIntended: () => (/* binding */ rememberIntended),
+/* harmony export */   takeIntended: () => (/* binding */ takeIntended)
+/* harmony export */ });
+// Remembers the page a logged-out user tried to open, so login can return them there
+// (e.g. /store_settings?section=delivery_boy_setting) instead of always the dashboard.
+// Kept in sessionStorage: survives the redirect/reload to the login page, gone with the tab.
+
+var KEY = 'intended_url';
+var AUTH_PAGES = /^\/(?:(?:seller|delivery_boy)\/)?(?:login|register|forgot[-_]password|reset[-_]password)\b|^\/(?:install|purchase_code|404)\b/;
+
+// Which login page owns a path: '/seller/...' -> seller panel, '/delivery_boy/...' -> delivery boy panel.
+function panelOf(path) {
+  if (/^\/seller(\/|$|\?)/.test(path)) return 'seller';
+  if (/^\/delivery_boy(\/|$|\?)/.test(path)) return 'delivery_boy';
+  return 'admin';
+}
+function loginPathFor(path) {
+  var panel = panelOf(path);
+  return panel === 'admin' ? '/login' : '/' + panel + '/login';
+}
+function isSafe(path) {
+  // same-app absolute path only (no //host or scheme), and never an auth page itself
+  return typeof path === 'string' && path.charAt(0) === '/' && path.charAt(1) !== '/' && !AUTH_PAGES.test(path);
+}
+function rememberIntended(fullPath) {
+  try {
+    if (isSafe(fullPath)) sessionStorage.setItem(KEY, fullPath);
+  } catch (e) {}
+}
+function clearIntended() {
+  try {
+    sessionStorage.removeItem(KEY);
+  } catch (e) {}
+}
+
+// Returns the remembered path when it belongs to `panel`, otherwise `fallback`; always clears it.
+function takeIntended(panel, fallback) {
+  var path = null;
+  try {
+    path = sessionStorage.getItem(KEY);
+  } catch (e) {}
+  clearIntended();
+  return path && isSafe(path) && panelOf(path) === panel ? path : fallback;
+}
+
+// Where to go right after a successful login: the remembered page if it belongs to this user's panel
+// (role 3 = seller, 4 = delivery boy, anything else = admin), otherwise `fallback`.
+function afterLoginPath(user, fallback) {
+  var roleId = user && user.role_id;
+  var panel = roleId === 3 ? 'seller' : roleId === 4 ? 'delivery_boy' : 'admin';
+  return takeIntended(panel, fallback);
+}
+
+/***/ }),
+
+/***/ "./resources/js/ThemePalette.js":
+/*!**************************************!*\
+  !*** ./resources/js/ThemePalette.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   applyTheme: () => (/* binding */ applyTheme),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   loadTheme: () => (/* binding */ loadTheme),
+/* harmony export */   themeChartColors: () => (/* binding */ themeChartColors),
+/* harmony export */   themeColor: () => (/* binding */ themeColor)
+/* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+// Applies the active module's Theme Settings palette (/theme-settings) to the whole panel.
+//
+// Every shade of every role is published as a CSS variable on <html>:
+//   --theme-primary-50 … --theme-primary-950   (brand, buttons, links, active states)
+//   --theme-neutral-50 … --theme-neutral-950   (text, surfaces, borders)
+//   --theme-success-*, --theme-error-*, --theme-warn-*, --theme-info-*  (states only)
+// The legacy --figma-* variables are defined on top of these in custom-egrocer.scss, so
+// existing CSS follows the theme too. Static fallbacks for every shade also live there (:root)
+// and are used until the first fetch completes.
+//
+// Switching module reloads the page, so applying once at boot is enough. The last payload is
+// cached so a reload paints with the right colors before the request returns.
+
+var ROLES = ['primary', 'neutral', 'success', 'error', 'warn', 'info'];
+var CACHE_KEY = 'theme_palette_cache';
+
+// Same module the header uses: the stored one, else the module marked as default.
+function activeModuleId() {
+  return Number(localStorage.getItem('active_module_id')) || null;
+}
+function readCache() {
+  try {
+    return JSON.parse(localStorage.getItem(CACHE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function writeCache(all) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(all));
+  } catch (e) {
+    // Storage full or blocked - the CSS fallbacks still apply.
+  }
+}
+function setPalette(palette) {
+  var root = document.documentElement.style;
+  ROLES.forEach(function (role) {
+    var shades = palette[role];
+    if (!shades || _typeof(shades) !== 'object') return;
+    Object.keys(shades).forEach(function (stop) {
+      return root.setProperty("--theme-".concat(role, "-").concat(stop), shades[stop]);
+    });
+  });
+}
+
+// Only the default module stores status colors; the others reuse its success/error/warn/info.
+function resolvePalette(all, moduleId) {
+  if (!all) return null;
+  var fallback = Object.values(all).find(function (m) {
+    return m && m.module_is_default;
+  }) || {};
+  var own = moduleId && all[moduleId] || fallback;
+  if (!own.primary) return null;
+  var palette = {
+    primary: own.primary,
+    neutral: own.neutral
+  };
+  ['success', 'error', 'warn', 'info'].forEach(function (type) {
+    palette[type] = own[type] || fallback[type];
+  });
+  return palette;
+}
+
+// Admin panel colours (Theme Settings > Admin panel colours, one global setting): when the admin
+// panel does not follow the module themes, its own primary / neutral replace the module's.
+// Status colours always stay the shared ones.
+var ADMIN_CACHE_KEY = 'theme_admin_panel_cache';
+function readAdminCache() {
+  try {
+    return JSON.parse(localStorage.getItem(ADMIN_CACHE_KEY)) || null;
+  } catch (e) {
+    return null;
+  }
+}
+function writeAdminCache(admin) {
+  try {
+    localStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify(admin));
+  } catch (e) {
+    // CSS fallbacks still apply.
+  }
+}
+
+// The admin panel colours belong to the admin panel only: sellers and delivery boys always follow
+// their own module's palette.
+function isAdminPanelUser() {
+  try {
+    var user = JSON.parse(localStorage.getItem('user'));
+    var role = user && user.role ? user.role.name : '';
+    return role !== 'Seller' && role !== 'Delivery Boy';
+  } catch (e) {
+    return true;
+  }
+}
+function applyTheme(all) {
+  var admin = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : readAdminCache();
+  var palette = resolvePalette(all, activeModuleId());
+  if (!palette) return;
+  if (admin && admin.use_module_theme === false && admin.primary && admin.neutral && isAdminPanelUser()) {
+    palette.primary = admin.primary;
+    palette.neutral = admin.neutral;
+  }
+  setPalette(palette);
+}
+function loadTheme(baseUrl) {
+  var cached = readCache();
+  if (Object.keys(cached).length) applyTheme(cached);
+  var themes = window.axios.get(baseUrl + '/api/theme').then(function (r) {
+    return r.data && r.data.data;
+  })["catch"](function () {
+    return null;
+  });
+  var admin = window.axios.get(baseUrl + '/api/theme/admin').then(function (r) {
+    return r.data && r.data.data;
+  })["catch"](function () {
+    return null;
+  });
+  return Promise.all([themes, admin]).then(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+      all = _ref2[0],
+      adminTheme = _ref2[1];
+    if (adminTheme) writeAdminCache(adminTheme);
+    var modules = all || (Object.keys(cached).length ? cached : null);
+    if (!modules) return;
+    if (all) writeCache(all);
+    applyTheme(modules, adminTheme || readAdminCache());
+  });
+}
+
+// Resolved hex value of a theme shade, e.g. themeColor('primary-500'). For libraries that cannot
+// read CSS variables themselves (ApexCharts, Leaflet, Google Maps).
+function themeColor(name) {
+  var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var value = getComputedStyle(document.documentElement).getPropertyValue('--theme-' + name).trim();
+  return value || fallback;
+}
+
+// Categorical series colors for charts, all taken from the theme palette.
+function themeChartColors() {
+  return ['primary-500', 'info-500', 'success-500', 'warn-500', 'error-500', 'primary-300', 'info-300', 'success-300', 'warn-300', 'error-300'].map(function (name) {
+    return themeColor(name);
+  });
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  loadTheme: loadTheme,
+  applyTheme: applyTheme,
+  themeColor: themeColor,
+  themeChartColors: themeChartColors
+});
+
+/***/ }),
+
 /***/ "./resources/js/app.js":
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
@@ -3209,36 +4828,38 @@ var Auth = /*#__PURE__*/function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Auth__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Auth */ "./resources/js/Auth.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
-/* harmony import */ var _router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./router */ "./resources/js/router/index.js");
-/* harmony import */ var vuejs_datatable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuejs-datatable */ "./node_modules/vuejs-datatable/dist/vuejs-datatable.esm.js");
-/* harmony import */ var bootstrap_vue__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! bootstrap-vue */ "./node_modules/bootstrap-vue/esm/index.js");
-/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! sweetalert2/dist/sweetalert2.js */ "./node_modules/sweetalert2/dist/sweetalert2.js");
-/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var v_select2_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! v-select2-component */ "./node_modules/v-select2-component/dist/Select2.esm.js");
-/* harmony import */ var _ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ckeditor/ckeditor5-vue2 */ "./node_modules/@ckeditor/ckeditor5-vue2/dist/ckeditor.js");
-/* harmony import */ var _ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _tinymce_tinymce_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tinymce/tinymce-vue */ "./node_modules/@tinymce/tinymce-vue/lib/es2015/main/ts/index.js");
-/* harmony import */ var _mixins_Permissions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./mixins/Permissions */ "./resources/js/mixins/Permissions.vue");
-/* harmony import */ var vue_toast_notification__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vue-toast-notification */ "./node_modules/vue-toast-notification/dist/index.min.js");
-/* harmony import */ var vue_toast_notification__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(vue_toast_notification__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var vue_toast_notification_dist_theme_sugar_css__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vue-toast-notification/dist/theme-sugar.css */ "./node_modules/vue-toast-notification/dist/theme-sugar.css");
-/* harmony import */ var v_clipboard__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! v-clipboard */ "./node_modules/v-clipboard/dist/index.min.js");
-/* harmony import */ var v_clipboard__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(v_clipboard__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var vue2_google_maps__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vue2-google-maps */ "./node_modules/vue2-google-maps/dist/main.js");
-/* harmony import */ var vue_sortable__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vue-sortable */ "./node_modules/vue-sortable/vue-sortable.js");
-/* harmony import */ var vue_sortable__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(vue_sortable__WEBPACK_IMPORTED_MODULE_12__);
-/* harmony import */ var vue_input_tag__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vue-input-tag */ "./node_modules/vue-input-tag/dist/vueInputTag.common.js");
-/* harmony import */ var vue_input_tag__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(vue_input_tag__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var vue_apexcharts__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vue-apexcharts */ "./node_modules/vue-apexcharts/dist/vue-apexcharts.js");
-/* harmony import */ var vue_apexcharts__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(vue_apexcharts__WEBPACK_IMPORTED_MODULE_14__);
-/* harmony import */ var vue_form_wizard__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vue-form-wizard */ "./node_modules/vue-form-wizard/dist/vue-form-wizard.js");
-/* harmony import */ var vue_form_wizard__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(vue_form_wizard__WEBPACK_IMPORTED_MODULE_15__);
-/* harmony import */ var vue_form_wizard_dist_vue_form_wizard_min_css__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vue-form-wizard/dist/vue-form-wizard.min.css */ "./node_modules/vue-form-wizard/dist/vue-form-wizard.min.css");
-/* harmony import */ var vuelidate__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vuelidate */ "./node_modules/vuelidate/lib/index.js");
-/* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! crypto-js */ "./node_modules/crypto-js/index.js");
-/* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(crypto_js__WEBPACK_IMPORTED_MODULE_19__);
+/* harmony import */ var _ThemePalette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ThemePalette */ "./resources/js/ThemePalette.js");
+/* harmony import */ var _EditorTheme__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EditorTheme */ "./resources/js/EditorTheme.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var _router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./router */ "./resources/js/router/index.js");
+/* harmony import */ var vuejs_datatable__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuejs-datatable */ "./node_modules/vuejs-datatable/dist/vuejs-datatable.esm.js");
+/* harmony import */ var bootstrap_vue__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! bootstrap-vue */ "./node_modules/bootstrap-vue/esm/index.js");
+/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sweetalert2/dist/sweetalert2.js */ "./node_modules/sweetalert2/dist/sweetalert2.js");
+/* harmony import */ var sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var v_select2_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! v-select2-component */ "./node_modules/v-select2-component/dist/Select2.esm.js");
+/* harmony import */ var _ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @ckeditor/ckeditor5-vue2 */ "./node_modules/@ckeditor/ckeditor5-vue2/dist/ckeditor.js");
+/* harmony import */ var _ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _tinymce_tinymce_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @tinymce/tinymce-vue */ "./node_modules/@tinymce/tinymce-vue/lib/es2015/main/ts/index.js");
+/* harmony import */ var _mixins_Permissions__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./mixins/Permissions */ "./resources/js/mixins/Permissions.vue");
+/* harmony import */ var vue_toast_notification__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vue-toast-notification */ "./node_modules/vue-toast-notification/dist/index.min.js");
+/* harmony import */ var vue_toast_notification__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(vue_toast_notification__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var vue_toast_notification_dist_theme_sugar_css__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vue-toast-notification/dist/theme-sugar.css */ "./node_modules/vue-toast-notification/dist/theme-sugar.css");
+/* harmony import */ var v_clipboard__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! v-clipboard */ "./node_modules/v-clipboard/dist/index.min.js");
+/* harmony import */ var v_clipboard__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(v_clipboard__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var vue2_google_maps__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vue2-google-maps */ "./node_modules/vue2-google-maps/dist/main.js");
+/* harmony import */ var vue_sortable__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vue-sortable */ "./node_modules/vue-sortable/vue-sortable.js");
+/* harmony import */ var vue_sortable__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(vue_sortable__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var vue_input_tag__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vue-input-tag */ "./node_modules/vue-input-tag/dist/vueInputTag.common.js");
+/* harmony import */ var vue_input_tag__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(vue_input_tag__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var vue_apexcharts__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vue-apexcharts */ "./node_modules/vue-apexcharts/dist/vue-apexcharts.js");
+/* harmony import */ var vue_apexcharts__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(vue_apexcharts__WEBPACK_IMPORTED_MODULE_16__);
+/* harmony import */ var vue_form_wizard__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue-form-wizard */ "./node_modules/vue-form-wizard/dist/vue-form-wizard.js");
+/* harmony import */ var vue_form_wizard__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(vue_form_wizard__WEBPACK_IMPORTED_MODULE_17__);
+/* harmony import */ var vue_form_wizard_dist_vue_form_wizard_min_css__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vue-form-wizard/dist/vue-form-wizard.min.css */ "./node_modules/vue-form-wizard/dist/vue-form-wizard.min.css");
+/* harmony import */ var vuelidate__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! vuelidate */ "./node_modules/vuelidate/lib/index.js");
+/* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! crypto-js */ "./node_modules/crypto-js/index.js");
+/* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_21___default = /*#__PURE__*/__webpack_require__.n(crypto_js__WEBPACK_IMPORTED_MODULE_21__);
 var _window$decimalPoint;
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -3246,6 +4867,8 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
 
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
@@ -3268,21 +4891,29 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].component('apexchart', (vue_apexcharts__WEBPACK_IMPORTED_MODULE_14___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use((vue_form_wizard__WEBPACK_IMPORTED_MODULE_15___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].component('InfiniteLoading', __webpack_require__(/*! vue-infinite-loading */ "./node_modules/vue-infinite-loading/dist/vue-infinite-loading.js"));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].component('input-tag', (vue_input_tag__WEBPACK_IMPORTED_MODULE_13___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].component('base-icon', (__webpack_require__(/*! ./components/BaseIcon.vue */ "./resources/js/components/BaseIcon.vue")["default"]));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use((vue_sortable__WEBPACK_IMPORTED_MODULE_12___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('apexchart', (vue_apexcharts__WEBPACK_IMPORTED_MODULE_16___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((vue_form_wizard__WEBPACK_IMPORTED_MODULE_17___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('InfiniteLoading', __webpack_require__(/*! vue-infinite-loading */ "./node_modules/vue-infinite-loading/dist/vue-infinite-loading.js"));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('input-tag', (vue_input_tag__WEBPACK_IMPORTED_MODULE_15___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('base-icon', (__webpack_require__(/*! ./components/BaseIcon.vue */ "./resources/js/components/BaseIcon.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('custom-field-date', (__webpack_require__(/*! ./components/CustomFieldDate.vue */ "./resources/js/components/CustomFieldDate.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('osm-map-picker', (__webpack_require__(/*! ./components/OsmMapPicker.vue */ "./resources/js/components/OsmMapPicker.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('google-place-search', (__webpack_require__(/*! ./components/GooglePlaceSearch.vue */ "./resources/js/components/GooglePlaceSearch.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('table-count', (__webpack_require__(/*! ./components/TableCount.vue */ "./resources/js/components/TableCount.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('data-table', (__webpack_require__(/*! ./components/DataTable.vue */ "./resources/js/components/DataTable.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('reorder-toggle', (__webpack_require__(/*! ./components/ReorderToggle.vue */ "./resources/js/components/ReorderToggle.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('module-icon', (__webpack_require__(/*! ./components/ModuleIcon.vue */ "./resources/js/components/ModuleIcon.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('command-palette', (__webpack_require__(/*! ./components/CommandPalette.vue */ "./resources/js/components/CommandPalette.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((vue_sortable__WEBPACK_IMPORTED_MODULE_14___default()));
 
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(vuelidate__WEBPACK_IMPORTED_MODULE_18__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use(vuelidate__WEBPACK_IMPORTED_MODULE_20__["default"]);
 
 var secretKey = "ewgrrtoecaemr";
 function decryptMapApiKey(encryptedKey) {
   if (!encryptedKey || typeof encryptedKey !== 'string') return null;
   try {
-    var bytes = crypto_js__WEBPACK_IMPORTED_MODULE_19___default().AES.decrypt(encryptedKey, secretKey);
-    var decrypted = bytes.toString((crypto_js__WEBPACK_IMPORTED_MODULE_19___default().enc).Utf8);
+    var bytes = crypto_js__WEBPACK_IMPORTED_MODULE_21___default().AES.decrypt(encryptedKey, secretKey);
+    var decrypted = bytes.toString((crypto_js__WEBPACK_IMPORTED_MODULE_21___default().enc).Utf8);
     return decrypted || null;
   } catch (error) {
     // Suppress console error as the key might just be unencrypted
@@ -3293,7 +4924,7 @@ function decryptMapApiKey(encryptedKey) {
 // Example usage
 var decryptedKey = decryptMapApiKey(window.MapApiKey);
 var decryptedMapKey = decryptMapApiKey(window.GoogleMapApiKey);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(vue2_google_maps__WEBPACK_IMPORTED_MODULE_11__, {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use(vue2_google_maps__WEBPACK_IMPORTED_MODULE_13__, {
   load: {
     key: window.GoogleMapApiKey || window.MapApiKey || decryptedMapKey || decryptedKey,
     // Use unencrypted map API key first, then fallback to place API key
@@ -3301,62 +4932,79 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(vue2_google_maps__WEBPACK_IMPOR
     v: '3.64'
   }
 });
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$googleMapsKey = window.GoogleMapApiKey || window.MapApiKey || decryptedMapKey || decryptedKey;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$appName = window.appName;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$appLogo = window.appLogo;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$appDarkLogo = window.appDarkLogo;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$panelLoginBackgroundImg = window.panelLoginBackgroundImg;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currency = window.currency;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$decimalPoint = (_window$decimalPoint = window.decimalPoint) !== null && _window$decimalPoint !== void 0 ? _window$decimalPoint : 2;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$formatAmount = function (value) {
-  return Number(value !== null && value !== void 0 ? value : 0).toFixed(vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$decimalPoint);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$googleMapsKey = window.GoogleMapApiKey || window.MapApiKey || decryptedMapKey || decryptedKey;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$appName = window.appName;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$appLogo = window.appLogo;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$appDarkLogo = window.appDarkLogo;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$panelLoginBackgroundImg = window.panelLoginBackgroundImg;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currency = window.currency;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$decimalPoint = (_window$decimalPoint = window.decimalPoint) !== null && _window$decimalPoint !== void 0 ? _window$decimalPoint : 2;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$formatAmount = function (value) {
+  return Number(value !== null && value !== void 0 ? value : 0).toFixed(vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$decimalPoint);
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$supportEmail = window.supportEmail;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$supportNumber = window.supportNumber;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$isDemo = window.isDemo;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentVersion = window.currentVersion;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$deliveryBoyBonusSettings = window.deliveryBoyBonusSettings;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$websiteUrl = window.websiteUrl;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$copyrightDetails = window.copyrightDetails;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$mobileWidth = 991;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentWidth = window.innerWidth;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentHeight = window.innerHeight;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$setWindowSize = function () {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$supportEmail = window.supportEmail;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$supportNumber = window.supportNumber;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$isDemo = window.isDemo;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentVersion = window.currentVersion;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$deliveryBoyBonusSettings = window.deliveryBoyBonusSettings;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$websiteUrl = window.websiteUrl;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$copyrightDetails = window.copyrightDetails;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$placeholderImage = window.placeholderImage || window.baseUrl + '/storage/front_end/placeholder_image/1750673833_83128.jpeg';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$getImageUrl = function (imageUrl) {
+  if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '') {
+    return imageUrl;
+  }
+  return vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$placeholderImage;
+};
+
+// Global image error handler: automatically fallback to settings placeholder image if any image fails to load
+window.addEventListener('error', function (e) {
+  if (e.target && e.target.tagName === 'IMG' && vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$placeholderImage) {
+    if (e.target.src !== vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$placeholderImage && !e.target.dataset.fallbackApplied) {
+      e.target.dataset.fallbackApplied = 'true';
+      e.target.src = vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$placeholderImage;
+    }
+  }
+}, true);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$mobileWidth = 991;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentWidth = window.innerWidth;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentHeight = window.innerHeight;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$setWindowSize = function () {
   if (typeof window.innerWidth == 'number') {
-    vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentWidth = window.innerWidth;
-    vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentHeight = window.innerHeight;
+    vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentWidth = window.innerWidth;
+    vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentHeight = window.innerHeight;
   } else {
     if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
-      vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentWidth = document.documentElement.clientWidth;
-      vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentHeight = document.documentElement.clientHeight;
+      vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentWidth = document.documentElement.clientWidth;
+      vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentHeight = document.documentElement.clientHeight;
     } else {
       if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
-        vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentWidth = document.body.clientWidth;
-        vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$currentHeight = document.body.clientHeight;
+        vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentWidth = document.body.clientWidth;
+        vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$currentHeight = document.body.clientHeight;
       }
     }
   }
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$setWindowSize();
-window.addEventListener('resize', vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$setWindowSize);
-window.addEventListener('DOMContentLoaded', vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$setWindowSize);
-window.Swal = (sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_3___default());
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$setWindowSize();
+window.addEventListener('resize', vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$setWindowSize);
+window.addEventListener('DOMContentLoaded', vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$setWindowSize);
+window.Swal = (sweetalert2_dist_sweetalert2_js__WEBPACK_IMPORTED_MODULE_5___default());
 window.moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 window.toastr = __webpack_require__(/*! toastr */ "./node_modules/toastr/toastr.js");
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].mixin(_mixins_Permissions__WEBPACK_IMPORTED_MODULE_7__["default"]);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use((_ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_5___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use((vue_toast_notification__WEBPACK_IMPORTED_MODULE_8___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_20__["default"]);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(vuejs_datatable__WEBPACK_IMPORTED_MODULE_2__.VuejsDatatableFactory);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_21__.BootstrapVue, {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].mixin(_mixins_Permissions__WEBPACK_IMPORTED_MODULE_9__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((_ckeditor_ckeditor5_vue2__WEBPACK_IMPORTED_MODULE_7___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((vue_toast_notification__WEBPACK_IMPORTED_MODULE_10___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use(vue_router__WEBPACK_IMPORTED_MODULE_22__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use(vuejs_datatable__WEBPACK_IMPORTED_MODULE_4__.VuejsDatatableFactory);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_23__.BootstrapVue, {
   BPagination: {
     hideGotoEndButtons: true,
     prevText: '<',
     nextText: '>'
   }
 });
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].use((v_clipboard__WEBPACK_IMPORTED_MODULE_10___default()));
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].component('Select2', v_select2_component__WEBPACK_IMPORTED_MODULE_4__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((v_clipboard__WEBPACK_IMPORTED_MODULE_12___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].component('Select2', v_select2_component__WEBPACK_IMPORTED_MODULE_6__["default"]);
 
 // Select2's dropdown only repositions on the window's own scroll event, not on scroll from a
 // nested container (e.g. a horizontally-scrollable table wrapper). Scrolling one of those left
@@ -3377,31 +5025,38 @@ document.addEventListener('scroll', function (event) {
     bubbles: true
   }));
 }, true);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$baseUrl = window.baseUrl;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$apiUrl = window.baseUrl + '/api';
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$sellerApiUrl = window.baseUrl + '/api/seller';
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$deliveryBoyApiUrl = window.baseUrl + '/api/delivery_boy';
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$storageUrl = window.baseUrl + '/storage/';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$baseUrl = window.baseUrl;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$apiUrl = window.baseUrl + '/api';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$sellerApiUrl = window.baseUrl + '/api/seller';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$deliveryBoyApiUrl = window.baseUrl + '/api/delivery_boy';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$storageUrl = window.baseUrl + '/storage/';
+
+// Paint the panel with the active module's Theme Settings palette.
+(0,_ThemePalette__WEBPACK_IMPORTED_MODULE_1__.loadTheme)(window.baseUrl);
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$themeColor = _ThemePalette__WEBPACK_IMPORTED_MODULE_1__.themeColor;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$themeChartColors = _ThemePalette__WEBPACK_IMPORTED_MODULE_1__.themeChartColors;
+// TinyMCE editors follow the light / dark theme.
+(0,_EditorTheme__WEBPACK_IMPORTED_MODULE_2__.installEditorTheme)();
 
 //Role
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$roleSuperAdmin = "Super Admin";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$roleSeller = "Seller";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$roleDeliveryBoy = "Delivery Boy";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$roleName = "Super Admin";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$roleSuperAdmin = "Super Admin";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$roleSeller = "Seller";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$roleDeliveryBoy = "Delivery Boy";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$roleName = "Super Admin";
 
 //order_status_lists
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$pending = "Payment Pending";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$received = "Received";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$processed = "Processed";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$shipped = "Shipped";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$outForDelivery = "Out For Delivery";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$delivered = "Delivered";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$cancelled = "Cancelled";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$returned = "Returned";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$editorPlugins = ["autolink", "lists", "link", "charmap", "anchor", "searchreplace", "visualblocks", "media", "table", "wordcount", "image", "code", "codesample"];
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$editorToolbar = "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | charmap | code | removeformat";
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$editorFont_size_formats = '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt';
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$tinymceImageUploadOptions = function () {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$pending = "Payment Pending";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$received = "Received";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$processed = "Processed";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$shipped = "Shipped";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$outForDelivery = "Out For Delivery";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$delivered = "Delivered";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$cancelled = "Cancelled";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$returned = "Returned";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$editorPlugins = ["autolink", "lists", "link", "charmap", "anchor", "searchreplace", "visualblocks", "media", "table", "wordcount", "image", "code", "codesample"];
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$editorToolbar = "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | charmap | code | removeformat";
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$editorFont_size_formats = '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$tinymceImageUploadOptions = function () {
   var apiUrl = this.$apiUrl;
   return {
     convert_urls: false,
@@ -3455,12 +5110,12 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$tinymceImageUploadOption
     }
   };
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$swal = window.Swal;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$logo = '';
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$swal = window.Swal;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$logo = '';
 var lang = localStorage.getItem("language");
 lang = JSON.parse(lang);
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$perPage = 10;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$pageOptions = [2, 5, 10, 20, 50, {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$perPage = 10;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$pageOptions = [2, 5, 10, 20, 50, {
   value: 100,
   text: '100'
 }];
@@ -3470,8 +5125,8 @@ window.trans = window.__ = function (string) {
   window.i18n = lang;
   return _.get(lang, string) || string;
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.trans = window.trans;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.__ = window.__;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.trans = window.trans;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.__ = window.__;
 
 // Use translated message for HTML5 required-field validation (same pattern as show_a_lot: lang from localStorage).
 document.addEventListener('invalid', function (e) {
@@ -3498,7 +5153,7 @@ document.addEventListener('change', function (e) {
 
 // Make b-table empty text translatable (empty state and filtered-empty state).
 // Override Bootstrap-Vue's b-table emptyText and emptyFilteredText defaults to use lang keys.
-var BTableComponent = vue__WEBPACK_IMPORTED_MODULE_17__["default"].options.components['b-table'] || vue__WEBPACK_IMPORTED_MODULE_17__["default"].options.components['BTable'];
+var BTableComponent = vue__WEBPACK_IMPORTED_MODULE_19__["default"].options.components['b-table'] || vue__WEBPACK_IMPORTED_MODULE_19__["default"].options.components['BTable'];
 if (BTableComponent && BTableComponent.options && BTableComponent.options.props) {
   var props = BTableComponent.options.props;
   if (props.emptyText) {
@@ -3512,15 +5167,15 @@ if (BTableComponent && BTableComponent.options && BTableComponent.options.props)
     };
   }
 }
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$eventBus = new vue__WEBPACK_IMPORTED_MODULE_17__["default"]();
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.updateLogo = function (logo) {
-  vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$logo = logo;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$eventBus = new vue__WEBPACK_IMPORTED_MODULE_19__["default"]();
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.updateLogo = function (logo) {
+  vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$logo = logo;
   window.localStorage.setItem('logo', logo);
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.isImage = function (url) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.isImage = function (url) {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$dragoverFile = function (event) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$dragoverFile = function (event) {
   event.preventDefault();
   // Add some visual fluff to show the user can drop its files
   if (!event.currentTarget.classList.contains('bg-green-300')) {
@@ -3528,25 +5183,25 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$dragoverFile = function 
     event.currentTarget.classList.add('bg-green-300');
   }
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$dragleaveFile = function (event) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$dragleaveFile = function (event) {
   // Clean up
   event.currentTarget.classList.add('bg-gray-100');
   event.currentTarget.classList.remove('bg-green-300');
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.formattedName = function (name) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.formattedName = function (name) {
   var newName = name.replace(/_/g, ' ');
   newName = newName.toLowerCase().replace(/(?<= )[^\s]|^./g, function (a) {
     return a.toUpperCase();
   });
   return newName;
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showMessage = function (variant, message) {
-  vue__WEBPACK_IMPORTED_MODULE_17__["default"].$toast.open({
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.showMessage = function (variant, message) {
+  vue__WEBPACK_IMPORTED_MODULE_19__["default"].$toast.open({
     type: variant,
     message: message
   });
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showSuccess = function (message) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.showSuccess = function (message) {
   this.$swal.fire({
     title: __('success'),
     text: message,
@@ -3554,7 +5209,7 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showSuccess = function (m
     confirmButtonText: __('ok')
   });
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showError = function (error_message) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.showError = function (error_message) {
   this.$swal.fire({
     title: __('error'),
     text: error_message,
@@ -3562,7 +5217,7 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showError = function (err
     confirmButtonText: __('ok')
   });
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showWarning = function (error_message) {
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.showWarning = function (error_message) {
   this.$swal.fire({
     title: __('warning'),
     text: error_message,
@@ -3570,8 +5225,8 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.showWarning = function (e
     confirmButtonText: __('ok')
   });
 };
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].filter('emailMask', function (value) {
-  if (vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$isDemo === 0 || vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$isDemo === "0") return value;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].filter('emailMask', function (value) {
+  if (vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$isDemo === 0 || vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$isDemo === "0") return value;
   if (!value) return '';
   var _value$split = value.split('@'),
     _value$split2 = _slicedToArray(_value$split, 2),
@@ -3584,8 +5239,8 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].filter('emailMask', function (value
   var maskedUsername = first + maskedCenter + last;
   return "".concat(maskedUsername, "@").concat(domain);
 });
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].filter('mobileMask', function (value) {
-  if (vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$isDemo === 0 || vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$isDemo === "0") return value;
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].filter('mobileMask', function (value) {
+  if (vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$isDemo === 0 || vue__WEBPACK_IMPORTED_MODULE_19__["default"].prototype.$isDemo === "0") return value;
   if (!value) return '';
   var first = value.substring(0, 2);
   var last = value.slice(-3);
@@ -3593,8 +5248,8 @@ vue__WEBPACK_IMPORTED_MODULE_17__["default"].filter('mobileMask', function (valu
   var maskedCenter = center.replace(/./g, '*');
   return "".concat(first).concat(maskedCenter).concat(last);
 });
-var app = new vue__WEBPACK_IMPORTED_MODULE_17__["default"]({
-  router: _router__WEBPACK_IMPORTED_MODULE_1__["default"]
+var app = new vue__WEBPACK_IMPORTED_MODULE_19__["default"]({
+  router: _router__WEBPACK_IMPORTED_MODULE_3__["default"]
 }).$mount('#app');
 
 /***/ }),
@@ -3639,12 +5294,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Auth_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Auth.js */ "./resources/js/Auth.js");
-/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _IntendedUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../IntendedUrl.js */ "./resources/js/IntendedUrl.js");
+/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_3__);
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 
 
 
@@ -3704,10 +5361,7 @@ var NotificationPanel = function NotificationPanel() {
 
 // Categories
 var ManageCategories = function ManageCategories() {
-  return __webpack_require__.e(/*! import() */ "resources_js_views_Category_ManageCategories_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Category/ManageCategories */ "./resources/js/views/Category/ManageCategories.vue"));
-};
-var CategoriesOrder = function CategoriesOrder() {
-  return __webpack_require__.e(/*! import() */ "resources_js_views_Category_CategoriesOrder_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Category/CategoriesOrder */ "./resources/js/views/Category/CategoriesOrder.vue"));
+  return __webpack_require__.e(/*! import() | manage_categories */ "manage_categories").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Category/ManageCategories */ "./resources/js/views/Category/ManageCategories.vue"));
 };
 
 // Products
@@ -3790,6 +5444,9 @@ var TimeSlots = function TimeSlots() {
 var StoreSettings = function StoreSettings() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_StoreSettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/StoreSettings */ "./resources/js/views/Setting/StoreSettings.vue"));
 };
+var SettingsHub = function SettingsHub() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_SettingsHub_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/SettingsHub */ "./resources/js/views/Setting/SettingsHub.vue"));
+};
 //Setting - Theme Settings
 var ThemeSettings = function ThemeSettings() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_ThemeSettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/ThemeSettings */ "./resources/js/views/Setting/ThemeSettings.vue"));
@@ -3835,6 +5492,15 @@ var NotificationTemplates = function NotificationTemplates() {
 };
 var SmsSettings = function SmsSettings() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_SmsSettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/SmsSettings */ "./resources/js/views/Setting/SmsSettings.vue"));
+};
+var DeeplinkSettings = function DeeplinkSettings() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_DeeplinkSettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/DeeplinkSettings */ "./resources/js/views/Setting/DeeplinkSettings.vue"));
+};
+var RealtimeSettings = function RealtimeSettings() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_RealtimeSettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/RealtimeSettings */ "./resources/js/views/Setting/RealtimeSettings.vue"));
+};
+var ModuleDeliverySettings = function ModuleDeliverySettings() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_ModuleDeliverySettings_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/ModuleDeliverySettings */ "./resources/js/views/Setting/ModuleDeliverySettings.vue"));
 };
 var SmsTemplates = function SmsTemplates() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Setting_SmsTemplates_SmsTemplates_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Setting/SmsTemplates/SmsTemplates */ "./resources/js/views/Setting/SmsTemplates/SmsTemplates.vue"));
@@ -4065,6 +5731,15 @@ var SellerTaxes = function SellerTaxes() {
 var SellerBrands = function SellerBrands() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Sellers_Brands_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Sellers/Brands */ "./resources/js/views/Sellers/Brands.vue"));
 };
+var SellerAbandonedCarts = function SellerAbandonedCarts() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Sellers_AbandonedCarts_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Sellers/AbandonedCarts */ "./resources/js/views/Sellers/AbandonedCarts.vue"));
+};
+var SellerMyDeliveryFleet = function SellerMyDeliveryFleet() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Sellers_MyDeliveryFleet_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Sellers/MyDeliveryFleet */ "./resources/js/views/Sellers/MyDeliveryFleet.vue"));
+};
+var SellerDeliveryBoyRequests = function SellerDeliveryBoyRequests() {
+  return __webpack_require__.e(/*! import() */ "resources_js_views_Sellers_DeliveryBoyRequests_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Sellers/DeliveryBoyRequests */ "./resources/js/views/Sellers/DeliveryBoyRequests.vue"));
+};
 var SellerAddons = function SellerAddons() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Sellers_Addons_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Sellers/Addons */ "./resources/js/views/Sellers/Addons.vue"));
 };
@@ -4122,6 +5797,7 @@ var DeliveryBoyDashboard = function DeliveryBoyDashboard() {
 var DeliveryBoyOrders = function DeliveryBoyOrders() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_DeliveryBoy_Orders_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/DeliveryBoy/Orders */ "./resources/js/views/DeliveryBoy/Orders.vue"));
 };
+// const DeliveryBoyRequestedOrders = () => import("../views/DeliveryBoy/RequestedOrders");
 var DeliveryBoyOrder = function DeliveryBoyOrder() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_Orders_ViewOrder_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/Orders/ViewOrder */ "./resources/js/views/Orders/ViewOrder.vue"));
 };
@@ -4158,7 +5834,7 @@ var DeliveryBoyViewProduct = function DeliveryBoyViewProduct() {
 var DeliveryBoySalary = function DeliveryBoySalary() {
   return __webpack_require__.e(/*! import() */ "resources_js_views_DeliveryBoys_Salary_DeliveryBoySalary_vue").then(__webpack_require__.bind(__webpack_require__, /*! ../views/DeliveryBoys/Salary/DeliveryBoySalary */ "./resources/js/views/DeliveryBoys/Salary/DeliveryBoySalary.vue"));
 };
-var router = new vue_router__WEBPACK_IMPORTED_MODULE_3__["default"]({
+var router = new vue_router__WEBPACK_IMPORTED_MODULE_4__["default"]({
   mode: "history",
   scrollBehavior: function scrollBehavior() {
     return {
@@ -4254,7 +5930,9 @@ router.beforeEach(function (to, from, next) {
           return;
         }
       } else {
-        router.push('/login')["catch"](function () {});
+        // remember the requested page (with its query) so login can return here
+        (0,_IntendedUrl_js__WEBPACK_IMPORTED_MODULE_2__.rememberIntended)(to.fullPath);
+        router.push((0,_IntendedUrl_js__WEBPACK_IMPORTED_MODULE_2__.loginPathFor)(to.fullPath))["catch"](function () {});
       }
     } else {
       next();
@@ -4285,7 +5963,7 @@ function configRoutes() {
             case 0:
               _context.prev = 0;
               _context.next = 3;
-              return axios__WEBPACK_IMPORTED_MODULE_2___default().get(window.baseUrl + '/api/role');
+              return axios__WEBPACK_IMPORTED_MODULE_3___default().get(window.baseUrl + '/api/role');
             case 3:
               response = _context.sent;
               data = response.data.data.map(function (role) {
@@ -4430,13 +6108,7 @@ function configRoutes() {
       }
     }, {
       path: "categories_order",
-      name: "categories_order",
-      component: CategoriesOrder,
-      meta: {
-        permission: 'order_list',
-        role: adminRoles,
-        title: 'Categories Order'
-      }
+      redirect: "/manage_categories"
     }, {
       path: "manage_products",
       name: "ManageProducts",
@@ -4666,9 +6338,18 @@ function configRoutes() {
       name: "Delivery Settings",
       component: TimeSlots,
       meta: {
-        permission: 'order_list',
+        permission: 'delivery_settings',
         role: adminRoles,
         title: 'Delivery Settings'
+      }
+    }, {
+      path: "system_settings",
+      name: "System Settings",
+      component: SettingsHub,
+      meta: {
+        permission: 'order_list',
+        role: adminRoles,
+        title: 'Settings'
       }
     }, {
       path: "store_settings",
@@ -4684,7 +6365,7 @@ function configRoutes() {
       name: "Theme Settings",
       component: ThemeSettings,
       meta: {
-        permission: 'order_list',
+        permission: 'theme_settings',
         role: adminRoles,
         title: 'Theme Settings'
       }
@@ -4774,16 +6455,43 @@ function configRoutes() {
       name: "SmsSettings",
       component: SmsSettings,
       meta: {
-        permission: 'order_list',
+        permission: 'sms_settings',
         role: adminRoles,
         title: 'SMS Settings'
+      }
+    }, {
+      path: "deeplink-settings",
+      name: "DeeplinkSettings",
+      component: DeeplinkSettings,
+      meta: {
+        permission: 'deeplink_settings',
+        role: adminRoles,
+        title: 'Deeplink Settings'
+      }
+    }, {
+      path: "realtime-settings",
+      name: "RealtimeSettings",
+      component: RealtimeSettings,
+      meta: {
+        permission: 'realtime_settings',
+        role: adminRoles,
+        title: 'Realtime Settings'
+      }
+    }, {
+      path: "auto-assign-settings",
+      name: "ModuleDeliverySettings",
+      component: ModuleDeliverySettings,
+      meta: {
+        permission: 'seller_delivery_boys',
+        role: adminRoles,
+        title: 'Seller Delivery Boys'
       }
     }, {
       path: "sms-templates",
       name: "SmsTemplates",
       component: SmsTemplates,
       meta: {
-        permission: 'order_list',
+        permission: 'sms_templates_list',
         role: adminRoles,
         title: 'Sms Templates'
       }
@@ -4792,7 +6500,7 @@ function configRoutes() {
       name: "SeoSettings",
       component: SeoSettings,
       meta: {
-        permission: 'order_list',
+        permission: 'seo_settings_list',
         role: adminRoles,
         title: 'SEO Settings'
       }
@@ -5479,6 +7187,42 @@ function configRoutes() {
         title: 'Brands'
       }
     }, {
+      path: "/seller/carts",
+      name: "seller_carts",
+      component: SellerAbandonedCarts,
+      meta: {
+        permission: 'order_list',
+        role: sellerRoles,
+        title: 'Abandoned Carts'
+      }
+    }, {
+      path: "/seller/delivery_boy_requests",
+      name: "seller_delivery_boy_requests",
+      component: SellerDeliveryBoyRequests,
+      meta: {
+        permission: 'order_list',
+        role: sellerRoles,
+        title: 'Delivery Boy Requests'
+      }
+    }, {
+      path: "/seller/delivery_boy_salary",
+      name: "seller_delivery_boy_salary",
+      component: DeliveryBoySalary,
+      meta: {
+        permission: 'order_list',
+        role: sellerRoles,
+        title: 'Delivery Boy Salary'
+      }
+    }, {
+      path: "/seller/my_delivery_fleet",
+      name: "seller_my_delivery_fleet",
+      component: SellerMyDeliveryFleet,
+      meta: {
+        permission: 'order_list',
+        role: sellerRoles,
+        title: 'My Delivery Boys'
+      }
+    }, {
       path: "/seller/addons",
       name: "seller_addons",
       component: SellerAddons,
@@ -5684,7 +7428,19 @@ function configRoutes() {
         role: deliveryBoyRoles,
         title: 'Orders'
       }
-    }, {
+    },
+    // Auto-assign delivery boy feature disabled
+    // {
+    //     path: "requested_orders",
+    //     name: "DeliveryBoyRequestedOrders",
+    //     component: DeliveryBoyRequestedOrders,
+    //     meta: {
+    //         permission: 'order_list',
+    //         role: deliveryBoyRoles,
+    //         title: 'Requested Orders'
+    //     },
+    // },
+    {
       path: "return_requests",
       name: "DeliveryBoyReturnRequests",
       component: DeliveryBoyReturnRequests,
@@ -5839,6 +7595,92 @@ function configRoutes() {
       title: '404 Page Not Found'
     }
   }];
+}
+
+/***/ }),
+
+/***/ "./resources/js/utils/settingsCatalog.js":
+/*!***********************************************!*\
+  !*** ./resources/js/utils/settingsCatalog.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   canSeeSetting: () => (/* binding */ canSeeSetting),
+/* harmony export */   settingsCatalog: () => (/* binding */ settingsCatalog)
+/* harmony export */ });
+// Every Settings page / Store Settings section in one grouped list, shared by the Settings hub
+// (/system_settings) and the command palette (Ctrl/Cmd + K). Pass the calling component (vm) for
+// translations. Visibility: canSeeSetting(vm, card) — same rule as the sidebar.
+
+function settingsCatalog(vm) {
+  var tr = function tr(key, fallback) {
+    var v = vm.__(key);
+    return v && v !== key ? v : fallback;
+  };
+  var section = function section(key, icon, descKey, descFallback, titleKey) {
+    return {
+      key: 'section_' + key,
+      title: vm.__(titleKey || key),
+      desc: tr(descKey, descFallback),
+      icon: icon,
+      to: {
+        path: '/store_settings',
+        query: {
+          section: key
+        }
+      },
+      permission: 'manage_store_settings'
+    };
+  };
+  var page = function page(key, title, url, permission, icon, descKey, descFallback) {
+    return {
+      key: key,
+      title: title,
+      desc: tr(descKey, descFallback),
+      icon: icon,
+      to: url,
+      permission: permission
+    };
+  };
+  return [{
+    key: 'general',
+    title: tr('settings_group_general', 'General'),
+    cards: [section('store_setting', 'fas fa-store', 'store_setting_desc', 'Store name, support contacts, logos and copyright text.'), section('address_setting', 'fas fa-map-marker-alt', 'store_address_settings_desc', 'Store address and map location shown to customers and on invoices.'), section('other_setting', 'fas fa-sliders-h', 'other_setting_desc', 'Country code, date and time formats, cart limits and stock alerts.'), section('app_setting', 'fas fa-mobile-alt', 'app_setting_desc', 'App store links and version control for the customer, seller and delivery boy apps.'), section('frontend_home_setting', 'fas fa-home', 'frontend_home_setting_desc', 'Choose which sections appear on the website home page and how many items they show.'), section('login_setting', 'fas fa-sign-in-alt', 'login_setting_desc', 'Sign-in methods available to customers.'), section('cart_setting', 'fas fa-shopping-cart', 'cart_setting_desc', 'Guest cart and abandoned-cart reminder notifications.'), section('refer_earn_setting', 'fas fa-gift', 'refer_earn_setting_desc', 'Referral rewards for customers who invite new users.'), page('theme_settings', vm.__('theme_settings'), '/theme-settings', 'theme_settings', 'fas fa-paint-brush', 'theme_settings_desc', 'Brand, neutral and status colours used across the panels and apps.')]
+  }, {
+    key: 'delivery',
+    title: tr('settings_group_delivery', 'Delivery'),
+    cards: [section('delivery_boy_setting', 'fas fa-motorcycle', 'delivery_boy_setting_desc', 'How delivery boys earn bonuses and confirm deliveries.'), page('delivery_settings', vm.__('delivery_settings'), '/delivery_settings', 'delivery_settings', 'fas fa-clock', 'time_slot_config_desc', 'Turn delivery time slots on or off and choose how customers pick a delivery time.'), page('auto_assign', tr('seller_own_drivers', 'Seller Delivery Boys'), '/auto-assign-settings', 'seller_delivery_boys', 'fas fa-route', 'seller_own_drivers_desc', 'Decide whether sellers can deliver orders with their own delivery boys.')]
+  }, {
+    key: 'payments',
+    title: tr('settings_group_payments', 'Payments'),
+    cards: [page('payment_methods', vm.__('payment_methods'), '/payment_methods', 'manage_payment_methods', 'fas fa-credit-card', 'payment_methods_desc', 'Turn payment gateways on or off and enter their credentials.'), page('additional_charges', vm.__('additional_charge'), '/additional_charges', 'additional_charges_list', 'fas fa-receipt', 'additional_charge_desc', 'Extra charges (packaging, handling, etc.) added to orders at checkout.')]
+  }, {
+    key: 'communication',
+    title: tr('settings_group_communication', 'Communication'),
+    cards: [section('smtp_mail_setting', 'fas fa-envelope', 'smtp_mail_setting_desc', 'Mail server used to send emails, plus a test email.'), page('firebase_settings', vm.__('firebase_settings'), '/firebase-settings', 'manage_Notification_settings', 'fas fa-fire', 'firebase_settings_desc', 'Firebase project keys and service-account file used for push notifications and phone login.'), page('notification_templates', vm.__('notification_templates'), '/notification-templates', 'manage_Notification_settings', 'fas fa-bell', 'notification_templates_desc', 'Title and message of the push notifications sent for each event.'), page('sms_settings', vm.__('sms_settings'), '/sms-settings', 'sms_settings', 'fas fa-sms', 'sms_settings_desc', 'Twilio credentials used to send OTP and order SMS messages.'), page('sms_templates', vm.__('sms_templates'), '/sms-templates', 'sms_templates_list', 'fas fa-comment-dots', 'sms_templates_desc', 'Text of the SMS messages sent for OTP and order updates.'), page('realtime_settings', tr('realtime_settings', 'Realtime Settings'), '/realtime-settings', 'realtime_settings', 'fas fa-bolt', 'realtime_settings_desc', 'Choose how realtime order-offer alerts reach delivery boys; only the selected driver is used.')]
+  }, {
+    key: 'integrations',
+    title: tr('settings_group_integrations', 'Integrations'),
+    cards: [section('third_party_api_credentials', 'fas fa-key', 'third_party_api_credentials_desc', 'Map provider and API keys used by the panel and apps.'), page('deeplink_settings', vm.__('deeplink_settings'), '/deeplink-settings', 'deeplink_settings', 'fas fa-link', 'deeplink_settings_desc', 'Deeplink configuration used by the website and the mobile apps to open in-app screens.'), page('seo_settings', vm.__('seo_settings'), '/seo-settings', 'seo_settings_list', 'fas fa-search', 'seo_settings_desc', 'Meta titles, descriptions and keywords used by search engines.')]
+  }, {
+    key: 'content',
+    title: tr('settings_group_content_policies', 'Content & Policies'),
+    cards: [page('contact_us', vm.__('contact_us'), '/contact_us', 'manage_contact_us', 'fas fa-address-book', 'contact_us_desc', 'Contact details shown on the Contact Us page of your store, per language.'), page('about_us', vm.__('about_us'), '/about_us', 'manage_about_us', 'fas fa-info-circle', 'about_us_desc', 'Content shown on the About Us page of your store, per language.'), page('customer_policies', vm.__('customer_policies'), '/privacy_policy', 'manage_privacy_policy', 'fas fa-user-shield', 'customer_policies_desc', 'Customer-facing policies shown in the app and website, per language.'), page('seller_policies', vm.__('policies_seller'), '/privacy_policy_seller', 'manage_privacy_policy_seller_app', 'fas fa-file-contract', 'seller_policies_desc', 'Privacy policy and terms that sellers accept, per language.'), page('delivery_boy_policies', vm.__('delivery_boy_policies'), '/privacy_policy_delivery_boy', 'manage_privacy_policy_delivery_boy', 'fas fa-shield-alt', 'delivery_boy_policies_desc', 'Privacy policy and terms that delivery boys accept, per language.'), page('general_web_settings', vm.__('general_web_settings'), '/general_settings', 'general_settings', 'fas fa-globe', 'general_web_settings_desc', 'Website header, footer, app download section and other web content.'), page('social_media', vm.__('social_media'), '/social_media', 'manage_social_media_list', 'fas fa-share-alt', 'social_media_desc', 'Social media links shown in the website footer.')]
+  }, {
+    key: 'sellers',
+    title: tr('settings_group_sellers', 'Sellers'),
+    cards: [section('seller_setting', 'fas fa-user-tie', 'seller_setting_desc', 'Seller cart rules, commission and self pickup.')]
+  }, {
+    key: 'system',
+    title: tr('settings_group_system', 'System'),
+    cards: [page('system_registration', vm.__('system_registration'), '/purchase_code', 'manage_system_registration', 'fas fa-certificate', 'purchase_code_desc', 'Register this installation with your purchase code to unlock updates and support.'), page('system_updater', vm.__('system_updater'), '/system_updater', 'manage_store_settings', 'fas fa-sync-alt', 'system_updater_desc', 'Review the changes in this release, then update the system.')]
+  }];
+}
+function canSeeSetting(vm, card) {
+  return card.role ? vm.$role('Super Admin') : !!(card.permission && vm.$can(card.permission));
 }
 
 /***/ }),
@@ -58243,6 +60085,78 @@ function isnan (val) {
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet-draw/dist/leaflet.draw.css":
+/*!*****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet-draw/dist/leaflet.draw.css ***!
+  \*****************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _images_spritesheet_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images/spritesheet.png */ "./node_modules/leaflet-draw/dist/images/spritesheet.png");
+/* harmony import */ var _images_spritesheet_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./images/spritesheet.svg */ "./node_modules/leaflet-draw/dist/images/spritesheet.svg");
+/* harmony import */ var _images_spritesheet_2x_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./images/spritesheet-2x.png */ "./node_modules/leaflet-draw/dist/images/spritesheet-2x.png");
+// Imports
+
+
+
+
+
+var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_spritesheet_png__WEBPACK_IMPORTED_MODULE_2__["default"]);
+var ___CSS_LOADER_URL_REPLACEMENT_1___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_spritesheet_svg__WEBPACK_IMPORTED_MODULE_3__["default"]);
+var ___CSS_LOADER_URL_REPLACEMENT_2___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_spritesheet_2x_png__WEBPACK_IMPORTED_MODULE_4__["default"]);
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, ".leaflet-draw-section{position:relative}.leaflet-draw-toolbar{margin-top:12px}.leaflet-draw-toolbar-top{margin-top:0}.leaflet-draw-toolbar-notop a:first-child{border-top-right-radius:0}.leaflet-draw-toolbar-nobottom a:last-child{border-bottom-right-radius:0}.leaflet-draw-toolbar a{background-image:url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");background-image:linear-gradient(transparent,transparent),url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");background-repeat:no-repeat;background-size:300px 30px;background-clip:padding-box}.leaflet-retina .leaflet-draw-toolbar a{background-image:url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ");background-image:linear-gradient(transparent,transparent),url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ")}\n.leaflet-draw a{display:block;text-align:center;text-decoration:none}.leaflet-draw a .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}.leaflet-draw-actions{display:none;list-style:none;margin:0;padding:0;position:absolute;left:26px;top:0;white-space:nowrap}.leaflet-touch .leaflet-draw-actions{left:32px}.leaflet-right .leaflet-draw-actions{right:26px;left:auto}.leaflet-touch .leaflet-right .leaflet-draw-actions{right:32px;left:auto}.leaflet-draw-actions li{display:inline-block}\n.leaflet-draw-actions li:first-child a{border-left:0}.leaflet-draw-actions li:last-child a{border-radius:0 4px 4px 0}.leaflet-right .leaflet-draw-actions li:last-child a{border-radius:0}.leaflet-right .leaflet-draw-actions li:first-child a{border-radius:4px 0 0 4px}.leaflet-draw-actions a{background-color:#919187;border-left:1px solid #AAA;color:#FFF;font:11px/19px \"Helvetica Neue\",Arial,Helvetica,sans-serif;line-height:28px;text-decoration:none;padding-left:10px;padding-right:10px;height:28px}\n.leaflet-touch .leaflet-draw-actions a{font-size:12px;line-height:30px;height:30px}.leaflet-draw-actions-bottom{margin-top:0}.leaflet-draw-actions-top{margin-top:1px}.leaflet-draw-actions-top a,.leaflet-draw-actions-bottom a{height:27px;line-height:27px}.leaflet-draw-actions a:hover{background-color:#a0a098}.leaflet-draw-actions-top.leaflet-draw-actions-bottom a{height:26px;line-height:26px}.leaflet-draw-toolbar .leaflet-draw-draw-polyline{background-position:-2px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-polyline{background-position:0 -1px}\n.leaflet-draw-toolbar .leaflet-draw-draw-polygon{background-position:-31px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-polygon{background-position:-29px -1px}.leaflet-draw-toolbar .leaflet-draw-draw-rectangle{background-position:-62px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-rectangle{background-position:-60px -1px}.leaflet-draw-toolbar .leaflet-draw-draw-circle{background-position:-92px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-circle{background-position:-90px -1px}\n.leaflet-draw-toolbar .leaflet-draw-draw-marker{background-position:-122px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-marker{background-position:-120px -1px}.leaflet-draw-toolbar .leaflet-draw-draw-circlemarker{background-position:-273px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-circlemarker{background-position:-271px -1px}.leaflet-draw-toolbar .leaflet-draw-edit-edit{background-position:-152px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-edit{background-position:-150px -1px}\n.leaflet-draw-toolbar .leaflet-draw-edit-remove{background-position:-182px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove{background-position:-180px -1px}.leaflet-draw-toolbar .leaflet-draw-edit-edit.leaflet-disabled{background-position:-212px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-edit.leaflet-disabled{background-position:-210px -1px}.leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-disabled{background-position:-242px -2px}.leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-disabled{background-position:-240px -2px}\n.leaflet-mouse-marker{background-color:#fff;cursor:crosshair}.leaflet-draw-tooltip{background:#363636;background:rgba(0,0,0,0.5);border:1px solid transparent;border-radius:4px;color:#fff;font:12px/18px \"Helvetica Neue\",Arial,Helvetica,sans-serif;margin-left:20px;margin-top:-21px;padding:4px 8px;position:absolute;visibility:hidden;white-space:nowrap;z-index:6}.leaflet-draw-tooltip:before{border-right:6px solid black;border-right-color:rgba(0,0,0,0.5);border-top:6px solid transparent;border-bottom:6px solid transparent;content:\"\";position:absolute;top:7px;left:-7px}\n.leaflet-error-draw-tooltip{background-color:#f2dede;border:1px solid #e6b6bd;color:#b94a48}.leaflet-error-draw-tooltip:before{border-right-color:#e6b6bd}.leaflet-draw-tooltip-single{margin-top:-12px}.leaflet-draw-tooltip-subtext{color:#f8d5e4}.leaflet-draw-guide-dash{font-size:1%;opacity:.6;position:absolute;width:5px;height:5px}.leaflet-edit-marker-selected{background-color:rgba(254,87,161,0.1);border:4px dashed rgba(254,87,161,0.6);border-radius:4px;box-sizing:content-box}\n.leaflet-edit-move{cursor:move}.leaflet-edit-resize{cursor:pointer}.leaflet-oldie .leaflet-draw-toolbar{border:1px solid #999}", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet/dist/leaflet.css":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet/dist/leaflet.css ***!
+  \*******************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _images_layers_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./images/layers.png */ "./node_modules/leaflet/dist/images/layers.png");
+/* harmony import */ var _images_layers_2x_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./images/layers-2x.png */ "./node_modules/leaflet/dist/images/layers-2x.png");
+/* harmony import */ var _images_marker_icon_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./images/marker-icon.png */ "./node_modules/leaflet/dist/images/marker-icon.png");
+// Imports
+
+
+
+
+
+var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_layers_png__WEBPACK_IMPORTED_MODULE_2__["default"]);
+var ___CSS_LOADER_URL_REPLACEMENT_1___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_layers_2x_png__WEBPACK_IMPORTED_MODULE_3__["default"]);
+var ___CSS_LOADER_URL_REPLACEMENT_2___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_images_marker_icon_png__WEBPACK_IMPORTED_MODULE_4__["default"]);
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "/* required styles */\r\n\r\n.leaflet-pane,\r\n.leaflet-tile,\r\n.leaflet-marker-icon,\r\n.leaflet-marker-shadow,\r\n.leaflet-tile-container,\r\n.leaflet-pane > svg,\r\n.leaflet-pane > canvas,\r\n.leaflet-zoom-box,\r\n.leaflet-image-layer,\r\n.leaflet-layer {\r\n\tposition: absolute;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\t}\r\n.leaflet-container {\r\n\toverflow: hidden;\r\n\t}\r\n.leaflet-tile,\r\n.leaflet-marker-icon,\r\n.leaflet-marker-shadow {\r\n\t-webkit-user-select: none;\r\n\t   -moz-user-select: none;\r\n\t        user-select: none;\r\n\t  -webkit-user-drag: none;\r\n\t}\r\n/* Prevents IE11 from highlighting tiles in blue */\r\n.leaflet-tile::-moz-selection {\r\n\tbackground: transparent;\r\n}\r\n.leaflet-tile::selection {\r\n\tbackground: transparent;\r\n}\r\n/* Safari renders non-retina tile on retina better with this, but Chrome is worse */\r\n.leaflet-safari .leaflet-tile {\r\n\timage-rendering: -webkit-optimize-contrast;\r\n\t}\r\n/* hack that prevents hw layers \"stretching\" when loading new tiles */\r\n.leaflet-safari .leaflet-tile-container {\r\n\twidth: 1600px;\r\n\theight: 1600px;\r\n\t-webkit-transform-origin: 0 0;\r\n\t}\r\n.leaflet-marker-icon,\r\n.leaflet-marker-shadow {\r\n\tdisplay: block;\r\n\t}\r\n/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */\r\n/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */\r\n.leaflet-container .leaflet-overlay-pane svg {\r\n\tmax-width: none !important;\r\n\tmax-height: none !important;\r\n\t}\r\n.leaflet-container .leaflet-marker-pane img,\r\n.leaflet-container .leaflet-shadow-pane img,\r\n.leaflet-container .leaflet-tile-pane img,\r\n.leaflet-container img.leaflet-image-layer,\r\n.leaflet-container .leaflet-tile {\r\n\tmax-width: none !important;\r\n\tmax-height: none !important;\r\n\twidth: auto;\r\n\tpadding: 0;\r\n\t}\r\n\r\n.leaflet-container img.leaflet-tile {\r\n\t/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */\r\n\tmix-blend-mode: plus-lighter;\r\n}\r\n\r\n.leaflet-container.leaflet-touch-zoom {\r\n\ttouch-action: pan-x pan-y;\r\n\t}\r\n.leaflet-container.leaflet-touch-drag {\r\n\t/* Fallback for FF which doesn't support pinch-zoom */\r\n\ttouch-action: none;\r\n\ttouch-action: pinch-zoom;\r\n}\r\n.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {\r\n\ttouch-action: none;\r\n}\r\n.leaflet-container {\r\n\t-webkit-tap-highlight-color: transparent;\r\n}\r\n.leaflet-container a {\r\n\t-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);\r\n}\r\n.leaflet-tile {\r\n\tfilter: inherit;\r\n\tvisibility: hidden;\r\n\t}\r\n.leaflet-tile-loaded {\r\n\tvisibility: inherit;\r\n\t}\r\n.leaflet-zoom-box {\r\n\twidth: 0;\r\n\theight: 0;\r\n\tbox-sizing: border-box;\r\n\tz-index: 800;\r\n\t}\r\n/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */\r\n.leaflet-overlay-pane svg {\r\n\t-moz-user-select: none;\r\n\t}\r\n\r\n.leaflet-pane         { z-index: 400; }\r\n\r\n.leaflet-tile-pane    { z-index: 200; }\r\n.leaflet-overlay-pane { z-index: 400; }\r\n.leaflet-shadow-pane  { z-index: 500; }\r\n.leaflet-marker-pane  { z-index: 600; }\r\n.leaflet-tooltip-pane   { z-index: 650; }\r\n.leaflet-popup-pane   { z-index: 700; }\r\n\r\n.leaflet-map-pane canvas { z-index: 100; }\r\n.leaflet-map-pane svg    { z-index: 200; }\r\n\r\n.leaflet-vml-shape {\r\n\twidth: 1px;\r\n\theight: 1px;\r\n\t}\r\n.lvml {\r\n\tbehavior: url(#default#VML);\r\n\tdisplay: inline-block;\r\n\tposition: absolute;\r\n\t}\r\n\r\n\r\n/* control positioning */\r\n\r\n.leaflet-control {\r\n\tposition: relative;\r\n\tz-index: 800;\r\n\tpointer-events: visiblePainted; /* IE 9-10 doesn't have auto */\r\n\tpointer-events: auto;\r\n\t}\r\n.leaflet-top,\r\n.leaflet-bottom {\r\n\tposition: absolute;\r\n\tz-index: 1000;\r\n\tpointer-events: none;\r\n\t}\r\n.leaflet-top {\r\n\ttop: 0;\r\n\t}\r\n.leaflet-right {\r\n\tright: 0;\r\n\t}\r\n.leaflet-bottom {\r\n\tbottom: 0;\r\n\t}\r\n.leaflet-left {\r\n\tleft: 0;\r\n\t}\r\n.leaflet-control {\r\n\tfloat: left;\r\n\tclear: both;\r\n\t}\r\n.leaflet-right .leaflet-control {\r\n\tfloat: right;\r\n\t}\r\n.leaflet-top .leaflet-control {\r\n\tmargin-top: 10px;\r\n\t}\r\n.leaflet-bottom .leaflet-control {\r\n\tmargin-bottom: 10px;\r\n\t}\r\n.leaflet-left .leaflet-control {\r\n\tmargin-left: 10px;\r\n\t}\r\n.leaflet-right .leaflet-control {\r\n\tmargin-right: 10px;\r\n\t}\r\n\r\n\r\n/* zoom and fade animations */\r\n\r\n.leaflet-fade-anim .leaflet-popup {\r\n\topacity: 0;\r\n\ttransition: opacity 0.2s linear;\r\n\t}\r\n.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {\r\n\topacity: 1;\r\n\t}\r\n.leaflet-zoom-animated {\r\n\ttransform-origin: 0 0;\r\n\t}\r\nsvg.leaflet-zoom-animated {\r\n\twill-change: transform;\r\n}\r\n\r\n.leaflet-zoom-anim .leaflet-zoom-animated {\r\n\ttransition:         transform 0.25s cubic-bezier(0,0,0.25,1);\r\n\t}\r\n.leaflet-zoom-anim .leaflet-tile,\r\n.leaflet-pan-anim .leaflet-tile {\r\n\ttransition: none;\r\n\t}\r\n\r\n.leaflet-zoom-anim .leaflet-zoom-hide {\r\n\tvisibility: hidden;\r\n\t}\r\n\r\n\r\n/* cursors */\r\n\r\n.leaflet-interactive {\r\n\tcursor: pointer;\r\n\t}\r\n.leaflet-grab {\r\n\tcursor:         grab;\r\n\t}\r\n.leaflet-crosshair,\r\n.leaflet-crosshair .leaflet-interactive {\r\n\tcursor: crosshair;\r\n\t}\r\n.leaflet-popup-pane,\r\n.leaflet-control {\r\n\tcursor: auto;\r\n\t}\r\n.leaflet-dragging .leaflet-grab,\r\n.leaflet-dragging .leaflet-grab .leaflet-interactive,\r\n.leaflet-dragging .leaflet-marker-draggable {\r\n\tcursor: move;\r\n\tcursor:         grabbing;\r\n\t}\r\n\r\n/* marker & overlays interactivity */\r\n.leaflet-marker-icon,\r\n.leaflet-marker-shadow,\r\n.leaflet-image-layer,\r\n.leaflet-pane > svg path,\r\n.leaflet-tile-container {\r\n\tpointer-events: none;\r\n\t}\r\n\r\n.leaflet-marker-icon.leaflet-interactive,\r\n.leaflet-image-layer.leaflet-interactive,\r\n.leaflet-pane > svg path.leaflet-interactive,\r\nsvg.leaflet-image-layer.leaflet-interactive path {\r\n\tpointer-events: visiblePainted; /* IE 9-10 doesn't have auto */\r\n\tpointer-events: auto;\r\n\t}\r\n\r\n/* visual tweaks */\r\n\r\n.leaflet-container {\r\n\tbackground: #ddd;\r\n\toutline-offset: 1px;\r\n\t}\r\n.leaflet-container a {\r\n\tcolor: #0078A8;\r\n\t}\r\n.leaflet-zoom-box {\r\n\tborder: 2px dotted #38f;\r\n\tbackground: rgba(255,255,255,0.5);\r\n\t}\r\n\r\n\r\n/* general typography */\r\n.leaflet-container {\r\n\tfont-family: \"Helvetica Neue\", Arial, Helvetica, sans-serif;\r\n\tfont-size: 12px;\r\n\tfont-size: 0.75rem;\r\n\tline-height: 1.5;\r\n\t}\r\n\r\n\r\n/* general toolbar styles */\r\n\r\n.leaflet-bar {\r\n\tbox-shadow: 0 1px 5px rgba(0,0,0,0.65);\r\n\tborder-radius: 4px;\r\n\t}\r\n.leaflet-bar a {\r\n\tbackground-color: #fff;\r\n\tborder-bottom: 1px solid #ccc;\r\n\twidth: 26px;\r\n\theight: 26px;\r\n\tline-height: 26px;\r\n\tdisplay: block;\r\n\ttext-align: center;\r\n\ttext-decoration: none;\r\n\tcolor: black;\r\n\t}\r\n.leaflet-bar a,\r\n.leaflet-control-layers-toggle {\r\n\tbackground-position: 50% 50%;\r\n\tbackground-repeat: no-repeat;\r\n\tdisplay: block;\r\n\t}\r\n.leaflet-bar a:hover,\r\n.leaflet-bar a:focus {\r\n\tbackground-color: #f4f4f4;\r\n\t}\r\n.leaflet-bar a:first-child {\r\n\tborder-top-left-radius: 4px;\r\n\tborder-top-right-radius: 4px;\r\n\t}\r\n.leaflet-bar a:last-child {\r\n\tborder-bottom-left-radius: 4px;\r\n\tborder-bottom-right-radius: 4px;\r\n\tborder-bottom: none;\r\n\t}\r\n.leaflet-bar a.leaflet-disabled {\r\n\tcursor: default;\r\n\tbackground-color: #f4f4f4;\r\n\tcolor: #bbb;\r\n\t}\r\n\r\n.leaflet-touch .leaflet-bar a {\r\n\twidth: 30px;\r\n\theight: 30px;\r\n\tline-height: 30px;\r\n\t}\r\n.leaflet-touch .leaflet-bar a:first-child {\r\n\tborder-top-left-radius: 2px;\r\n\tborder-top-right-radius: 2px;\r\n\t}\r\n.leaflet-touch .leaflet-bar a:last-child {\r\n\tborder-bottom-left-radius: 2px;\r\n\tborder-bottom-right-radius: 2px;\r\n\t}\r\n\r\n/* zoom control */\r\n\r\n.leaflet-control-zoom-in,\r\n.leaflet-control-zoom-out {\r\n\tfont: bold 18px 'Lucida Console', Monaco, monospace;\r\n\ttext-indent: 1px;\r\n\t}\r\n\r\n.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {\r\n\tfont-size: 22px;\r\n\t}\r\n\r\n\r\n/* layers control */\r\n\r\n.leaflet-control-layers {\r\n\tbox-shadow: 0 1px 5px rgba(0,0,0,0.4);\r\n\tbackground: #fff;\r\n\tborder-radius: 5px;\r\n\t}\r\n.leaflet-control-layers-toggle {\r\n\tbackground-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n\twidth: 36px;\r\n\theight: 36px;\r\n\t}\r\n.leaflet-retina .leaflet-control-layers-toggle {\r\n\tbackground-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n\tbackground-size: 26px 26px;\r\n\t}\r\n.leaflet-touch .leaflet-control-layers-toggle {\r\n\twidth: 44px;\r\n\theight: 44px;\r\n\t}\r\n.leaflet-control-layers .leaflet-control-layers-list,\r\n.leaflet-control-layers-expanded .leaflet-control-layers-toggle {\r\n\tdisplay: none;\r\n\t}\r\n.leaflet-control-layers-expanded .leaflet-control-layers-list {\r\n\tdisplay: block;\r\n\tposition: relative;\r\n\t}\r\n.leaflet-control-layers-expanded {\r\n\tpadding: 6px 10px 6px 6px;\r\n\tcolor: #333;\r\n\tbackground: #fff;\r\n\t}\r\n.leaflet-control-layers-scrollbar {\r\n\toverflow-y: scroll;\r\n\toverflow-x: hidden;\r\n\tpadding-right: 5px;\r\n\t}\r\n.leaflet-control-layers-selector {\r\n\tmargin-top: 2px;\r\n\tposition: relative;\r\n\ttop: 1px;\r\n\t}\r\n.leaflet-control-layers label {\r\n\tdisplay: block;\r\n\tfont-size: 13px;\r\n\tfont-size: 1.08333em;\r\n\t}\r\n.leaflet-control-layers-separator {\r\n\theight: 0;\r\n\tborder-top: 1px solid #ddd;\r\n\tmargin: 5px -10px 5px -6px;\r\n\t}\r\n\r\n/* Default icon URLs */\r\n.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */\r\n\tbackground-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ");\r\n\t}\r\n\r\n\r\n/* attribution and scale controls */\r\n\r\n.leaflet-container .leaflet-control-attribution {\r\n\tbackground: #fff;\r\n\tbackground: rgba(255, 255, 255, 0.8);\r\n\tmargin: 0;\r\n\t}\r\n.leaflet-control-attribution,\r\n.leaflet-control-scale-line {\r\n\tpadding: 0 5px;\r\n\tcolor: #333;\r\n\tline-height: 1.4;\r\n\t}\r\n.leaflet-control-attribution a {\r\n\ttext-decoration: none;\r\n\t}\r\n.leaflet-control-attribution a:hover,\r\n.leaflet-control-attribution a:focus {\r\n\ttext-decoration: underline;\r\n\t}\r\n.leaflet-attribution-flag {\r\n\tdisplay: inline !important;\r\n\tvertical-align: baseline !important;\r\n\twidth: 1em;\r\n\theight: 0.6669em;\r\n\t}\r\n.leaflet-left .leaflet-control-scale {\r\n\tmargin-left: 5px;\r\n\t}\r\n.leaflet-bottom .leaflet-control-scale {\r\n\tmargin-bottom: 5px;\r\n\t}\r\n.leaflet-control-scale-line {\r\n\tborder: 2px solid #777;\r\n\tborder-top: none;\r\n\tline-height: 1.1;\r\n\tpadding: 2px 5px 1px;\r\n\twhite-space: nowrap;\r\n\tbox-sizing: border-box;\r\n\tbackground: rgba(255, 255, 255, 0.8);\r\n\ttext-shadow: 1px 1px #fff;\r\n\t}\r\n.leaflet-control-scale-line:not(:first-child) {\r\n\tborder-top: 2px solid #777;\r\n\tborder-bottom: none;\r\n\tmargin-top: -2px;\r\n\t}\r\n.leaflet-control-scale-line:not(:first-child):not(:last-child) {\r\n\tborder-bottom: 2px solid #777;\r\n\t}\r\n\r\n.leaflet-touch .leaflet-control-attribution,\r\n.leaflet-touch .leaflet-control-layers,\r\n.leaflet-touch .leaflet-bar {\r\n\tbox-shadow: none;\r\n\t}\r\n.leaflet-touch .leaflet-control-layers,\r\n.leaflet-touch .leaflet-bar {\r\n\tborder: 2px solid rgba(0,0,0,0.2);\r\n\tbackground-clip: padding-box;\r\n\t}\r\n\r\n\r\n/* popup */\r\n\r\n.leaflet-popup {\r\n\tposition: absolute;\r\n\ttext-align: center;\r\n\tmargin-bottom: 20px;\r\n\t}\r\n.leaflet-popup-content-wrapper {\r\n\tpadding: 1px;\r\n\ttext-align: left;\r\n\tborder-radius: 12px;\r\n\t}\r\n.leaflet-popup-content {\r\n\tmargin: 13px 24px 13px 20px;\r\n\tline-height: 1.3;\r\n\tfont-size: 13px;\r\n\tfont-size: 1.08333em;\r\n\tmin-height: 1px;\r\n\t}\r\n.leaflet-popup-content p {\r\n\tmargin: 17px 0;\r\n\tmargin: 1.3em 0;\r\n\t}\r\n.leaflet-popup-tip-container {\r\n\twidth: 40px;\r\n\theight: 20px;\r\n\tposition: absolute;\r\n\tleft: 50%;\r\n\tmargin-top: -1px;\r\n\tmargin-left: -20px;\r\n\toverflow: hidden;\r\n\tpointer-events: none;\r\n\t}\r\n.leaflet-popup-tip {\r\n\twidth: 17px;\r\n\theight: 17px;\r\n\tpadding: 1px;\r\n\r\n\tmargin: -10px auto 0;\r\n\tpointer-events: auto;\r\n\ttransform: rotate(45deg);\r\n\t}\r\n.leaflet-popup-content-wrapper,\r\n.leaflet-popup-tip {\r\n\tbackground: white;\r\n\tcolor: #333;\r\n\tbox-shadow: 0 3px 14px rgba(0,0,0,0.4);\r\n\t}\r\n.leaflet-container a.leaflet-popup-close-button {\r\n\tposition: absolute;\r\n\ttop: 0;\r\n\tright: 0;\r\n\tborder: none;\r\n\ttext-align: center;\r\n\twidth: 24px;\r\n\theight: 24px;\r\n\tfont: 16px/24px Tahoma, Verdana, sans-serif;\r\n\tcolor: #757575;\r\n\ttext-decoration: none;\r\n\tbackground: transparent;\r\n\t}\r\n.leaflet-container a.leaflet-popup-close-button:hover,\r\n.leaflet-container a.leaflet-popup-close-button:focus {\r\n\tcolor: #585858;\r\n\t}\r\n.leaflet-popup-scrolled {\r\n\toverflow: auto;\r\n\t}\r\n\r\n.leaflet-oldie .leaflet-popup-content-wrapper {\r\n\t-ms-zoom: 1;\r\n\t}\r\n.leaflet-oldie .leaflet-popup-tip {\r\n\twidth: 24px;\r\n\tmargin: 0 auto;\r\n\r\n\t-ms-filter: \"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)\";\r\n\tfilter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);\r\n\t}\r\n\r\n.leaflet-oldie .leaflet-control-zoom,\r\n.leaflet-oldie .leaflet-control-layers,\r\n.leaflet-oldie .leaflet-popup-content-wrapper,\r\n.leaflet-oldie .leaflet-popup-tip {\r\n\tborder: 1px solid #999;\r\n\t}\r\n\r\n\r\n/* div icon */\r\n\r\n.leaflet-div-icon {\r\n\tbackground: #fff;\r\n\tborder: 1px solid #666;\r\n\t}\r\n\r\n\r\n/* Tooltip */\r\n/* Base styles for the element that has a tooltip */\r\n.leaflet-tooltip {\r\n\tposition: absolute;\r\n\tpadding: 6px;\r\n\tbackground-color: #fff;\r\n\tborder: 1px solid #fff;\r\n\tborder-radius: 3px;\r\n\tcolor: #222;\r\n\twhite-space: nowrap;\r\n\t-webkit-user-select: none;\r\n\t-moz-user-select: none;\r\n\tuser-select: none;\r\n\tpointer-events: none;\r\n\tbox-shadow: 0 1px 3px rgba(0,0,0,0.4);\r\n\t}\r\n.leaflet-tooltip.leaflet-interactive {\r\n\tcursor: pointer;\r\n\tpointer-events: auto;\r\n\t}\r\n.leaflet-tooltip-top:before,\r\n.leaflet-tooltip-bottom:before,\r\n.leaflet-tooltip-left:before,\r\n.leaflet-tooltip-right:before {\r\n\tposition: absolute;\r\n\tpointer-events: none;\r\n\tborder: 6px solid transparent;\r\n\tbackground: transparent;\r\n\tcontent: \"\";\r\n\t}\r\n\r\n/* Directions */\r\n\r\n.leaflet-tooltip-bottom {\r\n\tmargin-top: 6px;\r\n}\r\n.leaflet-tooltip-top {\r\n\tmargin-top: -6px;\r\n}\r\n.leaflet-tooltip-bottom:before,\r\n.leaflet-tooltip-top:before {\r\n\tleft: 50%;\r\n\tmargin-left: -6px;\r\n\t}\r\n.leaflet-tooltip-top:before {\r\n\tbottom: 0;\r\n\tmargin-bottom: -12px;\r\n\tborder-top-color: #fff;\r\n\t}\r\n.leaflet-tooltip-bottom:before {\r\n\ttop: 0;\r\n\tmargin-top: -12px;\r\n\tmargin-left: -6px;\r\n\tborder-bottom-color: #fff;\r\n\t}\r\n.leaflet-tooltip-left {\r\n\tmargin-left: -6px;\r\n}\r\n.leaflet-tooltip-right {\r\n\tmargin-left: 6px;\r\n}\r\n.leaflet-tooltip-left:before,\r\n.leaflet-tooltip-right:before {\r\n\ttop: 50%;\r\n\tmargin-top: -6px;\r\n\t}\r\n.leaflet-tooltip-left:before {\r\n\tright: 0;\r\n\tmargin-right: -12px;\r\n\tborder-left-color: #fff;\r\n\t}\r\n.leaflet-tooltip-right:before {\r\n\tleft: 0;\r\n\tmargin-left: -12px;\r\n\tborder-right-color: #fff;\r\n\t}\r\n\r\n/* Printing */\r\n\r\n@media print {\r\n\t/* Prevent printers from removing background-images of controls. */\r\n\t.leaflet-control {\r\n\t\t-webkit-print-color-adjust: exact;\r\n\t\tprint-color-adjust: exact;\r\n\t\t}\r\n\t}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/select2/dist/css/select2.min.css":
 /*!***************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/select2/dist/css/select2.min.css ***!
@@ -58315,6 +60229,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "@keyframes fadeOut{from{opacity:1}to{o
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css":
+/*!***********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css ***!
+  \***********************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "td[data-v-98ac2448],th[data-v-98ac2448]{padding:2px;background-color:#fff}td.today[data-v-98ac2448]{font-weight:700}td.disabled[data-v-98ac2448]{pointer-events:none;background-color:#eee;border-radius:0;opacity:.6}.fa[data-v-98ac2448]{display:inline-block;width:100%;height:100%;background:transparent no-repeat 50%;background-size:100% 100%;fill:#ccc}.next[data-v-98ac2448]:hover,.prev[data-v-98ac2448]:hover{background-color:transparent!important}.next .fa[data-v-98ac2448]:hover,.prev .fa[data-v-98ac2448]:hover{opacity:.6}.chevron-left[data-v-98ac2448]{width:16px;height:16px;display:block;background-image:url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 10 10'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E\")}.chevron-right[data-v-98ac2448]{width:16px;height:16px;display:block;background-image:url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 10 10'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E\")}.yearselect[data-v-98ac2448]{padding-right:1px;border:none;-webkit-appearance:menulist;-moz-appearance:menulist;appearance:menulist}.monthselect[data-v-98ac2448]{border:none}.daterangepicker .ranges{text-align:left;margin:0;width:100%}.daterangepicker .ranges ul{list-style:none;margin:0 auto;padding:0;width:100%}.daterangepicker .ranges li{font-size:12px;padding:8px 12px;cursor:pointer}.daterangepicker .ranges li:hover{background-color:#eee;color:#000}.daterangepicker .ranges li.active{background-color:#08c;color:#fff}.daterangepicker .monthselect,.daterangepicker .yearselect{font-size:12px;padding:1px;height:auto;margin:0;cursor:default;width:calc(50% - 1rem)}.daterangepicker .monthselect{margin-right:1rem}.daterangepicker .calendar-time{text-align:center;margin:4px auto 0 auto;line-height:30px;position:relative;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center}.daterangepicker .calendar-time select.disabled{color:#ccc;cursor:not-allowed}.daterangepicker select.ampmselect,.daterangepicker select.hourselect,.daterangepicker select.minuteselect,.daterangepicker select.secondselect{width:50px;margin:2px;background:#eee;border:1px solid #eee;padding:2px;outline:0;font-size:12px}.daterangepicker .drp-buttons .btn{margin-left:8px;font-size:12px;font-weight:700;padding:4px 8px}.daterangepicker .btn{display:inline-block;text-align:center;vertical-align:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background-color:transparent;border:1px solid transparent}.daterangepicker .btn-primary,.daterangepicker .btn-success{background-color:#28a745;color:#fff}.daterangepicker .btn-secondary{background-color:#6c757d;color:#fff}.vue-daterange-picker *,.vue-daterange-picker :after,.vue-daterange-picker :before{-webkit-box-sizing:border-box;box-sizing:border-box}.drp-calendar .col .left{-webkit-box-flex:0;-ms-flex:0 0 auto;flex:0 0 auto}.daterangepicker.hide-calendars.show-ranges .ranges,.daterangepicker.hide-calendars.show-ranges .ranges ul{width:100%}.daterangepicker .calendars-container{display:-webkit-box;display:-ms-flexbox;display:flex}.daterangepicker[readonly]{pointer-events:none}.daterangepicker{position:absolute;color:inherit;background-color:#fff;border-radius:4px;border:1px solid #ddd;width:278px;max-width:none;padding:0;margin-top:7px;top:100px;left:20px;z-index:3001;display:none;font-size:15px;line-height:1em}.daterangepicker:after,.daterangepicker:before{position:absolute;display:inline-block;border-bottom-color:rgba(0,0,0,.2);content:\"\"}.daterangepicker:before{top:-7px;border-right:7px solid transparent;border-left:7px solid transparent;border-bottom:7px solid #ccc}.daterangepicker:after{top:-6px;border-right:6px solid transparent;border-bottom:6px solid #fff;border-left:6px solid transparent}.daterangepicker.opensleft:before{right:9px}.daterangepicker.opensleft:after{right:10px}.daterangepicker.openscenter:after,.daterangepicker.openscenter:before{left:0;right:0;width:0;margin-left:auto;margin-right:auto}.daterangepicker.opensright:before{left:9px}.daterangepicker.opensright:after{left:10px}.daterangepicker.drop-up{margin-top:-7px}.daterangepicker.drop-up:before{top:auto;bottom:-7px;border-bottom:initial;border-top:7px solid #ccc}.daterangepicker.drop-up:after{top:auto;bottom:-6px;border-bottom:initial;border-top:6px solid #fff}.daterangepicker.single .drp-selected{display:none}.daterangepicker.show-calendar .drp-buttons,.daterangepicker.show-calendar .drp-calendar{display:block}.daterangepicker.auto-apply .drp-buttons{display:none}.daterangepicker .drp-calendar{display:none;max-width:270px;width:270px}.daterangepicker .drp-calendar.left{padding:8px 0 8px 8px}.daterangepicker .drp-calendar.right{padding:8px}.daterangepicker .drp-calendar.single .calendar-table{border:none}.daterangepicker .calendar-table .next span,.daterangepicker .calendar-table .prev span{color:#fff;border:solid #000;border-width:0 2px 2px 0;border-radius:0;display:inline-block;padding:3px}.daterangepicker .calendar-table .next span{transform:rotate(-45deg);-webkit-transform:rotate(-45deg)}.daterangepicker .calendar-table .prev span{transform:rotate(135deg);-webkit-transform:rotate(135deg)}.daterangepicker .calendar-table td,.daterangepicker .calendar-table th{white-space:nowrap;text-align:center;vertical-align:middle;min-width:32px;width:32px;height:24px;line-height:24px;font-size:12px;border-radius:4px;border:1px solid transparent;cursor:pointer}.daterangepicker .calendar-table{border:1px solid #fff;border-radius:4px;background-color:#fff}.daterangepicker .calendar-table table{width:100%;margin:0;border-spacing:0;border-collapse:collapse;display:table}.daterangepicker td.available:hover,.daterangepicker th.available:hover{background-color:#eee;border-color:transparent;color:inherit}.daterangepicker td.week,.daterangepicker th.week{font-size:80%;color:#ccc}.daterangepicker td.off,.daterangepicker td.off.end-date,.daterangepicker td.off.in-range,.daterangepicker td.off.start-date{background-color:#fff;border-color:transparent;color:#999}.daterangepicker td.in-range{background-color:#ebf4f8;border-color:transparent;color:#000;border-radius:0}.daterangepicker td.start-date{border-radius:4px 0 0 4px}.daterangepicker td.end-date{border-radius:0 4px 4px 0}.daterangepicker td.start-date.end-date{border-radius:4px}.daterangepicker td.active,.daterangepicker td.active:hover{background-color:#357ebd;border-color:transparent;color:#fff}.daterangepicker th.month{width:auto}.daterangepicker option.disabled,.daterangepicker td.disabled{color:#999;cursor:not-allowed;text-decoration:line-through}.daterangepicker select.yearselect{width:40%}.daterangepicker .drp-buttons{clear:both;text-align:right;padding:8px;border-top:1px solid #ddd;display:none;line-height:12px;vertical-align:middle}.daterangepicker .drp-selected{display:inline-block;font-size:12px;padding-right:8px}.daterangepicker.show-ranges .drp-calendar.left{border-left:1px solid #ddd}.daterangepicker.show-calendar .ranges{margin-top:8px;width:auto}@media (min-width:564px){.daterangepicker{width:auto}.daterangepicker .ranges ul{width:140px}.daterangepicker.single .ranges ul{width:100%}.daterangepicker.single .drp-calendar.left{clear:none}.daterangepicker.ltr{direction:ltr;text-align:left}.daterangepicker.ltr .drp-calendar.left{clear:left;margin-right:0}.daterangepicker.ltr .drp-calendar.left .calendar-table{border-right:none;border-top-right-radius:0;border-bottom-right-radius:0}.daterangepicker.ltr .drp-calendar.right{margin-left:0}.daterangepicker.ltr .drp-calendar.right .calendar-table{border-left:none;border-top-left-radius:0;border-bottom-left-radius:0}.daterangepicker.ltr .drp-calendar.left .calendar-table{padding-right:8px}.daterangepicker.rtl{direction:rtl;text-align:right}.daterangepicker.rtl .drp-calendar.left{clear:right;margin-left:0}.daterangepicker.rtl .drp-calendar.left .calendar-table{border-left:none;border-top-left-radius:0;border-bottom-left-radius:0}.daterangepicker.rtl .drp-calendar.right{margin-right:0}.daterangepicker.rtl .drp-calendar.right .calendar-table{border-right:none;border-top-right-radius:0;border-bottom-right-radius:0}.daterangepicker.rtl .drp-calendar.left .calendar-table{padding-left:12px}.daterangepicker.rtl .drp-calendar,.daterangepicker.rtl .ranges{text-align:right}}@media (min-width:730px){.daterangepicker .drp-calendar.left{clear:none!important}}.calendars[data-v-1ebd09d2]{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap}.reportrange-text[data-v-1ebd09d2]{background:#fff;cursor:pointer;padding:5px 10px;border:1px solid #ccc;width:100%;overflow:hidden}.daterangepicker[data-v-1ebd09d2]{-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;display:-webkit-box;display:-ms-flexbox;display:flex;width:auto}@media screen and (max-width:768px){.daterangepicker.show-ranges .drp-calendar.left[data-v-1ebd09d2]{border-left:0}.daterangepicker.show-ranges .ranges[data-v-1ebd09d2]{border-bottom:1px solid #ddd;width:100%}.daterangepicker.show-ranges .ranges[data-v-1ebd09d2] ul{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;width:auto}}@media screen and (max-width:541px){.daterangepicker .calendars-container[data-v-1ebd09d2]{-ms-flex-wrap:wrap;flex-wrap:wrap}}@media screen and (min-width:540px){.daterangepicker.show-weeknumbers[data-v-1ebd09d2],.daterangepicker[data-v-1ebd09d2]{min-width:486px}}@media screen and (min-width:768px){.daterangepicker.show-ranges.show-weeknumbers[data-v-1ebd09d2],.daterangepicker.show-ranges[data-v-1ebd09d2]{min-width:682px}}@media screen and (max-width:340px){.daterangepicker.single.show-weeknumbers[data-v-1ebd09d2],.daterangepicker.single[data-v-1ebd09d2]{min-width:250px}}@media screen and (min-width:339px){.daterangepicker.single[data-v-1ebd09d2]{min-width:auto}.daterangepicker.single.show-ranges.show-weeknumbers[data-v-1ebd09d2],.daterangepicker.single.show-ranges[data-v-1ebd09d2]{min-width:356px}.daterangepicker.single.show-ranges .drp-calendar.left[data-v-1ebd09d2]{border-left:1px solid #ddd}.daterangepicker.single.show-ranges .ranges[data-v-1ebd09d2]{max-width:none;-ms-flex-preferred-size:auto;flex-basis:auto;border-bottom:0}.daterangepicker.single.show-ranges .ranges[data-v-1ebd09d2] ul{display:block;width:100%}}.daterangepicker.show-calendar[data-v-1ebd09d2]{display:block;top:auto}.daterangepicker.opensleft[data-v-1ebd09d2]{right:10px;left:auto}.daterangepicker.openscenter[data-v-1ebd09d2]{right:auto;left:50%;-webkit-transform:translate(-50%);transform:translate(-50%)}.daterangepicker.opensright[data-v-1ebd09d2]{left:10px;right:auto}.slide-fade-enter-active[data-v-1ebd09d2]{-webkit-transition:all .2s ease;transition:all .2s ease}.slide-fade-leave-active[data-v-1ebd09d2]{-webkit-transition:all .1s cubic-bezier(1,.5,.8,1);transition:all .1s cubic-bezier(1,.5,.8,1)}.slide-fade-enter[data-v-1ebd09d2],.slide-fade-leave-to[data-v-1ebd09d2]{-webkit-transform:translateX(10px);transform:translateX(10px);opacity:0}.vue-daterange-picker[data-v-1ebd09d2]{position:relative;display:inline-block;min-width:60px}.vue-daterange-picker .show-ranges.hide-calendars[data-v-1ebd09d2]{width:150px;min-width:150px}.inline .daterangepicker[data-v-1ebd09d2]{position:static}.inline .daterangepicker[data-v-1ebd09d2]:after,.inline .daterangepicker[data-v-1ebd09d2]:before{display:none}", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./node_modules/vue2-google-maps/dist/components/map.vue?vue&type=style&index=0&id=85ca06a4&lang=css":
 /*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./node_modules/vue2-google-maps/dist/components/map.vue?vue&type=style&index=0&id=85ca06a4&lang=css ***!
@@ -58381,6 +60319,78 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.base-icon[data-v-ea971156] :deep(svg) {\n  width: 100%;\n  height: 100%;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.google-place-suggestions[data-v-703277bb] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    z-index: 1000;\n    max-height: 220px;\n    overflow-y: auto;\n    background: #fff;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.osm-suggestions[data-v-a0260928] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    z-index: 1000;\n    max-height: 220px;\n    overflow-y: auto;\n    background: #fff;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.table-count[data-v-2f412a0c] {\n    font-size: 13px;\n    line-height: 1.4;\n    color: var(--ui-text-muted);\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n    gap: 0.25rem;\n}\n.table-count__num[data-v-2f412a0c] {\n    color: var(--ui-heading, var(--ui-text));\n    font-weight: 700;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -58460,6 +60470,140 @@ module.exports = function (cssWithMappingToString) {
 
   return list;
 };
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/runtime/getUrl.js":
+/*!********************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/getUrl.js ***!
+  \********************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function (url, options) {
+  if (!options) {
+    // eslint-disable-next-line no-param-reassign
+    options = {};
+  } // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+
+
+  url = url && url.__esModule ? url.default : url;
+
+  if (typeof url !== "string") {
+    return url;
+  } // If url is already wrapped in quotes, remove them
+
+
+  if (/^['"].*['"]$/.test(url)) {
+    // eslint-disable-next-line no-param-reassign
+    url = url.slice(1, -1);
+  }
+
+  if (options.hash) {
+    // eslint-disable-next-line no-param-reassign
+    url += options.hash;
+  } // Should url be wrapped?
+  // See https://drafts.csswg.org/css-values-3/#urls
+
+
+  if (/["'() \t\n]/.test(url) || options.needQuotes) {
+    return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, "\\n"), "\"");
+  }
+
+  return url;
+};
+
+/***/ }),
+
+/***/ "./node_modules/leaflet-draw/dist/images/spritesheet-2x.png":
+/*!******************************************************************!*\
+  !*** ./node_modules/leaflet-draw/dist/images/spritesheet-2x.png ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet-draw/dist/spritesheet-2x.png?7ea3a6d428136b87ab95ee89b6e956e7");
+
+/***/ }),
+
+/***/ "./node_modules/leaflet-draw/dist/images/spritesheet.png":
+/*!***************************************************************!*\
+  !*** ./node_modules/leaflet-draw/dist/images/spritesheet.png ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet-draw/dist/spritesheet.png?ef32ea2bdf63ba132b4ced047203650d");
+
+/***/ }),
+
+/***/ "./node_modules/leaflet-draw/dist/images/spritesheet.svg":
+/*!***************************************************************!*\
+  !*** ./node_modules/leaflet-draw/dist/images/spritesheet.svg ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet-draw/dist/spritesheet.svg?a4e0eb7ad904a4858361202555b38aee");
+
+/***/ }),
+
+/***/ "./node_modules/leaflet/dist/images/layers-2x.png":
+/*!********************************************************!*\
+  !*** ./node_modules/leaflet/dist/images/layers-2x.png ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet/dist/layers-2x.png?8f2c4d11474275fbc1614b9098334eae");
+
+/***/ }),
+
+/***/ "./node_modules/leaflet/dist/images/layers.png":
+/*!*****************************************************!*\
+  !*** ./node_modules/leaflet/dist/images/layers.png ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet/dist/layers.png?416d91365b44e4b4f4777663e6f009f3");
+
+/***/ }),
+
+/***/ "./node_modules/leaflet/dist/images/marker-icon.png":
+/*!**********************************************************!*\
+  !*** ./node_modules/leaflet/dist/images/marker-icon.png ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/images/vendor/leaflet/dist/marker-icon.png?2b3e1faf89f94a4835397e7a43b4f77d");
 
 /***/ }),
 
@@ -69461,6 +71605,14546 @@ if ( typeof noGlobal === "undefined" ) {
 
 return jQuery;
 } );
+
+
+/***/ }),
+
+/***/ "./node_modules/leaflet-draw/dist/leaflet.draw.js":
+/*!********************************************************!*\
+  !*** ./node_modules/leaflet-draw/dist/leaflet.draw.js ***!
+  \********************************************************/
+/***/ (() => {
+
+/*
+ Leaflet.draw 1.0.4, a plugin that adds drawing and editing tools to Leaflet powered maps.
+ (c) 2012-2017, Jacob Toye, Jon West, Smartrak, Leaflet
+
+ https://github.com/Leaflet/Leaflet.draw
+ http://leafletjs.com
+ */
+!function(t,e,i){function o(t,e){for(;(t=t.parentElement)&&!t.classList.contains(e););return t}L.drawVersion="1.0.4",L.Draw={},L.drawLocal={draw:{toolbar:{actions:{title:"Cancel drawing",text:"Cancel"},finish:{title:"Finish drawing",text:"Finish"},undo:{title:"Delete last point drawn",text:"Delete last point"},buttons:{polyline:"Draw a polyline",polygon:"Draw a polygon",rectangle:"Draw a rectangle",circle:"Draw a circle",marker:"Draw a marker",circlemarker:"Draw a circlemarker"}},handlers:{circle:{tooltip:{start:"Click and drag to draw circle."},radius:"Radius"},circlemarker:{tooltip:{start:"Click map to place circle marker."}},marker:{tooltip:{start:"Click map to place marker."}},polygon:{tooltip:{start:"Click to start drawing shape.",cont:"Click to continue drawing shape.",end:"Click first point to close this shape."}},polyline:{error:"<strong>Error:</strong> shape edges cannot cross!",tooltip:{start:"Click to start drawing line.",cont:"Click to continue drawing line.",end:"Click last point to finish line."}},rectangle:{tooltip:{start:"Click and drag to draw rectangle."}},simpleshape:{tooltip:{end:"Release mouse to finish drawing."}}}},edit:{toolbar:{actions:{save:{title:"Save changes",text:"Save"},cancel:{title:"Cancel editing, discards all changes",text:"Cancel"},clearAll:{title:"Clear all layers",text:"Clear All"}},buttons:{edit:"Edit layers",editDisabled:"No layers to edit",remove:"Delete layers",removeDisabled:"No layers to delete"}},handlers:{edit:{tooltip:{text:"Drag handles or markers to edit features.",subtext:"Click cancel to undo changes."}},remove:{tooltip:{text:"Click on a feature to remove."}}}}},L.Draw.Event={},L.Draw.Event.CREATED="draw:created",L.Draw.Event.EDITED="draw:edited",L.Draw.Event.DELETED="draw:deleted",L.Draw.Event.DRAWSTART="draw:drawstart",L.Draw.Event.DRAWSTOP="draw:drawstop",L.Draw.Event.DRAWVERTEX="draw:drawvertex",L.Draw.Event.EDITSTART="draw:editstart",L.Draw.Event.EDITMOVE="draw:editmove",L.Draw.Event.EDITRESIZE="draw:editresize",L.Draw.Event.EDITVERTEX="draw:editvertex",L.Draw.Event.EDITSTOP="draw:editstop",L.Draw.Event.DELETESTART="draw:deletestart",L.Draw.Event.DELETESTOP="draw:deletestop",L.Draw.Event.TOOLBAROPENED="draw:toolbaropened",L.Draw.Event.TOOLBARCLOSED="draw:toolbarclosed",L.Draw.Event.MARKERCONTEXT="draw:markercontext",L.Draw=L.Draw||{},L.Draw.Feature=L.Handler.extend({initialize:function(t,e){this._map=t,this._container=t._container,this._overlayPane=t._panes.overlayPane,this._popupPane=t._panes.popupPane,e&&e.shapeOptions&&(e.shapeOptions=L.Util.extend({},this.options.shapeOptions,e.shapeOptions)),L.setOptions(this,e);var i=L.version.split(".");1===parseInt(i[0],10)&&parseInt(i[1],10)>=2?L.Draw.Feature.include(L.Evented.prototype):L.Draw.Feature.include(L.Mixin.Events)},enable:function(){this._enabled||(L.Handler.prototype.enable.call(this),this.fire("enabled",{handler:this.type}),this._map.fire(L.Draw.Event.DRAWSTART,{layerType:this.type}))},disable:function(){this._enabled&&(L.Handler.prototype.disable.call(this),this._map.fire(L.Draw.Event.DRAWSTOP,{layerType:this.type}),this.fire("disabled",{handler:this.type}))},addHooks:function(){var t=this._map;t&&(L.DomUtil.disableTextSelection(),t.getContainer().focus(),this._tooltip=new L.Draw.Tooltip(this._map),L.DomEvent.on(this._container,"keyup",this._cancelDrawing,this))},removeHooks:function(){this._map&&(L.DomUtil.enableTextSelection(),this._tooltip.dispose(),this._tooltip=null,L.DomEvent.off(this._container,"keyup",this._cancelDrawing,this))},setOptions:function(t){L.setOptions(this,t)},_fireCreatedEvent:function(t){this._map.fire(L.Draw.Event.CREATED,{layer:t,layerType:this.type})},_cancelDrawing:function(t){27===t.keyCode&&(this._map.fire("draw:canceled",{layerType:this.type}),this.disable())}}),L.Draw.Polyline=L.Draw.Feature.extend({statics:{TYPE:"polyline"},Poly:L.Polyline,options:{allowIntersection:!0,repeatMode:!1,drawError:{color:"#b00b00",timeout:2500},icon:new L.DivIcon({iconSize:new L.Point(8,8),className:"leaflet-div-icon leaflet-editing-icon"}),touchIcon:new L.DivIcon({iconSize:new L.Point(20,20),className:"leaflet-div-icon leaflet-editing-icon leaflet-touch-icon"}),guidelineDistance:20,maxGuideLineLength:4e3,shapeOptions:{stroke:!0,color:"#3388ff",weight:4,opacity:.5,fill:!1,clickable:!0},metric:!0,feet:!0,nautic:!1,showLength:!0,zIndexOffset:2e3,factor:1,maxPoints:0},initialize:function(t,e){L.Browser.touch&&(this.options.icon=this.options.touchIcon),this.options.drawError.message=L.drawLocal.draw.handlers.polyline.error,e&&e.drawError&&(e.drawError=L.Util.extend({},this.options.drawError,e.drawError)),this.type=L.Draw.Polyline.TYPE,L.Draw.Feature.prototype.initialize.call(this,t,e)},addHooks:function(){L.Draw.Feature.prototype.addHooks.call(this),this._map&&(this._markers=[],this._markerGroup=new L.LayerGroup,this._map.addLayer(this._markerGroup),this._poly=new L.Polyline([],this.options.shapeOptions),this._tooltip.updateContent(this._getTooltipText()),this._mouseMarker||(this._mouseMarker=L.marker(this._map.getCenter(),{icon:L.divIcon({className:"leaflet-mouse-marker",iconAnchor:[20,20],iconSize:[40,40]}),opacity:0,zIndexOffset:this.options.zIndexOffset})),this._mouseMarker.on("mouseout",this._onMouseOut,this).on("mousemove",this._onMouseMove,this).on("mousedown",this._onMouseDown,this).on("mouseup",this._onMouseUp,this).addTo(this._map),this._map.on("mouseup",this._onMouseUp,this).on("mousemove",this._onMouseMove,this).on("zoomlevelschange",this._onZoomEnd,this).on("touchstart",this._onTouch,this).on("zoomend",this._onZoomEnd,this))},removeHooks:function(){L.Draw.Feature.prototype.removeHooks.call(this),this._clearHideErrorTimeout(),this._cleanUpShape(),this._map.removeLayer(this._markerGroup),delete this._markerGroup,delete this._markers,this._map.removeLayer(this._poly),delete this._poly,this._mouseMarker.off("mousedown",this._onMouseDown,this).off("mouseout",this._onMouseOut,this).off("mouseup",this._onMouseUp,this).off("mousemove",this._onMouseMove,this),this._map.removeLayer(this._mouseMarker),delete this._mouseMarker,this._clearGuides(),this._map.off("mouseup",this._onMouseUp,this).off("mousemove",this._onMouseMove,this).off("zoomlevelschange",this._onZoomEnd,this).off("zoomend",this._onZoomEnd,this).off("touchstart",this._onTouch,this).off("click",this._onTouch,this)},deleteLastVertex:function(){if(!(this._markers.length<=1)){var t=this._markers.pop(),e=this._poly,i=e.getLatLngs(),o=i.splice(-1,1)[0];this._poly.setLatLngs(i),this._markerGroup.removeLayer(t),e.getLatLngs().length<2&&this._map.removeLayer(e),this._vertexChanged(o,!1)}},addVertex:function(t){if(this._markers.length>=2&&!this.options.allowIntersection&&this._poly.newLatLngIntersects(t))return void this._showErrorTooltip();this._errorShown&&this._hideErrorTooltip(),this._markers.push(this._createMarker(t)),this._poly.addLatLng(t),2===this._poly.getLatLngs().length&&this._map.addLayer(this._poly),this._vertexChanged(t,!0)},completeShape:function(){this._markers.length<=1||!this._shapeIsValid()||(this._fireCreatedEvent(),this.disable(),this.options.repeatMode&&this.enable())},_finishShape:function(){var t=this._poly._defaultShape?this._poly._defaultShape():this._poly.getLatLngs(),e=this._poly.newLatLngIntersects(t[t.length-1]);if(!this.options.allowIntersection&&e||!this._shapeIsValid())return void this._showErrorTooltip();this._fireCreatedEvent(),this.disable(),this.options.repeatMode&&this.enable()},_shapeIsValid:function(){return!0},_onZoomEnd:function(){null!==this._markers&&this._updateGuide()},_onMouseMove:function(t){var e=this._map.mouseEventToLayerPoint(t.originalEvent),i=this._map.layerPointToLatLng(e);this._currentLatLng=i,this._updateTooltip(i),this._updateGuide(e),this._mouseMarker.setLatLng(i),L.DomEvent.preventDefault(t.originalEvent)},_vertexChanged:function(t,e){this._map.fire(L.Draw.Event.DRAWVERTEX,{layers:this._markerGroup}),this._updateFinishHandler(),this._updateRunningMeasure(t,e),this._clearGuides(),this._updateTooltip()},_onMouseDown:function(t){if(!this._clickHandled&&!this._touchHandled&&!this._disableMarkers){this._onMouseMove(t),this._clickHandled=!0,this._disableNewMarkers();var e=t.originalEvent,i=e.clientX,o=e.clientY;this._startPoint.call(this,i,o)}},_startPoint:function(t,e){this._mouseDownOrigin=L.point(t,e)},_onMouseUp:function(t){var e=t.originalEvent,i=e.clientX,o=e.clientY;this._endPoint.call(this,i,o,t),this._clickHandled=null},_endPoint:function(e,i,o){if(this._mouseDownOrigin){var a=L.point(e,i).distanceTo(this._mouseDownOrigin),n=this._calculateFinishDistance(o.latlng);this.options.maxPoints>1&&this.options.maxPoints==this._markers.length+1?(this.addVertex(o.latlng),this._finishShape()):n<10&&L.Browser.touch?this._finishShape():Math.abs(a)<9*(t.devicePixelRatio||1)&&this.addVertex(o.latlng),this._enableNewMarkers()}this._mouseDownOrigin=null},_onTouch:function(t){var e,i,o=t.originalEvent;!o.touches||!o.touches[0]||this._clickHandled||this._touchHandled||this._disableMarkers||(e=o.touches[0].clientX,i=o.touches[0].clientY,this._disableNewMarkers(),this._touchHandled=!0,this._startPoint.call(this,e,i),this._endPoint.call(this,e,i,t),this._touchHandled=null),this._clickHandled=null},_onMouseOut:function(){this._tooltip&&this._tooltip._onMouseOut.call(this._tooltip)},_calculateFinishDistance:function(t){var e;if(this._markers.length>0){var i;if(this.type===L.Draw.Polyline.TYPE)i=this._markers[this._markers.length-1];else{if(this.type!==L.Draw.Polygon.TYPE)return 1/0;i=this._markers[0]}var o=this._map.latLngToContainerPoint(i.getLatLng()),a=new L.Marker(t,{icon:this.options.icon,zIndexOffset:2*this.options.zIndexOffset}),n=this._map.latLngToContainerPoint(a.getLatLng());e=o.distanceTo(n)}else e=1/0;return e},_updateFinishHandler:function(){var t=this._markers.length;t>1&&this._markers[t-1].on("click",this._finishShape,this),t>2&&this._markers[t-2].off("click",this._finishShape,this)},_createMarker:function(t){var e=new L.Marker(t,{icon:this.options.icon,zIndexOffset:2*this.options.zIndexOffset});return this._markerGroup.addLayer(e),e},_updateGuide:function(t){var e=this._markers?this._markers.length:0;e>0&&(t=t||this._map.latLngToLayerPoint(this._currentLatLng),this._clearGuides(),this._drawGuide(this._map.latLngToLayerPoint(this._markers[e-1].getLatLng()),t))},_updateTooltip:function(t){var e=this._getTooltipText();t&&this._tooltip.updatePosition(t),this._errorShown||this._tooltip.updateContent(e)},_drawGuide:function(t,e){var i,o,a,n=Math.floor(Math.sqrt(Math.pow(e.x-t.x,2)+Math.pow(e.y-t.y,2))),s=this.options.guidelineDistance,r=this.options.maxGuideLineLength,l=n>r?n-r:s;for(this._guidesContainer||(this._guidesContainer=L.DomUtil.create("div","leaflet-draw-guides",this._overlayPane));l<n;l+=this.options.guidelineDistance)i=l/n,o={x:Math.floor(t.x*(1-i)+i*e.x),y:Math.floor(t.y*(1-i)+i*e.y)},a=L.DomUtil.create("div","leaflet-draw-guide-dash",this._guidesContainer),a.style.backgroundColor=this._errorShown?this.options.drawError.color:this.options.shapeOptions.color,L.DomUtil.setPosition(a,o)},_updateGuideColor:function(t){if(this._guidesContainer)for(var e=0,i=this._guidesContainer.childNodes.length;e<i;e++)this._guidesContainer.childNodes[e].style.backgroundColor=t},_clearGuides:function(){if(this._guidesContainer)for(;this._guidesContainer.firstChild;)this._guidesContainer.removeChild(this._guidesContainer.firstChild)},_getTooltipText:function(){var t,e,i=this.options.showLength;return 0===this._markers.length?t={text:L.drawLocal.draw.handlers.polyline.tooltip.start}:(e=i?this._getMeasurementString():"",t=1===this._markers.length?{text:L.drawLocal.draw.handlers.polyline.tooltip.cont,subtext:e}:{text:L.drawLocal.draw.handlers.polyline.tooltip.end,subtext:e}),t},_updateRunningMeasure:function(t,e){var i,o,a=this._markers.length;1===this._markers.length?this._measurementRunningTotal=0:(i=a-(e?2:1),o=L.GeometryUtil.isVersion07x()?t.distanceTo(this._markers[i].getLatLng())*(this.options.factor||1):this._map.distance(t,this._markers[i].getLatLng())*(this.options.factor||1),this._measurementRunningTotal+=o*(e?1:-1))},_getMeasurementString:function(){var t,e=this._currentLatLng,i=this._markers[this._markers.length-1].getLatLng();return t=L.GeometryUtil.isVersion07x()?i&&e&&e.distanceTo?this._measurementRunningTotal+e.distanceTo(i)*(this.options.factor||1):this._measurementRunningTotal||0:i&&e?this._measurementRunningTotal+this._map.distance(e,i)*(this.options.factor||1):this._measurementRunningTotal||0,L.GeometryUtil.readableDistance(t,this.options.metric,this.options.feet,this.options.nautic,this.options.precision)},_showErrorTooltip:function(){this._errorShown=!0,this._tooltip.showAsError().updateContent({text:this.options.drawError.message}),this._updateGuideColor(this.options.drawError.color),this._poly.setStyle({color:this.options.drawError.color}),this._clearHideErrorTimeout(),this._hideErrorTimeout=setTimeout(L.Util.bind(this._hideErrorTooltip,this),this.options.drawError.timeout)},_hideErrorTooltip:function(){this._errorShown=!1,this._clearHideErrorTimeout(),this._tooltip.removeError().updateContent(this._getTooltipText()),this._updateGuideColor(this.options.shapeOptions.color),this._poly.setStyle({color:this.options.shapeOptions.color})},_clearHideErrorTimeout:function(){this._hideErrorTimeout&&(clearTimeout(this._hideErrorTimeout),this._hideErrorTimeout=null)},_disableNewMarkers:function(){this._disableMarkers=!0},_enableNewMarkers:function(){setTimeout(function(){this._disableMarkers=!1}.bind(this),50)},_cleanUpShape:function(){this._markers.length>1&&this._markers[this._markers.length-1].off("click",this._finishShape,this)},_fireCreatedEvent:function(){var t=new this.Poly(this._poly.getLatLngs(),this.options.shapeOptions);L.Draw.Feature.prototype._fireCreatedEvent.call(this,t)}}),L.Draw.Polygon=L.Draw.Polyline.extend({statics:{TYPE:"polygon"},Poly:L.Polygon,options:{showArea:!1,showLength:!1,shapeOptions:{stroke:!0,color:"#3388ff",weight:4,opacity:.5,fill:!0,fillColor:null,fillOpacity:.2,clickable:!0},metric:!0,feet:!0,nautic:!1,precision:{}},initialize:function(t,e){L.Draw.Polyline.prototype.initialize.call(this,t,e),this.type=L.Draw.Polygon.TYPE},_updateFinishHandler:function(){var t=this._markers.length;1===t&&this._markers[0].on("click",this._finishShape,this),t>2&&(this._markers[t-1].on("dblclick",this._finishShape,this),t>3&&this._markers[t-2].off("dblclick",this._finishShape,this))},_getTooltipText:function(){var t,e;return 0===this._markers.length?t=L.drawLocal.draw.handlers.polygon.tooltip.start:this._markers.length<3?(t=L.drawLocal.draw.handlers.polygon.tooltip.cont,e=this._getMeasurementString()):(t=L.drawLocal.draw.handlers.polygon.tooltip.end,e=this._getMeasurementString()),{text:t,subtext:e}},_getMeasurementString:function(){var t=this._area,e="";return t||this.options.showLength?(this.options.showLength&&(e=L.Draw.Polyline.prototype._getMeasurementString.call(this)),t&&(e+="<br>"+L.GeometryUtil.readableArea(t,this.options.metric,this.options.precision)),e):null},_shapeIsValid:function(){return this._markers.length>=3},_vertexChanged:function(t,e){var i;!this.options.allowIntersection&&this.options.showArea&&(i=this._poly.getLatLngs(),this._area=L.GeometryUtil.geodesicArea(i)),L.Draw.Polyline.prototype._vertexChanged.call(this,t,e)},_cleanUpShape:function(){var t=this._markers.length;t>0&&(this._markers[0].off("click",this._finishShape,this),t>2&&this._markers[t-1].off("dblclick",this._finishShape,this))}}),L.SimpleShape={},L.Draw.SimpleShape=L.Draw.Feature.extend({options:{repeatMode:!1},initialize:function(t,e){this._endLabelText=L.drawLocal.draw.handlers.simpleshape.tooltip.end,L.Draw.Feature.prototype.initialize.call(this,t,e)},addHooks:function(){L.Draw.Feature.prototype.addHooks.call(this),this._map&&(this._mapDraggable=this._map.dragging.enabled(),this._mapDraggable&&this._map.dragging.disable(),this._container.style.cursor="crosshair",this._tooltip.updateContent({text:this._initialLabelText}),this._map.on("mousedown",this._onMouseDown,this).on("mousemove",this._onMouseMove,this).on("touchstart",this._onMouseDown,this).on("touchmove",this._onMouseMove,this),e.addEventListener("touchstart",L.DomEvent.preventDefault,{passive:!1}))},removeHooks:function(){L.Draw.Feature.prototype.removeHooks.call(this),this._map&&(this._mapDraggable&&this._map.dragging.enable(),this._container.style.cursor="",this._map.off("mousedown",this._onMouseDown,this).off("mousemove",this._onMouseMove,this).off("touchstart",this._onMouseDown,this).off("touchmove",this._onMouseMove,this),L.DomEvent.off(e,"mouseup",this._onMouseUp,this),L.DomEvent.off(e,"touchend",this._onMouseUp,this),e.removeEventListener("touchstart",L.DomEvent.preventDefault),this._shape&&(this._map.removeLayer(this._shape),delete this._shape)),this._isDrawing=!1},_getTooltipText:function(){return{text:this._endLabelText}},_onMouseDown:function(t){this._isDrawing=!0,this._startLatLng=t.latlng,L.DomEvent.on(e,"mouseup",this._onMouseUp,this).on(e,"touchend",this._onMouseUp,this).preventDefault(t.originalEvent)},_onMouseMove:function(t){var e=t.latlng;this._tooltip.updatePosition(e),this._isDrawing&&(this._tooltip.updateContent(this._getTooltipText()),this._drawShape(e))},_onMouseUp:function(){this._shape&&this._fireCreatedEvent(),this.disable(),this.options.repeatMode&&this.enable()}}),L.Draw.Rectangle=L.Draw.SimpleShape.extend({statics:{TYPE:"rectangle"},options:{shapeOptions:{stroke:!0,color:"#3388ff",weight:4,opacity:.5,fill:!0,fillColor:null,fillOpacity:.2,clickable:!0},showArea:!0,metric:!0},initialize:function(t,e){this.type=L.Draw.Rectangle.TYPE,this._initialLabelText=L.drawLocal.draw.handlers.rectangle.tooltip.start,L.Draw.SimpleShape.prototype.initialize.call(this,t,e)},disable:function(){this._enabled&&(this._isCurrentlyTwoClickDrawing=!1,L.Draw.SimpleShape.prototype.disable.call(this))},_onMouseUp:function(t){if(!this._shape&&!this._isCurrentlyTwoClickDrawing)return void(this._isCurrentlyTwoClickDrawing=!0);this._isCurrentlyTwoClickDrawing&&!o(t.target,"leaflet-pane")||L.Draw.SimpleShape.prototype._onMouseUp.call(this)},_drawShape:function(t){this._shape?this._shape.setBounds(new L.LatLngBounds(this._startLatLng,t)):(this._shape=new L.Rectangle(new L.LatLngBounds(this._startLatLng,t),this.options.shapeOptions),this._map.addLayer(this._shape))},_fireCreatedEvent:function(){var t=new L.Rectangle(this._shape.getBounds(),this.options.shapeOptions);L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this,t)},_getTooltipText:function(){var t,e,i,o=L.Draw.SimpleShape.prototype._getTooltipText.call(this),a=this._shape,n=this.options.showArea;return a&&(t=this._shape._defaultShape?this._shape._defaultShape():this._shape.getLatLngs(),e=L.GeometryUtil.geodesicArea(t),i=n?L.GeometryUtil.readableArea(e,this.options.metric):""),{text:o.text,subtext:i}}}),L.Draw.Marker=L.Draw.Feature.extend({statics:{TYPE:"marker"},options:{icon:new L.Icon.Default,repeatMode:!1,zIndexOffset:2e3},initialize:function(t,e){this.type=L.Draw.Marker.TYPE,this._initialLabelText=L.drawLocal.draw.handlers.marker.tooltip.start,L.Draw.Feature.prototype.initialize.call(this,t,e)},addHooks:function(){L.Draw.Feature.prototype.addHooks.call(this),this._map&&(this._tooltip.updateContent({text:this._initialLabelText}),this._mouseMarker||(this._mouseMarker=L.marker(this._map.getCenter(),{icon:L.divIcon({className:"leaflet-mouse-marker",iconAnchor:[20,20],iconSize:[40,40]}),opacity:0,zIndexOffset:this.options.zIndexOffset})),this._mouseMarker.on("click",this._onClick,this).addTo(this._map),this._map.on("mousemove",this._onMouseMove,this),this._map.on("click",this._onTouch,this))},removeHooks:function(){L.Draw.Feature.prototype.removeHooks.call(this),this._map&&(this._map.off("click",this._onClick,this).off("click",this._onTouch,this),this._marker&&(this._marker.off("click",this._onClick,this),this._map.removeLayer(this._marker),delete this._marker),this._mouseMarker.off("click",this._onClick,this),this._map.removeLayer(this._mouseMarker),delete this._mouseMarker,this._map.off("mousemove",this._onMouseMove,this))},_onMouseMove:function(t){var e=t.latlng;this._tooltip.updatePosition(e),this._mouseMarker.setLatLng(e),this._marker?(e=this._mouseMarker.getLatLng(),this._marker.setLatLng(e)):(this._marker=this._createMarker(e),this._marker.on("click",this._onClick,this),this._map.on("click",this._onClick,this).addLayer(this._marker))},_createMarker:function(t){return new L.Marker(t,{icon:this.options.icon,zIndexOffset:this.options.zIndexOffset})},_onClick:function(){this._fireCreatedEvent(),this.disable(),this.options.repeatMode&&this.enable()},_onTouch:function(t){this._onMouseMove(t),this._onClick()},_fireCreatedEvent:function(){var t=new L.Marker.Touch(this._marker.getLatLng(),{icon:this.options.icon});L.Draw.Feature.prototype._fireCreatedEvent.call(this,t)}}),L.Draw.CircleMarker=L.Draw.Marker.extend({statics:{TYPE:"circlemarker"},options:{stroke:!0,color:"#3388ff",weight:4,opacity:.5,fill:!0,fillColor:null,fillOpacity:.2,clickable:!0,zIndexOffset:2e3},initialize:function(t,e){this.type=L.Draw.CircleMarker.TYPE,this._initialLabelText=L.drawLocal.draw.handlers.circlemarker.tooltip.start,L.Draw.Feature.prototype.initialize.call(this,t,e)},_fireCreatedEvent:function(){var t=new L.CircleMarker(this._marker.getLatLng(),this.options);L.Draw.Feature.prototype._fireCreatedEvent.call(this,t)},_createMarker:function(t){return new L.CircleMarker(t,this.options)}}),L.Draw.Circle=L.Draw.SimpleShape.extend({statics:{TYPE:"circle"},options:{shapeOptions:{stroke:!0,color:"#3388ff",weight:4,opacity:.5,fill:!0,fillColor:null,fillOpacity:.2,clickable:!0},showRadius:!0,metric:!0,feet:!0,nautic:!1},initialize:function(t,e){this.type=L.Draw.Circle.TYPE,this._initialLabelText=L.drawLocal.draw.handlers.circle.tooltip.start,L.Draw.SimpleShape.prototype.initialize.call(this,t,e)},_drawShape:function(t){if(L.GeometryUtil.isVersion07x())var e=this._startLatLng.distanceTo(t);else var e=this._map.distance(this._startLatLng,t);this._shape?this._shape.setRadius(e):(this._shape=new L.Circle(this._startLatLng,e,this.options.shapeOptions),this._map.addLayer(this._shape))},_fireCreatedEvent:function(){var t=new L.Circle(this._startLatLng,this._shape.getRadius(),this.options.shapeOptions);L.Draw.SimpleShape.prototype._fireCreatedEvent.call(this,t)},_onMouseMove:function(t){var e,i=t.latlng,o=this.options.showRadius,a=this.options.metric;if(this._tooltip.updatePosition(i),this._isDrawing){this._drawShape(i),e=this._shape.getRadius().toFixed(1);var n="";o&&(n=L.drawLocal.draw.handlers.circle.radius+": "+L.GeometryUtil.readableDistance(e,a,this.options.feet,this.options.nautic)),this._tooltip.updateContent({text:this._endLabelText,subtext:n})}}}),L.Edit=L.Edit||{},L.Edit.Marker=L.Handler.extend({initialize:function(t,e){this._marker=t,L.setOptions(this,e)},addHooks:function(){var t=this._marker;t.dragging.enable(),t.on("dragend",this._onDragEnd,t),this._toggleMarkerHighlight()},removeHooks:function(){var t=this._marker;t.dragging.disable(),t.off("dragend",this._onDragEnd,t),this._toggleMarkerHighlight()},_onDragEnd:function(t){var e=t.target;e.edited=!0,this._map.fire(L.Draw.Event.EDITMOVE,{layer:e})},_toggleMarkerHighlight:function(){var t=this._marker._icon;t&&(t.style.display="none",L.DomUtil.hasClass(t,"leaflet-edit-marker-selected")?(L.DomUtil.removeClass(t,"leaflet-edit-marker-selected"),this._offsetMarker(t,-4)):(L.DomUtil.addClass(t,"leaflet-edit-marker-selected"),this._offsetMarker(t,4)),t.style.display="")},_offsetMarker:function(t,e){var i=parseInt(t.style.marginTop,10)-e,o=parseInt(t.style.marginLeft,10)-e;t.style.marginTop=i+"px",t.style.marginLeft=o+"px"}}),L.Marker.addInitHook(function(){L.Edit.Marker&&(this.editing=new L.Edit.Marker(this),this.options.editable&&this.editing.enable())}),L.Edit=L.Edit||{},L.Edit.Poly=L.Handler.extend({initialize:function(t){this.latlngs=[t._latlngs],t._holes&&(this.latlngs=this.latlngs.concat(t._holes)),this._poly=t,this._poly.on("revert-edited",this._updateLatLngs,this)},_defaultShape:function(){return L.Polyline._flat?L.Polyline._flat(this._poly._latlngs)?this._poly._latlngs:this._poly._latlngs[0]:this._poly._latlngs},_eachVertexHandler:function(t){for(var e=0;e<this._verticesHandlers.length;e++)t(this._verticesHandlers[e])},addHooks:function(){this._initHandlers(),this._eachVertexHandler(function(t){t.addHooks()})},removeHooks:function(){this._eachVertexHandler(function(t){t.removeHooks()})},updateMarkers:function(){this._eachVertexHandler(function(t){t.updateMarkers()})},_initHandlers:function(){this._verticesHandlers=[];for(var t=0;t<this.latlngs.length;t++)this._verticesHandlers.push(new L.Edit.PolyVerticesEdit(this._poly,this.latlngs[t],this._poly.options.poly))},_updateLatLngs:function(t){this.latlngs=[t.layer._latlngs],t.layer._holes&&(this.latlngs=this.latlngs.concat(t.layer._holes))}}),L.Edit.PolyVerticesEdit=L.Handler.extend({options:{icon:new L.DivIcon({iconSize:new L.Point(8,8),className:"leaflet-div-icon leaflet-editing-icon"}),touchIcon:new L.DivIcon({iconSize:new L.Point(20,20),className:"leaflet-div-icon leaflet-editing-icon leaflet-touch-icon"}),drawError:{color:"#b00b00",timeout:1e3}},initialize:function(t,e,i){L.Browser.touch&&(this.options.icon=this.options.touchIcon),this._poly=t,i&&i.drawError&&(i.drawError=L.Util.extend({},this.options.drawError,i.drawError)),this._latlngs=e,L.setOptions(this,i)},_defaultShape:function(){return L.Polyline._flat?L.Polyline._flat(this._latlngs)?this._latlngs:this._latlngs[0]:this._latlngs},addHooks:function(){var t=this._poly,e=t._path;t instanceof L.Polygon||(t.options.fill=!1,t.options.editing&&(t.options.editing.fill=!1)),e&&t.options.editing&&t.options.editing.className&&(t.options.original.className&&t.options.original.className.split(" ").forEach(function(t){L.DomUtil.removeClass(e,t)}),t.options.editing.className.split(" ").forEach(function(t){L.DomUtil.addClass(e,t)})),t.setStyle(t.options.editing),this._poly._map&&(this._map=this._poly._map,this._markerGroup||this._initMarkers(),this._poly._map.addLayer(this._markerGroup))},removeHooks:function(){var t=this._poly,e=t._path;e&&t.options.editing&&t.options.editing.className&&(t.options.editing.className.split(" ").forEach(function(t){L.DomUtil.removeClass(e,t)}),t.options.original.className&&t.options.original.className.split(" ").forEach(function(t){L.DomUtil.addClass(e,t)})),t.setStyle(t.options.original),t._map&&(t._map.removeLayer(this._markerGroup),delete this._markerGroup,delete this._markers)},updateMarkers:function(){this._markerGroup.clearLayers(),this._initMarkers()},_initMarkers:function(){this._markerGroup||(this._markerGroup=new L.LayerGroup),this._markers=[];var t,e,i,o,a=this._defaultShape();for(t=0,i=a.length;t<i;t++)o=this._createMarker(a[t],t),o.on("click",this._onMarkerClick,this),o.on("contextmenu",this._onContextMenu,this),this._markers.push(o);var n,s;for(t=0,e=i-1;t<i;e=t++)(0!==t||L.Polygon&&this._poly instanceof L.Polygon)&&(n=this._markers[e],s=this._markers[t],this._createMiddleMarker(n,s),this._updatePrevNext(n,s))},_createMarker:function(t,e){var i=new L.Marker.Touch(t,{draggable:!0,icon:this.options.icon});return i._origLatLng=t,i._index=e,i.on("dragstart",this._onMarkerDragStart,this).on("drag",this._onMarkerDrag,this).on("dragend",this._fireEdit,this).on("touchmove",this._onTouchMove,this).on("touchend",this._fireEdit,this).on("MSPointerMove",this._onTouchMove,this).on("MSPointerUp",this._fireEdit,this),this._markerGroup.addLayer(i),i},_onMarkerDragStart:function(){this._poly.fire("editstart")},_spliceLatLngs:function(){var t=this._defaultShape(),e=[].splice.apply(t,arguments);return this._poly._convertLatLngs(t,!0),this._poly.redraw(),e},_removeMarker:function(t){var e=t._index;this._markerGroup.removeLayer(t),this._markers.splice(e,1),this._spliceLatLngs(e,1),this._updateIndexes(e,-1),t.off("dragstart",this._onMarkerDragStart,this).off("drag",this._onMarkerDrag,this).off("dragend",this._fireEdit,this).off("touchmove",this._onMarkerDrag,this).off("touchend",this._fireEdit,this).off("click",this._onMarkerClick,this).off("MSPointerMove",this._onTouchMove,this).off("MSPointerUp",this._fireEdit,this)},_fireEdit:function(){this._poly.edited=!0,this._poly.fire("edit"),this._poly._map.fire(L.Draw.Event.EDITVERTEX,{layers:this._markerGroup,poly:this._poly})},_onMarkerDrag:function(t){var e=t.target,i=this._poly,o=L.LatLngUtil.cloneLatLng(e._origLatLng);if(L.extend(e._origLatLng,e._latlng),i.options.poly){var a=i._map._editTooltip;if(!i.options.poly.allowIntersection&&i.intersects()){L.extend(e._origLatLng,o),e.setLatLng(o);var n=i.options.color;i.setStyle({color:this.options.drawError.color}),a&&a.updateContent({text:L.drawLocal.draw.handlers.polyline.error}),setTimeout(function(){i.setStyle({color:n}),a&&a.updateContent({text:L.drawLocal.edit.handlers.edit.tooltip.text,subtext:L.drawLocal.edit.handlers.edit.tooltip.subtext})},1e3)}}e._middleLeft&&e._middleLeft.setLatLng(this._getMiddleLatLng(e._prev,e)),e._middleRight&&e._middleRight.setLatLng(this._getMiddleLatLng(e,e._next)),this._poly._bounds._southWest=L.latLng(1/0,1/0),this._poly._bounds._northEast=L.latLng(-1/0,-1/0);var s=this._poly.getLatLngs();this._poly._convertLatLngs(s,!0),this._poly.redraw(),this._poly.fire("editdrag")},_onMarkerClick:function(t){var e=L.Polygon&&this._poly instanceof L.Polygon?4:3,i=t.target;this._defaultShape().length<e||(this._removeMarker(i),this._updatePrevNext(i._prev,i._next),i._middleLeft&&this._markerGroup.removeLayer(i._middleLeft),i._middleRight&&this._markerGroup.removeLayer(i._middleRight),i._prev&&i._next?this._createMiddleMarker(i._prev,i._next):i._prev?i._next||(i._prev._middleRight=null):i._next._middleLeft=null,this._fireEdit())},_onContextMenu:function(t){var e=t.target;this._poly;this._poly._map.fire(L.Draw.Event.MARKERCONTEXT,{marker:e,layers:this._markerGroup,poly:this._poly}),L.DomEvent.stopPropagation},_onTouchMove:function(t){var e=this._map.mouseEventToLayerPoint(t.originalEvent.touches[0]),i=this._map.layerPointToLatLng(e),o=t.target;L.extend(o._origLatLng,i),o._middleLeft&&o._middleLeft.setLatLng(this._getMiddleLatLng(o._prev,o)),o._middleRight&&o._middleRight.setLatLng(this._getMiddleLatLng(o,o._next)),this._poly.redraw(),this.updateMarkers()},_updateIndexes:function(t,e){this._markerGroup.eachLayer(function(i){i._index>t&&(i._index+=e)})},_createMiddleMarker:function(t,e){var i,o,a,n=this._getMiddleLatLng(t,e),s=this._createMarker(n);s.setOpacity(.6),t._middleRight=e._middleLeft=s,o=function(){s.off("touchmove",o,this);var a=e._index;s._index=a,s.off("click",i,this).on("click",this._onMarkerClick,this),n.lat=s.getLatLng().lat,n.lng=s.getLatLng().lng,this._spliceLatLngs(a,0,n),this._markers.splice(a,0,s),s.setOpacity(1),this._updateIndexes(a,1),e._index++,this._updatePrevNext(t,s),this._updatePrevNext(s,e),this._poly.fire("editstart")},a=function(){s.off("dragstart",o,this),s.off("dragend",a,this),s.off("touchmove",o,this),this._createMiddleMarker(t,s),this._createMiddleMarker(s,e)},i=function(){o.call(this),a.call(this),this._fireEdit()},s.on("click",i,this).on("dragstart",o,this).on("dragend",a,this).on("touchmove",o,this),this._markerGroup.addLayer(s)},_updatePrevNext:function(t,e){t&&(t._next=e),e&&(e._prev=t)},_getMiddleLatLng:function(t,e){var i=this._poly._map,o=i.project(t.getLatLng()),a=i.project(e.getLatLng());return i.unproject(o._add(a)._divideBy(2))}}),L.Polyline.addInitHook(function(){this.editing||(L.Edit.Poly&&(this.editing=new L.Edit.Poly(this),this.options.editable&&this.editing.enable()),this.on("add",function(){this.editing&&this.editing.enabled()&&this.editing.addHooks()}),this.on("remove",function(){this.editing&&this.editing.enabled()&&this.editing.removeHooks()}))}),L.Edit=L.Edit||{},L.Edit.SimpleShape=L.Handler.extend({options:{moveIcon:new L.DivIcon({iconSize:new L.Point(8,8),className:"leaflet-div-icon leaflet-editing-icon leaflet-edit-move"}),resizeIcon:new L.DivIcon({iconSize:new L.Point(8,8),
+className:"leaflet-div-icon leaflet-editing-icon leaflet-edit-resize"}),touchMoveIcon:new L.DivIcon({iconSize:new L.Point(20,20),className:"leaflet-div-icon leaflet-editing-icon leaflet-edit-move leaflet-touch-icon"}),touchResizeIcon:new L.DivIcon({iconSize:new L.Point(20,20),className:"leaflet-div-icon leaflet-editing-icon leaflet-edit-resize leaflet-touch-icon"})},initialize:function(t,e){L.Browser.touch&&(this.options.moveIcon=this.options.touchMoveIcon,this.options.resizeIcon=this.options.touchResizeIcon),this._shape=t,L.Util.setOptions(this,e)},addHooks:function(){var t=this._shape;this._shape._map&&(this._map=this._shape._map,t.setStyle(t.options.editing),t._map&&(this._map=t._map,this._markerGroup||this._initMarkers(),this._map.addLayer(this._markerGroup)))},removeHooks:function(){var t=this._shape;if(t.setStyle(t.options.original),t._map){this._unbindMarker(this._moveMarker);for(var e=0,i=this._resizeMarkers.length;e<i;e++)this._unbindMarker(this._resizeMarkers[e]);this._resizeMarkers=null,this._map.removeLayer(this._markerGroup),delete this._markerGroup}this._map=null},updateMarkers:function(){this._markerGroup.clearLayers(),this._initMarkers()},_initMarkers:function(){this._markerGroup||(this._markerGroup=new L.LayerGroup),this._createMoveMarker(),this._createResizeMarker()},_createMoveMarker:function(){},_createResizeMarker:function(){},_createMarker:function(t,e){var i=new L.Marker.Touch(t,{draggable:!0,icon:e,zIndexOffset:10});return this._bindMarker(i),this._markerGroup.addLayer(i),i},_bindMarker:function(t){t.on("dragstart",this._onMarkerDragStart,this).on("drag",this._onMarkerDrag,this).on("dragend",this._onMarkerDragEnd,this).on("touchstart",this._onTouchStart,this).on("touchmove",this._onTouchMove,this).on("MSPointerMove",this._onTouchMove,this).on("touchend",this._onTouchEnd,this).on("MSPointerUp",this._onTouchEnd,this)},_unbindMarker:function(t){t.off("dragstart",this._onMarkerDragStart,this).off("drag",this._onMarkerDrag,this).off("dragend",this._onMarkerDragEnd,this).off("touchstart",this._onTouchStart,this).off("touchmove",this._onTouchMove,this).off("MSPointerMove",this._onTouchMove,this).off("touchend",this._onTouchEnd,this).off("MSPointerUp",this._onTouchEnd,this)},_onMarkerDragStart:function(t){t.target.setOpacity(0),this._shape.fire("editstart")},_fireEdit:function(){this._shape.edited=!0,this._shape.fire("edit")},_onMarkerDrag:function(t){var e=t.target,i=e.getLatLng();e===this._moveMarker?this._move(i):this._resize(i),this._shape.redraw(),this._shape.fire("editdrag")},_onMarkerDragEnd:function(t){t.target.setOpacity(1),this._fireEdit()},_onTouchStart:function(t){if(L.Edit.SimpleShape.prototype._onMarkerDragStart.call(this,t),"function"==typeof this._getCorners){var e=this._getCorners(),i=t.target,o=i._cornerIndex;i.setOpacity(0),this._oppositeCorner=e[(o+2)%4],this._toggleCornerMarkers(0,o)}this._shape.fire("editstart")},_onTouchMove:function(t){var e=this._map.mouseEventToLayerPoint(t.originalEvent.touches[0]),i=this._map.layerPointToLatLng(e);return t.target===this._moveMarker?this._move(i):this._resize(i),this._shape.redraw(),!1},_onTouchEnd:function(t){t.target.setOpacity(1),this.updateMarkers(),this._fireEdit()},_move:function(){},_resize:function(){}}),L.Edit=L.Edit||{},L.Edit.Rectangle=L.Edit.SimpleShape.extend({_createMoveMarker:function(){var t=this._shape.getBounds(),e=t.getCenter();this._moveMarker=this._createMarker(e,this.options.moveIcon)},_createResizeMarker:function(){var t=this._getCorners();this._resizeMarkers=[];for(var e=0,i=t.length;e<i;e++)this._resizeMarkers.push(this._createMarker(t[e],this.options.resizeIcon)),this._resizeMarkers[e]._cornerIndex=e},_onMarkerDragStart:function(t){L.Edit.SimpleShape.prototype._onMarkerDragStart.call(this,t);var e=this._getCorners(),i=t.target,o=i._cornerIndex;this._oppositeCorner=e[(o+2)%4],this._toggleCornerMarkers(0,o)},_onMarkerDragEnd:function(t){var e,i,o=t.target;o===this._moveMarker&&(e=this._shape.getBounds(),i=e.getCenter(),o.setLatLng(i)),this._toggleCornerMarkers(1),this._repositionCornerMarkers(),L.Edit.SimpleShape.prototype._onMarkerDragEnd.call(this,t)},_move:function(t){for(var e,i=this._shape._defaultShape?this._shape._defaultShape():this._shape.getLatLngs(),o=this._shape.getBounds(),a=o.getCenter(),n=[],s=0,r=i.length;s<r;s++)e=[i[s].lat-a.lat,i[s].lng-a.lng],n.push([t.lat+e[0],t.lng+e[1]]);this._shape.setLatLngs(n),this._repositionCornerMarkers(),this._map.fire(L.Draw.Event.EDITMOVE,{layer:this._shape})},_resize:function(t){var e;this._shape.setBounds(L.latLngBounds(t,this._oppositeCorner)),e=this._shape.getBounds(),this._moveMarker.setLatLng(e.getCenter()),this._map.fire(L.Draw.Event.EDITRESIZE,{layer:this._shape})},_getCorners:function(){var t=this._shape.getBounds();return[t.getNorthWest(),t.getNorthEast(),t.getSouthEast(),t.getSouthWest()]},_toggleCornerMarkers:function(t){for(var e=0,i=this._resizeMarkers.length;e<i;e++)this._resizeMarkers[e].setOpacity(t)},_repositionCornerMarkers:function(){for(var t=this._getCorners(),e=0,i=this._resizeMarkers.length;e<i;e++)this._resizeMarkers[e].setLatLng(t[e])}}),L.Rectangle.addInitHook(function(){L.Edit.Rectangle&&(this.editing=new L.Edit.Rectangle(this),this.options.editable&&this.editing.enable())}),L.Edit=L.Edit||{},L.Edit.CircleMarker=L.Edit.SimpleShape.extend({_createMoveMarker:function(){var t=this._shape.getLatLng();this._moveMarker=this._createMarker(t,this.options.moveIcon)},_createResizeMarker:function(){this._resizeMarkers=[]},_move:function(t){if(this._resizeMarkers.length){var e=this._getResizeMarkerPoint(t);this._resizeMarkers[0].setLatLng(e)}this._shape.setLatLng(t),this._map.fire(L.Draw.Event.EDITMOVE,{layer:this._shape})}}),L.CircleMarker.addInitHook(function(){L.Edit.CircleMarker&&(this.editing=new L.Edit.CircleMarker(this),this.options.editable&&this.editing.enable()),this.on("add",function(){this.editing&&this.editing.enabled()&&this.editing.addHooks()}),this.on("remove",function(){this.editing&&this.editing.enabled()&&this.editing.removeHooks()})}),L.Edit=L.Edit||{},L.Edit.Circle=L.Edit.CircleMarker.extend({_createResizeMarker:function(){var t=this._shape.getLatLng(),e=this._getResizeMarkerPoint(t);this._resizeMarkers=[],this._resizeMarkers.push(this._createMarker(e,this.options.resizeIcon))},_getResizeMarkerPoint:function(t){var e=this._shape._radius*Math.cos(Math.PI/4),i=this._map.project(t);return this._map.unproject([i.x+e,i.y-e])},_resize:function(t){var e=this._moveMarker.getLatLng();L.GeometryUtil.isVersion07x()?radius=e.distanceTo(t):radius=this._map.distance(e,t),this._shape.setRadius(radius),this._map.editTooltip&&this._map._editTooltip.updateContent({text:L.drawLocal.edit.handlers.edit.tooltip.subtext+"<br />"+L.drawLocal.edit.handlers.edit.tooltip.text,subtext:L.drawLocal.draw.handlers.circle.radius+": "+L.GeometryUtil.readableDistance(radius,!0,this.options.feet,this.options.nautic)}),this._shape.setRadius(radius),this._map.fire(L.Draw.Event.EDITRESIZE,{layer:this._shape})}}),L.Circle.addInitHook(function(){L.Edit.Circle&&(this.editing=new L.Edit.Circle(this),this.options.editable&&this.editing.enable())}),L.Map.mergeOptions({touchExtend:!0}),L.Map.TouchExtend=L.Handler.extend({initialize:function(t){this._map=t,this._container=t._container,this._pane=t._panes.overlayPane},addHooks:function(){L.DomEvent.on(this._container,"touchstart",this._onTouchStart,this),L.DomEvent.on(this._container,"touchend",this._onTouchEnd,this),L.DomEvent.on(this._container,"touchmove",this._onTouchMove,this),this._detectIE()?(L.DomEvent.on(this._container,"MSPointerDown",this._onTouchStart,this),L.DomEvent.on(this._container,"MSPointerUp",this._onTouchEnd,this),L.DomEvent.on(this._container,"MSPointerMove",this._onTouchMove,this),L.DomEvent.on(this._container,"MSPointerCancel",this._onTouchCancel,this)):(L.DomEvent.on(this._container,"touchcancel",this._onTouchCancel,this),L.DomEvent.on(this._container,"touchleave",this._onTouchLeave,this))},removeHooks:function(){L.DomEvent.off(this._container,"touchstart",this._onTouchStart,this),L.DomEvent.off(this._container,"touchend",this._onTouchEnd,this),L.DomEvent.off(this._container,"touchmove",this._onTouchMove,this),this._detectIE()?(L.DomEvent.off(this._container,"MSPointerDown",this._onTouchStart,this),L.DomEvent.off(this._container,"MSPointerUp",this._onTouchEnd,this),L.DomEvent.off(this._container,"MSPointerMove",this._onTouchMove,this),L.DomEvent.off(this._container,"MSPointerCancel",this._onTouchCancel,this)):(L.DomEvent.off(this._container,"touchcancel",this._onTouchCancel,this),L.DomEvent.off(this._container,"touchleave",this._onTouchLeave,this))},_touchEvent:function(t,e){var i={};if(void 0!==t.touches){if(!t.touches.length)return;i=t.touches[0]}else{if("touch"!==t.pointerType)return;if(i=t,!this._filterClick(t))return}var o=this._map.mouseEventToContainerPoint(i),a=this._map.mouseEventToLayerPoint(i),n=this._map.layerPointToLatLng(a);this._map.fire(e,{latlng:n,layerPoint:a,containerPoint:o,pageX:i.pageX,pageY:i.pageY,originalEvent:t})},_filterClick:function(t){var e=t.timeStamp||t.originalEvent.timeStamp,i=L.DomEvent._lastClick&&e-L.DomEvent._lastClick;return i&&i>100&&i<500||t.target._simulatedClick&&!t._simulated?(L.DomEvent.stop(t),!1):(L.DomEvent._lastClick=e,!0)},_onTouchStart:function(t){if(this._map._loaded){this._touchEvent(t,"touchstart")}},_onTouchEnd:function(t){if(this._map._loaded){this._touchEvent(t,"touchend")}},_onTouchCancel:function(t){if(this._map._loaded){var e="touchcancel";this._detectIE()&&(e="pointercancel"),this._touchEvent(t,e)}},_onTouchLeave:function(t){if(this._map._loaded){this._touchEvent(t,"touchleave")}},_onTouchMove:function(t){if(this._map._loaded){this._touchEvent(t,"touchmove")}},_detectIE:function(){var e=t.navigator.userAgent,i=e.indexOf("MSIE ");if(i>0)return parseInt(e.substring(i+5,e.indexOf(".",i)),10);if(e.indexOf("Trident/")>0){var o=e.indexOf("rv:");return parseInt(e.substring(o+3,e.indexOf(".",o)),10)}var a=e.indexOf("Edge/");return a>0&&parseInt(e.substring(a+5,e.indexOf(".",a)),10)}}),L.Map.addInitHook("addHandler","touchExtend",L.Map.TouchExtend),L.Marker.Touch=L.Marker.extend({_initInteraction:function(){return this.addInteractiveTarget?L.Marker.prototype._initInteraction.apply(this):this._initInteractionLegacy()},_initInteractionLegacy:function(){if(this.options.clickable){var t=this._icon,e=["dblclick","mousedown","mouseover","mouseout","contextmenu","touchstart","touchend","touchmove"];this._detectIE?e.concat(["MSPointerDown","MSPointerUp","MSPointerMove","MSPointerCancel"]):e.concat(["touchcancel"]),L.DomUtil.addClass(t,"leaflet-clickable"),L.DomEvent.on(t,"click",this._onMouseClick,this),L.DomEvent.on(t,"keypress",this._onKeyPress,this);for(var i=0;i<e.length;i++)L.DomEvent.on(t,e[i],this._fireMouseEvent,this);L.Handler.MarkerDrag&&(this.dragging=new L.Handler.MarkerDrag(this),this.options.draggable&&this.dragging.enable())}},_detectIE:function(){var e=t.navigator.userAgent,i=e.indexOf("MSIE ");if(i>0)return parseInt(e.substring(i+5,e.indexOf(".",i)),10);if(e.indexOf("Trident/")>0){var o=e.indexOf("rv:");return parseInt(e.substring(o+3,e.indexOf(".",o)),10)}var a=e.indexOf("Edge/");return a>0&&parseInt(e.substring(a+5,e.indexOf(".",a)),10)}}),L.LatLngUtil={cloneLatLngs:function(t){for(var e=[],i=0,o=t.length;i<o;i++)Array.isArray(t[i])?e.push(L.LatLngUtil.cloneLatLngs(t[i])):e.push(this.cloneLatLng(t[i]));return e},cloneLatLng:function(t){return L.latLng(t.lat,t.lng)}},function(){var t={km:2,ha:2,m:0,mi:2,ac:2,yd:0,ft:0,nm:2};L.GeometryUtil=L.extend(L.GeometryUtil||{},{geodesicArea:function(t){var e,i,o=t.length,a=0,n=Math.PI/180;if(o>2){for(var s=0;s<o;s++)e=t[s],i=t[(s+1)%o],a+=(i.lng-e.lng)*n*(2+Math.sin(e.lat*n)+Math.sin(i.lat*n));a=6378137*a*6378137/2}return Math.abs(a)},formattedNumber:function(t,e){var i=parseFloat(t).toFixed(e),o=L.drawLocal.format&&L.drawLocal.format.numeric,a=o&&o.delimiters,n=a&&a.thousands,s=a&&a.decimal;if(n||s){var r=i.split(".");i=n?r[0].replace(/(\d)(?=(\d{3})+(?!\d))/g,"$1"+n):r[0],s=s||".",r.length>1&&(i=i+s+r[1])}return i},readableArea:function(e,i,o){var a,n,o=L.Util.extend({},t,o);return i?(n=["ha","m"],type=typeof i,"string"===type?n=[i]:"boolean"!==type&&(n=i),a=e>=1e6&&-1!==n.indexOf("km")?L.GeometryUtil.formattedNumber(1e-6*e,o.km)+" km²":e>=1e4&&-1!==n.indexOf("ha")?L.GeometryUtil.formattedNumber(1e-4*e,o.ha)+" ha":L.GeometryUtil.formattedNumber(e,o.m)+" m²"):(e/=.836127,a=e>=3097600?L.GeometryUtil.formattedNumber(e/3097600,o.mi)+" mi²":e>=4840?L.GeometryUtil.formattedNumber(e/4840,o.ac)+" acres":L.GeometryUtil.formattedNumber(e,o.yd)+" yd²"),a},readableDistance:function(e,i,o,a,n){var s,n=L.Util.extend({},t,n);switch(i?"string"==typeof i?i:"metric":o?"feet":a?"nauticalMile":"yards"){case"metric":s=e>1e3?L.GeometryUtil.formattedNumber(e/1e3,n.km)+" km":L.GeometryUtil.formattedNumber(e,n.m)+" m";break;case"feet":e*=3.28083,s=L.GeometryUtil.formattedNumber(e,n.ft)+" ft";break;case"nauticalMile":e*=.53996,s=L.GeometryUtil.formattedNumber(e/1e3,n.nm)+" nm";break;case"yards":default:e*=1.09361,s=e>1760?L.GeometryUtil.formattedNumber(e/1760,n.mi)+" miles":L.GeometryUtil.formattedNumber(e,n.yd)+" yd"}return s},isVersion07x:function(){var t=L.version.split(".");return 0===parseInt(t[0],10)&&7===parseInt(t[1],10)}})}(),L.Util.extend(L.LineUtil,{segmentsIntersect:function(t,e,i,o){return this._checkCounterclockwise(t,i,o)!==this._checkCounterclockwise(e,i,o)&&this._checkCounterclockwise(t,e,i)!==this._checkCounterclockwise(t,e,o)},_checkCounterclockwise:function(t,e,i){return(i.y-t.y)*(e.x-t.x)>(e.y-t.y)*(i.x-t.x)}}),L.Polyline.include({intersects:function(){var t,e,i,o=this._getProjectedPoints(),a=o?o.length:0;if(this._tooFewPointsForIntersection())return!1;for(t=a-1;t>=3;t--)if(e=o[t-1],i=o[t],this._lineSegmentsIntersectsRange(e,i,t-2))return!0;return!1},newLatLngIntersects:function(t,e){return!!this._map&&this.newPointIntersects(this._map.latLngToLayerPoint(t),e)},newPointIntersects:function(t,e){var i=this._getProjectedPoints(),o=i?i.length:0,a=i?i[o-1]:null,n=o-2;return!this._tooFewPointsForIntersection(1)&&this._lineSegmentsIntersectsRange(a,t,n,e?1:0)},_tooFewPointsForIntersection:function(t){var e=this._getProjectedPoints(),i=e?e.length:0;return i+=t||0,!e||i<=3},_lineSegmentsIntersectsRange:function(t,e,i,o){var a,n,s=this._getProjectedPoints();o=o||0;for(var r=i;r>o;r--)if(a=s[r-1],n=s[r],L.LineUtil.segmentsIntersect(t,e,a,n))return!0;return!1},_getProjectedPoints:function(){if(!this._defaultShape)return this._originalPoints;for(var t=[],e=this._defaultShape(),i=0;i<e.length;i++)t.push(this._map.latLngToLayerPoint(e[i]));return t}}),L.Polygon.include({intersects:function(){var t,e,i,o,a=this._getProjectedPoints();return!this._tooFewPointsForIntersection()&&(!!L.Polyline.prototype.intersects.call(this)||(t=a.length,e=a[0],i=a[t-1],o=t-2,this._lineSegmentsIntersectsRange(i,e,o,1)))}}),L.Control.Draw=L.Control.extend({options:{position:"topleft",draw:{},edit:!1},initialize:function(t){if(L.version<"0.7")throw new Error("Leaflet.draw 0.2.3+ requires Leaflet 0.7.0+. Download latest from https://github.com/Leaflet/Leaflet/");L.Control.prototype.initialize.call(this,t);var e;this._toolbars={},L.DrawToolbar&&this.options.draw&&(e=new L.DrawToolbar(this.options.draw),this._toolbars[L.DrawToolbar.TYPE]=e,this._toolbars[L.DrawToolbar.TYPE].on("enable",this._toolbarEnabled,this)),L.EditToolbar&&this.options.edit&&(e=new L.EditToolbar(this.options.edit),this._toolbars[L.EditToolbar.TYPE]=e,this._toolbars[L.EditToolbar.TYPE].on("enable",this._toolbarEnabled,this)),L.toolbar=this},onAdd:function(t){var e,i=L.DomUtil.create("div","leaflet-draw"),o=!1;for(var a in this._toolbars)this._toolbars.hasOwnProperty(a)&&(e=this._toolbars[a].addToolbar(t))&&(o||(L.DomUtil.hasClass(e,"leaflet-draw-toolbar-top")||L.DomUtil.addClass(e.childNodes[0],"leaflet-draw-toolbar-top"),o=!0),i.appendChild(e));return i},onRemove:function(){for(var t in this._toolbars)this._toolbars.hasOwnProperty(t)&&this._toolbars[t].removeToolbar()},setDrawingOptions:function(t){for(var e in this._toolbars)this._toolbars[e]instanceof L.DrawToolbar&&this._toolbars[e].setOptions(t)},_toolbarEnabled:function(t){var e=t.target;for(var i in this._toolbars)this._toolbars[i]!==e&&this._toolbars[i].disable()}}),L.Map.mergeOptions({drawControlTooltips:!0,drawControl:!1}),L.Map.addInitHook(function(){this.options.drawControl&&(this.drawControl=new L.Control.Draw,this.addControl(this.drawControl))}),L.Toolbar=L.Class.extend({initialize:function(t){L.setOptions(this,t),this._modes={},this._actionButtons=[],this._activeMode=null;var e=L.version.split(".");1===parseInt(e[0],10)&&parseInt(e[1],10)>=2?L.Toolbar.include(L.Evented.prototype):L.Toolbar.include(L.Mixin.Events)},enabled:function(){return null!==this._activeMode},disable:function(){this.enabled()&&this._activeMode.handler.disable()},addToolbar:function(t){var e,i=L.DomUtil.create("div","leaflet-draw-section"),o=0,a=this._toolbarClass||"",n=this.getModeHandlers(t);for(this._toolbarContainer=L.DomUtil.create("div","leaflet-draw-toolbar leaflet-bar"),this._map=t,e=0;e<n.length;e++)n[e].enabled&&this._initModeHandler(n[e].handler,this._toolbarContainer,o++,a,n[e].title);if(o)return this._lastButtonIndex=--o,this._actionsContainer=L.DomUtil.create("ul","leaflet-draw-actions"),i.appendChild(this._toolbarContainer),i.appendChild(this._actionsContainer),i},removeToolbar:function(){for(var t in this._modes)this._modes.hasOwnProperty(t)&&(this._disposeButton(this._modes[t].button,this._modes[t].handler.enable,this._modes[t].handler),this._modes[t].handler.disable(),this._modes[t].handler.off("enabled",this._handlerActivated,this).off("disabled",this._handlerDeactivated,this));this._modes={};for(var e=0,i=this._actionButtons.length;e<i;e++)this._disposeButton(this._actionButtons[e].button,this._actionButtons[e].callback,this);this._actionButtons=[],this._actionsContainer=null},_initModeHandler:function(t,e,i,o,a){var n=t.type;this._modes[n]={},this._modes[n].handler=t,this._modes[n].button=this._createButton({type:n,title:a,className:o+"-"+n,container:e,callback:this._modes[n].handler.enable,context:this._modes[n].handler}),this._modes[n].buttonIndex=i,this._modes[n].handler.on("enabled",this._handlerActivated,this).on("disabled",this._handlerDeactivated,this)},_detectIOS:function(){return/iPad|iPhone|iPod/.test(navigator.userAgent)&&!t.MSStream},_createButton:function(t){var e=L.DomUtil.create("a",t.className||"",t.container),i=L.DomUtil.create("span","sr-only",t.container);e.href="#",e.appendChild(i),t.title&&(e.title=t.title,i.innerHTML=t.title),t.text&&(e.innerHTML=t.text,i.innerHTML=t.text);var o=this._detectIOS()?"touchstart":"click";return L.DomEvent.on(e,"click",L.DomEvent.stopPropagation).on(e,"mousedown",L.DomEvent.stopPropagation).on(e,"dblclick",L.DomEvent.stopPropagation).on(e,"touchstart",L.DomEvent.stopPropagation).on(e,"click",L.DomEvent.preventDefault).on(e,o,t.callback,t.context),e},_disposeButton:function(t,e){var i=this._detectIOS()?"touchstart":"click";L.DomEvent.off(t,"click",L.DomEvent.stopPropagation).off(t,"mousedown",L.DomEvent.stopPropagation).off(t,"dblclick",L.DomEvent.stopPropagation).off(t,"touchstart",L.DomEvent.stopPropagation).off(t,"click",L.DomEvent.preventDefault).off(t,i,e)},_handlerActivated:function(t){this.disable(),this._activeMode=this._modes[t.handler],L.DomUtil.addClass(this._activeMode.button,"leaflet-draw-toolbar-button-enabled"),this._showActionsToolbar(),this.fire("enable")},_handlerDeactivated:function(){this._hideActionsToolbar(),L.DomUtil.removeClass(this._activeMode.button,"leaflet-draw-toolbar-button-enabled"),this._activeMode=null,this.fire("disable")},_createActions:function(t){var e,i,o,a,n=this._actionsContainer,s=this.getActions(t),r=s.length;for(i=0,o=this._actionButtons.length;i<o;i++)this._disposeButton(this._actionButtons[i].button,this._actionButtons[i].callback);for(this._actionButtons=[];n.firstChild;)n.removeChild(n.firstChild);for(var l=0;l<r;l++)"enabled"in s[l]&&!s[l].enabled||(e=L.DomUtil.create("li","",n),a=this._createButton({title:s[l].title,text:s[l].text,container:e,callback:s[l].callback,context:s[l].context}),this._actionButtons.push({button:a,callback:s[l].callback}))},_showActionsToolbar:function(){var t=this._activeMode.buttonIndex,e=this._lastButtonIndex,i=this._activeMode.button.offsetTop-1;this._createActions(this._activeMode.handler),this._actionsContainer.style.top=i+"px",0===t&&(L.DomUtil.addClass(this._toolbarContainer,"leaflet-draw-toolbar-notop"),L.DomUtil.addClass(this._actionsContainer,"leaflet-draw-actions-top")),t===e&&(L.DomUtil.addClass(this._toolbarContainer,"leaflet-draw-toolbar-nobottom"),L.DomUtil.addClass(this._actionsContainer,"leaflet-draw-actions-bottom")),this._actionsContainer.style.display="block",this._map.fire(L.Draw.Event.TOOLBAROPENED)},_hideActionsToolbar:function(){this._actionsContainer.style.display="none",L.DomUtil.removeClass(this._toolbarContainer,"leaflet-draw-toolbar-notop"),L.DomUtil.removeClass(this._toolbarContainer,"leaflet-draw-toolbar-nobottom"),L.DomUtil.removeClass(this._actionsContainer,"leaflet-draw-actions-top"),L.DomUtil.removeClass(this._actionsContainer,"leaflet-draw-actions-bottom"),this._map.fire(L.Draw.Event.TOOLBARCLOSED)}}),L.Draw=L.Draw||{},L.Draw.Tooltip=L.Class.extend({initialize:function(t){this._map=t,this._popupPane=t._panes.popupPane,this._visible=!1,this._container=t.options.drawControlTooltips?L.DomUtil.create("div","leaflet-draw-tooltip",this._popupPane):null,this._singleLineLabel=!1,this._map.on("mouseout",this._onMouseOut,this)},dispose:function(){this._map.off("mouseout",this._onMouseOut,this),this._container&&(this._popupPane.removeChild(this._container),this._container=null)},updateContent:function(t){return this._container?(t.subtext=t.subtext||"",0!==t.subtext.length||this._singleLineLabel?t.subtext.length>0&&this._singleLineLabel&&(L.DomUtil.removeClass(this._container,"leaflet-draw-tooltip-single"),this._singleLineLabel=!1):(L.DomUtil.addClass(this._container,"leaflet-draw-tooltip-single"),this._singleLineLabel=!0),this._container.innerHTML=(t.subtext.length>0?'<span class="leaflet-draw-tooltip-subtext">'+t.subtext+"</span><br />":"")+"<span>"+t.text+"</span>",t.text||t.subtext?(this._visible=!0,this._container.style.visibility="inherit"):(this._visible=!1,this._container.style.visibility="hidden"),this):this},updatePosition:function(t){var e=this._map.latLngToLayerPoint(t),i=this._container;return this._container&&(this._visible&&(i.style.visibility="inherit"),L.DomUtil.setPosition(i,e)),this},showAsError:function(){return this._container&&L.DomUtil.addClass(this._container,"leaflet-error-draw-tooltip"),this},removeError:function(){return this._container&&L.DomUtil.removeClass(this._container,"leaflet-error-draw-tooltip"),this},_onMouseOut:function(){this._container&&(this._container.style.visibility="hidden")}}),L.DrawToolbar=L.Toolbar.extend({statics:{TYPE:"draw"},options:{polyline:{},polygon:{},rectangle:{},circle:{},marker:{},circlemarker:{}},initialize:function(t){for(var e in this.options)this.options.hasOwnProperty(e)&&t[e]&&(t[e]=L.extend({},this.options[e],t[e]));this._toolbarClass="leaflet-draw-draw",L.Toolbar.prototype.initialize.call(this,t)},getModeHandlers:function(t){return[{enabled:this.options.polyline,handler:new L.Draw.Polyline(t,this.options.polyline),title:L.drawLocal.draw.toolbar.buttons.polyline},{enabled:this.options.polygon,handler:new L.Draw.Polygon(t,this.options.polygon),title:L.drawLocal.draw.toolbar.buttons.polygon},{enabled:this.options.rectangle,handler:new L.Draw.Rectangle(t,this.options.rectangle),title:L.drawLocal.draw.toolbar.buttons.rectangle},{enabled:this.options.circle,handler:new L.Draw.Circle(t,this.options.circle),title:L.drawLocal.draw.toolbar.buttons.circle},{enabled:this.options.marker,handler:new L.Draw.Marker(t,this.options.marker),title:L.drawLocal.draw.toolbar.buttons.marker},{enabled:this.options.circlemarker,handler:new L.Draw.CircleMarker(t,this.options.circlemarker),title:L.drawLocal.draw.toolbar.buttons.circlemarker}]},getActions:function(t){return[{enabled:t.completeShape,title:L.drawLocal.draw.toolbar.finish.title,text:L.drawLocal.draw.toolbar.finish.text,callback:t.completeShape,context:t},{enabled:t.deleteLastVertex,title:L.drawLocal.draw.toolbar.undo.title,text:L.drawLocal.draw.toolbar.undo.text,callback:t.deleteLastVertex,context:t},{title:L.drawLocal.draw.toolbar.actions.title,text:L.drawLocal.draw.toolbar.actions.text,callback:this.disable,context:this}]},setOptions:function(t){L.setOptions(this,t);for(var e in this._modes)this._modes.hasOwnProperty(e)&&t.hasOwnProperty(e)&&this._modes[e].handler.setOptions(t[e])}}),L.EditToolbar=L.Toolbar.extend({statics:{TYPE:"edit"},options:{edit:{selectedPathOptions:{dashArray:"10, 10",fill:!0,fillColor:"#fe57a1",fillOpacity:.1,maintainColor:!1}},remove:{},poly:null,featureGroup:null},initialize:function(t){t.edit&&(void 0===t.edit.selectedPathOptions&&(t.edit.selectedPathOptions=this.options.edit.selectedPathOptions),t.edit.selectedPathOptions=L.extend({},this.options.edit.selectedPathOptions,t.edit.selectedPathOptions)),t.remove&&(t.remove=L.extend({},this.options.remove,t.remove)),t.poly&&(t.poly=L.extend({},this.options.poly,t.poly)),this._toolbarClass="leaflet-draw-edit",L.Toolbar.prototype.initialize.call(this,t),this._selectedFeatureCount=0},getModeHandlers:function(t){var e=this.options.featureGroup;return[{enabled:this.options.edit,handler:new L.EditToolbar.Edit(t,{featureGroup:e,selectedPathOptions:this.options.edit.selectedPathOptions,poly:this.options.poly}),title:L.drawLocal.edit.toolbar.buttons.edit},{enabled:this.options.remove,handler:new L.EditToolbar.Delete(t,{featureGroup:e}),title:L.drawLocal.edit.toolbar.buttons.remove}]},getActions:function(t){var e=[{title:L.drawLocal.edit.toolbar.actions.save.title,text:L.drawLocal.edit.toolbar.actions.save.text,callback:this._save,context:this},{title:L.drawLocal.edit.toolbar.actions.cancel.title,text:L.drawLocal.edit.toolbar.actions.cancel.text,callback:this.disable,context:this}];return t.removeAllLayers&&e.push({title:L.drawLocal.edit.toolbar.actions.clearAll.title,text:L.drawLocal.edit.toolbar.actions.clearAll.text,callback:this._clearAllLayers,context:this}),e},addToolbar:function(t){var e=L.Toolbar.prototype.addToolbar.call(this,t);return this._checkDisabled(),this.options.featureGroup.on("layeradd layerremove",this._checkDisabled,this),e},removeToolbar:function(){this.options.featureGroup.off("layeradd layerremove",this._checkDisabled,this),L.Toolbar.prototype.removeToolbar.call(this)},disable:function(){this.enabled()&&(this._activeMode.handler.revertLayers(),L.Toolbar.prototype.disable.call(this))},_save:function(){this._activeMode.handler.save(),this._activeMode&&this._activeMode.handler.disable()},_clearAllLayers:function(){this._activeMode.handler.removeAllLayers(),this._activeMode&&this._activeMode.handler.disable()},_checkDisabled:function(){var t,e=this.options.featureGroup,i=0!==e.getLayers().length;this.options.edit&&(t=this._modes[L.EditToolbar.Edit.TYPE].button,i?L.DomUtil.removeClass(t,"leaflet-disabled"):L.DomUtil.addClass(t,"leaflet-disabled"),t.setAttribute("title",i?L.drawLocal.edit.toolbar.buttons.edit:L.drawLocal.edit.toolbar.buttons.editDisabled)),this.options.remove&&(t=this._modes[L.EditToolbar.Delete.TYPE].button,i?L.DomUtil.removeClass(t,"leaflet-disabled"):L.DomUtil.addClass(t,"leaflet-disabled"),t.setAttribute("title",i?L.drawLocal.edit.toolbar.buttons.remove:L.drawLocal.edit.toolbar.buttons.removeDisabled))}}),L.EditToolbar.Edit=L.Handler.extend({statics:{TYPE:"edit"},initialize:function(t,e){if(L.Handler.prototype.initialize.call(this,t),L.setOptions(this,e),this._featureGroup=e.featureGroup,!(this._featureGroup instanceof L.FeatureGroup))throw new Error("options.featureGroup must be a L.FeatureGroup");this._uneditedLayerProps={},this.type=L.EditToolbar.Edit.TYPE;var i=L.version.split(".");1===parseInt(i[0],10)&&parseInt(i[1],10)>=2?L.EditToolbar.Edit.include(L.Evented.prototype):L.EditToolbar.Edit.include(L.Mixin.Events)},enable:function(){!this._enabled&&this._hasAvailableLayers()&&(this.fire("enabled",{handler:this.type}),this._map.fire(L.Draw.Event.EDITSTART,{handler:this.type}),L.Handler.prototype.enable.call(this),this._featureGroup.on("layeradd",this._enableLayerEdit,this).on("layerremove",this._disableLayerEdit,this))},disable:function(){this._enabled&&(this._featureGroup.off("layeradd",this._enableLayerEdit,this).off("layerremove",this._disableLayerEdit,this),L.Handler.prototype.disable.call(this),this._map.fire(L.Draw.Event.EDITSTOP,{handler:this.type}),this.fire("disabled",{handler:this.type}))},addHooks:function(){var t=this._map;t&&(t.getContainer().focus(),this._featureGroup.eachLayer(this._enableLayerEdit,this),this._tooltip=new L.Draw.Tooltip(this._map),this._tooltip.updateContent({text:L.drawLocal.edit.handlers.edit.tooltip.text,subtext:L.drawLocal.edit.handlers.edit.tooltip.subtext}),t._editTooltip=this._tooltip,this._updateTooltip(),this._map.on("mousemove",this._onMouseMove,this).on("touchmove",this._onMouseMove,this).on("MSPointerMove",this._onMouseMove,this).on(L.Draw.Event.EDITVERTEX,this._updateTooltip,this))},removeHooks:function(){this._map&&(this._featureGroup.eachLayer(this._disableLayerEdit,this),this._uneditedLayerProps={},this._tooltip.dispose(),this._tooltip=null,this._map.off("mousemove",this._onMouseMove,this).off("touchmove",this._onMouseMove,this).off("MSPointerMove",this._onMouseMove,this).off(L.Draw.Event.EDITVERTEX,this._updateTooltip,this))},revertLayers:function(){this._featureGroup.eachLayer(function(t){this._revertLayer(t)},this)},save:function(){var t=new L.LayerGroup;this._featureGroup.eachLayer(function(e){e.edited&&(t.addLayer(e),e.edited=!1)}),this._map.fire(L.Draw.Event.EDITED,{layers:t})},_backupLayer:function(t){var e=L.Util.stamp(t);this._uneditedLayerProps[e]||(t instanceof L.Polyline||t instanceof L.Polygon||t instanceof L.Rectangle?this._uneditedLayerProps[e]={latlngs:L.LatLngUtil.cloneLatLngs(t.getLatLngs())}:t instanceof L.Circle?this._uneditedLayerProps[e]={latlng:L.LatLngUtil.cloneLatLng(t.getLatLng()),radius:t.getRadius()}:(t instanceof L.Marker||t instanceof L.CircleMarker)&&(this._uneditedLayerProps[e]={latlng:L.LatLngUtil.cloneLatLng(t.getLatLng())}))},_getTooltipText:function(){return{text:L.drawLocal.edit.handlers.edit.tooltip.text,subtext:L.drawLocal.edit.handlers.edit.tooltip.subtext}},_updateTooltip:function(){this._tooltip.updateContent(this._getTooltipText())},_revertLayer:function(t){var e=L.Util.stamp(t);t.edited=!1,this._uneditedLayerProps.hasOwnProperty(e)&&(t instanceof L.Polyline||t instanceof L.Polygon||t instanceof L.Rectangle?t.setLatLngs(this._uneditedLayerProps[e].latlngs):t instanceof L.Circle?(t.setLatLng(this._uneditedLayerProps[e].latlng),t.setRadius(this._uneditedLayerProps[e].radius)):(t instanceof L.Marker||t instanceof L.CircleMarker)&&t.setLatLng(this._uneditedLayerProps[e].latlng),t.fire("revert-edited",{layer:t}))},_enableLayerEdit:function(t){var e,i,o=t.layer||t.target||t;this._backupLayer(o),this.options.poly&&(i=L.Util.extend({},this.options.poly),o.options.poly=i),this.options.selectedPathOptions&&(e=L.Util.extend({},this.options.selectedPathOptions),e.maintainColor&&(e.color=o.options.color,e.fillColor=o.options.fillColor),o.options.original=L.extend({},o.options),o.options.editing=e),o instanceof L.Marker?(o.editing&&o.editing.enable(),o.dragging.enable(),o.on("dragend",this._onMarkerDragEnd).on("touchmove",this._onTouchMove,this).on("MSPointerMove",this._onTouchMove,this).on("touchend",this._onMarkerDragEnd,this).on("MSPointerUp",this._onMarkerDragEnd,this)):o.editing.enable()},_disableLayerEdit:function(t){var e=t.layer||t.target||t;e.edited=!1,e.editing&&e.editing.disable(),delete e.options.editing,delete e.options.original,
+this._selectedPathOptions&&(e instanceof L.Marker?this._toggleMarkerHighlight(e):(e.setStyle(e.options.previousOptions),delete e.options.previousOptions)),e instanceof L.Marker?(e.dragging.disable(),e.off("dragend",this._onMarkerDragEnd,this).off("touchmove",this._onTouchMove,this).off("MSPointerMove",this._onTouchMove,this).off("touchend",this._onMarkerDragEnd,this).off("MSPointerUp",this._onMarkerDragEnd,this)):e.editing.disable()},_onMouseMove:function(t){this._tooltip.updatePosition(t.latlng)},_onMarkerDragEnd:function(t){var e=t.target;e.edited=!0,this._map.fire(L.Draw.Event.EDITMOVE,{layer:e})},_onTouchMove:function(t){var e=t.originalEvent.changedTouches[0],i=this._map.mouseEventToLayerPoint(e),o=this._map.layerPointToLatLng(i);t.target.setLatLng(o)},_hasAvailableLayers:function(){return 0!==this._featureGroup.getLayers().length}}),L.EditToolbar.Delete=L.Handler.extend({statics:{TYPE:"remove"},initialize:function(t,e){if(L.Handler.prototype.initialize.call(this,t),L.Util.setOptions(this,e),this._deletableLayers=this.options.featureGroup,!(this._deletableLayers instanceof L.FeatureGroup))throw new Error("options.featureGroup must be a L.FeatureGroup");this.type=L.EditToolbar.Delete.TYPE;var i=L.version.split(".");1===parseInt(i[0],10)&&parseInt(i[1],10)>=2?L.EditToolbar.Delete.include(L.Evented.prototype):L.EditToolbar.Delete.include(L.Mixin.Events)},enable:function(){!this._enabled&&this._hasAvailableLayers()&&(this.fire("enabled",{handler:this.type}),this._map.fire(L.Draw.Event.DELETESTART,{handler:this.type}),L.Handler.prototype.enable.call(this),this._deletableLayers.on("layeradd",this._enableLayerDelete,this).on("layerremove",this._disableLayerDelete,this))},disable:function(){this._enabled&&(this._deletableLayers.off("layeradd",this._enableLayerDelete,this).off("layerremove",this._disableLayerDelete,this),L.Handler.prototype.disable.call(this),this._map.fire(L.Draw.Event.DELETESTOP,{handler:this.type}),this.fire("disabled",{handler:this.type}))},addHooks:function(){var t=this._map;t&&(t.getContainer().focus(),this._deletableLayers.eachLayer(this._enableLayerDelete,this),this._deletedLayers=new L.LayerGroup,this._tooltip=new L.Draw.Tooltip(this._map),this._tooltip.updateContent({text:L.drawLocal.edit.handlers.remove.tooltip.text}),this._map.on("mousemove",this._onMouseMove,this))},removeHooks:function(){this._map&&(this._deletableLayers.eachLayer(this._disableLayerDelete,this),this._deletedLayers=null,this._tooltip.dispose(),this._tooltip=null,this._map.off("mousemove",this._onMouseMove,this))},revertLayers:function(){this._deletedLayers.eachLayer(function(t){this._deletableLayers.addLayer(t),t.fire("revert-deleted",{layer:t})},this)},save:function(){this._map.fire(L.Draw.Event.DELETED,{layers:this._deletedLayers})},removeAllLayers:function(){this._deletableLayers.eachLayer(function(t){this._removeLayer({layer:t})},this),this.save()},_enableLayerDelete:function(t){(t.layer||t.target||t).on("click",this._removeLayer,this)},_disableLayerDelete:function(t){var e=t.layer||t.target||t;e.off("click",this._removeLayer,this),this._deletedLayers.removeLayer(e)},_removeLayer:function(t){var e=t.layer||t.target||t;this._deletableLayers.removeLayer(e),this._deletedLayers.addLayer(e),e.fire("deleted")},_onMouseMove:function(t){this._tooltip.updatePosition(t.latlng)},_hasAvailableLayers:function(){return 0!==this._deletableLayers.getLayers().length}})}(window,document);
+
+/***/ }),
+
+/***/ "./node_modules/leaflet/dist/leaflet-src.js":
+/*!**************************************************!*\
+  !*** ./node_modules/leaflet/dist/leaflet-src.js ***!
+  \**************************************************/
+/***/ (function(__unused_webpack_module, exports) {
+
+/* @preserve
+ * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
+ * (c) 2010-2023 Vladimir Agafonkin, (c) 2010-2011 CloudMade
+ */
+
+(function (global, factory) {
+   true ? factory(exports) :
+  0;
+})(this, (function (exports) { 'use strict';
+
+  var version = "1.9.4";
+
+  /*
+   * @namespace Util
+   *
+   * Various utility functions, used by Leaflet internally.
+   */
+
+  // @function extend(dest: Object, src?: Object): Object
+  // Merges the properties of the `src` object (or multiple objects) into `dest` object and returns the latter. Has an `L.extend` shortcut.
+  function extend(dest) {
+  	var i, j, len, src;
+
+  	for (j = 1, len = arguments.length; j < len; j++) {
+  		src = arguments[j];
+  		for (i in src) {
+  			dest[i] = src[i];
+  		}
+  	}
+  	return dest;
+  }
+
+  // @function create(proto: Object, properties?: Object): Object
+  // Compatibility polyfill for [Object.create](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
+  var create$2 = Object.create || (function () {
+  	function F() {}
+  	return function (proto) {
+  		F.prototype = proto;
+  		return new F();
+  	};
+  })();
+
+  // @function bind(fn: Function, …): Function
+  // Returns a new function bound to the arguments passed, like [Function.prototype.bind](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function/bind).
+  // Has a `L.bind()` shortcut.
+  function bind(fn, obj) {
+  	var slice = Array.prototype.slice;
+
+  	if (fn.bind) {
+  		return fn.bind.apply(fn, slice.call(arguments, 1));
+  	}
+
+  	var args = slice.call(arguments, 2);
+
+  	return function () {
+  		return fn.apply(obj, args.length ? args.concat(slice.call(arguments)) : arguments);
+  	};
+  }
+
+  // @property lastId: Number
+  // Last unique ID used by [`stamp()`](#util-stamp)
+  var lastId = 0;
+
+  // @function stamp(obj: Object): Number
+  // Returns the unique ID of an object, assigning it one if it doesn't have it.
+  function stamp(obj) {
+  	if (!('_leaflet_id' in obj)) {
+  		obj['_leaflet_id'] = ++lastId;
+  	}
+  	return obj._leaflet_id;
+  }
+
+  // @function throttle(fn: Function, time: Number, context: Object): Function
+  // Returns a function which executes function `fn` with the given scope `context`
+  // (so that the `this` keyword refers to `context` inside `fn`'s code). The function
+  // `fn` will be called no more than one time per given amount of `time`. The arguments
+  // received by the bound function will be any arguments passed when binding the
+  // function, followed by any arguments passed when invoking the bound function.
+  // Has an `L.throttle` shortcut.
+  function throttle(fn, time, context) {
+  	var lock, args, wrapperFn, later;
+
+  	later = function () {
+  		// reset lock and call if queued
+  		lock = false;
+  		if (args) {
+  			wrapperFn.apply(context, args);
+  			args = false;
+  		}
+  	};
+
+  	wrapperFn = function () {
+  		if (lock) {
+  			// called too soon, queue to call later
+  			args = arguments;
+
+  		} else {
+  			// call and lock until later
+  			fn.apply(context, arguments);
+  			setTimeout(later, time);
+  			lock = true;
+  		}
+  	};
+
+  	return wrapperFn;
+  }
+
+  // @function wrapNum(num: Number, range: Number[], includeMax?: Boolean): Number
+  // Returns the number `num` modulo `range` in such a way so it lies within
+  // `range[0]` and `range[1]`. The returned value will be always smaller than
+  // `range[1]` unless `includeMax` is set to `true`.
+  function wrapNum(x, range, includeMax) {
+  	var max = range[1],
+  	    min = range[0],
+  	    d = max - min;
+  	return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
+  }
+
+  // @function falseFn(): Function
+  // Returns a function which always returns `false`.
+  function falseFn() { return false; }
+
+  // @function formatNum(num: Number, precision?: Number|false): Number
+  // Returns the number `num` rounded with specified `precision`.
+  // The default `precision` value is 6 decimal places.
+  // `false` can be passed to skip any processing (can be useful to avoid round-off errors).
+  function formatNum(num, precision) {
+  	if (precision === false) { return num; }
+  	var pow = Math.pow(10, precision === undefined ? 6 : precision);
+  	return Math.round(num * pow) / pow;
+  }
+
+  // @function trim(str: String): String
+  // Compatibility polyfill for [String.prototype.trim](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String/Trim)
+  function trim(str) {
+  	return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+  }
+
+  // @function splitWords(str: String): String[]
+  // Trims and splits the string on whitespace and returns the array of parts.
+  function splitWords(str) {
+  	return trim(str).split(/\s+/);
+  }
+
+  // @function setOptions(obj: Object, options: Object): Object
+  // Merges the given properties to the `options` of the `obj` object, returning the resulting options. See `Class options`. Has an `L.setOptions` shortcut.
+  function setOptions(obj, options) {
+  	if (!Object.prototype.hasOwnProperty.call(obj, 'options')) {
+  		obj.options = obj.options ? create$2(obj.options) : {};
+  	}
+  	for (var i in options) {
+  		obj.options[i] = options[i];
+  	}
+  	return obj.options;
+  }
+
+  // @function getParamString(obj: Object, existingUrl?: String, uppercase?: Boolean): String
+  // Converts an object into a parameter URL string, e.g. `{a: "foo", b: "bar"}`
+  // translates to `'?a=foo&b=bar'`. If `existingUrl` is set, the parameters will
+  // be appended at the end. If `uppercase` is `true`, the parameter names will
+  // be uppercased (e.g. `'?A=foo&B=bar'`)
+  function getParamString(obj, existingUrl, uppercase) {
+  	var params = [];
+  	for (var i in obj) {
+  		params.push(encodeURIComponent(uppercase ? i.toUpperCase() : i) + '=' + encodeURIComponent(obj[i]));
+  	}
+  	return ((!existingUrl || existingUrl.indexOf('?') === -1) ? '?' : '&') + params.join('&');
+  }
+
+  var templateRe = /\{ *([\w_ -]+) *\}/g;
+
+  // @function template(str: String, data: Object): String
+  // Simple templating facility, accepts a template string of the form `'Hello {a}, {b}'`
+  // and a data object like `{a: 'foo', b: 'bar'}`, returns evaluated string
+  // `('Hello foo, bar')`. You can also specify functions instead of strings for
+  // data values — they will be evaluated passing `data` as an argument.
+  function template(str, data) {
+  	return str.replace(templateRe, function (str, key) {
+  		var value = data[key];
+
+  		if (value === undefined) {
+  			throw new Error('No value provided for variable ' + str);
+
+  		} else if (typeof value === 'function') {
+  			value = value(data);
+  		}
+  		return value;
+  	});
+  }
+
+  // @function isArray(obj): Boolean
+  // Compatibility polyfill for [Array.isArray](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray)
+  var isArray = Array.isArray || function (obj) {
+  	return (Object.prototype.toString.call(obj) === '[object Array]');
+  };
+
+  // @function indexOf(array: Array, el: Object): Number
+  // Compatibility polyfill for [Array.prototype.indexOf](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
+  function indexOf(array, el) {
+  	for (var i = 0; i < array.length; i++) {
+  		if (array[i] === el) { return i; }
+  	}
+  	return -1;
+  }
+
+  // @property emptyImageUrl: String
+  // Data URI string containing a base64-encoded empty GIF image.
+  // Used as a hack to free memory from unused images on WebKit-powered
+  // mobile devices (by setting image `src` to this string).
+  var emptyImageUrl = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+  // inspired by https://paulirish.com/2011/requestanimationframe-for-smart-animating/
+
+  function getPrefixed(name) {
+  	return window['webkit' + name] || window['moz' + name] || window['ms' + name];
+  }
+
+  var lastTime = 0;
+
+  // fallback for IE 7-8
+  function timeoutDefer(fn) {
+  	var time = +new Date(),
+  	    timeToCall = Math.max(0, 16 - (time - lastTime));
+
+  	lastTime = time + timeToCall;
+  	return window.setTimeout(fn, timeToCall);
+  }
+
+  var requestFn = window.requestAnimationFrame || getPrefixed('RequestAnimationFrame') || timeoutDefer;
+  var cancelFn = window.cancelAnimationFrame || getPrefixed('CancelAnimationFrame') ||
+  		getPrefixed('CancelRequestAnimationFrame') || function (id) { window.clearTimeout(id); };
+
+  // @function requestAnimFrame(fn: Function, context?: Object, immediate?: Boolean): Number
+  // Schedules `fn` to be executed when the browser repaints. `fn` is bound to
+  // `context` if given. When `immediate` is set, `fn` is called immediately if
+  // the browser doesn't have native support for
+  // [`window.requestAnimationFrame`](https://developer.mozilla.org/docs/Web/API/window/requestAnimationFrame),
+  // otherwise it's delayed. Returns a request ID that can be used to cancel the request.
+  function requestAnimFrame(fn, context, immediate) {
+  	if (immediate && requestFn === timeoutDefer) {
+  		fn.call(context);
+  	} else {
+  		return requestFn.call(window, bind(fn, context));
+  	}
+  }
+
+  // @function cancelAnimFrame(id: Number): undefined
+  // Cancels a previous `requestAnimFrame`. See also [window.cancelAnimationFrame](https://developer.mozilla.org/docs/Web/API/window/cancelAnimationFrame).
+  function cancelAnimFrame(id) {
+  	if (id) {
+  		cancelFn.call(window, id);
+  	}
+  }
+
+  var Util = {
+    __proto__: null,
+    extend: extend,
+    create: create$2,
+    bind: bind,
+    get lastId () { return lastId; },
+    stamp: stamp,
+    throttle: throttle,
+    wrapNum: wrapNum,
+    falseFn: falseFn,
+    formatNum: formatNum,
+    trim: trim,
+    splitWords: splitWords,
+    setOptions: setOptions,
+    getParamString: getParamString,
+    template: template,
+    isArray: isArray,
+    indexOf: indexOf,
+    emptyImageUrl: emptyImageUrl,
+    requestFn: requestFn,
+    cancelFn: cancelFn,
+    requestAnimFrame: requestAnimFrame,
+    cancelAnimFrame: cancelAnimFrame
+  };
+
+  // @class Class
+  // @aka L.Class
+
+  // @section
+  // @uninheritable
+
+  // Thanks to John Resig and Dean Edwards for inspiration!
+
+  function Class() {}
+
+  Class.extend = function (props) {
+
+  	// @function extend(props: Object): Function
+  	// [Extends the current class](#class-inheritance) given the properties to be included.
+  	// Returns a Javascript function that is a class constructor (to be called with `new`).
+  	var NewClass = function () {
+
+  		setOptions(this);
+
+  		// call the constructor
+  		if (this.initialize) {
+  			this.initialize.apply(this, arguments);
+  		}
+
+  		// call all constructor hooks
+  		this.callInitHooks();
+  	};
+
+  	var parentProto = NewClass.__super__ = this.prototype;
+
+  	var proto = create$2(parentProto);
+  	proto.constructor = NewClass;
+
+  	NewClass.prototype = proto;
+
+  	// inherit parent's statics
+  	for (var i in this) {
+  		if (Object.prototype.hasOwnProperty.call(this, i) && i !== 'prototype' && i !== '__super__') {
+  			NewClass[i] = this[i];
+  		}
+  	}
+
+  	// mix static properties into the class
+  	if (props.statics) {
+  		extend(NewClass, props.statics);
+  	}
+
+  	// mix includes into the prototype
+  	if (props.includes) {
+  		checkDeprecatedMixinEvents(props.includes);
+  		extend.apply(null, [proto].concat(props.includes));
+  	}
+
+  	// mix given properties into the prototype
+  	extend(proto, props);
+  	delete proto.statics;
+  	delete proto.includes;
+
+  	// merge options
+  	if (proto.options) {
+  		proto.options = parentProto.options ? create$2(parentProto.options) : {};
+  		extend(proto.options, props.options);
+  	}
+
+  	proto._initHooks = [];
+
+  	// add method for calling all hooks
+  	proto.callInitHooks = function () {
+
+  		if (this._initHooksCalled) { return; }
+
+  		if (parentProto.callInitHooks) {
+  			parentProto.callInitHooks.call(this);
+  		}
+
+  		this._initHooksCalled = true;
+
+  		for (var i = 0, len = proto._initHooks.length; i < len; i++) {
+  			proto._initHooks[i].call(this);
+  		}
+  	};
+
+  	return NewClass;
+  };
+
+
+  // @function include(properties: Object): this
+  // [Includes a mixin](#class-includes) into the current class.
+  Class.include = function (props) {
+  	var parentOptions = this.prototype.options;
+  	extend(this.prototype, props);
+  	if (props.options) {
+  		this.prototype.options = parentOptions;
+  		this.mergeOptions(props.options);
+  	}
+  	return this;
+  };
+
+  // @function mergeOptions(options: Object): this
+  // [Merges `options`](#class-options) into the defaults of the class.
+  Class.mergeOptions = function (options) {
+  	extend(this.prototype.options, options);
+  	return this;
+  };
+
+  // @function addInitHook(fn: Function): this
+  // Adds a [constructor hook](#class-constructor-hooks) to the class.
+  Class.addInitHook = function (fn) { // (Function) || (String, args...)
+  	var args = Array.prototype.slice.call(arguments, 1);
+
+  	var init = typeof fn === 'function' ? fn : function () {
+  		this[fn].apply(this, args);
+  	};
+
+  	this.prototype._initHooks = this.prototype._initHooks || [];
+  	this.prototype._initHooks.push(init);
+  	return this;
+  };
+
+  function checkDeprecatedMixinEvents(includes) {
+  	/* global L: true */
+  	if (typeof L === 'undefined' || !L || !L.Mixin) { return; }
+
+  	includes = isArray(includes) ? includes : [includes];
+
+  	for (var i = 0; i < includes.length; i++) {
+  		if (includes[i] === L.Mixin.Events) {
+  			console.warn('Deprecated include of L.Mixin.Events: ' +
+  				'this property will be removed in future releases, ' +
+  				'please inherit from L.Evented instead.', new Error().stack);
+  		}
+  	}
+  }
+
+  /*
+   * @class Evented
+   * @aka L.Evented
+   * @inherits Class
+   *
+   * A set of methods shared between event-powered classes (like `Map` and `Marker`). Generally, events allow you to execute some function when something happens with an object (e.g. the user clicks on the map, causing the map to fire `'click'` event).
+   *
+   * @example
+   *
+   * ```js
+   * map.on('click', function(e) {
+   * 	alert(e.latlng);
+   * } );
+   * ```
+   *
+   * Leaflet deals with event listeners by reference, so if you want to add a listener and then remove it, define it as a function:
+   *
+   * ```js
+   * function onClick(e) { ... }
+   *
+   * map.on('click', onClick);
+   * map.off('click', onClick);
+   * ```
+   */
+
+  var Events = {
+  	/* @method on(type: String, fn: Function, context?: Object): this
+  	 * Adds a listener function (`fn`) to a particular event type of the object. You can optionally specify the context of the listener (object the this keyword will point to). You can also pass several space-separated types (e.g. `'click dblclick'`).
+  	 *
+  	 * @alternative
+  	 * @method on(eventMap: Object): this
+  	 * Adds a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
+  	 */
+  	on: function (types, fn, context) {
+
+  		// types can be a map of types/handlers
+  		if (typeof types === 'object') {
+  			for (var type in types) {
+  				// we don't process space-separated events here for performance;
+  				// it's a hot path since Layer uses the on(obj) syntax
+  				this._on(type, types[type], fn);
+  			}
+
+  		} else {
+  			// types can be a string of space-separated words
+  			types = splitWords(types);
+
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				this._on(types[i], fn, context);
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	/* @method off(type: String, fn?: Function, context?: Object): this
+  	 * Removes a previously added listener function. If no function is specified, it will remove all the listeners of that particular event from the object. Note that if you passed a custom context to `on`, you must pass the same context to `off` in order to remove the listener.
+  	 *
+  	 * @alternative
+  	 * @method off(eventMap: Object): this
+  	 * Removes a set of type/listener pairs.
+  	 *
+  	 * @alternative
+  	 * @method off: this
+  	 * Removes all listeners to all events on the object. This includes implicitly attached events.
+  	 */
+  	off: function (types, fn, context) {
+
+  		if (!arguments.length) {
+  			// clear all listeners if called without arguments
+  			delete this._events;
+
+  		} else if (typeof types === 'object') {
+  			for (var type in types) {
+  				this._off(type, types[type], fn);
+  			}
+
+  		} else {
+  			types = splitWords(types);
+
+  			var removeAll = arguments.length === 1;
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				if (removeAll) {
+  					this._off(types[i]);
+  				} else {
+  					this._off(types[i], fn, context);
+  				}
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	// attach listener (without syntactic sugar now)
+  	_on: function (type, fn, context, _once) {
+  		if (typeof fn !== 'function') {
+  			console.warn('wrong listener type: ' + typeof fn);
+  			return;
+  		}
+
+  		// check if fn already there
+  		if (this._listens(type, fn, context) !== false) {
+  			return;
+  		}
+
+  		if (context === this) {
+  			// Less memory footprint.
+  			context = undefined;
+  		}
+
+  		var newListener = {fn: fn, ctx: context};
+  		if (_once) {
+  			newListener.once = true;
+  		}
+
+  		this._events = this._events || {};
+  		this._events[type] = this._events[type] || [];
+  		this._events[type].push(newListener);
+  	},
+
+  	_off: function (type, fn, context) {
+  		var listeners,
+  		    i,
+  		    len;
+
+  		if (!this._events) {
+  			return;
+  		}
+
+  		listeners = this._events[type];
+  		if (!listeners) {
+  			return;
+  		}
+
+  		if (arguments.length === 1) { // remove all
+  			if (this._firingCount) {
+  				// Set all removed listeners to noop
+  				// so they are not called if remove happens in fire
+  				for (i = 0, len = listeners.length; i < len; i++) {
+  					listeners[i].fn = falseFn;
+  				}
+  			}
+  			// clear all listeners for a type if function isn't specified
+  			delete this._events[type];
+  			return;
+  		}
+
+  		if (typeof fn !== 'function') {
+  			console.warn('wrong listener type: ' + typeof fn);
+  			return;
+  		}
+
+  		// find fn and remove it
+  		var index = this._listens(type, fn, context);
+  		if (index !== false) {
+  			var listener = listeners[index];
+  			if (this._firingCount) {
+  				// set the removed listener to noop so that's not called if remove happens in fire
+  				listener.fn = falseFn;
+
+  				/* copy array in case events are being fired */
+  				this._events[type] = listeners = listeners.slice();
+  			}
+  			listeners.splice(index, 1);
+  		}
+  	},
+
+  	// @method fire(type: String, data?: Object, propagate?: Boolean): this
+  	// Fires an event of the specified type. You can optionally provide a data
+  	// object — the first argument of the listener function will contain its
+  	// properties. The event can optionally be propagated to event parents.
+  	fire: function (type, data, propagate) {
+  		if (!this.listens(type, propagate)) { return this; }
+
+  		var event = extend({}, data, {
+  			type: type,
+  			target: this,
+  			sourceTarget: data && data.sourceTarget || this
+  		});
+
+  		if (this._events) {
+  			var listeners = this._events[type];
+  			if (listeners) {
+  				this._firingCount = (this._firingCount + 1) || 1;
+  				for (var i = 0, len = listeners.length; i < len; i++) {
+  					var l = listeners[i];
+  					// off overwrites l.fn, so we need to copy fn to a var
+  					var fn = l.fn;
+  					if (l.once) {
+  						this.off(type, fn, l.ctx);
+  					}
+  					fn.call(l.ctx || this, event);
+  				}
+
+  				this._firingCount--;
+  			}
+  		}
+
+  		if (propagate) {
+  			// propagate the event to parents (set with addEventParent)
+  			this._propagateEvent(event);
+  		}
+
+  		return this;
+  	},
+
+  	// @method listens(type: String, propagate?: Boolean): Boolean
+  	// @method listens(type: String, fn: Function, context?: Object, propagate?: Boolean): Boolean
+  	// Returns `true` if a particular event type has any listeners attached to it.
+  	// The verification can optionally be propagated, it will return `true` if parents have the listener attached to it.
+  	listens: function (type, fn, context, propagate) {
+  		if (typeof type !== 'string') {
+  			console.warn('"string" type argument expected');
+  		}
+
+  		// we don't overwrite the input `fn` value, because we need to use it for propagation
+  		var _fn = fn;
+  		if (typeof fn !== 'function') {
+  			propagate = !!fn;
+  			_fn = undefined;
+  			context = undefined;
+  		}
+
+  		var listeners = this._events && this._events[type];
+  		if (listeners && listeners.length) {
+  			if (this._listens(type, _fn, context) !== false) {
+  				return true;
+  			}
+  		}
+
+  		if (propagate) {
+  			// also check parents for listeners if event propagates
+  			for (var id in this._eventParents) {
+  				if (this._eventParents[id].listens(type, fn, context, propagate)) { return true; }
+  			}
+  		}
+  		return false;
+  	},
+
+  	// returns the index (number) or false
+  	_listens: function (type, fn, context) {
+  		if (!this._events) {
+  			return false;
+  		}
+
+  		var listeners = this._events[type] || [];
+  		if (!fn) {
+  			return !!listeners.length;
+  		}
+
+  		if (context === this) {
+  			// Less memory footprint.
+  			context = undefined;
+  		}
+
+  		for (var i = 0, len = listeners.length; i < len; i++) {
+  			if (listeners[i].fn === fn && listeners[i].ctx === context) {
+  				return i;
+  			}
+  		}
+  		return false;
+
+  	},
+
+  	// @method once(…): this
+  	// Behaves as [`on(…)`](#evented-on), except the listener will only get fired once and then removed.
+  	once: function (types, fn, context) {
+
+  		// types can be a map of types/handlers
+  		if (typeof types === 'object') {
+  			for (var type in types) {
+  				// we don't process space-separated events here for performance;
+  				// it's a hot path since Layer uses the on(obj) syntax
+  				this._on(type, types[type], fn, true);
+  			}
+
+  		} else {
+  			// types can be a string of space-separated words
+  			types = splitWords(types);
+
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				this._on(types[i], fn, context, true);
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	// @method addEventParent(obj: Evented): this
+  	// Adds an event parent - an `Evented` that will receive propagated events
+  	addEventParent: function (obj) {
+  		this._eventParents = this._eventParents || {};
+  		this._eventParents[stamp(obj)] = obj;
+  		return this;
+  	},
+
+  	// @method removeEventParent(obj: Evented): this
+  	// Removes an event parent, so it will stop receiving propagated events
+  	removeEventParent: function (obj) {
+  		if (this._eventParents) {
+  			delete this._eventParents[stamp(obj)];
+  		}
+  		return this;
+  	},
+
+  	_propagateEvent: function (e) {
+  		for (var id in this._eventParents) {
+  			this._eventParents[id].fire(e.type, extend({
+  				layer: e.target,
+  				propagatedFrom: e.target
+  			}, e), true);
+  		}
+  	}
+  };
+
+  // aliases; we should ditch those eventually
+
+  // @method addEventListener(…): this
+  // Alias to [`on(…)`](#evented-on)
+  Events.addEventListener = Events.on;
+
+  // @method removeEventListener(…): this
+  // Alias to [`off(…)`](#evented-off)
+
+  // @method clearAllEventListeners(…): this
+  // Alias to [`off()`](#evented-off)
+  Events.removeEventListener = Events.clearAllEventListeners = Events.off;
+
+  // @method addOneTimeEventListener(…): this
+  // Alias to [`once(…)`](#evented-once)
+  Events.addOneTimeEventListener = Events.once;
+
+  // @method fireEvent(…): this
+  // Alias to [`fire(…)`](#evented-fire)
+  Events.fireEvent = Events.fire;
+
+  // @method hasEventListeners(…): Boolean
+  // Alias to [`listens(…)`](#evented-listens)
+  Events.hasEventListeners = Events.listens;
+
+  var Evented = Class.extend(Events);
+
+  /*
+   * @class Point
+   * @aka L.Point
+   *
+   * Represents a point with `x` and `y` coordinates in pixels.
+   *
+   * @example
+   *
+   * ```js
+   * var point = L.point(200, 300);
+   * ```
+   *
+   * All Leaflet methods and options that accept `Point` objects also accept them in a simple Array form (unless noted otherwise), so these lines are equivalent:
+   *
+   * ```js
+   * map.panBy([200, 300]);
+   * map.panBy(L.point(200, 300));
+   * ```
+   *
+   * Note that `Point` does not inherit from Leaflet's `Class` object,
+   * which means new classes can't inherit from it, and new methods
+   * can't be added to it with the `include` function.
+   */
+
+  function Point(x, y, round) {
+  	// @property x: Number; The `x` coordinate of the point
+  	this.x = (round ? Math.round(x) : x);
+  	// @property y: Number; The `y` coordinate of the point
+  	this.y = (round ? Math.round(y) : y);
+  }
+
+  var trunc = Math.trunc || function (v) {
+  	return v > 0 ? Math.floor(v) : Math.ceil(v);
+  };
+
+  Point.prototype = {
+
+  	// @method clone(): Point
+  	// Returns a copy of the current point.
+  	clone: function () {
+  		return new Point(this.x, this.y);
+  	},
+
+  	// @method add(otherPoint: Point): Point
+  	// Returns the result of addition of the current and the given points.
+  	add: function (point) {
+  		// non-destructive, returns a new point
+  		return this.clone()._add(toPoint(point));
+  	},
+
+  	_add: function (point) {
+  		// destructive, used directly for performance in situations where it's safe to modify existing point
+  		this.x += point.x;
+  		this.y += point.y;
+  		return this;
+  	},
+
+  	// @method subtract(otherPoint: Point): Point
+  	// Returns the result of subtraction of the given point from the current.
+  	subtract: function (point) {
+  		return this.clone()._subtract(toPoint(point));
+  	},
+
+  	_subtract: function (point) {
+  		this.x -= point.x;
+  		this.y -= point.y;
+  		return this;
+  	},
+
+  	// @method divideBy(num: Number): Point
+  	// Returns the result of division of the current point by the given number.
+  	divideBy: function (num) {
+  		return this.clone()._divideBy(num);
+  	},
+
+  	_divideBy: function (num) {
+  		this.x /= num;
+  		this.y /= num;
+  		return this;
+  	},
+
+  	// @method multiplyBy(num: Number): Point
+  	// Returns the result of multiplication of the current point by the given number.
+  	multiplyBy: function (num) {
+  		return this.clone()._multiplyBy(num);
+  	},
+
+  	_multiplyBy: function (num) {
+  		this.x *= num;
+  		this.y *= num;
+  		return this;
+  	},
+
+  	// @method scaleBy(scale: Point): Point
+  	// Multiply each coordinate of the current point by each coordinate of
+  	// `scale`. In linear algebra terms, multiply the point by the
+  	// [scaling matrix](https://en.wikipedia.org/wiki/Scaling_%28geometry%29#Matrix_representation)
+  	// defined by `scale`.
+  	scaleBy: function (point) {
+  		return new Point(this.x * point.x, this.y * point.y);
+  	},
+
+  	// @method unscaleBy(scale: Point): Point
+  	// Inverse of `scaleBy`. Divide each coordinate of the current point by
+  	// each coordinate of `scale`.
+  	unscaleBy: function (point) {
+  		return new Point(this.x / point.x, this.y / point.y);
+  	},
+
+  	// @method round(): Point
+  	// Returns a copy of the current point with rounded coordinates.
+  	round: function () {
+  		return this.clone()._round();
+  	},
+
+  	_round: function () {
+  		this.x = Math.round(this.x);
+  		this.y = Math.round(this.y);
+  		return this;
+  	},
+
+  	// @method floor(): Point
+  	// Returns a copy of the current point with floored coordinates (rounded down).
+  	floor: function () {
+  		return this.clone()._floor();
+  	},
+
+  	_floor: function () {
+  		this.x = Math.floor(this.x);
+  		this.y = Math.floor(this.y);
+  		return this;
+  	},
+
+  	// @method ceil(): Point
+  	// Returns a copy of the current point with ceiled coordinates (rounded up).
+  	ceil: function () {
+  		return this.clone()._ceil();
+  	},
+
+  	_ceil: function () {
+  		this.x = Math.ceil(this.x);
+  		this.y = Math.ceil(this.y);
+  		return this;
+  	},
+
+  	// @method trunc(): Point
+  	// Returns a copy of the current point with truncated coordinates (rounded towards zero).
+  	trunc: function () {
+  		return this.clone()._trunc();
+  	},
+
+  	_trunc: function () {
+  		this.x = trunc(this.x);
+  		this.y = trunc(this.y);
+  		return this;
+  	},
+
+  	// @method distanceTo(otherPoint: Point): Number
+  	// Returns the cartesian distance between the current and the given points.
+  	distanceTo: function (point) {
+  		point = toPoint(point);
+
+  		var x = point.x - this.x,
+  		    y = point.y - this.y;
+
+  		return Math.sqrt(x * x + y * y);
+  	},
+
+  	// @method equals(otherPoint: Point): Boolean
+  	// Returns `true` if the given point has the same coordinates.
+  	equals: function (point) {
+  		point = toPoint(point);
+
+  		return point.x === this.x &&
+  		       point.y === this.y;
+  	},
+
+  	// @method contains(otherPoint: Point): Boolean
+  	// Returns `true` if both coordinates of the given point are less than the corresponding current point coordinates (in absolute values).
+  	contains: function (point) {
+  		point = toPoint(point);
+
+  		return Math.abs(point.x) <= Math.abs(this.x) &&
+  		       Math.abs(point.y) <= Math.abs(this.y);
+  	},
+
+  	// @method toString(): String
+  	// Returns a string representation of the point for debugging purposes.
+  	toString: function () {
+  		return 'Point(' +
+  		        formatNum(this.x) + ', ' +
+  		        formatNum(this.y) + ')';
+  	}
+  };
+
+  // @factory L.point(x: Number, y: Number, round?: Boolean)
+  // Creates a Point object with the given `x` and `y` coordinates. If optional `round` is set to true, rounds the `x` and `y` values.
+
+  // @alternative
+  // @factory L.point(coords: Number[])
+  // Expects an array of the form `[x, y]` instead.
+
+  // @alternative
+  // @factory L.point(coords: Object)
+  // Expects a plain object of the form `{x: Number, y: Number}` instead.
+  function toPoint(x, y, round) {
+  	if (x instanceof Point) {
+  		return x;
+  	}
+  	if (isArray(x)) {
+  		return new Point(x[0], x[1]);
+  	}
+  	if (x === undefined || x === null) {
+  		return x;
+  	}
+  	if (typeof x === 'object' && 'x' in x && 'y' in x) {
+  		return new Point(x.x, x.y);
+  	}
+  	return new Point(x, y, round);
+  }
+
+  /*
+   * @class Bounds
+   * @aka L.Bounds
+   *
+   * Represents a rectangular area in pixel coordinates.
+   *
+   * @example
+   *
+   * ```js
+   * var p1 = L.point(10, 10),
+   * p2 = L.point(40, 60),
+   * bounds = L.bounds(p1, p2);
+   * ```
+   *
+   * All Leaflet methods that accept `Bounds` objects also accept them in a simple Array form (unless noted otherwise), so the bounds example above can be passed like this:
+   *
+   * ```js
+   * otherBounds.intersects([[10, 10], [40, 60]]);
+   * ```
+   *
+   * Note that `Bounds` does not inherit from Leaflet's `Class` object,
+   * which means new classes can't inherit from it, and new methods
+   * can't be added to it with the `include` function.
+   */
+
+  function Bounds(a, b) {
+  	if (!a) { return; }
+
+  	var points = b ? [a, b] : a;
+
+  	for (var i = 0, len = points.length; i < len; i++) {
+  		this.extend(points[i]);
+  	}
+  }
+
+  Bounds.prototype = {
+  	// @method extend(point: Point): this
+  	// Extends the bounds to contain the given point.
+
+  	// @alternative
+  	// @method extend(otherBounds: Bounds): this
+  	// Extend the bounds to contain the given bounds
+  	extend: function (obj) {
+  		var min2, max2;
+  		if (!obj) { return this; }
+
+  		if (obj instanceof Point || typeof obj[0] === 'number' || 'x' in obj) {
+  			min2 = max2 = toPoint(obj);
+  		} else {
+  			obj = toBounds(obj);
+  			min2 = obj.min;
+  			max2 = obj.max;
+
+  			if (!min2 || !max2) { return this; }
+  		}
+
+  		// @property min: Point
+  		// The top left corner of the rectangle.
+  		// @property max: Point
+  		// The bottom right corner of the rectangle.
+  		if (!this.min && !this.max) {
+  			this.min = min2.clone();
+  			this.max = max2.clone();
+  		} else {
+  			this.min.x = Math.min(min2.x, this.min.x);
+  			this.max.x = Math.max(max2.x, this.max.x);
+  			this.min.y = Math.min(min2.y, this.min.y);
+  			this.max.y = Math.max(max2.y, this.max.y);
+  		}
+  		return this;
+  	},
+
+  	// @method getCenter(round?: Boolean): Point
+  	// Returns the center point of the bounds.
+  	getCenter: function (round) {
+  		return toPoint(
+  		        (this.min.x + this.max.x) / 2,
+  		        (this.min.y + this.max.y) / 2, round);
+  	},
+
+  	// @method getBottomLeft(): Point
+  	// Returns the bottom-left point of the bounds.
+  	getBottomLeft: function () {
+  		return toPoint(this.min.x, this.max.y);
+  	},
+
+  	// @method getTopRight(): Point
+  	// Returns the top-right point of the bounds.
+  	getTopRight: function () { // -> Point
+  		return toPoint(this.max.x, this.min.y);
+  	},
+
+  	// @method getTopLeft(): Point
+  	// Returns the top-left point of the bounds (i.e. [`this.min`](#bounds-min)).
+  	getTopLeft: function () {
+  		return this.min; // left, top
+  	},
+
+  	// @method getBottomRight(): Point
+  	// Returns the bottom-right point of the bounds (i.e. [`this.max`](#bounds-max)).
+  	getBottomRight: function () {
+  		return this.max; // right, bottom
+  	},
+
+  	// @method getSize(): Point
+  	// Returns the size of the given bounds
+  	getSize: function () {
+  		return this.max.subtract(this.min);
+  	},
+
+  	// @method contains(otherBounds: Bounds): Boolean
+  	// Returns `true` if the rectangle contains the given one.
+  	// @alternative
+  	// @method contains(point: Point): Boolean
+  	// Returns `true` if the rectangle contains the given point.
+  	contains: function (obj) {
+  		var min, max;
+
+  		if (typeof obj[0] === 'number' || obj instanceof Point) {
+  			obj = toPoint(obj);
+  		} else {
+  			obj = toBounds(obj);
+  		}
+
+  		if (obj instanceof Bounds) {
+  			min = obj.min;
+  			max = obj.max;
+  		} else {
+  			min = max = obj;
+  		}
+
+  		return (min.x >= this.min.x) &&
+  		       (max.x <= this.max.x) &&
+  		       (min.y >= this.min.y) &&
+  		       (max.y <= this.max.y);
+  	},
+
+  	// @method intersects(otherBounds: Bounds): Boolean
+  	// Returns `true` if the rectangle intersects the given bounds. Two bounds
+  	// intersect if they have at least one point in common.
+  	intersects: function (bounds) { // (Bounds) -> Boolean
+  		bounds = toBounds(bounds);
+
+  		var min = this.min,
+  		    max = this.max,
+  		    min2 = bounds.min,
+  		    max2 = bounds.max,
+  		    xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
+  		    yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
+
+  		return xIntersects && yIntersects;
+  	},
+
+  	// @method overlaps(otherBounds: Bounds): Boolean
+  	// Returns `true` if the rectangle overlaps the given bounds. Two bounds
+  	// overlap if their intersection is an area.
+  	overlaps: function (bounds) { // (Bounds) -> Boolean
+  		bounds = toBounds(bounds);
+
+  		var min = this.min,
+  		    max = this.max,
+  		    min2 = bounds.min,
+  		    max2 = bounds.max,
+  		    xOverlaps = (max2.x > min.x) && (min2.x < max.x),
+  		    yOverlaps = (max2.y > min.y) && (min2.y < max.y);
+
+  		return xOverlaps && yOverlaps;
+  	},
+
+  	// @method isValid(): Boolean
+  	// Returns `true` if the bounds are properly initialized.
+  	isValid: function () {
+  		return !!(this.min && this.max);
+  	},
+
+
+  	// @method pad(bufferRatio: Number): Bounds
+  	// Returns bounds created by extending or retracting the current bounds by a given ratio in each direction.
+  	// For example, a ratio of 0.5 extends the bounds by 50% in each direction.
+  	// Negative values will retract the bounds.
+  	pad: function (bufferRatio) {
+  		var min = this.min,
+  		max = this.max,
+  		heightBuffer = Math.abs(min.x - max.x) * bufferRatio,
+  		widthBuffer = Math.abs(min.y - max.y) * bufferRatio;
+
+
+  		return toBounds(
+  			toPoint(min.x - heightBuffer, min.y - widthBuffer),
+  			toPoint(max.x + heightBuffer, max.y + widthBuffer));
+  	},
+
+
+  	// @method equals(otherBounds: Bounds): Boolean
+  	// Returns `true` if the rectangle is equivalent to the given bounds.
+  	equals: function (bounds) {
+  		if (!bounds) { return false; }
+
+  		bounds = toBounds(bounds);
+
+  		return this.min.equals(bounds.getTopLeft()) &&
+  			this.max.equals(bounds.getBottomRight());
+  	},
+  };
+
+
+  // @factory L.bounds(corner1: Point, corner2: Point)
+  // Creates a Bounds object from two corners coordinate pairs.
+  // @alternative
+  // @factory L.bounds(points: Point[])
+  // Creates a Bounds object from the given array of points.
+  function toBounds(a, b) {
+  	if (!a || a instanceof Bounds) {
+  		return a;
+  	}
+  	return new Bounds(a, b);
+  }
+
+  /*
+   * @class LatLngBounds
+   * @aka L.LatLngBounds
+   *
+   * Represents a rectangular geographical area on a map.
+   *
+   * @example
+   *
+   * ```js
+   * var corner1 = L.latLng(40.712, -74.227),
+   * corner2 = L.latLng(40.774, -74.125),
+   * bounds = L.latLngBounds(corner1, corner2);
+   * ```
+   *
+   * All Leaflet methods that accept LatLngBounds objects also accept them in a simple Array form (unless noted otherwise), so the bounds example above can be passed like this:
+   *
+   * ```js
+   * map.fitBounds([
+   * 	[40.712, -74.227],
+   * 	[40.774, -74.125]
+   * ]);
+   * ```
+   *
+   * Caution: if the area crosses the antimeridian (often confused with the International Date Line), you must specify corners _outside_ the [-180, 180] degrees longitude range.
+   *
+   * Note that `LatLngBounds` does not inherit from Leaflet's `Class` object,
+   * which means new classes can't inherit from it, and new methods
+   * can't be added to it with the `include` function.
+   */
+
+  function LatLngBounds(corner1, corner2) { // (LatLng, LatLng) or (LatLng[])
+  	if (!corner1) { return; }
+
+  	var latlngs = corner2 ? [corner1, corner2] : corner1;
+
+  	for (var i = 0, len = latlngs.length; i < len; i++) {
+  		this.extend(latlngs[i]);
+  	}
+  }
+
+  LatLngBounds.prototype = {
+
+  	// @method extend(latlng: LatLng): this
+  	// Extend the bounds to contain the given point
+
+  	// @alternative
+  	// @method extend(otherBounds: LatLngBounds): this
+  	// Extend the bounds to contain the given bounds
+  	extend: function (obj) {
+  		var sw = this._southWest,
+  		    ne = this._northEast,
+  		    sw2, ne2;
+
+  		if (obj instanceof LatLng) {
+  			sw2 = obj;
+  			ne2 = obj;
+
+  		} else if (obj instanceof LatLngBounds) {
+  			sw2 = obj._southWest;
+  			ne2 = obj._northEast;
+
+  			if (!sw2 || !ne2) { return this; }
+
+  		} else {
+  			return obj ? this.extend(toLatLng(obj) || toLatLngBounds(obj)) : this;
+  		}
+
+  		if (!sw && !ne) {
+  			this._southWest = new LatLng(sw2.lat, sw2.lng);
+  			this._northEast = new LatLng(ne2.lat, ne2.lng);
+  		} else {
+  			sw.lat = Math.min(sw2.lat, sw.lat);
+  			sw.lng = Math.min(sw2.lng, sw.lng);
+  			ne.lat = Math.max(ne2.lat, ne.lat);
+  			ne.lng = Math.max(ne2.lng, ne.lng);
+  		}
+
+  		return this;
+  	},
+
+  	// @method pad(bufferRatio: Number): LatLngBounds
+  	// Returns bounds created by extending or retracting the current bounds by a given ratio in each direction.
+  	// For example, a ratio of 0.5 extends the bounds by 50% in each direction.
+  	// Negative values will retract the bounds.
+  	pad: function (bufferRatio) {
+  		var sw = this._southWest,
+  		    ne = this._northEast,
+  		    heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
+  		    widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
+
+  		return new LatLngBounds(
+  		        new LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer),
+  		        new LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
+  	},
+
+  	// @method getCenter(): LatLng
+  	// Returns the center point of the bounds.
+  	getCenter: function () {
+  		return new LatLng(
+  		        (this._southWest.lat + this._northEast.lat) / 2,
+  		        (this._southWest.lng + this._northEast.lng) / 2);
+  	},
+
+  	// @method getSouthWest(): LatLng
+  	// Returns the south-west point of the bounds.
+  	getSouthWest: function () {
+  		return this._southWest;
+  	},
+
+  	// @method getNorthEast(): LatLng
+  	// Returns the north-east point of the bounds.
+  	getNorthEast: function () {
+  		return this._northEast;
+  	},
+
+  	// @method getNorthWest(): LatLng
+  	// Returns the north-west point of the bounds.
+  	getNorthWest: function () {
+  		return new LatLng(this.getNorth(), this.getWest());
+  	},
+
+  	// @method getSouthEast(): LatLng
+  	// Returns the south-east point of the bounds.
+  	getSouthEast: function () {
+  		return new LatLng(this.getSouth(), this.getEast());
+  	},
+
+  	// @method getWest(): Number
+  	// Returns the west longitude of the bounds
+  	getWest: function () {
+  		return this._southWest.lng;
+  	},
+
+  	// @method getSouth(): Number
+  	// Returns the south latitude of the bounds
+  	getSouth: function () {
+  		return this._southWest.lat;
+  	},
+
+  	// @method getEast(): Number
+  	// Returns the east longitude of the bounds
+  	getEast: function () {
+  		return this._northEast.lng;
+  	},
+
+  	// @method getNorth(): Number
+  	// Returns the north latitude of the bounds
+  	getNorth: function () {
+  		return this._northEast.lat;
+  	},
+
+  	// @method contains(otherBounds: LatLngBounds): Boolean
+  	// Returns `true` if the rectangle contains the given one.
+
+  	// @alternative
+  	// @method contains (latlng: LatLng): Boolean
+  	// Returns `true` if the rectangle contains the given point.
+  	contains: function (obj) { // (LatLngBounds) or (LatLng) -> Boolean
+  		if (typeof obj[0] === 'number' || obj instanceof LatLng || 'lat' in obj) {
+  			obj = toLatLng(obj);
+  		} else {
+  			obj = toLatLngBounds(obj);
+  		}
+
+  		var sw = this._southWest,
+  		    ne = this._northEast,
+  		    sw2, ne2;
+
+  		if (obj instanceof LatLngBounds) {
+  			sw2 = obj.getSouthWest();
+  			ne2 = obj.getNorthEast();
+  		} else {
+  			sw2 = ne2 = obj;
+  		}
+
+  		return (sw2.lat >= sw.lat) && (ne2.lat <= ne.lat) &&
+  		       (sw2.lng >= sw.lng) && (ne2.lng <= ne.lng);
+  	},
+
+  	// @method intersects(otherBounds: LatLngBounds): Boolean
+  	// Returns `true` if the rectangle intersects the given bounds. Two bounds intersect if they have at least one point in common.
+  	intersects: function (bounds) {
+  		bounds = toLatLngBounds(bounds);
+
+  		var sw = this._southWest,
+  		    ne = this._northEast,
+  		    sw2 = bounds.getSouthWest(),
+  		    ne2 = bounds.getNorthEast(),
+
+  		    latIntersects = (ne2.lat >= sw.lat) && (sw2.lat <= ne.lat),
+  		    lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
+
+  		return latIntersects && lngIntersects;
+  	},
+
+  	// @method overlaps(otherBounds: LatLngBounds): Boolean
+  	// Returns `true` if the rectangle overlaps the given bounds. Two bounds overlap if their intersection is an area.
+  	overlaps: function (bounds) {
+  		bounds = toLatLngBounds(bounds);
+
+  		var sw = this._southWest,
+  		    ne = this._northEast,
+  		    sw2 = bounds.getSouthWest(),
+  		    ne2 = bounds.getNorthEast(),
+
+  		    latOverlaps = (ne2.lat > sw.lat) && (sw2.lat < ne.lat),
+  		    lngOverlaps = (ne2.lng > sw.lng) && (sw2.lng < ne.lng);
+
+  		return latOverlaps && lngOverlaps;
+  	},
+
+  	// @method toBBoxString(): String
+  	// Returns a string with bounding box coordinates in a 'southwest_lng,southwest_lat,northeast_lng,northeast_lat' format. Useful for sending requests to web services that return geo data.
+  	toBBoxString: function () {
+  		return [this.getWest(), this.getSouth(), this.getEast(), this.getNorth()].join(',');
+  	},
+
+  	// @method equals(otherBounds: LatLngBounds, maxMargin?: Number): Boolean
+  	// Returns `true` if the rectangle is equivalent (within a small margin of error) to the given bounds. The margin of error can be overridden by setting `maxMargin` to a small number.
+  	equals: function (bounds, maxMargin) {
+  		if (!bounds) { return false; }
+
+  		bounds = toLatLngBounds(bounds);
+
+  		return this._southWest.equals(bounds.getSouthWest(), maxMargin) &&
+  		       this._northEast.equals(bounds.getNorthEast(), maxMargin);
+  	},
+
+  	// @method isValid(): Boolean
+  	// Returns `true` if the bounds are properly initialized.
+  	isValid: function () {
+  		return !!(this._southWest && this._northEast);
+  	}
+  };
+
+  // TODO International date line?
+
+  // @factory L.latLngBounds(corner1: LatLng, corner2: LatLng)
+  // Creates a `LatLngBounds` object by defining two diagonally opposite corners of the rectangle.
+
+  // @alternative
+  // @factory L.latLngBounds(latlngs: LatLng[])
+  // Creates a `LatLngBounds` object defined by the geographical points it contains. Very useful for zooming the map to fit a particular set of locations with [`fitBounds`](#map-fitbounds).
+  function toLatLngBounds(a, b) {
+  	if (a instanceof LatLngBounds) {
+  		return a;
+  	}
+  	return new LatLngBounds(a, b);
+  }
+
+  /* @class LatLng
+   * @aka L.LatLng
+   *
+   * Represents a geographical point with a certain latitude and longitude.
+   *
+   * @example
+   *
+   * ```
+   * var latlng = L.latLng(50.5, 30.5);
+   * ```
+   *
+   * All Leaflet methods that accept LatLng objects also accept them in a simple Array form and simple object form (unless noted otherwise), so these lines are equivalent:
+   *
+   * ```
+   * map.panTo([50, 30]);
+   * map.panTo({lon: 30, lat: 50});
+   * map.panTo({lat: 50, lng: 30});
+   * map.panTo(L.latLng(50, 30));
+   * ```
+   *
+   * Note that `LatLng` does not inherit from Leaflet's `Class` object,
+   * which means new classes can't inherit from it, and new methods
+   * can't be added to it with the `include` function.
+   */
+
+  function LatLng(lat, lng, alt) {
+  	if (isNaN(lat) || isNaN(lng)) {
+  		throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
+  	}
+
+  	// @property lat: Number
+  	// Latitude in degrees
+  	this.lat = +lat;
+
+  	// @property lng: Number
+  	// Longitude in degrees
+  	this.lng = +lng;
+
+  	// @property alt: Number
+  	// Altitude in meters (optional)
+  	if (alt !== undefined) {
+  		this.alt = +alt;
+  	}
+  }
+
+  LatLng.prototype = {
+  	// @method equals(otherLatLng: LatLng, maxMargin?: Number): Boolean
+  	// Returns `true` if the given `LatLng` point is at the same position (within a small margin of error). The margin of error can be overridden by setting `maxMargin` to a small number.
+  	equals: function (obj, maxMargin) {
+  		if (!obj) { return false; }
+
+  		obj = toLatLng(obj);
+
+  		var margin = Math.max(
+  		        Math.abs(this.lat - obj.lat),
+  		        Math.abs(this.lng - obj.lng));
+
+  		return margin <= (maxMargin === undefined ? 1.0E-9 : maxMargin);
+  	},
+
+  	// @method toString(): String
+  	// Returns a string representation of the point (for debugging purposes).
+  	toString: function (precision) {
+  		return 'LatLng(' +
+  		        formatNum(this.lat, precision) + ', ' +
+  		        formatNum(this.lng, precision) + ')';
+  	},
+
+  	// @method distanceTo(otherLatLng: LatLng): Number
+  	// Returns the distance (in meters) to the given `LatLng` calculated using the [Spherical Law of Cosines](https://en.wikipedia.org/wiki/Spherical_law_of_cosines).
+  	distanceTo: function (other) {
+  		return Earth.distance(this, toLatLng(other));
+  	},
+
+  	// @method wrap(): LatLng
+  	// Returns a new `LatLng` object with the longitude wrapped so it's always between -180 and +180 degrees.
+  	wrap: function () {
+  		return Earth.wrapLatLng(this);
+  	},
+
+  	// @method toBounds(sizeInMeters: Number): LatLngBounds
+  	// Returns a new `LatLngBounds` object in which each boundary is `sizeInMeters/2` meters apart from the `LatLng`.
+  	toBounds: function (sizeInMeters) {
+  		var latAccuracy = 180 * sizeInMeters / 40075017,
+  		    lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
+
+  		return toLatLngBounds(
+  		        [this.lat - latAccuracy, this.lng - lngAccuracy],
+  		        [this.lat + latAccuracy, this.lng + lngAccuracy]);
+  	},
+
+  	clone: function () {
+  		return new LatLng(this.lat, this.lng, this.alt);
+  	}
+  };
+
+
+
+  // @factory L.latLng(latitude: Number, longitude: Number, altitude?: Number): LatLng
+  // Creates an object representing a geographical point with the given latitude and longitude (and optionally altitude).
+
+  // @alternative
+  // @factory L.latLng(coords: Array): LatLng
+  // Expects an array of the form `[Number, Number]` or `[Number, Number, Number]` instead.
+
+  // @alternative
+  // @factory L.latLng(coords: Object): LatLng
+  // Expects an plain object of the form `{lat: Number, lng: Number}` or `{lat: Number, lng: Number, alt: Number}` instead.
+
+  function toLatLng(a, b, c) {
+  	if (a instanceof LatLng) {
+  		return a;
+  	}
+  	if (isArray(a) && typeof a[0] !== 'object') {
+  		if (a.length === 3) {
+  			return new LatLng(a[0], a[1], a[2]);
+  		}
+  		if (a.length === 2) {
+  			return new LatLng(a[0], a[1]);
+  		}
+  		return null;
+  	}
+  	if (a === undefined || a === null) {
+  		return a;
+  	}
+  	if (typeof a === 'object' && 'lat' in a) {
+  		return new LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
+  	}
+  	if (b === undefined) {
+  		return null;
+  	}
+  	return new LatLng(a, b, c);
+  }
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.Base
+   * Object that defines coordinate reference systems for projecting
+   * geographical points into pixel (screen) coordinates and back (and to
+   * coordinates in other units for [WMS](https://en.wikipedia.org/wiki/Web_Map_Service) services). See
+   * [spatial reference system](https://en.wikipedia.org/wiki/Spatial_reference_system).
+   *
+   * Leaflet defines the most usual CRSs by default. If you want to use a
+   * CRS not defined by default, take a look at the
+   * [Proj4Leaflet](https://github.com/kartena/Proj4Leaflet) plugin.
+   *
+   * Note that the CRS instances do not inherit from Leaflet's `Class` object,
+   * and can't be instantiated. Also, new classes can't inherit from them,
+   * and methods can't be added to them with the `include` function.
+   */
+
+  var CRS = {
+  	// @method latLngToPoint(latlng: LatLng, zoom: Number): Point
+  	// Projects geographical coordinates into pixel coordinates for a given zoom.
+  	latLngToPoint: function (latlng, zoom) {
+  		var projectedPoint = this.projection.project(latlng),
+  		    scale = this.scale(zoom);
+
+  		return this.transformation._transform(projectedPoint, scale);
+  	},
+
+  	// @method pointToLatLng(point: Point, zoom: Number): LatLng
+  	// The inverse of `latLngToPoint`. Projects pixel coordinates on a given
+  	// zoom into geographical coordinates.
+  	pointToLatLng: function (point, zoom) {
+  		var scale = this.scale(zoom),
+  		    untransformedPoint = this.transformation.untransform(point, scale);
+
+  		return this.projection.unproject(untransformedPoint);
+  	},
+
+  	// @method project(latlng: LatLng): Point
+  	// Projects geographical coordinates into coordinates in units accepted for
+  	// this CRS (e.g. meters for EPSG:3857, for passing it to WMS services).
+  	project: function (latlng) {
+  		return this.projection.project(latlng);
+  	},
+
+  	// @method unproject(point: Point): LatLng
+  	// Given a projected coordinate returns the corresponding LatLng.
+  	// The inverse of `project`.
+  	unproject: function (point) {
+  		return this.projection.unproject(point);
+  	},
+
+  	// @method scale(zoom: Number): Number
+  	// Returns the scale used when transforming projected coordinates into
+  	// pixel coordinates for a particular zoom. For example, it returns
+  	// `256 * 2^zoom` for Mercator-based CRS.
+  	scale: function (zoom) {
+  		return 256 * Math.pow(2, zoom);
+  	},
+
+  	// @method zoom(scale: Number): Number
+  	// Inverse of `scale()`, returns the zoom level corresponding to a scale
+  	// factor of `scale`.
+  	zoom: function (scale) {
+  		return Math.log(scale / 256) / Math.LN2;
+  	},
+
+  	// @method getProjectedBounds(zoom: Number): Bounds
+  	// Returns the projection's bounds scaled and transformed for the provided `zoom`.
+  	getProjectedBounds: function (zoom) {
+  		if (this.infinite) { return null; }
+
+  		var b = this.projection.bounds,
+  		    s = this.scale(zoom),
+  		    min = this.transformation.transform(b.min, s),
+  		    max = this.transformation.transform(b.max, s);
+
+  		return new Bounds(min, max);
+  	},
+
+  	// @method distance(latlng1: LatLng, latlng2: LatLng): Number
+  	// Returns the distance between two geographical coordinates.
+
+  	// @property code: String
+  	// Standard code name of the CRS passed into WMS services (e.g. `'EPSG:3857'`)
+  	//
+  	// @property wrapLng: Number[]
+  	// An array of two numbers defining whether the longitude (horizontal) coordinate
+  	// axis wraps around a given range and how. Defaults to `[-180, 180]` in most
+  	// geographical CRSs. If `undefined`, the longitude axis does not wrap around.
+  	//
+  	// @property wrapLat: Number[]
+  	// Like `wrapLng`, but for the latitude (vertical) axis.
+
+  	// wrapLng: [min, max],
+  	// wrapLat: [min, max],
+
+  	// @property infinite: Boolean
+  	// If true, the coordinate space will be unbounded (infinite in both axes)
+  	infinite: false,
+
+  	// @method wrapLatLng(latlng: LatLng): LatLng
+  	// Returns a `LatLng` where lat and lng has been wrapped according to the
+  	// CRS's `wrapLat` and `wrapLng` properties, if they are outside the CRS's bounds.
+  	wrapLatLng: function (latlng) {
+  		var lng = this.wrapLng ? wrapNum(latlng.lng, this.wrapLng, true) : latlng.lng,
+  		    lat = this.wrapLat ? wrapNum(latlng.lat, this.wrapLat, true) : latlng.lat,
+  		    alt = latlng.alt;
+
+  		return new LatLng(lat, lng, alt);
+  	},
+
+  	// @method wrapLatLngBounds(bounds: LatLngBounds): LatLngBounds
+  	// Returns a `LatLngBounds` with the same size as the given one, ensuring
+  	// that its center is within the CRS's bounds.
+  	// Only accepts actual `L.LatLngBounds` instances, not arrays.
+  	wrapLatLngBounds: function (bounds) {
+  		var center = bounds.getCenter(),
+  		    newCenter = this.wrapLatLng(center),
+  		    latShift = center.lat - newCenter.lat,
+  		    lngShift = center.lng - newCenter.lng;
+
+  		if (latShift === 0 && lngShift === 0) {
+  			return bounds;
+  		}
+
+  		var sw = bounds.getSouthWest(),
+  		    ne = bounds.getNorthEast(),
+  		    newSw = new LatLng(sw.lat - latShift, sw.lng - lngShift),
+  		    newNe = new LatLng(ne.lat - latShift, ne.lng - lngShift);
+
+  		return new LatLngBounds(newSw, newNe);
+  	}
+  };
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.Earth
+   *
+   * Serves as the base for CRS that are global such that they cover the earth.
+   * Can only be used as the base for other CRS and cannot be used directly,
+   * since it does not have a `code`, `projection` or `transformation`. `distance()` returns
+   * meters.
+   */
+
+  var Earth = extend({}, CRS, {
+  	wrapLng: [-180, 180],
+
+  	// Mean Earth Radius, as recommended for use by
+  	// the International Union of Geodesy and Geophysics,
+  	// see https://rosettacode.org/wiki/Haversine_formula
+  	R: 6371000,
+
+  	// distance between two geographical points using spherical law of cosines approximation
+  	distance: function (latlng1, latlng2) {
+  		var rad = Math.PI / 180,
+  		    lat1 = latlng1.lat * rad,
+  		    lat2 = latlng2.lat * rad,
+  		    sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
+  		    sinDLon = Math.sin((latlng2.lng - latlng1.lng) * rad / 2),
+  		    a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
+  		    c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  		return this.R * c;
+  	}
+  });
+
+  /*
+   * @namespace Projection
+   * @projection L.Projection.SphericalMercator
+   *
+   * Spherical Mercator projection — the most common projection for online maps,
+   * used by almost all free and commercial tile providers. Assumes that Earth is
+   * a sphere. Used by the `EPSG:3857` CRS.
+   */
+
+  var earthRadius = 6378137;
+
+  var SphericalMercator = {
+
+  	R: earthRadius,
+  	MAX_LATITUDE: 85.0511287798,
+
+  	project: function (latlng) {
+  		var d = Math.PI / 180,
+  		    max = this.MAX_LATITUDE,
+  		    lat = Math.max(Math.min(max, latlng.lat), -max),
+  		    sin = Math.sin(lat * d);
+
+  		return new Point(
+  			this.R * latlng.lng * d,
+  			this.R * Math.log((1 + sin) / (1 - sin)) / 2);
+  	},
+
+  	unproject: function (point) {
+  		var d = 180 / Math.PI;
+
+  		return new LatLng(
+  			(2 * Math.atan(Math.exp(point.y / this.R)) - (Math.PI / 2)) * d,
+  			point.x * d / this.R);
+  	},
+
+  	bounds: (function () {
+  		var d = earthRadius * Math.PI;
+  		return new Bounds([-d, -d], [d, d]);
+  	})()
+  };
+
+  /*
+   * @class Transformation
+   * @aka L.Transformation
+   *
+   * Represents an affine transformation: a set of coefficients `a`, `b`, `c`, `d`
+   * for transforming a point of a form `(x, y)` into `(a*x + b, c*y + d)` and doing
+   * the reverse. Used by Leaflet in its projections code.
+   *
+   * @example
+   *
+   * ```js
+   * var transformation = L.transformation(2, 5, -1, 10),
+   * 	p = L.point(1, 2),
+   * 	p2 = transformation.transform(p), //  L.point(7, 8)
+   * 	p3 = transformation.untransform(p2); //  L.point(1, 2)
+   * ```
+   */
+
+
+  // factory new L.Transformation(a: Number, b: Number, c: Number, d: Number)
+  // Creates a `Transformation` object with the given coefficients.
+  function Transformation(a, b, c, d) {
+  	if (isArray(a)) {
+  		// use array properties
+  		this._a = a[0];
+  		this._b = a[1];
+  		this._c = a[2];
+  		this._d = a[3];
+  		return;
+  	}
+  	this._a = a;
+  	this._b = b;
+  	this._c = c;
+  	this._d = d;
+  }
+
+  Transformation.prototype = {
+  	// @method transform(point: Point, scale?: Number): Point
+  	// Returns a transformed point, optionally multiplied by the given scale.
+  	// Only accepts actual `L.Point` instances, not arrays.
+  	transform: function (point, scale) { // (Point, Number) -> Point
+  		return this._transform(point.clone(), scale);
+  	},
+
+  	// destructive transform (faster)
+  	_transform: function (point, scale) {
+  		scale = scale || 1;
+  		point.x = scale * (this._a * point.x + this._b);
+  		point.y = scale * (this._c * point.y + this._d);
+  		return point;
+  	},
+
+  	// @method untransform(point: Point, scale?: Number): Point
+  	// Returns the reverse transformation of the given point, optionally divided
+  	// by the given scale. Only accepts actual `L.Point` instances, not arrays.
+  	untransform: function (point, scale) {
+  		scale = scale || 1;
+  		return new Point(
+  		        (point.x / scale - this._b) / this._a,
+  		        (point.y / scale - this._d) / this._c);
+  	}
+  };
+
+  // factory L.transformation(a: Number, b: Number, c: Number, d: Number)
+
+  // @factory L.transformation(a: Number, b: Number, c: Number, d: Number)
+  // Instantiates a Transformation object with the given coefficients.
+
+  // @alternative
+  // @factory L.transformation(coefficients: Array): Transformation
+  // Expects an coefficients array of the form
+  // `[a: Number, b: Number, c: Number, d: Number]`.
+
+  function toTransformation(a, b, c, d) {
+  	return new Transformation(a, b, c, d);
+  }
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.EPSG3857
+   *
+   * The most common CRS for online maps, used by almost all free and commercial
+   * tile providers. Uses Spherical Mercator projection. Set in by default in
+   * Map's `crs` option.
+   */
+
+  var EPSG3857 = extend({}, Earth, {
+  	code: 'EPSG:3857',
+  	projection: SphericalMercator,
+
+  	transformation: (function () {
+  		var scale = 0.5 / (Math.PI * SphericalMercator.R);
+  		return toTransformation(scale, 0.5, -scale, 0.5);
+  	}())
+  });
+
+  var EPSG900913 = extend({}, EPSG3857, {
+  	code: 'EPSG:900913'
+  });
+
+  // @namespace SVG; @section
+  // There are several static functions which can be called without instantiating L.SVG:
+
+  // @function create(name: String): SVGElement
+  // Returns a instance of [SVGElement](https://developer.mozilla.org/docs/Web/API/SVGElement),
+  // corresponding to the class name passed. For example, using 'line' will return
+  // an instance of [SVGLineElement](https://developer.mozilla.org/docs/Web/API/SVGLineElement).
+  function svgCreate(name) {
+  	return document.createElementNS('http://www.w3.org/2000/svg', name);
+  }
+
+  // @function pointsToPath(rings: Point[], closed: Boolean): String
+  // Generates a SVG path string for multiple rings, with each ring turning
+  // into "M..L..L.." instructions
+  function pointsToPath(rings, closed) {
+  	var str = '',
+  	i, j, len, len2, points, p;
+
+  	for (i = 0, len = rings.length; i < len; i++) {
+  		points = rings[i];
+
+  		for (j = 0, len2 = points.length; j < len2; j++) {
+  			p = points[j];
+  			str += (j ? 'L' : 'M') + p.x + ' ' + p.y;
+  		}
+
+  		// closes the ring for polygons; "x" is VML syntax
+  		str += closed ? (Browser.svg ? 'z' : 'x') : '';
+  	}
+
+  	// SVG complains about empty path strings
+  	return str || 'M0 0';
+  }
+
+  /*
+   * @namespace Browser
+   * @aka L.Browser
+   *
+   * A namespace with static properties for browser/feature detection used by Leaflet internally.
+   *
+   * @example
+   *
+   * ```js
+   * if (L.Browser.ielt9) {
+   *   alert('Upgrade your browser, dude!');
+   * }
+   * ```
+   */
+
+  var style = document.documentElement.style;
+
+  // @property ie: Boolean; `true` for all Internet Explorer versions (not Edge).
+  var ie = 'ActiveXObject' in window;
+
+  // @property ielt9: Boolean; `true` for Internet Explorer versions less than 9.
+  var ielt9 = ie && !document.addEventListener;
+
+  // @property edge: Boolean; `true` for the Edge web browser.
+  var edge = 'msLaunchUri' in navigator && !('documentMode' in document);
+
+  // @property webkit: Boolean;
+  // `true` for webkit-based browsers like Chrome and Safari (including mobile versions).
+  var webkit = userAgentContains('webkit');
+
+  // @property android: Boolean
+  // **Deprecated.** `true` for any browser running on an Android platform.
+  var android = userAgentContains('android');
+
+  // @property android23: Boolean; **Deprecated.** `true` for browsers running on Android 2 or Android 3.
+  var android23 = userAgentContains('android 2') || userAgentContains('android 3');
+
+  /* See https://stackoverflow.com/a/17961266 for details on detecting stock Android */
+  var webkitVer = parseInt(/WebKit\/([0-9]+)|$/.exec(navigator.userAgent)[1], 10); // also matches AppleWebKit
+  // @property androidStock: Boolean; **Deprecated.** `true` for the Android stock browser (i.e. not Chrome)
+  var androidStock = android && userAgentContains('Google') && webkitVer < 537 && !('AudioNode' in window);
+
+  // @property opera: Boolean; `true` for the Opera browser
+  var opera = !!window.opera;
+
+  // @property chrome: Boolean; `true` for the Chrome browser.
+  var chrome = !edge && userAgentContains('chrome');
+
+  // @property gecko: Boolean; `true` for gecko-based browsers like Firefox.
+  var gecko = userAgentContains('gecko') && !webkit && !opera && !ie;
+
+  // @property safari: Boolean; `true` for the Safari browser.
+  var safari = !chrome && userAgentContains('safari');
+
+  var phantom = userAgentContains('phantom');
+
+  // @property opera12: Boolean
+  // `true` for the Opera browser supporting CSS transforms (version 12 or later).
+  var opera12 = 'OTransition' in style;
+
+  // @property win: Boolean; `true` when the browser is running in a Windows platform
+  var win = navigator.platform.indexOf('Win') === 0;
+
+  // @property ie3d: Boolean; `true` for all Internet Explorer versions supporting CSS transforms.
+  var ie3d = ie && ('transition' in style);
+
+  // @property webkit3d: Boolean; `true` for webkit-based browsers supporting CSS transforms.
+  var webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23;
+
+  // @property gecko3d: Boolean; `true` for gecko-based browsers supporting CSS transforms.
+  var gecko3d = 'MozPerspective' in style;
+
+  // @property any3d: Boolean
+  // `true` for all browsers supporting CSS transforms.
+  var any3d = !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d) && !opera12 && !phantom;
+
+  // @property mobile: Boolean; `true` for all browsers running in a mobile device.
+  var mobile = typeof orientation !== 'undefined' || userAgentContains('mobile');
+
+  // @property mobileWebkit: Boolean; `true` for all webkit-based browsers in a mobile device.
+  var mobileWebkit = mobile && webkit;
+
+  // @property mobileWebkit3d: Boolean
+  // `true` for all webkit-based browsers in a mobile device supporting CSS transforms.
+  var mobileWebkit3d = mobile && webkit3d;
+
+  // @property msPointer: Boolean
+  // `true` for browsers implementing the Microsoft touch events model (notably IE10).
+  var msPointer = !window.PointerEvent && window.MSPointerEvent;
+
+  // @property pointer: Boolean
+  // `true` for all browsers supporting [pointer events](https://msdn.microsoft.com/en-us/library/dn433244%28v=vs.85%29.aspx).
+  var pointer = !!(window.PointerEvent || msPointer);
+
+  // @property touchNative: Boolean
+  // `true` for all browsers supporting [touch events](https://developer.mozilla.org/docs/Web/API/Touch_events).
+  // **This does not necessarily mean** that the browser is running in a computer with
+  // a touchscreen, it only means that the browser is capable of understanding
+  // touch events.
+  var touchNative = 'ontouchstart' in window || !!window.TouchEvent;
+
+  // @property touch: Boolean
+  // `true` for all browsers supporting either [touch](#browser-touch) or [pointer](#browser-pointer) events.
+  // Note: pointer events will be preferred (if available), and processed for all `touch*` listeners.
+  var touch = !window.L_NO_TOUCH && (touchNative || pointer);
+
+  // @property mobileOpera: Boolean; `true` for the Opera browser in a mobile device.
+  var mobileOpera = mobile && opera;
+
+  // @property mobileGecko: Boolean
+  // `true` for gecko-based browsers running in a mobile device.
+  var mobileGecko = mobile && gecko;
+
+  // @property retina: Boolean
+  // `true` for browsers on a high-resolution "retina" screen or on any screen when browser's display zoom is more than 100%.
+  var retina = (window.devicePixelRatio || (window.screen.deviceXDPI / window.screen.logicalXDPI)) > 1;
+
+  // @property passiveEvents: Boolean
+  // `true` for browsers that support passive events.
+  var passiveEvents = (function () {
+  	var supportsPassiveOption = false;
+  	try {
+  		var opts = Object.defineProperty({}, 'passive', {
+  			get: function () { // eslint-disable-line getter-return
+  				supportsPassiveOption = true;
+  			}
+  		});
+  		window.addEventListener('testPassiveEventSupport', falseFn, opts);
+  		window.removeEventListener('testPassiveEventSupport', falseFn, opts);
+  	} catch (e) {
+  		// Errors can safely be ignored since this is only a browser support test.
+  	}
+  	return supportsPassiveOption;
+  }());
+
+  // @property canvas: Boolean
+  // `true` when the browser supports [`<canvas>`](https://developer.mozilla.org/docs/Web/API/Canvas_API).
+  var canvas$1 = (function () {
+  	return !!document.createElement('canvas').getContext;
+  }());
+
+  // @property svg: Boolean
+  // `true` when the browser supports [SVG](https://developer.mozilla.org/docs/Web/SVG).
+  var svg$1 = !!(document.createElementNS && svgCreate('svg').createSVGRect);
+
+  var inlineSvg = !!svg$1 && (function () {
+  	var div = document.createElement('div');
+  	div.innerHTML = '<svg/>';
+  	return (div.firstChild && div.firstChild.namespaceURI) === 'http://www.w3.org/2000/svg';
+  })();
+
+  // @property vml: Boolean
+  // `true` if the browser supports [VML](https://en.wikipedia.org/wiki/Vector_Markup_Language).
+  var vml = !svg$1 && (function () {
+  	try {
+  		var div = document.createElement('div');
+  		div.innerHTML = '<v:shape adj="1"/>';
+
+  		var shape = div.firstChild;
+  		shape.style.behavior = 'url(#default#VML)';
+
+  		return shape && (typeof shape.adj === 'object');
+
+  	} catch (e) {
+  		return false;
+  	}
+  }());
+
+
+  // @property mac: Boolean; `true` when the browser is running in a Mac platform
+  var mac = navigator.platform.indexOf('Mac') === 0;
+
+  // @property mac: Boolean; `true` when the browser is running in a Linux platform
+  var linux = navigator.platform.indexOf('Linux') === 0;
+
+  function userAgentContains(str) {
+  	return navigator.userAgent.toLowerCase().indexOf(str) >= 0;
+  }
+
+
+  var Browser = {
+  	ie: ie,
+  	ielt9: ielt9,
+  	edge: edge,
+  	webkit: webkit,
+  	android: android,
+  	android23: android23,
+  	androidStock: androidStock,
+  	opera: opera,
+  	chrome: chrome,
+  	gecko: gecko,
+  	safari: safari,
+  	phantom: phantom,
+  	opera12: opera12,
+  	win: win,
+  	ie3d: ie3d,
+  	webkit3d: webkit3d,
+  	gecko3d: gecko3d,
+  	any3d: any3d,
+  	mobile: mobile,
+  	mobileWebkit: mobileWebkit,
+  	mobileWebkit3d: mobileWebkit3d,
+  	msPointer: msPointer,
+  	pointer: pointer,
+  	touch: touch,
+  	touchNative: touchNative,
+  	mobileOpera: mobileOpera,
+  	mobileGecko: mobileGecko,
+  	retina: retina,
+  	passiveEvents: passiveEvents,
+  	canvas: canvas$1,
+  	svg: svg$1,
+  	vml: vml,
+  	inlineSvg: inlineSvg,
+  	mac: mac,
+  	linux: linux
+  };
+
+  /*
+   * Extends L.DomEvent to provide touch support for Internet Explorer and Windows-based devices.
+   */
+
+  var POINTER_DOWN =   Browser.msPointer ? 'MSPointerDown'   : 'pointerdown';
+  var POINTER_MOVE =   Browser.msPointer ? 'MSPointerMove'   : 'pointermove';
+  var POINTER_UP =     Browser.msPointer ? 'MSPointerUp'     : 'pointerup';
+  var POINTER_CANCEL = Browser.msPointer ? 'MSPointerCancel' : 'pointercancel';
+  var pEvent = {
+  	touchstart  : POINTER_DOWN,
+  	touchmove   : POINTER_MOVE,
+  	touchend    : POINTER_UP,
+  	touchcancel : POINTER_CANCEL
+  };
+  var handle = {
+  	touchstart  : _onPointerStart,
+  	touchmove   : _handlePointer,
+  	touchend    : _handlePointer,
+  	touchcancel : _handlePointer
+  };
+  var _pointers = {};
+  var _pointerDocListener = false;
+
+  // Provides a touch events wrapper for (ms)pointer events.
+  // ref https://www.w3.org/TR/pointerevents/ https://www.w3.org/Bugs/Public/show_bug.cgi?id=22890
+
+  function addPointerListener(obj, type, handler) {
+  	if (type === 'touchstart') {
+  		_addPointerDocListener();
+  	}
+  	if (!handle[type]) {
+  		console.warn('wrong event specified:', type);
+  		return falseFn;
+  	}
+  	handler = handle[type].bind(this, handler);
+  	obj.addEventListener(pEvent[type], handler, false);
+  	return handler;
+  }
+
+  function removePointerListener(obj, type, handler) {
+  	if (!pEvent[type]) {
+  		console.warn('wrong event specified:', type);
+  		return;
+  	}
+  	obj.removeEventListener(pEvent[type], handler, false);
+  }
+
+  function _globalPointerDown(e) {
+  	_pointers[e.pointerId] = e;
+  }
+
+  function _globalPointerMove(e) {
+  	if (_pointers[e.pointerId]) {
+  		_pointers[e.pointerId] = e;
+  	}
+  }
+
+  function _globalPointerUp(e) {
+  	delete _pointers[e.pointerId];
+  }
+
+  function _addPointerDocListener() {
+  	// need to keep track of what pointers and how many are active to provide e.touches emulation
+  	if (!_pointerDocListener) {
+  		// we listen document as any drags that end by moving the touch off the screen get fired there
+  		document.addEventListener(POINTER_DOWN, _globalPointerDown, true);
+  		document.addEventListener(POINTER_MOVE, _globalPointerMove, true);
+  		document.addEventListener(POINTER_UP, _globalPointerUp, true);
+  		document.addEventListener(POINTER_CANCEL, _globalPointerUp, true);
+
+  		_pointerDocListener = true;
+  	}
+  }
+
+  function _handlePointer(handler, e) {
+  	if (e.pointerType === (e.MSPOINTER_TYPE_MOUSE || 'mouse')) { return; }
+
+  	e.touches = [];
+  	for (var i in _pointers) {
+  		e.touches.push(_pointers[i]);
+  	}
+  	e.changedTouches = [e];
+
+  	handler(e);
+  }
+
+  function _onPointerStart(handler, e) {
+  	// IE10 specific: MsTouch needs preventDefault. See #2000
+  	if (e.MSPOINTER_TYPE_TOUCH && e.pointerType === e.MSPOINTER_TYPE_TOUCH) {
+  		preventDefault(e);
+  	}
+  	_handlePointer(handler, e);
+  }
+
+  /*
+   * Extends the event handling code with double tap support for mobile browsers.
+   *
+   * Note: currently most browsers fire native dblclick, with only a few exceptions
+   * (see https://github.com/Leaflet/Leaflet/issues/7012#issuecomment-595087386)
+   */
+
+  function makeDblclick(event) {
+  	// in modern browsers `type` cannot be just overridden:
+  	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/Getter_only
+  	var newEvent = {},
+  	    prop, i;
+  	for (i in event) {
+  		prop = event[i];
+  		newEvent[i] = prop && prop.bind ? prop.bind(event) : prop;
+  	}
+  	event = newEvent;
+  	newEvent.type = 'dblclick';
+  	newEvent.detail = 2;
+  	newEvent.isTrusted = false;
+  	newEvent._simulated = true; // for debug purposes
+  	return newEvent;
+  }
+
+  var delay = 200;
+  function addDoubleTapListener(obj, handler) {
+  	// Most browsers handle double tap natively
+  	obj.addEventListener('dblclick', handler);
+
+  	// On some platforms the browser doesn't fire native dblclicks for touch events.
+  	// It seems that in all such cases `detail` property of `click` event is always `1`.
+  	// So here we rely on that fact to avoid excessive 'dblclick' simulation when not needed.
+  	var last = 0,
+  	    detail;
+  	function simDblclick(e) {
+  		if (e.detail !== 1) {
+  			detail = e.detail; // keep in sync to avoid false dblclick in some cases
+  			return;
+  		}
+
+  		if (e.pointerType === 'mouse' ||
+  			(e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents)) {
+
+  			return;
+  		}
+
+  		// When clicking on an <input>, the browser generates a click on its
+  		// <label> (and vice versa) triggering two clicks in quick succession.
+  		// This ignores clicks on elements which are a label with a 'for'
+  		// attribute (or children of such a label), but not children of
+  		// a <input>.
+  		var path = getPropagationPath(e);
+  		if (path.some(function (el) {
+  			return el instanceof HTMLLabelElement && el.attributes.for;
+  		}) &&
+  			!path.some(function (el) {
+  				return (
+  					el instanceof HTMLInputElement ||
+  					el instanceof HTMLSelectElement
+  				);
+  			})
+  		) {
+  			return;
+  		}
+
+  		var now = Date.now();
+  		if (now - last <= delay) {
+  			detail++;
+  			if (detail === 2) {
+  				handler(makeDblclick(e));
+  			}
+  		} else {
+  			detail = 1;
+  		}
+  		last = now;
+  	}
+
+  	obj.addEventListener('click', simDblclick);
+
+  	return {
+  		dblclick: handler,
+  		simDblclick: simDblclick
+  	};
+  }
+
+  function removeDoubleTapListener(obj, handlers) {
+  	obj.removeEventListener('dblclick', handlers.dblclick);
+  	obj.removeEventListener('click', handlers.simDblclick);
+  }
+
+  /*
+   * @namespace DomUtil
+   *
+   * Utility functions to work with the [DOM](https://developer.mozilla.org/docs/Web/API/Document_Object_Model)
+   * tree, used by Leaflet internally.
+   *
+   * Most functions expecting or returning a `HTMLElement` also work for
+   * SVG elements. The only difference is that classes refer to CSS classes
+   * in HTML and SVG classes in SVG.
+   */
+
+
+  // @property TRANSFORM: String
+  // Vendor-prefixed transform style name (e.g. `'webkitTransform'` for WebKit).
+  var TRANSFORM = testProp(
+  	['transform', 'webkitTransform', 'OTransform', 'MozTransform', 'msTransform']);
+
+  // webkitTransition comes first because some browser versions that drop vendor prefix don't do
+  // the same for the transitionend event, in particular the Android 4.1 stock browser
+
+  // @property TRANSITION: String
+  // Vendor-prefixed transition style name.
+  var TRANSITION = testProp(
+  	['webkitTransition', 'transition', 'OTransition', 'MozTransition', 'msTransition']);
+
+  // @property TRANSITION_END: String
+  // Vendor-prefixed transitionend event name.
+  var TRANSITION_END =
+  	TRANSITION === 'webkitTransition' || TRANSITION === 'OTransition' ? TRANSITION + 'End' : 'transitionend';
+
+
+  // @function get(id: String|HTMLElement): HTMLElement
+  // Returns an element given its DOM id, or returns the element itself
+  // if it was passed directly.
+  function get(id) {
+  	return typeof id === 'string' ? document.getElementById(id) : id;
+  }
+
+  // @function getStyle(el: HTMLElement, styleAttrib: String): String
+  // Returns the value for a certain style attribute on an element,
+  // including computed values or values set through CSS.
+  function getStyle(el, style) {
+  	var value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
+
+  	if ((!value || value === 'auto') && document.defaultView) {
+  		var css = document.defaultView.getComputedStyle(el, null);
+  		value = css ? css[style] : null;
+  	}
+  	return value === 'auto' ? null : value;
+  }
+
+  // @function create(tagName: String, className?: String, container?: HTMLElement): HTMLElement
+  // Creates an HTML element with `tagName`, sets its class to `className`, and optionally appends it to `container` element.
+  function create$1(tagName, className, container) {
+  	var el = document.createElement(tagName);
+  	el.className = className || '';
+
+  	if (container) {
+  		container.appendChild(el);
+  	}
+  	return el;
+  }
+
+  // @function remove(el: HTMLElement)
+  // Removes `el` from its parent element
+  function remove(el) {
+  	var parent = el.parentNode;
+  	if (parent) {
+  		parent.removeChild(el);
+  	}
+  }
+
+  // @function empty(el: HTMLElement)
+  // Removes all of `el`'s children elements from `el`
+  function empty(el) {
+  	while (el.firstChild) {
+  		el.removeChild(el.firstChild);
+  	}
+  }
+
+  // @function toFront(el: HTMLElement)
+  // Makes `el` the last child of its parent, so it renders in front of the other children.
+  function toFront(el) {
+  	var parent = el.parentNode;
+  	if (parent && parent.lastChild !== el) {
+  		parent.appendChild(el);
+  	}
+  }
+
+  // @function toBack(el: HTMLElement)
+  // Makes `el` the first child of its parent, so it renders behind the other children.
+  function toBack(el) {
+  	var parent = el.parentNode;
+  	if (parent && parent.firstChild !== el) {
+  		parent.insertBefore(el, parent.firstChild);
+  	}
+  }
+
+  // @function hasClass(el: HTMLElement, name: String): Boolean
+  // Returns `true` if the element's class attribute contains `name`.
+  function hasClass(el, name) {
+  	if (el.classList !== undefined) {
+  		return el.classList.contains(name);
+  	}
+  	var className = getClass(el);
+  	return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
+  }
+
+  // @function addClass(el: HTMLElement, name: String)
+  // Adds `name` to the element's class attribute.
+  function addClass(el, name) {
+  	if (el.classList !== undefined) {
+  		var classes = splitWords(name);
+  		for (var i = 0, len = classes.length; i < len; i++) {
+  			el.classList.add(classes[i]);
+  		}
+  	} else if (!hasClass(el, name)) {
+  		var className = getClass(el);
+  		setClass(el, (className ? className + ' ' : '') + name);
+  	}
+  }
+
+  // @function removeClass(el: HTMLElement, name: String)
+  // Removes `name` from the element's class attribute.
+  function removeClass(el, name) {
+  	if (el.classList !== undefined) {
+  		el.classList.remove(name);
+  	} else {
+  		setClass(el, trim((' ' + getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
+  	}
+  }
+
+  // @function setClass(el: HTMLElement, name: String)
+  // Sets the element's class.
+  function setClass(el, name) {
+  	if (el.className.baseVal === undefined) {
+  		el.className = name;
+  	} else {
+  		// in case of SVG element
+  		el.className.baseVal = name;
+  	}
+  }
+
+  // @function getClass(el: HTMLElement): String
+  // Returns the element's class.
+  function getClass(el) {
+  	// Check if the element is an SVGElementInstance and use the correspondingElement instead
+  	// (Required for linked SVG elements in IE11.)
+  	if (el.correspondingElement) {
+  		el = el.correspondingElement;
+  	}
+  	return el.className.baseVal === undefined ? el.className : el.className.baseVal;
+  }
+
+  // @function setOpacity(el: HTMLElement, opacity: Number)
+  // Set the opacity of an element (including old IE support).
+  // `opacity` must be a number from `0` to `1`.
+  function setOpacity(el, value) {
+  	if ('opacity' in el.style) {
+  		el.style.opacity = value;
+  	} else if ('filter' in el.style) {
+  		_setOpacityIE(el, value);
+  	}
+  }
+
+  function _setOpacityIE(el, value) {
+  	var filter = false,
+  	    filterName = 'DXImageTransform.Microsoft.Alpha';
+
+  	// filters collection throws an error if we try to retrieve a filter that doesn't exist
+  	try {
+  		filter = el.filters.item(filterName);
+  	} catch (e) {
+  		// don't set opacity to 1 if we haven't already set an opacity,
+  		// it isn't needed and breaks transparent pngs.
+  		if (value === 1) { return; }
+  	}
+
+  	value = Math.round(value * 100);
+
+  	if (filter) {
+  		filter.Enabled = (value !== 100);
+  		filter.Opacity = value;
+  	} else {
+  		el.style.filter += ' progid:' + filterName + '(opacity=' + value + ')';
+  	}
+  }
+
+  // @function testProp(props: String[]): String|false
+  // Goes through the array of style names and returns the first name
+  // that is a valid style name for an element. If no such name is found,
+  // it returns false. Useful for vendor-prefixed styles like `transform`.
+  function testProp(props) {
+  	var style = document.documentElement.style;
+
+  	for (var i = 0; i < props.length; i++) {
+  		if (props[i] in style) {
+  			return props[i];
+  		}
+  	}
+  	return false;
+  }
+
+  // @function setTransform(el: HTMLElement, offset: Point, scale?: Number)
+  // Resets the 3D CSS transform of `el` so it is translated by `offset` pixels
+  // and optionally scaled by `scale`. Does not have an effect if the
+  // browser doesn't support 3D CSS transforms.
+  function setTransform(el, offset, scale) {
+  	var pos = offset || new Point(0, 0);
+
+  	el.style[TRANSFORM] =
+  		(Browser.ie3d ?
+  			'translate(' + pos.x + 'px,' + pos.y + 'px)' :
+  			'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') +
+  		(scale ? ' scale(' + scale + ')' : '');
+  }
+
+  // @function setPosition(el: HTMLElement, position: Point)
+  // Sets the position of `el` to coordinates specified by `position`,
+  // using CSS translate or top/left positioning depending on the browser
+  // (used by Leaflet internally to position its layers).
+  function setPosition(el, point) {
+
+  	/*eslint-disable */
+  	el._leaflet_pos = point;
+  	/* eslint-enable */
+
+  	if (Browser.any3d) {
+  		setTransform(el, point);
+  	} else {
+  		el.style.left = point.x + 'px';
+  		el.style.top = point.y + 'px';
+  	}
+  }
+
+  // @function getPosition(el: HTMLElement): Point
+  // Returns the coordinates of an element previously positioned with setPosition.
+  function getPosition(el) {
+  	// this method is only used for elements previously positioned using setPosition,
+  	// so it's safe to cache the position for performance
+
+  	return el._leaflet_pos || new Point(0, 0);
+  }
+
+  // @function disableTextSelection()
+  // Prevents the user from generating `selectstart` DOM events, usually generated
+  // when the user drags the mouse through a page with text. Used internally
+  // by Leaflet to override the behaviour of any click-and-drag interaction on
+  // the map. Affects drag interactions on the whole document.
+
+  // @function enableTextSelection()
+  // Cancels the effects of a previous [`L.DomUtil.disableTextSelection`](#domutil-disabletextselection).
+  var disableTextSelection;
+  var enableTextSelection;
+  var _userSelect;
+  if ('onselectstart' in document) {
+  	disableTextSelection = function () {
+  		on(window, 'selectstart', preventDefault);
+  	};
+  	enableTextSelection = function () {
+  		off(window, 'selectstart', preventDefault);
+  	};
+  } else {
+  	var userSelectProperty = testProp(
+  		['userSelect', 'WebkitUserSelect', 'OUserSelect', 'MozUserSelect', 'msUserSelect']);
+
+  	disableTextSelection = function () {
+  		if (userSelectProperty) {
+  			var style = document.documentElement.style;
+  			_userSelect = style[userSelectProperty];
+  			style[userSelectProperty] = 'none';
+  		}
+  	};
+  	enableTextSelection = function () {
+  		if (userSelectProperty) {
+  			document.documentElement.style[userSelectProperty] = _userSelect;
+  			_userSelect = undefined;
+  		}
+  	};
+  }
+
+  // @function disableImageDrag()
+  // As [`L.DomUtil.disableTextSelection`](#domutil-disabletextselection), but
+  // for `dragstart` DOM events, usually generated when the user drags an image.
+  function disableImageDrag() {
+  	on(window, 'dragstart', preventDefault);
+  }
+
+  // @function enableImageDrag()
+  // Cancels the effects of a previous [`L.DomUtil.disableImageDrag`](#domutil-disabletextselection).
+  function enableImageDrag() {
+  	off(window, 'dragstart', preventDefault);
+  }
+
+  var _outlineElement, _outlineStyle;
+  // @function preventOutline(el: HTMLElement)
+  // Makes the [outline](https://developer.mozilla.org/docs/Web/CSS/outline)
+  // of the element `el` invisible. Used internally by Leaflet to prevent
+  // focusable elements from displaying an outline when the user performs a
+  // drag interaction on them.
+  function preventOutline(element) {
+  	while (element.tabIndex === -1) {
+  		element = element.parentNode;
+  	}
+  	if (!element.style) { return; }
+  	restoreOutline();
+  	_outlineElement = element;
+  	_outlineStyle = element.style.outlineStyle;
+  	element.style.outlineStyle = 'none';
+  	on(window, 'keydown', restoreOutline);
+  }
+
+  // @function restoreOutline()
+  // Cancels the effects of a previous [`L.DomUtil.preventOutline`]().
+  function restoreOutline() {
+  	if (!_outlineElement) { return; }
+  	_outlineElement.style.outlineStyle = _outlineStyle;
+  	_outlineElement = undefined;
+  	_outlineStyle = undefined;
+  	off(window, 'keydown', restoreOutline);
+  }
+
+  // @function getSizedParentNode(el: HTMLElement): HTMLElement
+  // Finds the closest parent node which size (width and height) is not null.
+  function getSizedParentNode(element) {
+  	do {
+  		element = element.parentNode;
+  	} while ((!element.offsetWidth || !element.offsetHeight) && element !== document.body);
+  	return element;
+  }
+
+  // @function getScale(el: HTMLElement): Object
+  // Computes the CSS scale currently applied on the element.
+  // Returns an object with `x` and `y` members as horizontal and vertical scales respectively,
+  // and `boundingClientRect` as the result of [`getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect).
+  function getScale(element) {
+  	var rect = element.getBoundingClientRect(); // Read-only in old browsers.
+
+  	return {
+  		x: rect.width / element.offsetWidth || 1,
+  		y: rect.height / element.offsetHeight || 1,
+  		boundingClientRect: rect
+  	};
+  }
+
+  var DomUtil = {
+    __proto__: null,
+    TRANSFORM: TRANSFORM,
+    TRANSITION: TRANSITION,
+    TRANSITION_END: TRANSITION_END,
+    get: get,
+    getStyle: getStyle,
+    create: create$1,
+    remove: remove,
+    empty: empty,
+    toFront: toFront,
+    toBack: toBack,
+    hasClass: hasClass,
+    addClass: addClass,
+    removeClass: removeClass,
+    setClass: setClass,
+    getClass: getClass,
+    setOpacity: setOpacity,
+    testProp: testProp,
+    setTransform: setTransform,
+    setPosition: setPosition,
+    getPosition: getPosition,
+    get disableTextSelection () { return disableTextSelection; },
+    get enableTextSelection () { return enableTextSelection; },
+    disableImageDrag: disableImageDrag,
+    enableImageDrag: enableImageDrag,
+    preventOutline: preventOutline,
+    restoreOutline: restoreOutline,
+    getSizedParentNode: getSizedParentNode,
+    getScale: getScale
+  };
+
+  /*
+   * @namespace DomEvent
+   * Utility functions to work with the [DOM events](https://developer.mozilla.org/docs/Web/API/Event), used by Leaflet internally.
+   */
+
+  // Inspired by John Resig, Dean Edwards and YUI addEvent implementations.
+
+  // @function on(el: HTMLElement, types: String, fn: Function, context?: Object): this
+  // Adds a listener function (`fn`) to a particular DOM event type of the
+  // element `el`. You can optionally specify the context of the listener
+  // (object the `this` keyword will point to). You can also pass several
+  // space-separated types (e.g. `'click dblclick'`).
+
+  // @alternative
+  // @function on(el: HTMLElement, eventMap: Object, context?: Object): this
+  // Adds a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
+  function on(obj, types, fn, context) {
+
+  	if (types && typeof types === 'object') {
+  		for (var type in types) {
+  			addOne(obj, type, types[type], fn);
+  		}
+  	} else {
+  		types = splitWords(types);
+
+  		for (var i = 0, len = types.length; i < len; i++) {
+  			addOne(obj, types[i], fn, context);
+  		}
+  	}
+
+  	return this;
+  }
+
+  var eventsKey = '_leaflet_events';
+
+  // @function off(el: HTMLElement, types: String, fn: Function, context?: Object): this
+  // Removes a previously added listener function.
+  // Note that if you passed a custom context to on, you must pass the same
+  // context to `off` in order to remove the listener.
+
+  // @alternative
+  // @function off(el: HTMLElement, eventMap: Object, context?: Object): this
+  // Removes a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
+
+  // @alternative
+  // @function off(el: HTMLElement, types: String): this
+  // Removes all previously added listeners of given types.
+
+  // @alternative
+  // @function off(el: HTMLElement): this
+  // Removes all previously added listeners from given HTMLElement
+  function off(obj, types, fn, context) {
+
+  	if (arguments.length === 1) {
+  		batchRemove(obj);
+  		delete obj[eventsKey];
+
+  	} else if (types && typeof types === 'object') {
+  		for (var type in types) {
+  			removeOne(obj, type, types[type], fn);
+  		}
+
+  	} else {
+  		types = splitWords(types);
+
+  		if (arguments.length === 2) {
+  			batchRemove(obj, function (type) {
+  				return indexOf(types, type) !== -1;
+  			});
+  		} else {
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				removeOne(obj, types[i], fn, context);
+  			}
+  		}
+  	}
+
+  	return this;
+  }
+
+  function batchRemove(obj, filterFn) {
+  	for (var id in obj[eventsKey]) {
+  		var type = id.split(/\d/)[0];
+  		if (!filterFn || filterFn(type)) {
+  			removeOne(obj, type, null, null, id);
+  		}
+  	}
+  }
+
+  var mouseSubst = {
+  	mouseenter: 'mouseover',
+  	mouseleave: 'mouseout',
+  	wheel: !('onwheel' in window) && 'mousewheel'
+  };
+
+  function addOne(obj, type, fn, context) {
+  	var id = type + stamp(fn) + (context ? '_' + stamp(context) : '');
+
+  	if (obj[eventsKey] && obj[eventsKey][id]) { return this; }
+
+  	var handler = function (e) {
+  		return fn.call(context || obj, e || window.event);
+  	};
+
+  	var originalHandler = handler;
+
+  	if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
+  		// Needs DomEvent.Pointer.js
+  		handler = addPointerListener(obj, type, handler);
+
+  	} else if (Browser.touch && (type === 'dblclick')) {
+  		handler = addDoubleTapListener(obj, handler);
+
+  	} else if ('addEventListener' in obj) {
+
+  		if (type === 'touchstart' || type === 'touchmove' || type === 'wheel' ||  type === 'mousewheel') {
+  			obj.addEventListener(mouseSubst[type] || type, handler, Browser.passiveEvents ? {passive: false} : false);
+
+  		} else if (type === 'mouseenter' || type === 'mouseleave') {
+  			handler = function (e) {
+  				e = e || window.event;
+  				if (isExternalTarget(obj, e)) {
+  					originalHandler(e);
+  				}
+  			};
+  			obj.addEventListener(mouseSubst[type], handler, false);
+
+  		} else {
+  			obj.addEventListener(type, originalHandler, false);
+  		}
+
+  	} else {
+  		obj.attachEvent('on' + type, handler);
+  	}
+
+  	obj[eventsKey] = obj[eventsKey] || {};
+  	obj[eventsKey][id] = handler;
+  }
+
+  function removeOne(obj, type, fn, context, id) {
+  	id = id || type + stamp(fn) + (context ? '_' + stamp(context) : '');
+  	var handler = obj[eventsKey] && obj[eventsKey][id];
+
+  	if (!handler) { return this; }
+
+  	if (!Browser.touchNative && Browser.pointer && type.indexOf('touch') === 0) {
+  		removePointerListener(obj, type, handler);
+
+  	} else if (Browser.touch && (type === 'dblclick')) {
+  		removeDoubleTapListener(obj, handler);
+
+  	} else if ('removeEventListener' in obj) {
+
+  		obj.removeEventListener(mouseSubst[type] || type, handler, false);
+
+  	} else {
+  		obj.detachEvent('on' + type, handler);
+  	}
+
+  	obj[eventsKey][id] = null;
+  }
+
+  // @function stopPropagation(ev: DOMEvent): this
+  // Stop the given event from propagation to parent elements. Used inside the listener functions:
+  // ```js
+  // L.DomEvent.on(div, 'click', function (ev) {
+  // 	L.DomEvent.stopPropagation(ev);
+  // });
+  // ```
+  function stopPropagation(e) {
+
+  	if (e.stopPropagation) {
+  		e.stopPropagation();
+  	} else if (e.originalEvent) {  // In case of Leaflet event.
+  		e.originalEvent._stopped = true;
+  	} else {
+  		e.cancelBubble = true;
+  	}
+
+  	return this;
+  }
+
+  // @function disableScrollPropagation(el: HTMLElement): this
+  // Adds `stopPropagation` to the element's `'wheel'` events (plus browser variants).
+  function disableScrollPropagation(el) {
+  	addOne(el, 'wheel', stopPropagation);
+  	return this;
+  }
+
+  // @function disableClickPropagation(el: HTMLElement): this
+  // Adds `stopPropagation` to the element's `'click'`, `'dblclick'`, `'contextmenu'`,
+  // `'mousedown'` and `'touchstart'` events (plus browser variants).
+  function disableClickPropagation(el) {
+  	on(el, 'mousedown touchstart dblclick contextmenu', stopPropagation);
+  	el['_leaflet_disable_click'] = true;
+  	return this;
+  }
+
+  // @function preventDefault(ev: DOMEvent): this
+  // Prevents the default action of the DOM Event `ev` from happening (such as
+  // following a link in the href of the a element, or doing a POST request
+  // with page reload when a `<form>` is submitted).
+  // Use it inside listener functions.
+  function preventDefault(e) {
+  	if (e.preventDefault) {
+  		e.preventDefault();
+  	} else {
+  		e.returnValue = false;
+  	}
+  	return this;
+  }
+
+  // @function stop(ev: DOMEvent): this
+  // Does `stopPropagation` and `preventDefault` at the same time.
+  function stop(e) {
+  	preventDefault(e);
+  	stopPropagation(e);
+  	return this;
+  }
+
+  // @function getPropagationPath(ev: DOMEvent): Array
+  // Compatibility polyfill for [`Event.composedPath()`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath).
+  // Returns an array containing the `HTMLElement`s that the given DOM event
+  // should propagate to (if not stopped).
+  function getPropagationPath(ev) {
+  	if (ev.composedPath) {
+  		return ev.composedPath();
+  	}
+
+  	var path = [];
+  	var el = ev.target;
+
+  	while (el) {
+  		path.push(el);
+  		el = el.parentNode;
+  	}
+  	return path;
+  }
+
+
+  // @function getMousePosition(ev: DOMEvent, container?: HTMLElement): Point
+  // Gets normalized mouse position from a DOM event relative to the
+  // `container` (border excluded) or to the whole page if not specified.
+  function getMousePosition(e, container) {
+  	if (!container) {
+  		return new Point(e.clientX, e.clientY);
+  	}
+
+  	var scale = getScale(container),
+  	    offset = scale.boundingClientRect; // left and top  values are in page scale (like the event clientX/Y)
+
+  	return new Point(
+  		// offset.left/top values are in page scale (like clientX/Y),
+  		// whereas clientLeft/Top (border width) values are the original values (before CSS scale applies).
+  		(e.clientX - offset.left) / scale.x - container.clientLeft,
+  		(e.clientY - offset.top) / scale.y - container.clientTop
+  	);
+  }
+
+
+  //  except , Safari and
+  // We need double the scroll pixels (see #7403 and #4538) for all Browsers
+  // except OSX (Mac) -> 3x, Chrome running on Linux 1x
+
+  var wheelPxFactor =
+  	(Browser.linux && Browser.chrome) ? window.devicePixelRatio :
+  	Browser.mac ? window.devicePixelRatio * 3 :
+  	window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
+  // @function getWheelDelta(ev: DOMEvent): Number
+  // Gets normalized wheel delta from a wheel DOM event, in vertical
+  // pixels scrolled (negative if scrolling down).
+  // Events from pointing devices without precise scrolling are mapped to
+  // a best guess of 60 pixels.
+  function getWheelDelta(e) {
+  	return (Browser.edge) ? e.wheelDeltaY / 2 : // Don't trust window-geometry-based delta
+  	       (e.deltaY && e.deltaMode === 0) ? -e.deltaY / wheelPxFactor : // Pixels
+  	       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 20 : // Lines
+  	       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 60 : // Pages
+  	       (e.deltaX || e.deltaZ) ? 0 :	// Skip horizontal/depth wheel events
+  	       e.wheelDelta ? (e.wheelDeltaY || e.wheelDelta) / 2 : // Legacy IE pixels
+  	       (e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 20 : // Legacy Moz lines
+  	       e.detail ? e.detail / -32765 * 60 : // Legacy Moz pages
+  	       0;
+  }
+
+  // check if element really left/entered the event target (for mouseenter/mouseleave)
+  function isExternalTarget(el, e) {
+
+  	var related = e.relatedTarget;
+
+  	if (!related) { return true; }
+
+  	try {
+  		while (related && (related !== el)) {
+  			related = related.parentNode;
+  		}
+  	} catch (err) {
+  		return false;
+  	}
+  	return (related !== el);
+  }
+
+  var DomEvent = {
+    __proto__: null,
+    on: on,
+    off: off,
+    stopPropagation: stopPropagation,
+    disableScrollPropagation: disableScrollPropagation,
+    disableClickPropagation: disableClickPropagation,
+    preventDefault: preventDefault,
+    stop: stop,
+    getPropagationPath: getPropagationPath,
+    getMousePosition: getMousePosition,
+    getWheelDelta: getWheelDelta,
+    isExternalTarget: isExternalTarget,
+    addListener: on,
+    removeListener: off
+  };
+
+  /*
+   * @class PosAnimation
+   * @aka L.PosAnimation
+   * @inherits Evented
+   * Used internally for panning animations, utilizing CSS3 Transitions for modern browsers and a timer fallback for IE6-9.
+   *
+   * @example
+   * ```js
+   * var myPositionMarker = L.marker([48.864716, 2.294694]).addTo(map);
+   *
+   * myPositionMarker.on("click", function() {
+   * 	var pos = map.latLngToLayerPoint(myPositionMarker.getLatLng());
+   * 	pos.y -= 25;
+   * 	var fx = new L.PosAnimation();
+   *
+   * 	fx.once('end',function() {
+   * 		pos.y += 25;
+   * 		fx.run(myPositionMarker._icon, pos, 0.8);
+   * 	});
+   *
+   * 	fx.run(myPositionMarker._icon, pos, 0.3);
+   * });
+   *
+   * ```
+   *
+   * @constructor L.PosAnimation()
+   * Creates a `PosAnimation` object.
+   *
+   */
+
+  var PosAnimation = Evented.extend({
+
+  	// @method run(el: HTMLElement, newPos: Point, duration?: Number, easeLinearity?: Number)
+  	// Run an animation of a given element to a new position, optionally setting
+  	// duration in seconds (`0.25` by default) and easing linearity factor (3rd
+  	// argument of the [cubic bezier curve](https://cubic-bezier.com/#0,0,.5,1),
+  	// `0.5` by default).
+  	run: function (el, newPos, duration, easeLinearity) {
+  		this.stop();
+
+  		this._el = el;
+  		this._inProgress = true;
+  		this._duration = duration || 0.25;
+  		this._easeOutPower = 1 / Math.max(easeLinearity || 0.5, 0.2);
+
+  		this._startPos = getPosition(el);
+  		this._offset = newPos.subtract(this._startPos);
+  		this._startTime = +new Date();
+
+  		// @event start: Event
+  		// Fired when the animation starts
+  		this.fire('start');
+
+  		this._animate();
+  	},
+
+  	// @method stop()
+  	// Stops the animation (if currently running).
+  	stop: function () {
+  		if (!this._inProgress) { return; }
+
+  		this._step(true);
+  		this._complete();
+  	},
+
+  	_animate: function () {
+  		// animation loop
+  		this._animId = requestAnimFrame(this._animate, this);
+  		this._step();
+  	},
+
+  	_step: function (round) {
+  		var elapsed = (+new Date()) - this._startTime,
+  		    duration = this._duration * 1000;
+
+  		if (elapsed < duration) {
+  			this._runFrame(this._easeOut(elapsed / duration), round);
+  		} else {
+  			this._runFrame(1);
+  			this._complete();
+  		}
+  	},
+
+  	_runFrame: function (progress, round) {
+  		var pos = this._startPos.add(this._offset.multiplyBy(progress));
+  		if (round) {
+  			pos._round();
+  		}
+  		setPosition(this._el, pos);
+
+  		// @event step: Event
+  		// Fired continuously during the animation.
+  		this.fire('step');
+  	},
+
+  	_complete: function () {
+  		cancelAnimFrame(this._animId);
+
+  		this._inProgress = false;
+  		// @event end: Event
+  		// Fired when the animation ends.
+  		this.fire('end');
+  	},
+
+  	_easeOut: function (t) {
+  		return 1 - Math.pow(1 - t, this._easeOutPower);
+  	}
+  });
+
+  /*
+   * @class Map
+   * @aka L.Map
+   * @inherits Evented
+   *
+   * The central class of the API — it is used to create a map on a page and manipulate it.
+   *
+   * @example
+   *
+   * ```js
+   * // initialize the map on the "map" div with a given center and zoom
+   * var map = L.map('map', {
+   * 	center: [51.505, -0.09],
+   * 	zoom: 13
+   * });
+   * ```
+   *
+   */
+
+  var Map = Evented.extend({
+
+  	options: {
+  		// @section Map State Options
+  		// @option crs: CRS = L.CRS.EPSG3857
+  		// The [Coordinate Reference System](#crs) to use. Don't change this if you're not
+  		// sure what it means.
+  		crs: EPSG3857,
+
+  		// @option center: LatLng = undefined
+  		// Initial geographic center of the map
+  		center: undefined,
+
+  		// @option zoom: Number = undefined
+  		// Initial map zoom level
+  		zoom: undefined,
+
+  		// @option minZoom: Number = *
+  		// Minimum zoom level of the map.
+  		// If not specified and at least one `GridLayer` or `TileLayer` is in the map,
+  		// the lowest of their `minZoom` options will be used instead.
+  		minZoom: undefined,
+
+  		// @option maxZoom: Number = *
+  		// Maximum zoom level of the map.
+  		// If not specified and at least one `GridLayer` or `TileLayer` is in the map,
+  		// the highest of their `maxZoom` options will be used instead.
+  		maxZoom: undefined,
+
+  		// @option layers: Layer[] = []
+  		// Array of layers that will be added to the map initially
+  		layers: [],
+
+  		// @option maxBounds: LatLngBounds = null
+  		// When this option is set, the map restricts the view to the given
+  		// geographical bounds, bouncing the user back if the user tries to pan
+  		// outside the view. To set the restriction dynamically, use
+  		// [`setMaxBounds`](#map-setmaxbounds) method.
+  		maxBounds: undefined,
+
+  		// @option renderer: Renderer = *
+  		// The default method for drawing vector layers on the map. `L.SVG`
+  		// or `L.Canvas` by default depending on browser support.
+  		renderer: undefined,
+
+
+  		// @section Animation Options
+  		// @option zoomAnimation: Boolean = true
+  		// Whether the map zoom animation is enabled. By default it's enabled
+  		// in all browsers that support CSS3 Transitions except Android.
+  		zoomAnimation: true,
+
+  		// @option zoomAnimationThreshold: Number = 4
+  		// Won't animate zoom if the zoom difference exceeds this value.
+  		zoomAnimationThreshold: 4,
+
+  		// @option fadeAnimation: Boolean = true
+  		// Whether the tile fade animation is enabled. By default it's enabled
+  		// in all browsers that support CSS3 Transitions except Android.
+  		fadeAnimation: true,
+
+  		// @option markerZoomAnimation: Boolean = true
+  		// Whether markers animate their zoom with the zoom animation, if disabled
+  		// they will disappear for the length of the animation. By default it's
+  		// enabled in all browsers that support CSS3 Transitions except Android.
+  		markerZoomAnimation: true,
+
+  		// @option transform3DLimit: Number = 2^23
+  		// Defines the maximum size of a CSS translation transform. The default
+  		// value should not be changed unless a web browser positions layers in
+  		// the wrong place after doing a large `panBy`.
+  		transform3DLimit: 8388608, // Precision limit of a 32-bit float
+
+  		// @section Interaction Options
+  		// @option zoomSnap: Number = 1
+  		// Forces the map's zoom level to always be a multiple of this, particularly
+  		// right after a [`fitBounds()`](#map-fitbounds) or a pinch-zoom.
+  		// By default, the zoom level snaps to the nearest integer; lower values
+  		// (e.g. `0.5` or `0.1`) allow for greater granularity. A value of `0`
+  		// means the zoom level will not be snapped after `fitBounds` or a pinch-zoom.
+  		zoomSnap: 1,
+
+  		// @option zoomDelta: Number = 1
+  		// Controls how much the map's zoom level will change after a
+  		// [`zoomIn()`](#map-zoomin), [`zoomOut()`](#map-zoomout), pressing `+`
+  		// or `-` on the keyboard, or using the [zoom controls](#control-zoom).
+  		// Values smaller than `1` (e.g. `0.5`) allow for greater granularity.
+  		zoomDelta: 1,
+
+  		// @option trackResize: Boolean = true
+  		// Whether the map automatically handles browser window resize to update itself.
+  		trackResize: true
+  	},
+
+  	initialize: function (id, options) { // (HTMLElement or String, Object)
+  		options = setOptions(this, options);
+
+  		// Make sure to assign internal flags at the beginning,
+  		// to avoid inconsistent state in some edge cases.
+  		this._handlers = [];
+  		this._layers = {};
+  		this._zoomBoundLayers = {};
+  		this._sizeChanged = true;
+
+  		this._initContainer(id);
+  		this._initLayout();
+
+  		// hack for https://github.com/Leaflet/Leaflet/issues/1980
+  		this._onResize = bind(this._onResize, this);
+
+  		this._initEvents();
+
+  		if (options.maxBounds) {
+  			this.setMaxBounds(options.maxBounds);
+  		}
+
+  		if (options.zoom !== undefined) {
+  			this._zoom = this._limitZoom(options.zoom);
+  		}
+
+  		if (options.center && options.zoom !== undefined) {
+  			this.setView(toLatLng(options.center), options.zoom, {reset: true});
+  		}
+
+  		this.callInitHooks();
+
+  		// don't animate on browsers without hardware-accelerated transitions or old Android/Opera
+  		this._zoomAnimated = TRANSITION && Browser.any3d && !Browser.mobileOpera &&
+  				this.options.zoomAnimation;
+
+  		// zoom transitions run with the same duration for all layers, so if one of transitionend events
+  		// happens after starting zoom animation (propagating to the map pane), we know that it ended globally
+  		if (this._zoomAnimated) {
+  			this._createAnimProxy();
+  			on(this._proxy, TRANSITION_END, this._catchTransitionEnd, this);
+  		}
+
+  		this._addLayers(this.options.layers);
+  	},
+
+
+  	// @section Methods for modifying map state
+
+  	// @method setView(center: LatLng, zoom: Number, options?: Zoom/pan options): this
+  	// Sets the view of the map (geographical center and zoom) with the given
+  	// animation options.
+  	setView: function (center, zoom, options) {
+
+  		zoom = zoom === undefined ? this._zoom : this._limitZoom(zoom);
+  		center = this._limitCenter(toLatLng(center), zoom, this.options.maxBounds);
+  		options = options || {};
+
+  		this._stop();
+
+  		if (this._loaded && !options.reset && options !== true) {
+
+  			if (options.animate !== undefined) {
+  				options.zoom = extend({animate: options.animate}, options.zoom);
+  				options.pan = extend({animate: options.animate, duration: options.duration}, options.pan);
+  			}
+
+  			// try animating pan or zoom
+  			var moved = (this._zoom !== zoom) ?
+  				this._tryAnimatedZoom && this._tryAnimatedZoom(center, zoom, options.zoom) :
+  				this._tryAnimatedPan(center, options.pan);
+
+  			if (moved) {
+  				// prevent resize handler call, the view will refresh after animation anyway
+  				clearTimeout(this._sizeTimer);
+  				return this;
+  			}
+  		}
+
+  		// animation didn't start, just reset the map view
+  		this._resetView(center, zoom, options.pan && options.pan.noMoveStart);
+
+  		return this;
+  	},
+
+  	// @method setZoom(zoom: Number, options?: Zoom/pan options): this
+  	// Sets the zoom of the map.
+  	setZoom: function (zoom, options) {
+  		if (!this._loaded) {
+  			this._zoom = zoom;
+  			return this;
+  		}
+  		return this.setView(this.getCenter(), zoom, {zoom: options});
+  	},
+
+  	// @method zoomIn(delta?: Number, options?: Zoom options): this
+  	// Increases the zoom of the map by `delta` ([`zoomDelta`](#map-zoomdelta) by default).
+  	zoomIn: function (delta, options) {
+  		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
+  		return this.setZoom(this._zoom + delta, options);
+  	},
+
+  	// @method zoomOut(delta?: Number, options?: Zoom options): this
+  	// Decreases the zoom of the map by `delta` ([`zoomDelta`](#map-zoomdelta) by default).
+  	zoomOut: function (delta, options) {
+  		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1);
+  		return this.setZoom(this._zoom - delta, options);
+  	},
+
+  	// @method setZoomAround(latlng: LatLng, zoom: Number, options: Zoom options): this
+  	// Zooms the map while keeping a specified geographical point on the map
+  	// stationary (e.g. used internally for scroll zoom and double-click zoom).
+  	// @alternative
+  	// @method setZoomAround(offset: Point, zoom: Number, options: Zoom options): this
+  	// Zooms the map while keeping a specified pixel on the map (relative to the top-left corner) stationary.
+  	setZoomAround: function (latlng, zoom, options) {
+  		var scale = this.getZoomScale(zoom),
+  		    viewHalf = this.getSize().divideBy(2),
+  		    containerPoint = latlng instanceof Point ? latlng : this.latLngToContainerPoint(latlng),
+
+  		    centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
+  		    newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset));
+
+  		return this.setView(newCenter, zoom, {zoom: options});
+  	},
+
+  	_getBoundsCenterZoom: function (bounds, options) {
+
+  		options = options || {};
+  		bounds = bounds.getBounds ? bounds.getBounds() : toLatLngBounds(bounds);
+
+  		var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]),
+  		    paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
+
+  		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
+
+  		zoom = (typeof options.maxZoom === 'number') ? Math.min(options.maxZoom, zoom) : zoom;
+
+  		if (zoom === Infinity) {
+  			return {
+  				center: bounds.getCenter(),
+  				zoom: zoom
+  			};
+  		}
+
+  		var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
+
+  		    swPoint = this.project(bounds.getSouthWest(), zoom),
+  		    nePoint = this.project(bounds.getNorthEast(), zoom),
+  		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
+
+  		return {
+  			center: center,
+  			zoom: zoom
+  		};
+  	},
+
+  	// @method fitBounds(bounds: LatLngBounds, options?: fitBounds options): this
+  	// Sets a map view that contains the given geographical bounds with the
+  	// maximum zoom level possible.
+  	fitBounds: function (bounds, options) {
+
+  		bounds = toLatLngBounds(bounds);
+
+  		if (!bounds.isValid()) {
+  			throw new Error('Bounds are not valid.');
+  		}
+
+  		var target = this._getBoundsCenterZoom(bounds, options);
+  		return this.setView(target.center, target.zoom, options);
+  	},
+
+  	// @method fitWorld(options?: fitBounds options): this
+  	// Sets a map view that mostly contains the whole world with the maximum
+  	// zoom level possible.
+  	fitWorld: function (options) {
+  		return this.fitBounds([[-90, -180], [90, 180]], options);
+  	},
+
+  	// @method panTo(latlng: LatLng, options?: Pan options): this
+  	// Pans the map to a given center.
+  	panTo: function (center, options) { // (LatLng)
+  		return this.setView(center, this._zoom, {pan: options});
+  	},
+
+  	// @method panBy(offset: Point, options?: Pan options): this
+  	// Pans the map by a given number of pixels (animated).
+  	panBy: function (offset, options) {
+  		offset = toPoint(offset).round();
+  		options = options || {};
+
+  		if (!offset.x && !offset.y) {
+  			return this.fire('moveend');
+  		}
+  		// If we pan too far, Chrome gets issues with tiles
+  		// and makes them disappear or appear in the wrong place (slightly offset) #2602
+  		if (options.animate !== true && !this.getSize().contains(offset)) {
+  			this._resetView(this.unproject(this.project(this.getCenter()).add(offset)), this.getZoom());
+  			return this;
+  		}
+
+  		if (!this._panAnim) {
+  			this._panAnim = new PosAnimation();
+
+  			this._panAnim.on({
+  				'step': this._onPanTransitionStep,
+  				'end': this._onPanTransitionEnd
+  			}, this);
+  		}
+
+  		// don't fire movestart if animating inertia
+  		if (!options.noMoveStart) {
+  			this.fire('movestart');
+  		}
+
+  		// animate pan unless animate: false specified
+  		if (options.animate !== false) {
+  			addClass(this._mapPane, 'leaflet-pan-anim');
+
+  			var newPos = this._getMapPanePos().subtract(offset).round();
+  			this._panAnim.run(this._mapPane, newPos, options.duration || 0.25, options.easeLinearity);
+  		} else {
+  			this._rawPanBy(offset);
+  			this.fire('move').fire('moveend');
+  		}
+
+  		return this;
+  	},
+
+  	// @method flyTo(latlng: LatLng, zoom?: Number, options?: Zoom/pan options): this
+  	// Sets the view of the map (geographical center and zoom) performing a smooth
+  	// pan-zoom animation.
+  	flyTo: function (targetCenter, targetZoom, options) {
+
+  		options = options || {};
+  		if (options.animate === false || !Browser.any3d) {
+  			return this.setView(targetCenter, targetZoom, options);
+  		}
+
+  		this._stop();
+
+  		var from = this.project(this.getCenter()),
+  		    to = this.project(targetCenter),
+  		    size = this.getSize(),
+  		    startZoom = this._zoom;
+
+  		targetCenter = toLatLng(targetCenter);
+  		targetZoom = targetZoom === undefined ? startZoom : targetZoom;
+
+  		var w0 = Math.max(size.x, size.y),
+  		    w1 = w0 * this.getZoomScale(startZoom, targetZoom),
+  		    u1 = (to.distanceTo(from)) || 1,
+  		    rho = 1.42,
+  		    rho2 = rho * rho;
+
+  		function r(i) {
+  			var s1 = i ? -1 : 1,
+  			    s2 = i ? w1 : w0,
+  			    t1 = w1 * w1 - w0 * w0 + s1 * rho2 * rho2 * u1 * u1,
+  			    b1 = 2 * s2 * rho2 * u1,
+  			    b = t1 / b1,
+  			    sq = Math.sqrt(b * b + 1) - b;
+
+  			    // workaround for floating point precision bug when sq = 0, log = -Infinite,
+  			    // thus triggering an infinite loop in flyTo
+  			    var log = sq < 0.000000001 ? -18 : Math.log(sq);
+
+  			return log;
+  		}
+
+  		function sinh(n) { return (Math.exp(n) - Math.exp(-n)) / 2; }
+  		function cosh(n) { return (Math.exp(n) + Math.exp(-n)) / 2; }
+  		function tanh(n) { return sinh(n) / cosh(n); }
+
+  		var r0 = r(0);
+
+  		function w(s) { return w0 * (cosh(r0) / cosh(r0 + rho * s)); }
+  		function u(s) { return w0 * (cosh(r0) * tanh(r0 + rho * s) - sinh(r0)) / rho2; }
+
+  		function easeOut(t) { return 1 - Math.pow(1 - t, 1.5); }
+
+  		var start = Date.now(),
+  		    S = (r(1) - r0) / rho,
+  		    duration = options.duration ? 1000 * options.duration : 1000 * S * 0.8;
+
+  		function frame() {
+  			var t = (Date.now() - start) / duration,
+  			    s = easeOut(t) * S;
+
+  			if (t <= 1) {
+  				this._flyToFrame = requestAnimFrame(frame, this);
+
+  				this._move(
+  					this.unproject(from.add(to.subtract(from).multiplyBy(u(s) / u1)), startZoom),
+  					this.getScaleZoom(w0 / w(s), startZoom),
+  					{flyTo: true});
+
+  			} else {
+  				this
+  					._move(targetCenter, targetZoom)
+  					._moveEnd(true);
+  			}
+  		}
+
+  		this._moveStart(true, options.noMoveStart);
+
+  		frame.call(this);
+  		return this;
+  	},
+
+  	// @method flyToBounds(bounds: LatLngBounds, options?: fitBounds options): this
+  	// Sets the view of the map with a smooth animation like [`flyTo`](#map-flyto),
+  	// but takes a bounds parameter like [`fitBounds`](#map-fitbounds).
+  	flyToBounds: function (bounds, options) {
+  		var target = this._getBoundsCenterZoom(bounds, options);
+  		return this.flyTo(target.center, target.zoom, options);
+  	},
+
+  	// @method setMaxBounds(bounds: LatLngBounds): this
+  	// Restricts the map view to the given bounds (see the [maxBounds](#map-maxbounds) option).
+  	setMaxBounds: function (bounds) {
+  		bounds = toLatLngBounds(bounds);
+
+  		if (this.listens('moveend', this._panInsideMaxBounds)) {
+  			this.off('moveend', this._panInsideMaxBounds);
+  		}
+
+  		if (!bounds.isValid()) {
+  			this.options.maxBounds = null;
+  			return this;
+  		}
+
+  		this.options.maxBounds = bounds;
+
+  		if (this._loaded) {
+  			this._panInsideMaxBounds();
+  		}
+
+  		return this.on('moveend', this._panInsideMaxBounds);
+  	},
+
+  	// @method setMinZoom(zoom: Number): this
+  	// Sets the lower limit for the available zoom levels (see the [minZoom](#map-minzoom) option).
+  	setMinZoom: function (zoom) {
+  		var oldZoom = this.options.minZoom;
+  		this.options.minZoom = zoom;
+
+  		if (this._loaded && oldZoom !== zoom) {
+  			this.fire('zoomlevelschange');
+
+  			if (this.getZoom() < this.options.minZoom) {
+  				return this.setZoom(zoom);
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	// @method setMaxZoom(zoom: Number): this
+  	// Sets the upper limit for the available zoom levels (see the [maxZoom](#map-maxzoom) option).
+  	setMaxZoom: function (zoom) {
+  		var oldZoom = this.options.maxZoom;
+  		this.options.maxZoom = zoom;
+
+  		if (this._loaded && oldZoom !== zoom) {
+  			this.fire('zoomlevelschange');
+
+  			if (this.getZoom() > this.options.maxZoom) {
+  				return this.setZoom(zoom);
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	// @method panInsideBounds(bounds: LatLngBounds, options?: Pan options): this
+  	// Pans the map to the closest view that would lie inside the given bounds (if it's not already), controlling the animation using the options specific, if any.
+  	panInsideBounds: function (bounds, options) {
+  		this._enforcingBounds = true;
+  		var center = this.getCenter(),
+  		    newCenter = this._limitCenter(center, this._zoom, toLatLngBounds(bounds));
+
+  		if (!center.equals(newCenter)) {
+  			this.panTo(newCenter, options);
+  		}
+
+  		this._enforcingBounds = false;
+  		return this;
+  	},
+
+  	// @method panInside(latlng: LatLng, options?: padding options): this
+  	// Pans the map the minimum amount to make the `latlng` visible. Use
+  	// padding options to fit the display to more restricted bounds.
+  	// If `latlng` is already within the (optionally padded) display bounds,
+  	// the map will not be panned.
+  	panInside: function (latlng, options) {
+  		options = options || {};
+
+  		var paddingTL = toPoint(options.paddingTopLeft || options.padding || [0, 0]),
+  		    paddingBR = toPoint(options.paddingBottomRight || options.padding || [0, 0]),
+  		    pixelCenter = this.project(this.getCenter()),
+  		    pixelPoint = this.project(latlng),
+  		    pixelBounds = this.getPixelBounds(),
+  		    paddedBounds = toBounds([pixelBounds.min.add(paddingTL), pixelBounds.max.subtract(paddingBR)]),
+  		    paddedSize = paddedBounds.getSize();
+
+  		if (!paddedBounds.contains(pixelPoint)) {
+  			this._enforcingBounds = true;
+  			var centerOffset = pixelPoint.subtract(paddedBounds.getCenter());
+  			var offset = paddedBounds.extend(pixelPoint).getSize().subtract(paddedSize);
+  			pixelCenter.x += centerOffset.x < 0 ? -offset.x : offset.x;
+  			pixelCenter.y += centerOffset.y < 0 ? -offset.y : offset.y;
+  			this.panTo(this.unproject(pixelCenter), options);
+  			this._enforcingBounds = false;
+  		}
+  		return this;
+  	},
+
+  	// @method invalidateSize(options: Zoom/pan options): this
+  	// Checks if the map container size changed and updates the map if so —
+  	// call it after you've changed the map size dynamically, also animating
+  	// pan by default. If `options.pan` is `false`, panning will not occur.
+  	// If `options.debounceMoveend` is `true`, it will delay `moveend` event so
+  	// that it doesn't happen often even if the method is called many
+  	// times in a row.
+
+  	// @alternative
+  	// @method invalidateSize(animate: Boolean): this
+  	// Checks if the map container size changed and updates the map if so —
+  	// call it after you've changed the map size dynamically, also animating
+  	// pan by default.
+  	invalidateSize: function (options) {
+  		if (!this._loaded) { return this; }
+
+  		options = extend({
+  			animate: false,
+  			pan: true
+  		}, options === true ? {animate: true} : options);
+
+  		var oldSize = this.getSize();
+  		this._sizeChanged = true;
+  		this._lastCenter = null;
+
+  		var newSize = this.getSize(),
+  		    oldCenter = oldSize.divideBy(2).round(),
+  		    newCenter = newSize.divideBy(2).round(),
+  		    offset = oldCenter.subtract(newCenter);
+
+  		if (!offset.x && !offset.y) { return this; }
+
+  		if (options.animate && options.pan) {
+  			this.panBy(offset);
+
+  		} else {
+  			if (options.pan) {
+  				this._rawPanBy(offset);
+  			}
+
+  			this.fire('move');
+
+  			if (options.debounceMoveend) {
+  				clearTimeout(this._sizeTimer);
+  				this._sizeTimer = setTimeout(bind(this.fire, this, 'moveend'), 200);
+  			} else {
+  				this.fire('moveend');
+  			}
+  		}
+
+  		// @section Map state change events
+  		// @event resize: ResizeEvent
+  		// Fired when the map is resized.
+  		return this.fire('resize', {
+  			oldSize: oldSize,
+  			newSize: newSize
+  		});
+  	},
+
+  	// @section Methods for modifying map state
+  	// @method stop(): this
+  	// Stops the currently running `panTo` or `flyTo` animation, if any.
+  	stop: function () {
+  		this.setZoom(this._limitZoom(this._zoom));
+  		if (!this.options.zoomSnap) {
+  			this.fire('viewreset');
+  		}
+  		return this._stop();
+  	},
+
+  	// @section Geolocation methods
+  	// @method locate(options?: Locate options): this
+  	// Tries to locate the user using the Geolocation API, firing a [`locationfound`](#map-locationfound)
+  	// event with location data on success or a [`locationerror`](#map-locationerror) event on failure,
+  	// and optionally sets the map view to the user's location with respect to
+  	// detection accuracy (or to the world view if geolocation failed).
+  	// Note that, if your page doesn't use HTTPS, this method will fail in
+  	// modern browsers ([Chrome 50 and newer](https://sites.google.com/a/chromium.org/dev/Home/chromium-security/deprecating-powerful-features-on-insecure-origins))
+  	// See `Locate options` for more details.
+  	locate: function (options) {
+
+  		options = this._locateOptions = extend({
+  			timeout: 10000,
+  			watch: false
+  			// setView: false
+  			// maxZoom: <Number>
+  			// maximumAge: 0
+  			// enableHighAccuracy: false
+  		}, options);
+
+  		if (!('geolocation' in navigator)) {
+  			this._handleGeolocationError({
+  				code: 0,
+  				message: 'Geolocation not supported.'
+  			});
+  			return this;
+  		}
+
+  		var onResponse = bind(this._handleGeolocationResponse, this),
+  		    onError = bind(this._handleGeolocationError, this);
+
+  		if (options.watch) {
+  			this._locationWatchId =
+  			        navigator.geolocation.watchPosition(onResponse, onError, options);
+  		} else {
+  			navigator.geolocation.getCurrentPosition(onResponse, onError, options);
+  		}
+  		return this;
+  	},
+
+  	// @method stopLocate(): this
+  	// Stops watching location previously initiated by `map.locate({watch: true})`
+  	// and aborts resetting the map view if map.locate was called with
+  	// `{setView: true}`.
+  	stopLocate: function () {
+  		if (navigator.geolocation && navigator.geolocation.clearWatch) {
+  			navigator.geolocation.clearWatch(this._locationWatchId);
+  		}
+  		if (this._locateOptions) {
+  			this._locateOptions.setView = false;
+  		}
+  		return this;
+  	},
+
+  	_handleGeolocationError: function (error) {
+  		if (!this._container._leaflet_id) { return; }
+
+  		var c = error.code,
+  		    message = error.message ||
+  		            (c === 1 ? 'permission denied' :
+  		            (c === 2 ? 'position unavailable' : 'timeout'));
+
+  		if (this._locateOptions.setView && !this._loaded) {
+  			this.fitWorld();
+  		}
+
+  		// @section Location events
+  		// @event locationerror: ErrorEvent
+  		// Fired when geolocation (using the [`locate`](#map-locate) method) failed.
+  		this.fire('locationerror', {
+  			code: c,
+  			message: 'Geolocation error: ' + message + '.'
+  		});
+  	},
+
+  	_handleGeolocationResponse: function (pos) {
+  		if (!this._container._leaflet_id) { return; }
+
+  		var lat = pos.coords.latitude,
+  		    lng = pos.coords.longitude,
+  		    latlng = new LatLng(lat, lng),
+  		    bounds = latlng.toBounds(pos.coords.accuracy * 2),
+  		    options = this._locateOptions;
+
+  		if (options.setView) {
+  			var zoom = this.getBoundsZoom(bounds);
+  			this.setView(latlng, options.maxZoom ? Math.min(zoom, options.maxZoom) : zoom);
+  		}
+
+  		var data = {
+  			latlng: latlng,
+  			bounds: bounds,
+  			timestamp: pos.timestamp
+  		};
+
+  		for (var i in pos.coords) {
+  			if (typeof pos.coords[i] === 'number') {
+  				data[i] = pos.coords[i];
+  			}
+  		}
+
+  		// @event locationfound: LocationEvent
+  		// Fired when geolocation (using the [`locate`](#map-locate) method)
+  		// went successfully.
+  		this.fire('locationfound', data);
+  	},
+
+  	// TODO Appropriate docs section?
+  	// @section Other Methods
+  	// @method addHandler(name: String, HandlerClass: Function): this
+  	// Adds a new `Handler` to the map, given its name and constructor function.
+  	addHandler: function (name, HandlerClass) {
+  		if (!HandlerClass) { return this; }
+
+  		var handler = this[name] = new HandlerClass(this);
+
+  		this._handlers.push(handler);
+
+  		if (this.options[name]) {
+  			handler.enable();
+  		}
+
+  		return this;
+  	},
+
+  	// @method remove(): this
+  	// Destroys the map and clears all related event listeners.
+  	remove: function () {
+
+  		this._initEvents(true);
+  		if (this.options.maxBounds) { this.off('moveend', this._panInsideMaxBounds); }
+
+  		if (this._containerId !== this._container._leaflet_id) {
+  			throw new Error('Map container is being reused by another instance');
+  		}
+
+  		try {
+  			// throws error in IE6-8
+  			delete this._container._leaflet_id;
+  			delete this._containerId;
+  		} catch (e) {
+  			/*eslint-disable */
+  			this._container._leaflet_id = undefined;
+  			/* eslint-enable */
+  			this._containerId = undefined;
+  		}
+
+  		if (this._locationWatchId !== undefined) {
+  			this.stopLocate();
+  		}
+
+  		this._stop();
+
+  		remove(this._mapPane);
+
+  		if (this._clearControlPos) {
+  			this._clearControlPos();
+  		}
+  		if (this._resizeRequest) {
+  			cancelAnimFrame(this._resizeRequest);
+  			this._resizeRequest = null;
+  		}
+
+  		this._clearHandlers();
+
+  		if (this._loaded) {
+  			// @section Map state change events
+  			// @event unload: Event
+  			// Fired when the map is destroyed with [remove](#map-remove) method.
+  			this.fire('unload');
+  		}
+
+  		var i;
+  		for (i in this._layers) {
+  			this._layers[i].remove();
+  		}
+  		for (i in this._panes) {
+  			remove(this._panes[i]);
+  		}
+
+  		this._layers = [];
+  		this._panes = [];
+  		delete this._mapPane;
+  		delete this._renderer;
+
+  		return this;
+  	},
+
+  	// @section Other Methods
+  	// @method createPane(name: String, container?: HTMLElement): HTMLElement
+  	// Creates a new [map pane](#map-pane) with the given name if it doesn't exist already,
+  	// then returns it. The pane is created as a child of `container`, or
+  	// as a child of the main map pane if not set.
+  	createPane: function (name, container) {
+  		var className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
+  		    pane = create$1('div', className, container || this._mapPane);
+
+  		if (name) {
+  			this._panes[name] = pane;
+  		}
+  		return pane;
+  	},
+
+  	// @section Methods for Getting Map State
+
+  	// @method getCenter(): LatLng
+  	// Returns the geographical center of the map view
+  	getCenter: function () {
+  		this._checkIfLoaded();
+
+  		if (this._lastCenter && !this._moved()) {
+  			return this._lastCenter.clone();
+  		}
+  		return this.layerPointToLatLng(this._getCenterLayerPoint());
+  	},
+
+  	// @method getZoom(): Number
+  	// Returns the current zoom level of the map view
+  	getZoom: function () {
+  		return this._zoom;
+  	},
+
+  	// @method getBounds(): LatLngBounds
+  	// Returns the geographical bounds visible in the current map view
+  	getBounds: function () {
+  		var bounds = this.getPixelBounds(),
+  		    sw = this.unproject(bounds.getBottomLeft()),
+  		    ne = this.unproject(bounds.getTopRight());
+
+  		return new LatLngBounds(sw, ne);
+  	},
+
+  	// @method getMinZoom(): Number
+  	// Returns the minimum zoom level of the map (if set in the `minZoom` option of the map or of any layers), or `0` by default.
+  	getMinZoom: function () {
+  		return this.options.minZoom === undefined ? this._layersMinZoom || 0 : this.options.minZoom;
+  	},
+
+  	// @method getMaxZoom(): Number
+  	// Returns the maximum zoom level of the map (if set in the `maxZoom` option of the map or of any layers).
+  	getMaxZoom: function () {
+  		return this.options.maxZoom === undefined ?
+  			(this._layersMaxZoom === undefined ? Infinity : this._layersMaxZoom) :
+  			this.options.maxZoom;
+  	},
+
+  	// @method getBoundsZoom(bounds: LatLngBounds, inside?: Boolean, padding?: Point): Number
+  	// Returns the maximum zoom level on which the given bounds fit to the map
+  	// view in its entirety. If `inside` (optional) is set to `true`, the method
+  	// instead returns the minimum zoom level on which the map view fits into
+  	// the given bounds in its entirety.
+  	getBoundsZoom: function (bounds, inside, padding) { // (LatLngBounds[, Boolean, Point]) -> Number
+  		bounds = toLatLngBounds(bounds);
+  		padding = toPoint(padding || [0, 0]);
+
+  		var zoom = this.getZoom() || 0,
+  		    min = this.getMinZoom(),
+  		    max = this.getMaxZoom(),
+  		    nw = bounds.getNorthWest(),
+  		    se = bounds.getSouthEast(),
+  		    size = this.getSize().subtract(padding),
+  		    boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize(),
+  		    snap = Browser.any3d ? this.options.zoomSnap : 1,
+  		    scalex = size.x / boundsSize.x,
+  		    scaley = size.y / boundsSize.y,
+  		    scale = inside ? Math.max(scalex, scaley) : Math.min(scalex, scaley);
+
+  		zoom = this.getScaleZoom(scale, zoom);
+
+  		if (snap) {
+  			zoom = Math.round(zoom / (snap / 100)) * (snap / 100); // don't jump if within 1% of a snap level
+  			zoom = inside ? Math.ceil(zoom / snap) * snap : Math.floor(zoom / snap) * snap;
+  		}
+
+  		return Math.max(min, Math.min(max, zoom));
+  	},
+
+  	// @method getSize(): Point
+  	// Returns the current size of the map container (in pixels).
+  	getSize: function () {
+  		if (!this._size || this._sizeChanged) {
+  			this._size = new Point(
+  				this._container.clientWidth || 0,
+  				this._container.clientHeight || 0);
+
+  			this._sizeChanged = false;
+  		}
+  		return this._size.clone();
+  	},
+
+  	// @method getPixelBounds(): Bounds
+  	// Returns the bounds of the current map view in projected pixel
+  	// coordinates (sometimes useful in layer and overlay implementations).
+  	getPixelBounds: function (center, zoom) {
+  		var topLeftPoint = this._getTopLeftPoint(center, zoom);
+  		return new Bounds(topLeftPoint, topLeftPoint.add(this.getSize()));
+  	},
+
+  	// TODO: Check semantics - isn't the pixel origin the 0,0 coord relative to
+  	// the map pane? "left point of the map layer" can be confusing, specially
+  	// since there can be negative offsets.
+  	// @method getPixelOrigin(): Point
+  	// Returns the projected pixel coordinates of the top left point of
+  	// the map layer (useful in custom layer and overlay implementations).
+  	getPixelOrigin: function () {
+  		this._checkIfLoaded();
+  		return this._pixelOrigin;
+  	},
+
+  	// @method getPixelWorldBounds(zoom?: Number): Bounds
+  	// Returns the world's bounds in pixel coordinates for zoom level `zoom`.
+  	// If `zoom` is omitted, the map's current zoom level is used.
+  	getPixelWorldBounds: function (zoom) {
+  		return this.options.crs.getProjectedBounds(zoom === undefined ? this.getZoom() : zoom);
+  	},
+
+  	// @section Other Methods
+
+  	// @method getPane(pane: String|HTMLElement): HTMLElement
+  	// Returns a [map pane](#map-pane), given its name or its HTML element (its identity).
+  	getPane: function (pane) {
+  		return typeof pane === 'string' ? this._panes[pane] : pane;
+  	},
+
+  	// @method getPanes(): Object
+  	// Returns a plain object containing the names of all [panes](#map-pane) as keys and
+  	// the panes as values.
+  	getPanes: function () {
+  		return this._panes;
+  	},
+
+  	// @method getContainer: HTMLElement
+  	// Returns the HTML element that contains the map.
+  	getContainer: function () {
+  		return this._container;
+  	},
+
+
+  	// @section Conversion Methods
+
+  	// @method getZoomScale(toZoom: Number, fromZoom: Number): Number
+  	// Returns the scale factor to be applied to a map transition from zoom level
+  	// `fromZoom` to `toZoom`. Used internally to help with zoom animations.
+  	getZoomScale: function (toZoom, fromZoom) {
+  		// TODO replace with universal implementation after refactoring projections
+  		var crs = this.options.crs;
+  		fromZoom = fromZoom === undefined ? this._zoom : fromZoom;
+  		return crs.scale(toZoom) / crs.scale(fromZoom);
+  	},
+
+  	// @method getScaleZoom(scale: Number, fromZoom: Number): Number
+  	// Returns the zoom level that the map would end up at, if it is at `fromZoom`
+  	// level and everything is scaled by a factor of `scale`. Inverse of
+  	// [`getZoomScale`](#map-getZoomScale).
+  	getScaleZoom: function (scale, fromZoom) {
+  		var crs = this.options.crs;
+  		fromZoom = fromZoom === undefined ? this._zoom : fromZoom;
+  		var zoom = crs.zoom(scale * crs.scale(fromZoom));
+  		return isNaN(zoom) ? Infinity : zoom;
+  	},
+
+  	// @method project(latlng: LatLng, zoom: Number): Point
+  	// Projects a geographical coordinate `LatLng` according to the projection
+  	// of the map's CRS, then scales it according to `zoom` and the CRS's
+  	// `Transformation`. The result is pixel coordinate relative to
+  	// the CRS origin.
+  	project: function (latlng, zoom) {
+  		zoom = zoom === undefined ? this._zoom : zoom;
+  		return this.options.crs.latLngToPoint(toLatLng(latlng), zoom);
+  	},
+
+  	// @method unproject(point: Point, zoom: Number): LatLng
+  	// Inverse of [`project`](#map-project).
+  	unproject: function (point, zoom) {
+  		zoom = zoom === undefined ? this._zoom : zoom;
+  		return this.options.crs.pointToLatLng(toPoint(point), zoom);
+  	},
+
+  	// @method layerPointToLatLng(point: Point): LatLng
+  	// Given a pixel coordinate relative to the [origin pixel](#map-getpixelorigin),
+  	// returns the corresponding geographical coordinate (for the current zoom level).
+  	layerPointToLatLng: function (point) {
+  		var projectedPoint = toPoint(point).add(this.getPixelOrigin());
+  		return this.unproject(projectedPoint);
+  	},
+
+  	// @method latLngToLayerPoint(latlng: LatLng): Point
+  	// Given a geographical coordinate, returns the corresponding pixel coordinate
+  	// relative to the [origin pixel](#map-getpixelorigin).
+  	latLngToLayerPoint: function (latlng) {
+  		var projectedPoint = this.project(toLatLng(latlng))._round();
+  		return projectedPoint._subtract(this.getPixelOrigin());
+  	},
+
+  	// @method wrapLatLng(latlng: LatLng): LatLng
+  	// Returns a `LatLng` where `lat` and `lng` has been wrapped according to the
+  	// map's CRS's `wrapLat` and `wrapLng` properties, if they are outside the
+  	// CRS's bounds.
+  	// By default this means longitude is wrapped around the dateline so its
+  	// value is between -180 and +180 degrees.
+  	wrapLatLng: function (latlng) {
+  		return this.options.crs.wrapLatLng(toLatLng(latlng));
+  	},
+
+  	// @method wrapLatLngBounds(bounds: LatLngBounds): LatLngBounds
+  	// Returns a `LatLngBounds` with the same size as the given one, ensuring that
+  	// its center is within the CRS's bounds.
+  	// By default this means the center longitude is wrapped around the dateline so its
+  	// value is between -180 and +180 degrees, and the majority of the bounds
+  	// overlaps the CRS's bounds.
+  	wrapLatLngBounds: function (latlng) {
+  		return this.options.crs.wrapLatLngBounds(toLatLngBounds(latlng));
+  	},
+
+  	// @method distance(latlng1: LatLng, latlng2: LatLng): Number
+  	// Returns the distance between two geographical coordinates according to
+  	// the map's CRS. By default this measures distance in meters.
+  	distance: function (latlng1, latlng2) {
+  		return this.options.crs.distance(toLatLng(latlng1), toLatLng(latlng2));
+  	},
+
+  	// @method containerPointToLayerPoint(point: Point): Point
+  	// Given a pixel coordinate relative to the map container, returns the corresponding
+  	// pixel coordinate relative to the [origin pixel](#map-getpixelorigin).
+  	containerPointToLayerPoint: function (point) { // (Point)
+  		return toPoint(point).subtract(this._getMapPanePos());
+  	},
+
+  	// @method layerPointToContainerPoint(point: Point): Point
+  	// Given a pixel coordinate relative to the [origin pixel](#map-getpixelorigin),
+  	// returns the corresponding pixel coordinate relative to the map container.
+  	layerPointToContainerPoint: function (point) { // (Point)
+  		return toPoint(point).add(this._getMapPanePos());
+  	},
+
+  	// @method containerPointToLatLng(point: Point): LatLng
+  	// Given a pixel coordinate relative to the map container, returns
+  	// the corresponding geographical coordinate (for the current zoom level).
+  	containerPointToLatLng: function (point) {
+  		var layerPoint = this.containerPointToLayerPoint(toPoint(point));
+  		return this.layerPointToLatLng(layerPoint);
+  	},
+
+  	// @method latLngToContainerPoint(latlng: LatLng): Point
+  	// Given a geographical coordinate, returns the corresponding pixel coordinate
+  	// relative to the map container.
+  	latLngToContainerPoint: function (latlng) {
+  		return this.layerPointToContainerPoint(this.latLngToLayerPoint(toLatLng(latlng)));
+  	},
+
+  	// @method mouseEventToContainerPoint(ev: MouseEvent): Point
+  	// Given a MouseEvent object, returns the pixel coordinate relative to the
+  	// map container where the event took place.
+  	mouseEventToContainerPoint: function (e) {
+  		return getMousePosition(e, this._container);
+  	},
+
+  	// @method mouseEventToLayerPoint(ev: MouseEvent): Point
+  	// Given a MouseEvent object, returns the pixel coordinate relative to
+  	// the [origin pixel](#map-getpixelorigin) where the event took place.
+  	mouseEventToLayerPoint: function (e) {
+  		return this.containerPointToLayerPoint(this.mouseEventToContainerPoint(e));
+  	},
+
+  	// @method mouseEventToLatLng(ev: MouseEvent): LatLng
+  	// Given a MouseEvent object, returns geographical coordinate where the
+  	// event took place.
+  	mouseEventToLatLng: function (e) { // (MouseEvent)
+  		return this.layerPointToLatLng(this.mouseEventToLayerPoint(e));
+  	},
+
+
+  	// map initialization methods
+
+  	_initContainer: function (id) {
+  		var container = this._container = get(id);
+
+  		if (!container) {
+  			throw new Error('Map container not found.');
+  		} else if (container._leaflet_id) {
+  			throw new Error('Map container is already initialized.');
+  		}
+
+  		on(container, 'scroll', this._onScroll, this);
+  		this._containerId = stamp(container);
+  	},
+
+  	_initLayout: function () {
+  		var container = this._container;
+
+  		this._fadeAnimated = this.options.fadeAnimation && Browser.any3d;
+
+  		addClass(container, 'leaflet-container' +
+  			(Browser.touch ? ' leaflet-touch' : '') +
+  			(Browser.retina ? ' leaflet-retina' : '') +
+  			(Browser.ielt9 ? ' leaflet-oldie' : '') +
+  			(Browser.safari ? ' leaflet-safari' : '') +
+  			(this._fadeAnimated ? ' leaflet-fade-anim' : ''));
+
+  		var position = getStyle(container, 'position');
+
+  		if (position !== 'absolute' && position !== 'relative' && position !== 'fixed' && position !== 'sticky') {
+  			container.style.position = 'relative';
+  		}
+
+  		this._initPanes();
+
+  		if (this._initControlPos) {
+  			this._initControlPos();
+  		}
+  	},
+
+  	_initPanes: function () {
+  		var panes = this._panes = {};
+  		this._paneRenderers = {};
+
+  		// @section
+  		//
+  		// Panes are DOM elements used to control the ordering of layers on the map. You
+  		// can access panes with [`map.getPane`](#map-getpane) or
+  		// [`map.getPanes`](#map-getpanes) methods. New panes can be created with the
+  		// [`map.createPane`](#map-createpane) method.
+  		//
+  		// Every map has the following default panes that differ only in zIndex.
+  		//
+  		// @pane mapPane: HTMLElement = 'auto'
+  		// Pane that contains all other map panes
+
+  		this._mapPane = this.createPane('mapPane', this._container);
+  		setPosition(this._mapPane, new Point(0, 0));
+
+  		// @pane tilePane: HTMLElement = 200
+  		// Pane for `GridLayer`s and `TileLayer`s
+  		this.createPane('tilePane');
+  		// @pane overlayPane: HTMLElement = 400
+  		// Pane for vectors (`Path`s, like `Polyline`s and `Polygon`s), `ImageOverlay`s and `VideoOverlay`s
+  		this.createPane('overlayPane');
+  		// @pane shadowPane: HTMLElement = 500
+  		// Pane for overlay shadows (e.g. `Marker` shadows)
+  		this.createPane('shadowPane');
+  		// @pane markerPane: HTMLElement = 600
+  		// Pane for `Icon`s of `Marker`s
+  		this.createPane('markerPane');
+  		// @pane tooltipPane: HTMLElement = 650
+  		// Pane for `Tooltip`s.
+  		this.createPane('tooltipPane');
+  		// @pane popupPane: HTMLElement = 700
+  		// Pane for `Popup`s.
+  		this.createPane('popupPane');
+
+  		if (!this.options.markerZoomAnimation) {
+  			addClass(panes.markerPane, 'leaflet-zoom-hide');
+  			addClass(panes.shadowPane, 'leaflet-zoom-hide');
+  		}
+  	},
+
+
+  	// private methods that modify map state
+
+  	// @section Map state change events
+  	_resetView: function (center, zoom, noMoveStart) {
+  		setPosition(this._mapPane, new Point(0, 0));
+
+  		var loading = !this._loaded;
+  		this._loaded = true;
+  		zoom = this._limitZoom(zoom);
+
+  		this.fire('viewprereset');
+
+  		var zoomChanged = this._zoom !== zoom;
+  		this
+  			._moveStart(zoomChanged, noMoveStart)
+  			._move(center, zoom)
+  			._moveEnd(zoomChanged);
+
+  		// @event viewreset: Event
+  		// Fired when the map needs to redraw its content (this usually happens
+  		// on map zoom or load). Very useful for creating custom overlays.
+  		this.fire('viewreset');
+
+  		// @event load: Event
+  		// Fired when the map is initialized (when its center and zoom are set
+  		// for the first time).
+  		if (loading) {
+  			this.fire('load');
+  		}
+  	},
+
+  	_moveStart: function (zoomChanged, noMoveStart) {
+  		// @event zoomstart: Event
+  		// Fired when the map zoom is about to change (e.g. before zoom animation).
+  		// @event movestart: Event
+  		// Fired when the view of the map starts changing (e.g. user starts dragging the map).
+  		if (zoomChanged) {
+  			this.fire('zoomstart');
+  		}
+  		if (!noMoveStart) {
+  			this.fire('movestart');
+  		}
+  		return this;
+  	},
+
+  	_move: function (center, zoom, data, supressEvent) {
+  		if (zoom === undefined) {
+  			zoom = this._zoom;
+  		}
+  		var zoomChanged = this._zoom !== zoom;
+
+  		this._zoom = zoom;
+  		this._lastCenter = center;
+  		this._pixelOrigin = this._getNewPixelOrigin(center);
+
+  		if (!supressEvent) {
+  			// @event zoom: Event
+  			// Fired repeatedly during any change in zoom level,
+  			// including zoom and fly animations.
+  			if (zoomChanged || (data && data.pinch)) {	// Always fire 'zoom' if pinching because #3530
+  				this.fire('zoom', data);
+  			}
+
+  			// @event move: Event
+  			// Fired repeatedly during any movement of the map,
+  			// including pan and fly animations.
+  			this.fire('move', data);
+  		} else if (data && data.pinch) {	// Always fire 'zoom' if pinching because #3530
+  			this.fire('zoom', data);
+  		}
+  		return this;
+  	},
+
+  	_moveEnd: function (zoomChanged) {
+  		// @event zoomend: Event
+  		// Fired when the map zoom changed, after any animations.
+  		if (zoomChanged) {
+  			this.fire('zoomend');
+  		}
+
+  		// @event moveend: Event
+  		// Fired when the center of the map stops changing
+  		// (e.g. user stopped dragging the map or after non-centered zoom).
+  		return this.fire('moveend');
+  	},
+
+  	_stop: function () {
+  		cancelAnimFrame(this._flyToFrame);
+  		if (this._panAnim) {
+  			this._panAnim.stop();
+  		}
+  		return this;
+  	},
+
+  	_rawPanBy: function (offset) {
+  		setPosition(this._mapPane, this._getMapPanePos().subtract(offset));
+  	},
+
+  	_getZoomSpan: function () {
+  		return this.getMaxZoom() - this.getMinZoom();
+  	},
+
+  	_panInsideMaxBounds: function () {
+  		if (!this._enforcingBounds) {
+  			this.panInsideBounds(this.options.maxBounds);
+  		}
+  	},
+
+  	_checkIfLoaded: function () {
+  		if (!this._loaded) {
+  			throw new Error('Set map center and zoom first.');
+  		}
+  	},
+
+  	// DOM event handling
+
+  	// @section Interaction events
+  	_initEvents: function (remove) {
+  		this._targets = {};
+  		this._targets[stamp(this._container)] = this;
+
+  		var onOff = remove ? off : on;
+
+  		// @event click: MouseEvent
+  		// Fired when the user clicks (or taps) the map.
+  		// @event dblclick: MouseEvent
+  		// Fired when the user double-clicks (or double-taps) the map.
+  		// @event mousedown: MouseEvent
+  		// Fired when the user pushes the mouse button on the map.
+  		// @event mouseup: MouseEvent
+  		// Fired when the user releases the mouse button on the map.
+  		// @event mouseover: MouseEvent
+  		// Fired when the mouse enters the map.
+  		// @event mouseout: MouseEvent
+  		// Fired when the mouse leaves the map.
+  		// @event mousemove: MouseEvent
+  		// Fired while the mouse moves over the map.
+  		// @event contextmenu: MouseEvent
+  		// Fired when the user pushes the right mouse button on the map, prevents
+  		// default browser context menu from showing if there are listeners on
+  		// this event. Also fired on mobile when the user holds a single touch
+  		// for a second (also called long press).
+  		// @event keypress: KeyboardEvent
+  		// Fired when the user presses a key from the keyboard that produces a character value while the map is focused.
+  		// @event keydown: KeyboardEvent
+  		// Fired when the user presses a key from the keyboard while the map is focused. Unlike the `keypress` event,
+  		// the `keydown` event is fired for keys that produce a character value and for keys
+  		// that do not produce a character value.
+  		// @event keyup: KeyboardEvent
+  		// Fired when the user releases a key from the keyboard while the map is focused.
+  		onOff(this._container, 'click dblclick mousedown mouseup ' +
+  			'mouseover mouseout mousemove contextmenu keypress keydown keyup', this._handleDOMEvent, this);
+
+  		if (this.options.trackResize) {
+  			onOff(window, 'resize', this._onResize, this);
+  		}
+
+  		if (Browser.any3d && this.options.transform3DLimit) {
+  			(remove ? this.off : this.on).call(this, 'moveend', this._onMoveEnd);
+  		}
+  	},
+
+  	_onResize: function () {
+  		cancelAnimFrame(this._resizeRequest);
+  		this._resizeRequest = requestAnimFrame(
+  		        function () { this.invalidateSize({debounceMoveend: true}); }, this);
+  	},
+
+  	_onScroll: function () {
+  		this._container.scrollTop  = 0;
+  		this._container.scrollLeft = 0;
+  	},
+
+  	_onMoveEnd: function () {
+  		var pos = this._getMapPanePos();
+  		if (Math.max(Math.abs(pos.x), Math.abs(pos.y)) >= this.options.transform3DLimit) {
+  			// https://bugzilla.mozilla.org/show_bug.cgi?id=1203873 but Webkit also have
+  			// a pixel offset on very high values, see: https://jsfiddle.net/dg6r5hhb/
+  			this._resetView(this.getCenter(), this.getZoom());
+  		}
+  	},
+
+  	_findEventTargets: function (e, type) {
+  		var targets = [],
+  		    target,
+  		    isHover = type === 'mouseout' || type === 'mouseover',
+  		    src = e.target || e.srcElement,
+  		    dragging = false;
+
+  		while (src) {
+  			target = this._targets[stamp(src)];
+  			if (target && (type === 'click' || type === 'preclick') && this._draggableMoved(target)) {
+  				// Prevent firing click after you just dragged an object.
+  				dragging = true;
+  				break;
+  			}
+  			if (target && target.listens(type, true)) {
+  				if (isHover && !isExternalTarget(src, e)) { break; }
+  				targets.push(target);
+  				if (isHover) { break; }
+  			}
+  			if (src === this._container) { break; }
+  			src = src.parentNode;
+  		}
+  		if (!targets.length && !dragging && !isHover && this.listens(type, true)) {
+  			targets = [this];
+  		}
+  		return targets;
+  	},
+
+  	_isClickDisabled: function (el) {
+  		while (el && el !== this._container) {
+  			if (el['_leaflet_disable_click']) { return true; }
+  			el = el.parentNode;
+  		}
+  	},
+
+  	_handleDOMEvent: function (e) {
+  		var el = (e.target || e.srcElement);
+  		if (!this._loaded || el['_leaflet_disable_events'] || e.type === 'click' && this._isClickDisabled(el)) {
+  			return;
+  		}
+
+  		var type = e.type;
+
+  		if (type === 'mousedown') {
+  			// prevents outline when clicking on keyboard-focusable element
+  			preventOutline(el);
+  		}
+
+  		this._fireDOMEvent(e, type);
+  	},
+
+  	_mouseEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
+
+  	_fireDOMEvent: function (e, type, canvasTargets) {
+
+  		if (e.type === 'click') {
+  			// Fire a synthetic 'preclick' event which propagates up (mainly for closing popups).
+  			// @event preclick: MouseEvent
+  			// Fired before mouse click on the map (sometimes useful when you
+  			// want something to happen on click before any existing click
+  			// handlers start running).
+  			var synth = extend({}, e);
+  			synth.type = 'preclick';
+  			this._fireDOMEvent(synth, synth.type, canvasTargets);
+  		}
+
+  		// Find the layer the event is propagating from and its parents.
+  		var targets = this._findEventTargets(e, type);
+
+  		if (canvasTargets) {
+  			var filtered = []; // pick only targets with listeners
+  			for (var i = 0; i < canvasTargets.length; i++) {
+  				if (canvasTargets[i].listens(type, true)) {
+  					filtered.push(canvasTargets[i]);
+  				}
+  			}
+  			targets = filtered.concat(targets);
+  		}
+
+  		if (!targets.length) { return; }
+
+  		if (type === 'contextmenu') {
+  			preventDefault(e);
+  		}
+
+  		var target = targets[0];
+  		var data = {
+  			originalEvent: e
+  		};
+
+  		if (e.type !== 'keypress' && e.type !== 'keydown' && e.type !== 'keyup') {
+  			var isMarker = target.getLatLng && (!target._radius || target._radius <= 10);
+  			data.containerPoint = isMarker ?
+  				this.latLngToContainerPoint(target.getLatLng()) : this.mouseEventToContainerPoint(e);
+  			data.layerPoint = this.containerPointToLayerPoint(data.containerPoint);
+  			data.latlng = isMarker ? target.getLatLng() : this.layerPointToLatLng(data.layerPoint);
+  		}
+
+  		for (i = 0; i < targets.length; i++) {
+  			targets[i].fire(type, data, true);
+  			if (data.originalEvent._stopped ||
+  				(targets[i].options.bubblingMouseEvents === false && indexOf(this._mouseEvents, type) !== -1)) { return; }
+  		}
+  	},
+
+  	_draggableMoved: function (obj) {
+  		obj = obj.dragging && obj.dragging.enabled() ? obj : this;
+  		return (obj.dragging && obj.dragging.moved()) || (this.boxZoom && this.boxZoom.moved());
+  	},
+
+  	_clearHandlers: function () {
+  		for (var i = 0, len = this._handlers.length; i < len; i++) {
+  			this._handlers[i].disable();
+  		}
+  	},
+
+  	// @section Other Methods
+
+  	// @method whenReady(fn: Function, context?: Object): this
+  	// Runs the given function `fn` when the map gets initialized with
+  	// a view (center and zoom) and at least one layer, or immediately
+  	// if it's already initialized, optionally passing a function context.
+  	whenReady: function (callback, context) {
+  		if (this._loaded) {
+  			callback.call(context || this, {target: this});
+  		} else {
+  			this.on('load', callback, context);
+  		}
+  		return this;
+  	},
+
+
+  	// private methods for getting map state
+
+  	_getMapPanePos: function () {
+  		return getPosition(this._mapPane) || new Point(0, 0);
+  	},
+
+  	_moved: function () {
+  		var pos = this._getMapPanePos();
+  		return pos && !pos.equals([0, 0]);
+  	},
+
+  	_getTopLeftPoint: function (center, zoom) {
+  		var pixelOrigin = center && zoom !== undefined ?
+  			this._getNewPixelOrigin(center, zoom) :
+  			this.getPixelOrigin();
+  		return pixelOrigin.subtract(this._getMapPanePos());
+  	},
+
+  	_getNewPixelOrigin: function (center, zoom) {
+  		var viewHalf = this.getSize()._divideBy(2);
+  		return this.project(center, zoom)._subtract(viewHalf)._add(this._getMapPanePos())._round();
+  	},
+
+  	_latLngToNewLayerPoint: function (latlng, zoom, center) {
+  		var topLeft = this._getNewPixelOrigin(center, zoom);
+  		return this.project(latlng, zoom)._subtract(topLeft);
+  	},
+
+  	_latLngBoundsToNewLayerBounds: function (latLngBounds, zoom, center) {
+  		var topLeft = this._getNewPixelOrigin(center, zoom);
+  		return toBounds([
+  			this.project(latLngBounds.getSouthWest(), zoom)._subtract(topLeft),
+  			this.project(latLngBounds.getNorthWest(), zoom)._subtract(topLeft),
+  			this.project(latLngBounds.getSouthEast(), zoom)._subtract(topLeft),
+  			this.project(latLngBounds.getNorthEast(), zoom)._subtract(topLeft)
+  		]);
+  	},
+
+  	// layer point of the current center
+  	_getCenterLayerPoint: function () {
+  		return this.containerPointToLayerPoint(this.getSize()._divideBy(2));
+  	},
+
+  	// offset of the specified place to the current center in pixels
+  	_getCenterOffset: function (latlng) {
+  		return this.latLngToLayerPoint(latlng).subtract(this._getCenterLayerPoint());
+  	},
+
+  	// adjust center for view to get inside bounds
+  	_limitCenter: function (center, zoom, bounds) {
+
+  		if (!bounds) { return center; }
+
+  		var centerPoint = this.project(center, zoom),
+  		    viewHalf = this.getSize().divideBy(2),
+  		    viewBounds = new Bounds(centerPoint.subtract(viewHalf), centerPoint.add(viewHalf)),
+  		    offset = this._getBoundsOffset(viewBounds, bounds, zoom);
+
+  		// If offset is less than a pixel, ignore.
+  		// This prevents unstable projections from getting into
+  		// an infinite loop of tiny offsets.
+  		if (Math.abs(offset.x) <= 1 && Math.abs(offset.y) <= 1) {
+  			return center;
+  		}
+
+  		return this.unproject(centerPoint.add(offset), zoom);
+  	},
+
+  	// adjust offset for view to get inside bounds
+  	_limitOffset: function (offset, bounds) {
+  		if (!bounds) { return offset; }
+
+  		var viewBounds = this.getPixelBounds(),
+  		    newBounds = new Bounds(viewBounds.min.add(offset), viewBounds.max.add(offset));
+
+  		return offset.add(this._getBoundsOffset(newBounds, bounds));
+  	},
+
+  	// returns offset needed for pxBounds to get inside maxBounds at a specified zoom
+  	_getBoundsOffset: function (pxBounds, maxBounds, zoom) {
+  		var projectedMaxBounds = toBounds(
+  		        this.project(maxBounds.getNorthEast(), zoom),
+  		        this.project(maxBounds.getSouthWest(), zoom)
+  		    ),
+  		    minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
+  		    maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),
+
+  		    dx = this._rebound(minOffset.x, -maxOffset.x),
+  		    dy = this._rebound(minOffset.y, -maxOffset.y);
+
+  		return new Point(dx, dy);
+  	},
+
+  	_rebound: function (left, right) {
+  		return left + right > 0 ?
+  			Math.round(left - right) / 2 :
+  			Math.max(0, Math.ceil(left)) - Math.max(0, Math.floor(right));
+  	},
+
+  	_limitZoom: function (zoom) {
+  		var min = this.getMinZoom(),
+  		    max = this.getMaxZoom(),
+  		    snap = Browser.any3d ? this.options.zoomSnap : 1;
+  		if (snap) {
+  			zoom = Math.round(zoom / snap) * snap;
+  		}
+  		return Math.max(min, Math.min(max, zoom));
+  	},
+
+  	_onPanTransitionStep: function () {
+  		this.fire('move');
+  	},
+
+  	_onPanTransitionEnd: function () {
+  		removeClass(this._mapPane, 'leaflet-pan-anim');
+  		this.fire('moveend');
+  	},
+
+  	_tryAnimatedPan: function (center, options) {
+  		// difference between the new and current centers in pixels
+  		var offset = this._getCenterOffset(center)._trunc();
+
+  		// don't animate too far unless animate: true specified in options
+  		if ((options && options.animate) !== true && !this.getSize().contains(offset)) { return false; }
+
+  		this.panBy(offset, options);
+
+  		return true;
+  	},
+
+  	_createAnimProxy: function () {
+
+  		var proxy = this._proxy = create$1('div', 'leaflet-proxy leaflet-zoom-animated');
+  		this._panes.mapPane.appendChild(proxy);
+
+  		this.on('zoomanim', function (e) {
+  			var prop = TRANSFORM,
+  			    transform = this._proxy.style[prop];
+
+  			setTransform(this._proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
+
+  			// workaround for case when transform is the same and so transitionend event is not fired
+  			if (transform === this._proxy.style[prop] && this._animatingZoom) {
+  				this._onZoomTransitionEnd();
+  			}
+  		}, this);
+
+  		this.on('load moveend', this._animMoveEnd, this);
+
+  		this._on('unload', this._destroyAnimProxy, this);
+  	},
+
+  	_destroyAnimProxy: function () {
+  		remove(this._proxy);
+  		this.off('load moveend', this._animMoveEnd, this);
+  		delete this._proxy;
+  	},
+
+  	_animMoveEnd: function () {
+  		var c = this.getCenter(),
+  		    z = this.getZoom();
+  		setTransform(this._proxy, this.project(c, z), this.getZoomScale(z, 1));
+  	},
+
+  	_catchTransitionEnd: function (e) {
+  		if (this._animatingZoom && e.propertyName.indexOf('transform') >= 0) {
+  			this._onZoomTransitionEnd();
+  		}
+  	},
+
+  	_nothingToAnimate: function () {
+  		return !this._container.getElementsByClassName('leaflet-zoom-animated').length;
+  	},
+
+  	_tryAnimatedZoom: function (center, zoom, options) {
+
+  		if (this._animatingZoom) { return true; }
+
+  		options = options || {};
+
+  		// don't animate if disabled, not supported or zoom difference is too large
+  		if (!this._zoomAnimated || options.animate === false || this._nothingToAnimate() ||
+  		        Math.abs(zoom - this._zoom) > this.options.zoomAnimationThreshold) { return false; }
+
+  		// offset is the pixel coords of the zoom origin relative to the current center
+  		var scale = this.getZoomScale(zoom),
+  		    offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale);
+
+  		// don't animate if the zoom origin isn't within one screen from the current center, unless forced
+  		if (options.animate !== true && !this.getSize().contains(offset)) { return false; }
+
+  		requestAnimFrame(function () {
+  			this
+  			    ._moveStart(true, options.noMoveStart || false)
+  			    ._animateZoom(center, zoom, true);
+  		}, this);
+
+  		return true;
+  	},
+
+  	_animateZoom: function (center, zoom, startAnim, noUpdate) {
+  		if (!this._mapPane) { return; }
+
+  		if (startAnim) {
+  			this._animatingZoom = true;
+
+  			// remember what center/zoom to set after animation
+  			this._animateToCenter = center;
+  			this._animateToZoom = zoom;
+
+  			addClass(this._mapPane, 'leaflet-zoom-anim');
+  		}
+
+  		// @section Other Events
+  		// @event zoomanim: ZoomAnimEvent
+  		// Fired at least once per zoom animation. For continuous zoom, like pinch zooming, fired once per frame during zoom.
+  		this.fire('zoomanim', {
+  			center: center,
+  			zoom: zoom,
+  			noUpdate: noUpdate
+  		});
+
+  		if (!this._tempFireZoomEvent) {
+  			this._tempFireZoomEvent = this._zoom !== this._animateToZoom;
+  		}
+
+  		this._move(this._animateToCenter, this._animateToZoom, undefined, true);
+
+  		// Work around webkit not firing 'transitionend', see https://github.com/Leaflet/Leaflet/issues/3689, 2693
+  		setTimeout(bind(this._onZoomTransitionEnd, this), 250);
+  	},
+
+  	_onZoomTransitionEnd: function () {
+  		if (!this._animatingZoom) { return; }
+
+  		if (this._mapPane) {
+  			removeClass(this._mapPane, 'leaflet-zoom-anim');
+  		}
+
+  		this._animatingZoom = false;
+
+  		this._move(this._animateToCenter, this._animateToZoom, undefined, true);
+
+  		if (this._tempFireZoomEvent) {
+  			this.fire('zoom');
+  		}
+  		delete this._tempFireZoomEvent;
+
+  		this.fire('move');
+
+  		this._moveEnd(true);
+  	}
+  });
+
+  // @section
+
+  // @factory L.map(id: String, options?: Map options)
+  // Instantiates a map object given the DOM ID of a `<div>` element
+  // and optionally an object literal with `Map options`.
+  //
+  // @alternative
+  // @factory L.map(el: HTMLElement, options?: Map options)
+  // Instantiates a map object given an instance of a `<div>` HTML element
+  // and optionally an object literal with `Map options`.
+  function createMap(id, options) {
+  	return new Map(id, options);
+  }
+
+  /*
+   * @class Control
+   * @aka L.Control
+   * @inherits Class
+   *
+   * L.Control is a base class for implementing map controls. Handles positioning.
+   * All other controls extend from this class.
+   */
+
+  var Control = Class.extend({
+  	// @section
+  	// @aka Control Options
+  	options: {
+  		// @option position: String = 'topright'
+  		// The position of the control (one of the map corners). Possible values are `'topleft'`,
+  		// `'topright'`, `'bottomleft'` or `'bottomright'`
+  		position: 'topright'
+  	},
+
+  	initialize: function (options) {
+  		setOptions(this, options);
+  	},
+
+  	/* @section
+  	 * Classes extending L.Control will inherit the following methods:
+  	 *
+  	 * @method getPosition: string
+  	 * Returns the position of the control.
+  	 */
+  	getPosition: function () {
+  		return this.options.position;
+  	},
+
+  	// @method setPosition(position: string): this
+  	// Sets the position of the control.
+  	setPosition: function (position) {
+  		var map = this._map;
+
+  		if (map) {
+  			map.removeControl(this);
+  		}
+
+  		this.options.position = position;
+
+  		if (map) {
+  			map.addControl(this);
+  		}
+
+  		return this;
+  	},
+
+  	// @method getContainer: HTMLElement
+  	// Returns the HTMLElement that contains the control.
+  	getContainer: function () {
+  		return this._container;
+  	},
+
+  	// @method addTo(map: Map): this
+  	// Adds the control to the given map.
+  	addTo: function (map) {
+  		this.remove();
+  		this._map = map;
+
+  		var container = this._container = this.onAdd(map),
+  		    pos = this.getPosition(),
+  		    corner = map._controlCorners[pos];
+
+  		addClass(container, 'leaflet-control');
+
+  		if (pos.indexOf('bottom') !== -1) {
+  			corner.insertBefore(container, corner.firstChild);
+  		} else {
+  			corner.appendChild(container);
+  		}
+
+  		this._map.on('unload', this.remove, this);
+
+  		return this;
+  	},
+
+  	// @method remove: this
+  	// Removes the control from the map it is currently active on.
+  	remove: function () {
+  		if (!this._map) {
+  			return this;
+  		}
+
+  		remove(this._container);
+
+  		if (this.onRemove) {
+  			this.onRemove(this._map);
+  		}
+
+  		this._map.off('unload', this.remove, this);
+  		this._map = null;
+
+  		return this;
+  	},
+
+  	_refocusOnMap: function (e) {
+  		// if map exists and event is not a keyboard event
+  		if (this._map && e && e.screenX > 0 && e.screenY > 0) {
+  			this._map.getContainer().focus();
+  		}
+  	}
+  });
+
+  var control = function (options) {
+  	return new Control(options);
+  };
+
+  /* @section Extension methods
+   * @uninheritable
+   *
+   * Every control should extend from `L.Control` and (re-)implement the following methods.
+   *
+   * @method onAdd(map: Map): HTMLElement
+   * Should return the container DOM element for the control and add listeners on relevant map events. Called on [`control.addTo(map)`](#control-addTo).
+   *
+   * @method onRemove(map: Map)
+   * Optional method. Should contain all clean up code that removes the listeners previously added in [`onAdd`](#control-onadd). Called on [`control.remove()`](#control-remove).
+   */
+
+  /* @namespace Map
+   * @section Methods for Layers and Controls
+   */
+  Map.include({
+  	// @method addControl(control: Control): this
+  	// Adds the given control to the map
+  	addControl: function (control) {
+  		control.addTo(this);
+  		return this;
+  	},
+
+  	// @method removeControl(control: Control): this
+  	// Removes the given control from the map
+  	removeControl: function (control) {
+  		control.remove();
+  		return this;
+  	},
+
+  	_initControlPos: function () {
+  		var corners = this._controlCorners = {},
+  		    l = 'leaflet-',
+  		    container = this._controlContainer =
+  		            create$1('div', l + 'control-container', this._container);
+
+  		function createCorner(vSide, hSide) {
+  			var className = l + vSide + ' ' + l + hSide;
+
+  			corners[vSide + hSide] = create$1('div', className, container);
+  		}
+
+  		createCorner('top', 'left');
+  		createCorner('top', 'right');
+  		createCorner('bottom', 'left');
+  		createCorner('bottom', 'right');
+  	},
+
+  	_clearControlPos: function () {
+  		for (var i in this._controlCorners) {
+  			remove(this._controlCorners[i]);
+  		}
+  		remove(this._controlContainer);
+  		delete this._controlCorners;
+  		delete this._controlContainer;
+  	}
+  });
+
+  /*
+   * @class Control.Layers
+   * @aka L.Control.Layers
+   * @inherits Control
+   *
+   * The layers control gives users the ability to switch between different base layers and switch overlays on/off (check out the [detailed example](https://leafletjs.com/examples/layers-control/)). Extends `Control`.
+   *
+   * @example
+   *
+   * ```js
+   * var baseLayers = {
+   * 	"Mapbox": mapbox,
+   * 	"OpenStreetMap": osm
+   * };
+   *
+   * var overlays = {
+   * 	"Marker": marker,
+   * 	"Roads": roadsLayer
+   * };
+   *
+   * L.control.layers(baseLayers, overlays).addTo(map);
+   * ```
+   *
+   * The `baseLayers` and `overlays` parameters are object literals with layer names as keys and `Layer` objects as values:
+   *
+   * ```js
+   * {
+   *     "<someName1>": layer1,
+   *     "<someName2>": layer2
+   * }
+   * ```
+   *
+   * The layer names can contain HTML, which allows you to add additional styling to the items:
+   *
+   * ```js
+   * {"<img src='my-layer-icon' /> <span class='my-layer-item'>My Layer</span>": myLayer}
+   * ```
+   */
+
+  var Layers = Control.extend({
+  	// @section
+  	// @aka Control.Layers options
+  	options: {
+  		// @option collapsed: Boolean = true
+  		// If `true`, the control will be collapsed into an icon and expanded on mouse hover, touch, or keyboard activation.
+  		collapsed: true,
+  		position: 'topright',
+
+  		// @option autoZIndex: Boolean = true
+  		// If `true`, the control will assign zIndexes in increasing order to all of its layers so that the order is preserved when switching them on/off.
+  		autoZIndex: true,
+
+  		// @option hideSingleBase: Boolean = false
+  		// If `true`, the base layers in the control will be hidden when there is only one.
+  		hideSingleBase: false,
+
+  		// @option sortLayers: Boolean = false
+  		// Whether to sort the layers. When `false`, layers will keep the order
+  		// in which they were added to the control.
+  		sortLayers: false,
+
+  		// @option sortFunction: Function = *
+  		// A [compare function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+  		// that will be used for sorting the layers, when `sortLayers` is `true`.
+  		// The function receives both the `L.Layer` instances and their names, as in
+  		// `sortFunction(layerA, layerB, nameA, nameB)`.
+  		// By default, it sorts layers alphabetically by their name.
+  		sortFunction: function (layerA, layerB, nameA, nameB) {
+  			return nameA < nameB ? -1 : (nameB < nameA ? 1 : 0);
+  		}
+  	},
+
+  	initialize: function (baseLayers, overlays, options) {
+  		setOptions(this, options);
+
+  		this._layerControlInputs = [];
+  		this._layers = [];
+  		this._lastZIndex = 0;
+  		this._handlingClick = false;
+  		this._preventClick = false;
+
+  		for (var i in baseLayers) {
+  			this._addLayer(baseLayers[i], i);
+  		}
+
+  		for (i in overlays) {
+  			this._addLayer(overlays[i], i, true);
+  		}
+  	},
+
+  	onAdd: function (map) {
+  		this._initLayout();
+  		this._update();
+
+  		this._map = map;
+  		map.on('zoomend', this._checkDisabledLayers, this);
+
+  		for (var i = 0; i < this._layers.length; i++) {
+  			this._layers[i].layer.on('add remove', this._onLayerChange, this);
+  		}
+
+  		return this._container;
+  	},
+
+  	addTo: function (map) {
+  		Control.prototype.addTo.call(this, map);
+  		// Trigger expand after Layers Control has been inserted into DOM so that is now has an actual height.
+  		return this._expandIfNotCollapsed();
+  	},
+
+  	onRemove: function () {
+  		this._map.off('zoomend', this._checkDisabledLayers, this);
+
+  		for (var i = 0; i < this._layers.length; i++) {
+  			this._layers[i].layer.off('add remove', this._onLayerChange, this);
+  		}
+  	},
+
+  	// @method addBaseLayer(layer: Layer, name: String): this
+  	// Adds a base layer (radio button entry) with the given name to the control.
+  	addBaseLayer: function (layer, name) {
+  		this._addLayer(layer, name);
+  		return (this._map) ? this._update() : this;
+  	},
+
+  	// @method addOverlay(layer: Layer, name: String): this
+  	// Adds an overlay (checkbox entry) with the given name to the control.
+  	addOverlay: function (layer, name) {
+  		this._addLayer(layer, name, true);
+  		return (this._map) ? this._update() : this;
+  	},
+
+  	// @method removeLayer(layer: Layer): this
+  	// Remove the given layer from the control.
+  	removeLayer: function (layer) {
+  		layer.off('add remove', this._onLayerChange, this);
+
+  		var obj = this._getLayer(stamp(layer));
+  		if (obj) {
+  			this._layers.splice(this._layers.indexOf(obj), 1);
+  		}
+  		return (this._map) ? this._update() : this;
+  	},
+
+  	// @method expand(): this
+  	// Expand the control container if collapsed.
+  	expand: function () {
+  		addClass(this._container, 'leaflet-control-layers-expanded');
+  		this._section.style.height = null;
+  		var acceptableHeight = this._map.getSize().y - (this._container.offsetTop + 50);
+  		if (acceptableHeight < this._section.clientHeight) {
+  			addClass(this._section, 'leaflet-control-layers-scrollbar');
+  			this._section.style.height = acceptableHeight + 'px';
+  		} else {
+  			removeClass(this._section, 'leaflet-control-layers-scrollbar');
+  		}
+  		this._checkDisabledLayers();
+  		return this;
+  	},
+
+  	// @method collapse(): this
+  	// Collapse the control container if expanded.
+  	collapse: function () {
+  		removeClass(this._container, 'leaflet-control-layers-expanded');
+  		return this;
+  	},
+
+  	_initLayout: function () {
+  		var className = 'leaflet-control-layers',
+  		    container = this._container = create$1('div', className),
+  		    collapsed = this.options.collapsed;
+
+  		// makes this work on IE touch devices by stopping it from firing a mouseout event when the touch is released
+  		container.setAttribute('aria-haspopup', true);
+
+  		disableClickPropagation(container);
+  		disableScrollPropagation(container);
+
+  		var section = this._section = create$1('section', className + '-list');
+
+  		if (collapsed) {
+  			this._map.on('click', this.collapse, this);
+
+  			on(container, {
+  				mouseenter: this._expandSafely,
+  				mouseleave: this.collapse
+  			}, this);
+  		}
+
+  		var link = this._layersLink = create$1('a', className + '-toggle', container);
+  		link.href = '#';
+  		link.title = 'Layers';
+  		link.setAttribute('role', 'button');
+
+  		on(link, {
+  			keydown: function (e) {
+  				if (e.keyCode === 13) {
+  					this._expandSafely();
+  				}
+  			},
+  			// Certain screen readers intercept the key event and instead send a click event
+  			click: function (e) {
+  				preventDefault(e);
+  				this._expandSafely();
+  			}
+  		}, this);
+
+  		if (!collapsed) {
+  			this.expand();
+  		}
+
+  		this._baseLayersList = create$1('div', className + '-base', section);
+  		this._separator = create$1('div', className + '-separator', section);
+  		this._overlaysList = create$1('div', className + '-overlays', section);
+
+  		container.appendChild(section);
+  	},
+
+  	_getLayer: function (id) {
+  		for (var i = 0; i < this._layers.length; i++) {
+
+  			if (this._layers[i] && stamp(this._layers[i].layer) === id) {
+  				return this._layers[i];
+  			}
+  		}
+  	},
+
+  	_addLayer: function (layer, name, overlay) {
+  		if (this._map) {
+  			layer.on('add remove', this._onLayerChange, this);
+  		}
+
+  		this._layers.push({
+  			layer: layer,
+  			name: name,
+  			overlay: overlay
+  		});
+
+  		if (this.options.sortLayers) {
+  			this._layers.sort(bind(function (a, b) {
+  				return this.options.sortFunction(a.layer, b.layer, a.name, b.name);
+  			}, this));
+  		}
+
+  		if (this.options.autoZIndex && layer.setZIndex) {
+  			this._lastZIndex++;
+  			layer.setZIndex(this._lastZIndex);
+  		}
+
+  		this._expandIfNotCollapsed();
+  	},
+
+  	_update: function () {
+  		if (!this._container) { return this; }
+
+  		empty(this._baseLayersList);
+  		empty(this._overlaysList);
+
+  		this._layerControlInputs = [];
+  		var baseLayersPresent, overlaysPresent, i, obj, baseLayersCount = 0;
+
+  		for (i = 0; i < this._layers.length; i++) {
+  			obj = this._layers[i];
+  			this._addItem(obj);
+  			overlaysPresent = overlaysPresent || obj.overlay;
+  			baseLayersPresent = baseLayersPresent || !obj.overlay;
+  			baseLayersCount += !obj.overlay ? 1 : 0;
+  		}
+
+  		// Hide base layers section if there's only one layer.
+  		if (this.options.hideSingleBase) {
+  			baseLayersPresent = baseLayersPresent && baseLayersCount > 1;
+  			this._baseLayersList.style.display = baseLayersPresent ? '' : 'none';
+  		}
+
+  		this._separator.style.display = overlaysPresent && baseLayersPresent ? '' : 'none';
+
+  		return this;
+  	},
+
+  	_onLayerChange: function (e) {
+  		if (!this._handlingClick) {
+  			this._update();
+  		}
+
+  		var obj = this._getLayer(stamp(e.target));
+
+  		// @namespace Map
+  		// @section Layer events
+  		// @event baselayerchange: LayersControlEvent
+  		// Fired when the base layer is changed through the [layers control](#control-layers).
+  		// @event overlayadd: LayersControlEvent
+  		// Fired when an overlay is selected through the [layers control](#control-layers).
+  		// @event overlayremove: LayersControlEvent
+  		// Fired when an overlay is deselected through the [layers control](#control-layers).
+  		// @namespace Control.Layers
+  		var type = obj.overlay ?
+  			(e.type === 'add' ? 'overlayadd' : 'overlayremove') :
+  			(e.type === 'add' ? 'baselayerchange' : null);
+
+  		if (type) {
+  			this._map.fire(type, obj);
+  		}
+  	},
+
+  	// IE7 bugs out if you create a radio dynamically, so you have to do it this hacky way (see https://stackoverflow.com/a/119079)
+  	_createRadioElement: function (name, checked) {
+
+  		var radioHtml = '<input type="radio" class="leaflet-control-layers-selector" name="' +
+  				name + '"' + (checked ? ' checked="checked"' : '') + '/>';
+
+  		var radioFragment = document.createElement('div');
+  		radioFragment.innerHTML = radioHtml;
+
+  		return radioFragment.firstChild;
+  	},
+
+  	_addItem: function (obj) {
+  		var label = document.createElement('label'),
+  		    checked = this._map.hasLayer(obj.layer),
+  		    input;
+
+  		if (obj.overlay) {
+  			input = document.createElement('input');
+  			input.type = 'checkbox';
+  			input.className = 'leaflet-control-layers-selector';
+  			input.defaultChecked = checked;
+  		} else {
+  			input = this._createRadioElement('leaflet-base-layers_' + stamp(this), checked);
+  		}
+
+  		this._layerControlInputs.push(input);
+  		input.layerId = stamp(obj.layer);
+
+  		on(input, 'click', this._onInputClick, this);
+
+  		var name = document.createElement('span');
+  		name.innerHTML = ' ' + obj.name;
+
+  		// Helps from preventing layer control flicker when checkboxes are disabled
+  		// https://github.com/Leaflet/Leaflet/issues/2771
+  		var holder = document.createElement('span');
+
+  		label.appendChild(holder);
+  		holder.appendChild(input);
+  		holder.appendChild(name);
+
+  		var container = obj.overlay ? this._overlaysList : this._baseLayersList;
+  		container.appendChild(label);
+
+  		this._checkDisabledLayers();
+  		return label;
+  	},
+
+  	_onInputClick: function () {
+  		// expanding the control on mobile with a click can cause adding a layer - we don't want this
+  		if (this._preventClick) {
+  			return;
+  		}
+
+  		var inputs = this._layerControlInputs,
+  		    input, layer;
+  		var addedLayers = [],
+  		    removedLayers = [];
+
+  		this._handlingClick = true;
+
+  		for (var i = inputs.length - 1; i >= 0; i--) {
+  			input = inputs[i];
+  			layer = this._getLayer(input.layerId).layer;
+
+  			if (input.checked) {
+  				addedLayers.push(layer);
+  			} else if (!input.checked) {
+  				removedLayers.push(layer);
+  			}
+  		}
+
+  		// Bugfix issue 2318: Should remove all old layers before readding new ones
+  		for (i = 0; i < removedLayers.length; i++) {
+  			if (this._map.hasLayer(removedLayers[i])) {
+  				this._map.removeLayer(removedLayers[i]);
+  			}
+  		}
+  		for (i = 0; i < addedLayers.length; i++) {
+  			if (!this._map.hasLayer(addedLayers[i])) {
+  				this._map.addLayer(addedLayers[i]);
+  			}
+  		}
+
+  		this._handlingClick = false;
+
+  		this._refocusOnMap();
+  	},
+
+  	_checkDisabledLayers: function () {
+  		var inputs = this._layerControlInputs,
+  		    input,
+  		    layer,
+  		    zoom = this._map.getZoom();
+
+  		for (var i = inputs.length - 1; i >= 0; i--) {
+  			input = inputs[i];
+  			layer = this._getLayer(input.layerId).layer;
+  			input.disabled = (layer.options.minZoom !== undefined && zoom < layer.options.minZoom) ||
+  			                 (layer.options.maxZoom !== undefined && zoom > layer.options.maxZoom);
+
+  		}
+  	},
+
+  	_expandIfNotCollapsed: function () {
+  		if (this._map && !this.options.collapsed) {
+  			this.expand();
+  		}
+  		return this;
+  	},
+
+  	_expandSafely: function () {
+  		var section = this._section;
+  		this._preventClick = true;
+  		on(section, 'click', preventDefault);
+  		this.expand();
+  		var that = this;
+  		setTimeout(function () {
+  			off(section, 'click', preventDefault);
+  			that._preventClick = false;
+  		});
+  	}
+
+  });
+
+
+  // @factory L.control.layers(baselayers?: Object, overlays?: Object, options?: Control.Layers options)
+  // Creates a layers control with the given layers. Base layers will be switched with radio buttons, while overlays will be switched with checkboxes. Note that all base layers should be passed in the base layers object, but only one should be added to the map during map instantiation.
+  var layers = function (baseLayers, overlays, options) {
+  	return new Layers(baseLayers, overlays, options);
+  };
+
+  /*
+   * @class Control.Zoom
+   * @aka L.Control.Zoom
+   * @inherits Control
+   *
+   * A basic zoom control with two buttons (zoom in and zoom out). It is put on the map by default unless you set its [`zoomControl` option](#map-zoomcontrol) to `false`. Extends `Control`.
+   */
+
+  var Zoom = Control.extend({
+  	// @section
+  	// @aka Control.Zoom options
+  	options: {
+  		position: 'topleft',
+
+  		// @option zoomInText: String = '<span aria-hidden="true">+</span>'
+  		// The text set on the 'zoom in' button.
+  		zoomInText: '<span aria-hidden="true">+</span>',
+
+  		// @option zoomInTitle: String = 'Zoom in'
+  		// The title set on the 'zoom in' button.
+  		zoomInTitle: 'Zoom in',
+
+  		// @option zoomOutText: String = '<span aria-hidden="true">&#x2212;</span>'
+  		// The text set on the 'zoom out' button.
+  		zoomOutText: '<span aria-hidden="true">&#x2212;</span>',
+
+  		// @option zoomOutTitle: String = 'Zoom out'
+  		// The title set on the 'zoom out' button.
+  		zoomOutTitle: 'Zoom out'
+  	},
+
+  	onAdd: function (map) {
+  		var zoomName = 'leaflet-control-zoom',
+  		    container = create$1('div', zoomName + ' leaflet-bar'),
+  		    options = this.options;
+
+  		this._zoomInButton  = this._createButton(options.zoomInText, options.zoomInTitle,
+  		        zoomName + '-in',  container, this._zoomIn);
+  		this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle,
+  		        zoomName + '-out', container, this._zoomOut);
+
+  		this._updateDisabled();
+  		map.on('zoomend zoomlevelschange', this._updateDisabled, this);
+
+  		return container;
+  	},
+
+  	onRemove: function (map) {
+  		map.off('zoomend zoomlevelschange', this._updateDisabled, this);
+  	},
+
+  	disable: function () {
+  		this._disabled = true;
+  		this._updateDisabled();
+  		return this;
+  	},
+
+  	enable: function () {
+  		this._disabled = false;
+  		this._updateDisabled();
+  		return this;
+  	},
+
+  	_zoomIn: function (e) {
+  		if (!this._disabled && this._map._zoom < this._map.getMaxZoom()) {
+  			this._map.zoomIn(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));
+  		}
+  	},
+
+  	_zoomOut: function (e) {
+  		if (!this._disabled && this._map._zoom > this._map.getMinZoom()) {
+  			this._map.zoomOut(this._map.options.zoomDelta * (e.shiftKey ? 3 : 1));
+  		}
+  	},
+
+  	_createButton: function (html, title, className, container, fn) {
+  		var link = create$1('a', className, container);
+  		link.innerHTML = html;
+  		link.href = '#';
+  		link.title = title;
+
+  		/*
+  		 * Will force screen readers like VoiceOver to read this as "Zoom in - button"
+  		 */
+  		link.setAttribute('role', 'button');
+  		link.setAttribute('aria-label', title);
+
+  		disableClickPropagation(link);
+  		on(link, 'click', stop);
+  		on(link, 'click', fn, this);
+  		on(link, 'click', this._refocusOnMap, this);
+
+  		return link;
+  	},
+
+  	_updateDisabled: function () {
+  		var map = this._map,
+  		    className = 'leaflet-disabled';
+
+  		removeClass(this._zoomInButton, className);
+  		removeClass(this._zoomOutButton, className);
+  		this._zoomInButton.setAttribute('aria-disabled', 'false');
+  		this._zoomOutButton.setAttribute('aria-disabled', 'false');
+
+  		if (this._disabled || map._zoom === map.getMinZoom()) {
+  			addClass(this._zoomOutButton, className);
+  			this._zoomOutButton.setAttribute('aria-disabled', 'true');
+  		}
+  		if (this._disabled || map._zoom === map.getMaxZoom()) {
+  			addClass(this._zoomInButton, className);
+  			this._zoomInButton.setAttribute('aria-disabled', 'true');
+  		}
+  	}
+  });
+
+  // @namespace Map
+  // @section Control options
+  // @option zoomControl: Boolean = true
+  // Whether a [zoom control](#control-zoom) is added to the map by default.
+  Map.mergeOptions({
+  	zoomControl: true
+  });
+
+  Map.addInitHook(function () {
+  	if (this.options.zoomControl) {
+  		// @section Controls
+  		// @property zoomControl: Control.Zoom
+  		// The default zoom control (only available if the
+  		// [`zoomControl` option](#map-zoomcontrol) was `true` when creating the map).
+  		this.zoomControl = new Zoom();
+  		this.addControl(this.zoomControl);
+  	}
+  });
+
+  // @namespace Control.Zoom
+  // @factory L.control.zoom(options: Control.Zoom options)
+  // Creates a zoom control
+  var zoom = function (options) {
+  	return new Zoom(options);
+  };
+
+  /*
+   * @class Control.Scale
+   * @aka L.Control.Scale
+   * @inherits Control
+   *
+   * A simple scale control that shows the scale of the current center of screen in metric (m/km) and imperial (mi/ft) systems. Extends `Control`.
+   *
+   * @example
+   *
+   * ```js
+   * L.control.scale().addTo(map);
+   * ```
+   */
+
+  var Scale = Control.extend({
+  	// @section
+  	// @aka Control.Scale options
+  	options: {
+  		position: 'bottomleft',
+
+  		// @option maxWidth: Number = 100
+  		// Maximum width of the control in pixels. The width is set dynamically to show round values (e.g. 100, 200, 500).
+  		maxWidth: 100,
+
+  		// @option metric: Boolean = True
+  		// Whether to show the metric scale line (m/km).
+  		metric: true,
+
+  		// @option imperial: Boolean = True
+  		// Whether to show the imperial scale line (mi/ft).
+  		imperial: true
+
+  		// @option updateWhenIdle: Boolean = false
+  		// If `true`, the control is updated on [`moveend`](#map-moveend), otherwise it's always up-to-date (updated on [`move`](#map-move)).
+  	},
+
+  	onAdd: function (map) {
+  		var className = 'leaflet-control-scale',
+  		    container = create$1('div', className),
+  		    options = this.options;
+
+  		this._addScales(options, className + '-line', container);
+
+  		map.on(options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+  		map.whenReady(this._update, this);
+
+  		return container;
+  	},
+
+  	onRemove: function (map) {
+  		map.off(this.options.updateWhenIdle ? 'moveend' : 'move', this._update, this);
+  	},
+
+  	_addScales: function (options, className, container) {
+  		if (options.metric) {
+  			this._mScale = create$1('div', className, container);
+  		}
+  		if (options.imperial) {
+  			this._iScale = create$1('div', className, container);
+  		}
+  	},
+
+  	_update: function () {
+  		var map = this._map,
+  		    y = map.getSize().y / 2;
+
+  		var maxMeters = map.distance(
+  			map.containerPointToLatLng([0, y]),
+  			map.containerPointToLatLng([this.options.maxWidth, y]));
+
+  		this._updateScales(maxMeters);
+  	},
+
+  	_updateScales: function (maxMeters) {
+  		if (this.options.metric && maxMeters) {
+  			this._updateMetric(maxMeters);
+  		}
+  		if (this.options.imperial && maxMeters) {
+  			this._updateImperial(maxMeters);
+  		}
+  	},
+
+  	_updateMetric: function (maxMeters) {
+  		var meters = this._getRoundNum(maxMeters),
+  		    label = meters < 1000 ? meters + ' m' : (meters / 1000) + ' km';
+
+  		this._updateScale(this._mScale, label, meters / maxMeters);
+  	},
+
+  	_updateImperial: function (maxMeters) {
+  		var maxFeet = maxMeters * 3.2808399,
+  		    maxMiles, miles, feet;
+
+  		if (maxFeet > 5280) {
+  			maxMiles = maxFeet / 5280;
+  			miles = this._getRoundNum(maxMiles);
+  			this._updateScale(this._iScale, miles + ' mi', miles / maxMiles);
+
+  		} else {
+  			feet = this._getRoundNum(maxFeet);
+  			this._updateScale(this._iScale, feet + ' ft', feet / maxFeet);
+  		}
+  	},
+
+  	_updateScale: function (scale, text, ratio) {
+  		scale.style.width = Math.round(this.options.maxWidth * ratio) + 'px';
+  		scale.innerHTML = text;
+  	},
+
+  	_getRoundNum: function (num) {
+  		var pow10 = Math.pow(10, (Math.floor(num) + '').length - 1),
+  		    d = num / pow10;
+
+  		d = d >= 10 ? 10 :
+  		    d >= 5 ? 5 :
+  		    d >= 3 ? 3 :
+  		    d >= 2 ? 2 : 1;
+
+  		return pow10 * d;
+  	}
+  });
+
+
+  // @factory L.control.scale(options?: Control.Scale options)
+  // Creates an scale control with the given options.
+  var scale = function (options) {
+  	return new Scale(options);
+  };
+
+  var ukrainianFlag = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>';
+
+
+  /*
+   * @class Control.Attribution
+   * @aka L.Control.Attribution
+   * @inherits Control
+   *
+   * The attribution control allows you to display attribution data in a small text box on a map. It is put on the map by default unless you set its [`attributionControl` option](#map-attributioncontrol) to `false`, and it fetches attribution texts from layers with the [`getAttribution` method](#layer-getattribution) automatically. Extends Control.
+   */
+
+  var Attribution = Control.extend({
+  	// @section
+  	// @aka Control.Attribution options
+  	options: {
+  		position: 'bottomright',
+
+  		// @option prefix: String|false = 'Leaflet'
+  		// The HTML text shown before the attributions. Pass `false` to disable.
+  		prefix: '<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">' + (Browser.inlineSvg ? ukrainianFlag + ' ' : '') + 'Leaflet</a>'
+  	},
+
+  	initialize: function (options) {
+  		setOptions(this, options);
+
+  		this._attributions = {};
+  	},
+
+  	onAdd: function (map) {
+  		map.attributionControl = this;
+  		this._container = create$1('div', 'leaflet-control-attribution');
+  		disableClickPropagation(this._container);
+
+  		// TODO ugly, refactor
+  		for (var i in map._layers) {
+  			if (map._layers[i].getAttribution) {
+  				this.addAttribution(map._layers[i].getAttribution());
+  			}
+  		}
+
+  		this._update();
+
+  		map.on('layeradd', this._addAttribution, this);
+
+  		return this._container;
+  	},
+
+  	onRemove: function (map) {
+  		map.off('layeradd', this._addAttribution, this);
+  	},
+
+  	_addAttribution: function (ev) {
+  		if (ev.layer.getAttribution) {
+  			this.addAttribution(ev.layer.getAttribution());
+  			ev.layer.once('remove', function () {
+  				this.removeAttribution(ev.layer.getAttribution());
+  			}, this);
+  		}
+  	},
+
+  	// @method setPrefix(prefix: String|false): this
+  	// The HTML text shown before the attributions. Pass `false` to disable.
+  	setPrefix: function (prefix) {
+  		this.options.prefix = prefix;
+  		this._update();
+  		return this;
+  	},
+
+  	// @method addAttribution(text: String): this
+  	// Adds an attribution text (e.g. `'&copy; OpenStreetMap contributors'`).
+  	addAttribution: function (text) {
+  		if (!text) { return this; }
+
+  		if (!this._attributions[text]) {
+  			this._attributions[text] = 0;
+  		}
+  		this._attributions[text]++;
+
+  		this._update();
+
+  		return this;
+  	},
+
+  	// @method removeAttribution(text: String): this
+  	// Removes an attribution text.
+  	removeAttribution: function (text) {
+  		if (!text) { return this; }
+
+  		if (this._attributions[text]) {
+  			this._attributions[text]--;
+  			this._update();
+  		}
+
+  		return this;
+  	},
+
+  	_update: function () {
+  		if (!this._map) { return; }
+
+  		var attribs = [];
+
+  		for (var i in this._attributions) {
+  			if (this._attributions[i]) {
+  				attribs.push(i);
+  			}
+  		}
+
+  		var prefixAndAttribs = [];
+
+  		if (this.options.prefix) {
+  			prefixAndAttribs.push(this.options.prefix);
+  		}
+  		if (attribs.length) {
+  			prefixAndAttribs.push(attribs.join(', '));
+  		}
+
+  		this._container.innerHTML = prefixAndAttribs.join(' <span aria-hidden="true">|</span> ');
+  	}
+  });
+
+  // @namespace Map
+  // @section Control options
+  // @option attributionControl: Boolean = true
+  // Whether a [attribution control](#control-attribution) is added to the map by default.
+  Map.mergeOptions({
+  	attributionControl: true
+  });
+
+  Map.addInitHook(function () {
+  	if (this.options.attributionControl) {
+  		new Attribution().addTo(this);
+  	}
+  });
+
+  // @namespace Control.Attribution
+  // @factory L.control.attribution(options: Control.Attribution options)
+  // Creates an attribution control.
+  var attribution = function (options) {
+  	return new Attribution(options);
+  };
+
+  Control.Layers = Layers;
+  Control.Zoom = Zoom;
+  Control.Scale = Scale;
+  Control.Attribution = Attribution;
+
+  control.layers = layers;
+  control.zoom = zoom;
+  control.scale = scale;
+  control.attribution = attribution;
+
+  /*
+  	L.Handler is a base class for handler classes that are used internally to inject
+  	interaction features like dragging to classes like Map and Marker.
+  */
+
+  // @class Handler
+  // @aka L.Handler
+  // Abstract class for map interaction handlers
+
+  var Handler = Class.extend({
+  	initialize: function (map) {
+  		this._map = map;
+  	},
+
+  	// @method enable(): this
+  	// Enables the handler
+  	enable: function () {
+  		if (this._enabled) { return this; }
+
+  		this._enabled = true;
+  		this.addHooks();
+  		return this;
+  	},
+
+  	// @method disable(): this
+  	// Disables the handler
+  	disable: function () {
+  		if (!this._enabled) { return this; }
+
+  		this._enabled = false;
+  		this.removeHooks();
+  		return this;
+  	},
+
+  	// @method enabled(): Boolean
+  	// Returns `true` if the handler is enabled
+  	enabled: function () {
+  		return !!this._enabled;
+  	}
+
+  	// @section Extension methods
+  	// Classes inheriting from `Handler` must implement the two following methods:
+  	// @method addHooks()
+  	// Called when the handler is enabled, should add event hooks.
+  	// @method removeHooks()
+  	// Called when the handler is disabled, should remove the event hooks added previously.
+  });
+
+  // @section There is static function which can be called without instantiating L.Handler:
+  // @function addTo(map: Map, name: String): this
+  // Adds a new Handler to the given map with the given name.
+  Handler.addTo = function (map, name) {
+  	map.addHandler(name, this);
+  	return this;
+  };
+
+  var Mixin = {Events: Events};
+
+  /*
+   * @class Draggable
+   * @aka L.Draggable
+   * @inherits Evented
+   *
+   * A class for making DOM elements draggable (including touch support).
+   * Used internally for map and marker dragging. Only works for elements
+   * that were positioned with [`L.DomUtil.setPosition`](#domutil-setposition).
+   *
+   * @example
+   * ```js
+   * var draggable = new L.Draggable(elementToDrag);
+   * draggable.enable();
+   * ```
+   */
+
+  var START = Browser.touch ? 'touchstart mousedown' : 'mousedown';
+
+  var Draggable = Evented.extend({
+
+  	options: {
+  		// @section
+  		// @aka Draggable options
+  		// @option clickTolerance: Number = 3
+  		// The max number of pixels a user can shift the mouse pointer during a click
+  		// for it to be considered a valid click (as opposed to a mouse drag).
+  		clickTolerance: 3
+  	},
+
+  	// @constructor L.Draggable(el: HTMLElement, dragHandle?: HTMLElement, preventOutline?: Boolean, options?: Draggable options)
+  	// Creates a `Draggable` object for moving `el` when you start dragging the `dragHandle` element (equals `el` itself by default).
+  	initialize: function (element, dragStartTarget, preventOutline, options) {
+  		setOptions(this, options);
+
+  		this._element = element;
+  		this._dragStartTarget = dragStartTarget || element;
+  		this._preventOutline = preventOutline;
+  	},
+
+  	// @method enable()
+  	// Enables the dragging ability
+  	enable: function () {
+  		if (this._enabled) { return; }
+
+  		on(this._dragStartTarget, START, this._onDown, this);
+
+  		this._enabled = true;
+  	},
+
+  	// @method disable()
+  	// Disables the dragging ability
+  	disable: function () {
+  		if (!this._enabled) { return; }
+
+  		// If we're currently dragging this draggable,
+  		// disabling it counts as first ending the drag.
+  		if (Draggable._dragging === this) {
+  			this.finishDrag(true);
+  		}
+
+  		off(this._dragStartTarget, START, this._onDown, this);
+
+  		this._enabled = false;
+  		this._moved = false;
+  	},
+
+  	_onDown: function (e) {
+  		// Ignore the event if disabled; this happens in IE11
+  		// under some circumstances, see #3666.
+  		if (!this._enabled) { return; }
+
+  		this._moved = false;
+
+  		if (hasClass(this._element, 'leaflet-zoom-anim')) { return; }
+
+  		if (e.touches && e.touches.length !== 1) {
+  			// Finish dragging to avoid conflict with touchZoom
+  			if (Draggable._dragging === this) {
+  				this.finishDrag();
+  			}
+  			return;
+  		}
+
+  		if (Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches)) { return; }
+  		Draggable._dragging = this;  // Prevent dragging multiple objects at once.
+
+  		if (this._preventOutline) {
+  			preventOutline(this._element);
+  		}
+
+  		disableImageDrag();
+  		disableTextSelection();
+
+  		if (this._moving) { return; }
+
+  		// @event down: Event
+  		// Fired when a drag is about to start.
+  		this.fire('down');
+
+  		var first = e.touches ? e.touches[0] : e,
+  		    sizedParent = getSizedParentNode(this._element);
+
+  		this._startPoint = new Point(first.clientX, first.clientY);
+  		this._startPos = getPosition(this._element);
+
+  		// Cache the scale, so that we can continuously compensate for it during drag (_onMove).
+  		this._parentScale = getScale(sizedParent);
+
+  		var mouseevent = e.type === 'mousedown';
+  		on(document, mouseevent ? 'mousemove' : 'touchmove', this._onMove, this);
+  		on(document, mouseevent ? 'mouseup' : 'touchend touchcancel', this._onUp, this);
+  	},
+
+  	_onMove: function (e) {
+  		// Ignore the event if disabled; this happens in IE11
+  		// under some circumstances, see #3666.
+  		if (!this._enabled) { return; }
+
+  		if (e.touches && e.touches.length > 1) {
+  			this._moved = true;
+  			return;
+  		}
+
+  		var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
+  		    offset = new Point(first.clientX, first.clientY)._subtract(this._startPoint);
+
+  		if (!offset.x && !offset.y) { return; }
+  		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) { return; }
+
+  		// We assume that the parent container's position, border and scale do not change for the duration of the drag.
+  		// Therefore there is no need to account for the position and border (they are eliminated by the subtraction)
+  		// and we can use the cached value for the scale.
+  		offset.x /= this._parentScale.x;
+  		offset.y /= this._parentScale.y;
+
+  		preventDefault(e);
+
+  		if (!this._moved) {
+  			// @event dragstart: Event
+  			// Fired when a drag starts
+  			this.fire('dragstart');
+
+  			this._moved = true;
+
+  			addClass(document.body, 'leaflet-dragging');
+
+  			this._lastTarget = e.target || e.srcElement;
+  			// IE and Edge do not give the <use> element, so fetch it
+  			// if necessary
+  			if (window.SVGElementInstance && this._lastTarget instanceof window.SVGElementInstance) {
+  				this._lastTarget = this._lastTarget.correspondingUseElement;
+  			}
+  			addClass(this._lastTarget, 'leaflet-drag-target');
+  		}
+
+  		this._newPos = this._startPos.add(offset);
+  		this._moving = true;
+
+  		this._lastEvent = e;
+  		this._updatePosition();
+  	},
+
+  	_updatePosition: function () {
+  		var e = {originalEvent: this._lastEvent};
+
+  		// @event predrag: Event
+  		// Fired continuously during dragging *before* each corresponding
+  		// update of the element's position.
+  		this.fire('predrag', e);
+  		setPosition(this._element, this._newPos);
+
+  		// @event drag: Event
+  		// Fired continuously during dragging.
+  		this.fire('drag', e);
+  	},
+
+  	_onUp: function () {
+  		// Ignore the event if disabled; this happens in IE11
+  		// under some circumstances, see #3666.
+  		if (!this._enabled) { return; }
+  		this.finishDrag();
+  	},
+
+  	finishDrag: function (noInertia) {
+  		removeClass(document.body, 'leaflet-dragging');
+
+  		if (this._lastTarget) {
+  			removeClass(this._lastTarget, 'leaflet-drag-target');
+  			this._lastTarget = null;
+  		}
+
+  		off(document, 'mousemove touchmove', this._onMove, this);
+  		off(document, 'mouseup touchend touchcancel', this._onUp, this);
+
+  		enableImageDrag();
+  		enableTextSelection();
+
+  		var fireDragend = this._moved && this._moving;
+
+  		this._moving = false;
+  		Draggable._dragging = false;
+
+  		if (fireDragend) {
+  			// @event dragend: DragEndEvent
+  			// Fired when the drag ends.
+  			this.fire('dragend', {
+  				noInertia: noInertia,
+  				distance: this._newPos.distanceTo(this._startPos)
+  			});
+  		}
+  	}
+
+  });
+
+  /*
+   * @namespace PolyUtil
+   * Various utility functions for polygon geometries.
+   */
+
+  /* @function clipPolygon(points: Point[], bounds: Bounds, round?: Boolean): Point[]
+   * Clips the polygon geometry defined by the given `points` by the given bounds (using the [Sutherland-Hodgman algorithm](https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm)).
+   * Used by Leaflet to only show polygon points that are on the screen or near, increasing
+   * performance. Note that polygon points needs different algorithm for clipping
+   * than polyline, so there's a separate method for it.
+   */
+  function clipPolygon(points, bounds, round) {
+  	var clippedPoints,
+  	    edges = [1, 4, 2, 8],
+  	    i, j, k,
+  	    a, b,
+  	    len, edge, p;
+
+  	for (i = 0, len = points.length; i < len; i++) {
+  		points[i]._code = _getBitCode(points[i], bounds);
+  	}
+
+  	// for each edge (left, bottom, right, top)
+  	for (k = 0; k < 4; k++) {
+  		edge = edges[k];
+  		clippedPoints = [];
+
+  		for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+  			a = points[i];
+  			b = points[j];
+
+  			// if a is inside the clip window
+  			if (!(a._code & edge)) {
+  				// if b is outside the clip window (a->b goes out of screen)
+  				if (b._code & edge) {
+  					p = _getEdgeIntersection(b, a, edge, bounds, round);
+  					p._code = _getBitCode(p, bounds);
+  					clippedPoints.push(p);
+  				}
+  				clippedPoints.push(a);
+
+  			// else if b is inside the clip window (a->b enters the screen)
+  			} else if (!(b._code & edge)) {
+  				p = _getEdgeIntersection(b, a, edge, bounds, round);
+  				p._code = _getBitCode(p, bounds);
+  				clippedPoints.push(p);
+  			}
+  		}
+  		points = clippedPoints;
+  	}
+
+  	return points;
+  }
+
+  /* @function polygonCenter(latlngs: LatLng[], crs: CRS): LatLng
+   * Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the passed LatLngs (first ring) from a polygon.
+   */
+  function polygonCenter(latlngs, crs) {
+  	var i, j, p1, p2, f, area, x, y, center;
+
+  	if (!latlngs || latlngs.length === 0) {
+  		throw new Error('latlngs not passed');
+  	}
+
+  	if (!isFlat(latlngs)) {
+  		console.warn('latlngs are not flat! Only the first ring will be used');
+  		latlngs = latlngs[0];
+  	}
+
+  	var centroidLatLng = toLatLng([0, 0]);
+
+  	var bounds = toLatLngBounds(latlngs);
+  	var areaBounds = bounds.getNorthWest().distanceTo(bounds.getSouthWest()) * bounds.getNorthEast().distanceTo(bounds.getNorthWest());
+  	// tests showed that below 1700 rounding errors are happening
+  	if (areaBounds < 1700) {
+  		// getting a inexact center, to move the latlngs near to [0, 0] to prevent rounding errors
+  		centroidLatLng = centroid(latlngs);
+  	}
+
+  	var len = latlngs.length;
+  	var points = [];
+  	for (i = 0; i < len; i++) {
+  		var latlng = toLatLng(latlngs[i]);
+  		points.push(crs.project(toLatLng([latlng.lat - centroidLatLng.lat, latlng.lng - centroidLatLng.lng])));
+  	}
+
+  	area = x = y = 0;
+
+  	// polygon centroid algorithm;
+  	for (i = 0, j = len - 1; i < len; j = i++) {
+  		p1 = points[i];
+  		p2 = points[j];
+
+  		f = p1.y * p2.x - p2.y * p1.x;
+  		x += (p1.x + p2.x) * f;
+  		y += (p1.y + p2.y) * f;
+  		area += f * 3;
+  	}
+
+  	if (area === 0) {
+  		// Polygon is so small that all points are on same pixel.
+  		center = points[0];
+  	} else {
+  		center = [x / area, y / area];
+  	}
+
+  	var latlngCenter = crs.unproject(toPoint(center));
+  	return toLatLng([latlngCenter.lat + centroidLatLng.lat, latlngCenter.lng + centroidLatLng.lng]);
+  }
+
+  /* @function centroid(latlngs: LatLng[]): LatLng
+   * Returns the 'center of mass' of the passed LatLngs.
+   */
+  function centroid(coords) {
+  	var latSum = 0;
+  	var lngSum = 0;
+  	var len = 0;
+  	for (var i = 0; i < coords.length; i++) {
+  		var latlng = toLatLng(coords[i]);
+  		latSum += latlng.lat;
+  		lngSum += latlng.lng;
+  		len++;
+  	}
+  	return toLatLng([latSum / len, lngSum / len]);
+  }
+
+  var PolyUtil = {
+    __proto__: null,
+    clipPolygon: clipPolygon,
+    polygonCenter: polygonCenter,
+    centroid: centroid
+  };
+
+  /*
+   * @namespace LineUtil
+   *
+   * Various utility functions for polyline points processing, used by Leaflet internally to make polylines lightning-fast.
+   */
+
+  // Simplify polyline with vertex reduction and Douglas-Peucker simplification.
+  // Improves rendering performance dramatically by lessening the number of points to draw.
+
+  // @function simplify(points: Point[], tolerance: Number): Point[]
+  // Dramatically reduces the number of points in a polyline while retaining
+  // its shape and returns a new array of simplified points, using the
+  // [Ramer-Douglas-Peucker algorithm](https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm).
+  // Used for a huge performance boost when processing/displaying Leaflet polylines for
+  // each zoom level and also reducing visual noise. tolerance affects the amount of
+  // simplification (lesser value means higher quality but slower and with more points).
+  // Also released as a separated micro-library [Simplify.js](https://mourner.github.io/simplify-js/).
+  function simplify(points, tolerance) {
+  	if (!tolerance || !points.length) {
+  		return points.slice();
+  	}
+
+  	var sqTolerance = tolerance * tolerance;
+
+  	    // stage 1: vertex reduction
+  	    points = _reducePoints(points, sqTolerance);
+
+  	    // stage 2: Douglas-Peucker simplification
+  	    points = _simplifyDP(points, sqTolerance);
+
+  	return points;
+  }
+
+  // @function pointToSegmentDistance(p: Point, p1: Point, p2: Point): Number
+  // Returns the distance between point `p` and segment `p1` to `p2`.
+  function pointToSegmentDistance(p, p1, p2) {
+  	return Math.sqrt(_sqClosestPointOnSegment(p, p1, p2, true));
+  }
+
+  // @function closestPointOnSegment(p: Point, p1: Point, p2: Point): Number
+  // Returns the closest point from a point `p` on a segment `p1` to `p2`.
+  function closestPointOnSegment(p, p1, p2) {
+  	return _sqClosestPointOnSegment(p, p1, p2);
+  }
+
+  // Ramer-Douglas-Peucker simplification, see https://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm
+  function _simplifyDP(points, sqTolerance) {
+
+  	var len = points.length,
+  	    ArrayConstructor = typeof Uint8Array !== undefined + '' ? Uint8Array : Array,
+  	    markers = new ArrayConstructor(len);
+
+  	    markers[0] = markers[len - 1] = 1;
+
+  	_simplifyDPStep(points, markers, sqTolerance, 0, len - 1);
+
+  	var i,
+  	    newPoints = [];
+
+  	for (i = 0; i < len; i++) {
+  		if (markers[i]) {
+  			newPoints.push(points[i]);
+  		}
+  	}
+
+  	return newPoints;
+  }
+
+  function _simplifyDPStep(points, markers, sqTolerance, first, last) {
+
+  	var maxSqDist = 0,
+  	index, i, sqDist;
+
+  	for (i = first + 1; i <= last - 1; i++) {
+  		sqDist = _sqClosestPointOnSegment(points[i], points[first], points[last], true);
+
+  		if (sqDist > maxSqDist) {
+  			index = i;
+  			maxSqDist = sqDist;
+  		}
+  	}
+
+  	if (maxSqDist > sqTolerance) {
+  		markers[index] = 1;
+
+  		_simplifyDPStep(points, markers, sqTolerance, first, index);
+  		_simplifyDPStep(points, markers, sqTolerance, index, last);
+  	}
+  }
+
+  // reduce points that are too close to each other to a single point
+  function _reducePoints(points, sqTolerance) {
+  	var reducedPoints = [points[0]];
+
+  	for (var i = 1, prev = 0, len = points.length; i < len; i++) {
+  		if (_sqDist(points[i], points[prev]) > sqTolerance) {
+  			reducedPoints.push(points[i]);
+  			prev = i;
+  		}
+  	}
+  	if (prev < len - 1) {
+  		reducedPoints.push(points[len - 1]);
+  	}
+  	return reducedPoints;
+  }
+
+  var _lastCode;
+
+  // @function clipSegment(a: Point, b: Point, bounds: Bounds, useLastCode?: Boolean, round?: Boolean): Point[]|Boolean
+  // Clips the segment a to b by rectangular bounds with the
+  // [Cohen-Sutherland algorithm](https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm)
+  // (modifying the segment points directly!). Used by Leaflet to only show polyline
+  // points that are on the screen or near, increasing performance.
+  function clipSegment(a, b, bounds, useLastCode, round) {
+  	var codeA = useLastCode ? _lastCode : _getBitCode(a, bounds),
+  	    codeB = _getBitCode(b, bounds),
+
+  	    codeOut, p, newCode;
+
+  	    // save 2nd code to avoid calculating it on the next segment
+  	    _lastCode = codeB;
+
+  	while (true) {
+  		// if a,b is inside the clip window (trivial accept)
+  		if (!(codeA | codeB)) {
+  			return [a, b];
+  		}
+
+  		// if a,b is outside the clip window (trivial reject)
+  		if (codeA & codeB) {
+  			return false;
+  		}
+
+  		// other cases
+  		codeOut = codeA || codeB;
+  		p = _getEdgeIntersection(a, b, codeOut, bounds, round);
+  		newCode = _getBitCode(p, bounds);
+
+  		if (codeOut === codeA) {
+  			a = p;
+  			codeA = newCode;
+  		} else {
+  			b = p;
+  			codeB = newCode;
+  		}
+  	}
+  }
+
+  function _getEdgeIntersection(a, b, code, bounds, round) {
+  	var dx = b.x - a.x,
+  	    dy = b.y - a.y,
+  	    min = bounds.min,
+  	    max = bounds.max,
+  	    x, y;
+
+  	if (code & 8) { // top
+  		x = a.x + dx * (max.y - a.y) / dy;
+  		y = max.y;
+
+  	} else if (code & 4) { // bottom
+  		x = a.x + dx * (min.y - a.y) / dy;
+  		y = min.y;
+
+  	} else if (code & 2) { // right
+  		x = max.x;
+  		y = a.y + dy * (max.x - a.x) / dx;
+
+  	} else if (code & 1) { // left
+  		x = min.x;
+  		y = a.y + dy * (min.x - a.x) / dx;
+  	}
+
+  	return new Point(x, y, round);
+  }
+
+  function _getBitCode(p, bounds) {
+  	var code = 0;
+
+  	if (p.x < bounds.min.x) { // left
+  		code |= 1;
+  	} else if (p.x > bounds.max.x) { // right
+  		code |= 2;
+  	}
+
+  	if (p.y < bounds.min.y) { // bottom
+  		code |= 4;
+  	} else if (p.y > bounds.max.y) { // top
+  		code |= 8;
+  	}
+
+  	return code;
+  }
+
+  // square distance (to avoid unnecessary Math.sqrt calls)
+  function _sqDist(p1, p2) {
+  	var dx = p2.x - p1.x,
+  	    dy = p2.y - p1.y;
+  	return dx * dx + dy * dy;
+  }
+
+  // return closest point on segment or distance to that point
+  function _sqClosestPointOnSegment(p, p1, p2, sqDist) {
+  	var x = p1.x,
+  	    y = p1.y,
+  	    dx = p2.x - x,
+  	    dy = p2.y - y,
+  	    dot = dx * dx + dy * dy,
+  	    t;
+
+  	if (dot > 0) {
+  		t = ((p.x - x) * dx + (p.y - y) * dy) / dot;
+
+  		if (t > 1) {
+  			x = p2.x;
+  			y = p2.y;
+  		} else if (t > 0) {
+  			x += dx * t;
+  			y += dy * t;
+  		}
+  	}
+
+  	dx = p.x - x;
+  	dy = p.y - y;
+
+  	return sqDist ? dx * dx + dy * dy : new Point(x, y);
+  }
+
+
+  // @function isFlat(latlngs: LatLng[]): Boolean
+  // Returns true if `latlngs` is a flat array, false is nested.
+  function isFlat(latlngs) {
+  	return !isArray(latlngs[0]) || (typeof latlngs[0][0] !== 'object' && typeof latlngs[0][0] !== 'undefined');
+  }
+
+  function _flat(latlngs) {
+  	console.warn('Deprecated use of _flat, please use L.LineUtil.isFlat instead.');
+  	return isFlat(latlngs);
+  }
+
+  /* @function polylineCenter(latlngs: LatLng[], crs: CRS): LatLng
+   * Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the passed LatLngs (first ring) from a polyline.
+   */
+  function polylineCenter(latlngs, crs) {
+  	var i, halfDist, segDist, dist, p1, p2, ratio, center;
+
+  	if (!latlngs || latlngs.length === 0) {
+  		throw new Error('latlngs not passed');
+  	}
+
+  	if (!isFlat(latlngs)) {
+  		console.warn('latlngs are not flat! Only the first ring will be used');
+  		latlngs = latlngs[0];
+  	}
+
+  	var centroidLatLng = toLatLng([0, 0]);
+
+  	var bounds = toLatLngBounds(latlngs);
+  	var areaBounds = bounds.getNorthWest().distanceTo(bounds.getSouthWest()) * bounds.getNorthEast().distanceTo(bounds.getNorthWest());
+  	// tests showed that below 1700 rounding errors are happening
+  	if (areaBounds < 1700) {
+  		// getting a inexact center, to move the latlngs near to [0, 0] to prevent rounding errors
+  		centroidLatLng = centroid(latlngs);
+  	}
+
+  	var len = latlngs.length;
+  	var points = [];
+  	for (i = 0; i < len; i++) {
+  		var latlng = toLatLng(latlngs[i]);
+  		points.push(crs.project(toLatLng([latlng.lat - centroidLatLng.lat, latlng.lng - centroidLatLng.lng])));
+  	}
+
+  	for (i = 0, halfDist = 0; i < len - 1; i++) {
+  		halfDist += points[i].distanceTo(points[i + 1]) / 2;
+  	}
+
+  	// The line is so small in the current view that all points are on the same pixel.
+  	if (halfDist === 0) {
+  		center = points[0];
+  	} else {
+  		for (i = 0, dist = 0; i < len - 1; i++) {
+  			p1 = points[i];
+  			p2 = points[i + 1];
+  			segDist = p1.distanceTo(p2);
+  			dist += segDist;
+
+  			if (dist > halfDist) {
+  				ratio = (dist - halfDist) / segDist;
+  				center = [
+  					p2.x - ratio * (p2.x - p1.x),
+  					p2.y - ratio * (p2.y - p1.y)
+  				];
+  				break;
+  			}
+  		}
+  	}
+
+  	var latlngCenter = crs.unproject(toPoint(center));
+  	return toLatLng([latlngCenter.lat + centroidLatLng.lat, latlngCenter.lng + centroidLatLng.lng]);
+  }
+
+  var LineUtil = {
+    __proto__: null,
+    simplify: simplify,
+    pointToSegmentDistance: pointToSegmentDistance,
+    closestPointOnSegment: closestPointOnSegment,
+    clipSegment: clipSegment,
+    _getEdgeIntersection: _getEdgeIntersection,
+    _getBitCode: _getBitCode,
+    _sqClosestPointOnSegment: _sqClosestPointOnSegment,
+    isFlat: isFlat,
+    _flat: _flat,
+    polylineCenter: polylineCenter
+  };
+
+  /*
+   * @namespace Projection
+   * @section
+   * Leaflet comes with a set of already defined Projections out of the box:
+   *
+   * @projection L.Projection.LonLat
+   *
+   * Equirectangular, or Plate Carree projection — the most simple projection,
+   * mostly used by GIS enthusiasts. Directly maps `x` as longitude, and `y` as
+   * latitude. Also suitable for flat worlds, e.g. game maps. Used by the
+   * `EPSG:4326` and `Simple` CRS.
+   */
+
+  var LonLat = {
+  	project: function (latlng) {
+  		return new Point(latlng.lng, latlng.lat);
+  	},
+
+  	unproject: function (point) {
+  		return new LatLng(point.y, point.x);
+  	},
+
+  	bounds: new Bounds([-180, -90], [180, 90])
+  };
+
+  /*
+   * @namespace Projection
+   * @projection L.Projection.Mercator
+   *
+   * Elliptical Mercator projection — more complex than Spherical Mercator. Assumes that Earth is an ellipsoid. Used by the EPSG:3395 CRS.
+   */
+
+  var Mercator = {
+  	R: 6378137,
+  	R_MINOR: 6356752.314245179,
+
+  	bounds: new Bounds([-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]),
+
+  	project: function (latlng) {
+  		var d = Math.PI / 180,
+  		    r = this.R,
+  		    y = latlng.lat * d,
+  		    tmp = this.R_MINOR / r,
+  		    e = Math.sqrt(1 - tmp * tmp),
+  		    con = e * Math.sin(y);
+
+  		var ts = Math.tan(Math.PI / 4 - y / 2) / Math.pow((1 - con) / (1 + con), e / 2);
+  		y = -r * Math.log(Math.max(ts, 1E-10));
+
+  		return new Point(latlng.lng * d * r, y);
+  	},
+
+  	unproject: function (point) {
+  		var d = 180 / Math.PI,
+  		    r = this.R,
+  		    tmp = this.R_MINOR / r,
+  		    e = Math.sqrt(1 - tmp * tmp),
+  		    ts = Math.exp(-point.y / r),
+  		    phi = Math.PI / 2 - 2 * Math.atan(ts);
+
+  		for (var i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
+  			con = e * Math.sin(phi);
+  			con = Math.pow((1 - con) / (1 + con), e / 2);
+  			dphi = Math.PI / 2 - 2 * Math.atan(ts * con) - phi;
+  			phi += dphi;
+  		}
+
+  		return new LatLng(phi * d, point.x * d / r);
+  	}
+  };
+
+  /*
+   * @class Projection
+
+   * An object with methods for projecting geographical coordinates of the world onto
+   * a flat surface (and back). See [Map projection](https://en.wikipedia.org/wiki/Map_projection).
+
+   * @property bounds: Bounds
+   * The bounds (specified in CRS units) where the projection is valid
+
+   * @method project(latlng: LatLng): Point
+   * Projects geographical coordinates into a 2D point.
+   * Only accepts actual `L.LatLng` instances, not arrays.
+
+   * @method unproject(point: Point): LatLng
+   * The inverse of `project`. Projects a 2D point into a geographical location.
+   * Only accepts actual `L.Point` instances, not arrays.
+
+   * Note that the projection instances do not inherit from Leaflet's `Class` object,
+   * and can't be instantiated. Also, new classes can't inherit from them,
+   * and methods can't be added to them with the `include` function.
+
+   */
+
+  var index = {
+    __proto__: null,
+    LonLat: LonLat,
+    Mercator: Mercator,
+    SphericalMercator: SphericalMercator
+  };
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.EPSG3395
+   *
+   * Rarely used by some commercial tile providers. Uses Elliptical Mercator projection.
+   */
+  var EPSG3395 = extend({}, Earth, {
+  	code: 'EPSG:3395',
+  	projection: Mercator,
+
+  	transformation: (function () {
+  		var scale = 0.5 / (Math.PI * Mercator.R);
+  		return toTransformation(scale, 0.5, -scale, 0.5);
+  	}())
+  });
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.EPSG4326
+   *
+   * A common CRS among GIS enthusiasts. Uses simple Equirectangular projection.
+   *
+   * Leaflet 1.0.x complies with the [TMS coordinate scheme for EPSG:4326](https://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#global-geodetic),
+   * which is a breaking change from 0.7.x behaviour.  If you are using a `TileLayer`
+   * with this CRS, ensure that there are two 256x256 pixel tiles covering the
+   * whole earth at zoom level zero, and that the tile coordinate origin is (-180,+90),
+   * or (-180,-90) for `TileLayer`s with [the `tms` option](#tilelayer-tms) set.
+   */
+
+  var EPSG4326 = extend({}, Earth, {
+  	code: 'EPSG:4326',
+  	projection: LonLat,
+  	transformation: toTransformation(1 / 180, 1, -1 / 180, 0.5)
+  });
+
+  /*
+   * @namespace CRS
+   * @crs L.CRS.Simple
+   *
+   * A simple CRS that maps longitude and latitude into `x` and `y` directly.
+   * May be used for maps of flat surfaces (e.g. game maps). Note that the `y`
+   * axis should still be inverted (going from bottom to top). `distance()` returns
+   * simple euclidean distance.
+   */
+
+  var Simple = extend({}, CRS, {
+  	projection: LonLat,
+  	transformation: toTransformation(1, 0, -1, 0),
+
+  	scale: function (zoom) {
+  		return Math.pow(2, zoom);
+  	},
+
+  	zoom: function (scale) {
+  		return Math.log(scale) / Math.LN2;
+  	},
+
+  	distance: function (latlng1, latlng2) {
+  		var dx = latlng2.lng - latlng1.lng,
+  		    dy = latlng2.lat - latlng1.lat;
+
+  		return Math.sqrt(dx * dx + dy * dy);
+  	},
+
+  	infinite: true
+  });
+
+  CRS.Earth = Earth;
+  CRS.EPSG3395 = EPSG3395;
+  CRS.EPSG3857 = EPSG3857;
+  CRS.EPSG900913 = EPSG900913;
+  CRS.EPSG4326 = EPSG4326;
+  CRS.Simple = Simple;
+
+  /*
+   * @class Layer
+   * @inherits Evented
+   * @aka L.Layer
+   * @aka ILayer
+   *
+   * A set of methods from the Layer base class that all Leaflet layers use.
+   * Inherits all methods, options and events from `L.Evented`.
+   *
+   * @example
+   *
+   * ```js
+   * var layer = L.marker(latlng).addTo(map);
+   * layer.addTo(map);
+   * layer.remove();
+   * ```
+   *
+   * @event add: Event
+   * Fired after the layer is added to a map
+   *
+   * @event remove: Event
+   * Fired after the layer is removed from a map
+   */
+
+
+  var Layer = Evented.extend({
+
+  	// Classes extending `L.Layer` will inherit the following options:
+  	options: {
+  		// @option pane: String = 'overlayPane'
+  		// By default the layer will be added to the map's [overlay pane](#map-overlaypane). Overriding this option will cause the layer to be placed on another pane by default.
+  		pane: 'overlayPane',
+
+  		// @option attribution: String = null
+  		// String to be shown in the attribution control, e.g. "© OpenStreetMap contributors". It describes the layer data and is often a legal obligation towards copyright holders and tile providers.
+  		attribution: null,
+
+  		bubblingMouseEvents: true
+  	},
+
+  	/* @section
+  	 * Classes extending `L.Layer` will inherit the following methods:
+  	 *
+  	 * @method addTo(map: Map|LayerGroup): this
+  	 * Adds the layer to the given map or layer group.
+  	 */
+  	addTo: function (map) {
+  		map.addLayer(this);
+  		return this;
+  	},
+
+  	// @method remove: this
+  	// Removes the layer from the map it is currently active on.
+  	remove: function () {
+  		return this.removeFrom(this._map || this._mapToAdd);
+  	},
+
+  	// @method removeFrom(map: Map): this
+  	// Removes the layer from the given map
+  	//
+  	// @alternative
+  	// @method removeFrom(group: LayerGroup): this
+  	// Removes the layer from the given `LayerGroup`
+  	removeFrom: function (obj) {
+  		if (obj) {
+  			obj.removeLayer(this);
+  		}
+  		return this;
+  	},
+
+  	// @method getPane(name? : String): HTMLElement
+  	// Returns the `HTMLElement` representing the named pane on the map. If `name` is omitted, returns the pane for this layer.
+  	getPane: function (name) {
+  		return this._map.getPane(name ? (this.options[name] || name) : this.options.pane);
+  	},
+
+  	addInteractiveTarget: function (targetEl) {
+  		this._map._targets[stamp(targetEl)] = this;
+  		return this;
+  	},
+
+  	removeInteractiveTarget: function (targetEl) {
+  		delete this._map._targets[stamp(targetEl)];
+  		return this;
+  	},
+
+  	// @method getAttribution: String
+  	// Used by the `attribution control`, returns the [attribution option](#gridlayer-attribution).
+  	getAttribution: function () {
+  		return this.options.attribution;
+  	},
+
+  	_layerAdd: function (e) {
+  		var map = e.target;
+
+  		// check in case layer gets added and then removed before the map is ready
+  		if (!map.hasLayer(this)) { return; }
+
+  		this._map = map;
+  		this._zoomAnimated = map._zoomAnimated;
+
+  		if (this.getEvents) {
+  			var events = this.getEvents();
+  			map.on(events, this);
+  			this.once('remove', function () {
+  				map.off(events, this);
+  			}, this);
+  		}
+
+  		this.onAdd(map);
+
+  		this.fire('add');
+  		map.fire('layeradd', {layer: this});
+  	}
+  });
+
+  /* @section Extension methods
+   * @uninheritable
+   *
+   * Every layer should extend from `L.Layer` and (re-)implement the following methods.
+   *
+   * @method onAdd(map: Map): this
+   * Should contain code that creates DOM elements for the layer, adds them to `map panes` where they should belong and puts listeners on relevant map events. Called on [`map.addLayer(layer)`](#map-addlayer).
+   *
+   * @method onRemove(map: Map): this
+   * Should contain all clean up code that removes the layer's elements from the DOM and removes listeners previously added in [`onAdd`](#layer-onadd). Called on [`map.removeLayer(layer)`](#map-removelayer).
+   *
+   * @method getEvents(): Object
+   * This optional method should return an object like `{ viewreset: this._reset }` for [`addEventListener`](#evented-addeventlistener). The event handlers in this object will be automatically added and removed from the map with your layer.
+   *
+   * @method getAttribution(): String
+   * This optional method should return a string containing HTML to be shown on the `Attribution control` whenever the layer is visible.
+   *
+   * @method beforeAdd(map: Map): this
+   * Optional method. Called on [`map.addLayer(layer)`](#map-addlayer), before the layer is added to the map, before events are initialized, without waiting until the map is in a usable state. Use for early initialization only.
+   */
+
+
+  /* @namespace Map
+   * @section Layer events
+   *
+   * @event layeradd: LayerEvent
+   * Fired when a new layer is added to the map.
+   *
+   * @event layerremove: LayerEvent
+   * Fired when some layer is removed from the map
+   *
+   * @section Methods for Layers and Controls
+   */
+  Map.include({
+  	// @method addLayer(layer: Layer): this
+  	// Adds the given layer to the map
+  	addLayer: function (layer) {
+  		if (!layer._layerAdd) {
+  			throw new Error('The provided object is not a Layer.');
+  		}
+
+  		var id = stamp(layer);
+  		if (this._layers[id]) { return this; }
+  		this._layers[id] = layer;
+
+  		layer._mapToAdd = this;
+
+  		if (layer.beforeAdd) {
+  			layer.beforeAdd(this);
+  		}
+
+  		this.whenReady(layer._layerAdd, layer);
+
+  		return this;
+  	},
+
+  	// @method removeLayer(layer: Layer): this
+  	// Removes the given layer from the map.
+  	removeLayer: function (layer) {
+  		var id = stamp(layer);
+
+  		if (!this._layers[id]) { return this; }
+
+  		if (this._loaded) {
+  			layer.onRemove(this);
+  		}
+
+  		delete this._layers[id];
+
+  		if (this._loaded) {
+  			this.fire('layerremove', {layer: layer});
+  			layer.fire('remove');
+  		}
+
+  		layer._map = layer._mapToAdd = null;
+
+  		return this;
+  	},
+
+  	// @method hasLayer(layer: Layer): Boolean
+  	// Returns `true` if the given layer is currently added to the map
+  	hasLayer: function (layer) {
+  		return stamp(layer) in this._layers;
+  	},
+
+  	/* @method eachLayer(fn: Function, context?: Object): this
+  	 * Iterates over the layers of the map, optionally specifying context of the iterator function.
+  	 * ```
+  	 * map.eachLayer(function(layer){
+  	 *     layer.bindPopup('Hello');
+  	 * });
+  	 * ```
+  	 */
+  	eachLayer: function (method, context) {
+  		for (var i in this._layers) {
+  			method.call(context, this._layers[i]);
+  		}
+  		return this;
+  	},
+
+  	_addLayers: function (layers) {
+  		layers = layers ? (isArray(layers) ? layers : [layers]) : [];
+
+  		for (var i = 0, len = layers.length; i < len; i++) {
+  			this.addLayer(layers[i]);
+  		}
+  	},
+
+  	_addZoomLimit: function (layer) {
+  		if (!isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
+  			this._zoomBoundLayers[stamp(layer)] = layer;
+  			this._updateZoomLevels();
+  		}
+  	},
+
+  	_removeZoomLimit: function (layer) {
+  		var id = stamp(layer);
+
+  		if (this._zoomBoundLayers[id]) {
+  			delete this._zoomBoundLayers[id];
+  			this._updateZoomLevels();
+  		}
+  	},
+
+  	_updateZoomLevels: function () {
+  		var minZoom = Infinity,
+  		    maxZoom = -Infinity,
+  		    oldZoomSpan = this._getZoomSpan();
+
+  		for (var i in this._zoomBoundLayers) {
+  			var options = this._zoomBoundLayers[i].options;
+
+  			minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom);
+  			maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom);
+  		}
+
+  		this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom;
+  		this._layersMinZoom = minZoom === Infinity ? undefined : minZoom;
+
+  		// @section Map state change events
+  		// @event zoomlevelschange: Event
+  		// Fired when the number of zoomlevels on the map is changed due
+  		// to adding or removing a layer.
+  		if (oldZoomSpan !== this._getZoomSpan()) {
+  			this.fire('zoomlevelschange');
+  		}
+
+  		if (this.options.maxZoom === undefined && this._layersMaxZoom && this.getZoom() > this._layersMaxZoom) {
+  			this.setZoom(this._layersMaxZoom);
+  		}
+  		if (this.options.minZoom === undefined && this._layersMinZoom && this.getZoom() < this._layersMinZoom) {
+  			this.setZoom(this._layersMinZoom);
+  		}
+  	}
+  });
+
+  /*
+   * @class LayerGroup
+   * @aka L.LayerGroup
+   * @inherits Interactive layer
+   *
+   * Used to group several layers and handle them as one. If you add it to the map,
+   * any layers added or removed from the group will be added/removed on the map as
+   * well. Extends `Layer`.
+   *
+   * @example
+   *
+   * ```js
+   * L.layerGroup([marker1, marker2])
+   * 	.addLayer(polyline)
+   * 	.addTo(map);
+   * ```
+   */
+
+  var LayerGroup = Layer.extend({
+
+  	initialize: function (layers, options) {
+  		setOptions(this, options);
+
+  		this._layers = {};
+
+  		var i, len;
+
+  		if (layers) {
+  			for (i = 0, len = layers.length; i < len; i++) {
+  				this.addLayer(layers[i]);
+  			}
+  		}
+  	},
+
+  	// @method addLayer(layer: Layer): this
+  	// Adds the given layer to the group.
+  	addLayer: function (layer) {
+  		var id = this.getLayerId(layer);
+
+  		this._layers[id] = layer;
+
+  		if (this._map) {
+  			this._map.addLayer(layer);
+  		}
+
+  		return this;
+  	},
+
+  	// @method removeLayer(layer: Layer): this
+  	// Removes the given layer from the group.
+  	// @alternative
+  	// @method removeLayer(id: Number): this
+  	// Removes the layer with the given internal ID from the group.
+  	removeLayer: function (layer) {
+  		var id = layer in this._layers ? layer : this.getLayerId(layer);
+
+  		if (this._map && this._layers[id]) {
+  			this._map.removeLayer(this._layers[id]);
+  		}
+
+  		delete this._layers[id];
+
+  		return this;
+  	},
+
+  	// @method hasLayer(layer: Layer): Boolean
+  	// Returns `true` if the given layer is currently added to the group.
+  	// @alternative
+  	// @method hasLayer(id: Number): Boolean
+  	// Returns `true` if the given internal ID is currently added to the group.
+  	hasLayer: function (layer) {
+  		var layerId = typeof layer === 'number' ? layer : this.getLayerId(layer);
+  		return layerId in this._layers;
+  	},
+
+  	// @method clearLayers(): this
+  	// Removes all the layers from the group.
+  	clearLayers: function () {
+  		return this.eachLayer(this.removeLayer, this);
+  	},
+
+  	// @method invoke(methodName: String, …): this
+  	// Calls `methodName` on every layer contained in this group, passing any
+  	// additional parameters. Has no effect if the layers contained do not
+  	// implement `methodName`.
+  	invoke: function (methodName) {
+  		var args = Array.prototype.slice.call(arguments, 1),
+  		    i, layer;
+
+  		for (i in this._layers) {
+  			layer = this._layers[i];
+
+  			if (layer[methodName]) {
+  				layer[methodName].apply(layer, args);
+  			}
+  		}
+
+  		return this;
+  	},
+
+  	onAdd: function (map) {
+  		this.eachLayer(map.addLayer, map);
+  	},
+
+  	onRemove: function (map) {
+  		this.eachLayer(map.removeLayer, map);
+  	},
+
+  	// @method eachLayer(fn: Function, context?: Object): this
+  	// Iterates over the layers of the group, optionally specifying context of the iterator function.
+  	// ```js
+  	// group.eachLayer(function (layer) {
+  	// 	layer.bindPopup('Hello');
+  	// });
+  	// ```
+  	eachLayer: function (method, context) {
+  		for (var i in this._layers) {
+  			method.call(context, this._layers[i]);
+  		}
+  		return this;
+  	},
+
+  	// @method getLayer(id: Number): Layer
+  	// Returns the layer with the given internal ID.
+  	getLayer: function (id) {
+  		return this._layers[id];
+  	},
+
+  	// @method getLayers(): Layer[]
+  	// Returns an array of all the layers added to the group.
+  	getLayers: function () {
+  		var layers = [];
+  		this.eachLayer(layers.push, layers);
+  		return layers;
+  	},
+
+  	// @method setZIndex(zIndex: Number): this
+  	// Calls `setZIndex` on every layer contained in this group, passing the z-index.
+  	setZIndex: function (zIndex) {
+  		return this.invoke('setZIndex', zIndex);
+  	},
+
+  	// @method getLayerId(layer: Layer): Number
+  	// Returns the internal ID for a layer
+  	getLayerId: function (layer) {
+  		return stamp(layer);
+  	}
+  });
+
+
+  // @factory L.layerGroup(layers?: Layer[], options?: Object)
+  // Create a layer group, optionally given an initial set of layers and an `options` object.
+  var layerGroup = function (layers, options) {
+  	return new LayerGroup(layers, options);
+  };
+
+  /*
+   * @class FeatureGroup
+   * @aka L.FeatureGroup
+   * @inherits LayerGroup
+   *
+   * Extended `LayerGroup` that makes it easier to do the same thing to all its member layers:
+   *  * [`bindPopup`](#layer-bindpopup) binds a popup to all of the layers at once (likewise with [`bindTooltip`](#layer-bindtooltip))
+   *  * Events are propagated to the `FeatureGroup`, so if the group has an event
+   * handler, it will handle events from any of the layers. This includes mouse events
+   * and custom events.
+   *  * Has `layeradd` and `layerremove` events
+   *
+   * @example
+   *
+   * ```js
+   * L.featureGroup([marker1, marker2, polyline])
+   * 	.bindPopup('Hello world!')
+   * 	.on('click', function() { alert('Clicked on a member of the group!'); })
+   * 	.addTo(map);
+   * ```
+   */
+
+  var FeatureGroup = LayerGroup.extend({
+
+  	addLayer: function (layer) {
+  		if (this.hasLayer(layer)) {
+  			return this;
+  		}
+
+  		layer.addEventParent(this);
+
+  		LayerGroup.prototype.addLayer.call(this, layer);
+
+  		// @event layeradd: LayerEvent
+  		// Fired when a layer is added to this `FeatureGroup`
+  		return this.fire('layeradd', {layer: layer});
+  	},
+
+  	removeLayer: function (layer) {
+  		if (!this.hasLayer(layer)) {
+  			return this;
+  		}
+  		if (layer in this._layers) {
+  			layer = this._layers[layer];
+  		}
+
+  		layer.removeEventParent(this);
+
+  		LayerGroup.prototype.removeLayer.call(this, layer);
+
+  		// @event layerremove: LayerEvent
+  		// Fired when a layer is removed from this `FeatureGroup`
+  		return this.fire('layerremove', {layer: layer});
+  	},
+
+  	// @method setStyle(style: Path options): this
+  	// Sets the given path options to each layer of the group that has a `setStyle` method.
+  	setStyle: function (style) {
+  		return this.invoke('setStyle', style);
+  	},
+
+  	// @method bringToFront(): this
+  	// Brings the layer group to the top of all other layers
+  	bringToFront: function () {
+  		return this.invoke('bringToFront');
+  	},
+
+  	// @method bringToBack(): this
+  	// Brings the layer group to the back of all other layers
+  	bringToBack: function () {
+  		return this.invoke('bringToBack');
+  	},
+
+  	// @method getBounds(): LatLngBounds
+  	// Returns the LatLngBounds of the Feature Group (created from bounds and coordinates of its children).
+  	getBounds: function () {
+  		var bounds = new LatLngBounds();
+
+  		for (var id in this._layers) {
+  			var layer = this._layers[id];
+  			bounds.extend(layer.getBounds ? layer.getBounds() : layer.getLatLng());
+  		}
+  		return bounds;
+  	}
+  });
+
+  // @factory L.featureGroup(layers?: Layer[], options?: Object)
+  // Create a feature group, optionally given an initial set of layers and an `options` object.
+  var featureGroup = function (layers, options) {
+  	return new FeatureGroup(layers, options);
+  };
+
+  /*
+   * @class Icon
+   * @aka L.Icon
+   *
+   * Represents an icon to provide when creating a marker.
+   *
+   * @example
+   *
+   * ```js
+   * var myIcon = L.icon({
+   *     iconUrl: 'my-icon.png',
+   *     iconRetinaUrl: 'my-icon@2x.png',
+   *     iconSize: [38, 95],
+   *     iconAnchor: [22, 94],
+   *     popupAnchor: [-3, -76],
+   *     shadowUrl: 'my-icon-shadow.png',
+   *     shadowRetinaUrl: 'my-icon-shadow@2x.png',
+   *     shadowSize: [68, 95],
+   *     shadowAnchor: [22, 94]
+   * });
+   *
+   * L.marker([50.505, 30.57], {icon: myIcon}).addTo(map);
+   * ```
+   *
+   * `L.Icon.Default` extends `L.Icon` and is the blue icon Leaflet uses for markers by default.
+   *
+   */
+
+  var Icon = Class.extend({
+
+  	/* @section
+  	 * @aka Icon options
+  	 *
+  	 * @option iconUrl: String = null
+  	 * **(required)** The URL to the icon image (absolute or relative to your script path).
+  	 *
+  	 * @option iconRetinaUrl: String = null
+  	 * The URL to a retina sized version of the icon image (absolute or relative to your
+  	 * script path). Used for Retina screen devices.
+  	 *
+  	 * @option iconSize: Point = null
+  	 * Size of the icon image in pixels.
+  	 *
+  	 * @option iconAnchor: Point = null
+  	 * The coordinates of the "tip" of the icon (relative to its top left corner). The icon
+  	 * will be aligned so that this point is at the marker's geographical location. Centered
+  	 * by default if size is specified, also can be set in CSS with negative margins.
+  	 *
+  	 * @option popupAnchor: Point = [0, 0]
+  	 * The coordinates of the point from which popups will "open", relative to the icon anchor.
+  	 *
+  	 * @option tooltipAnchor: Point = [0, 0]
+  	 * The coordinates of the point from which tooltips will "open", relative to the icon anchor.
+  	 *
+  	 * @option shadowUrl: String = null
+  	 * The URL to the icon shadow image. If not specified, no shadow image will be created.
+  	 *
+  	 * @option shadowRetinaUrl: String = null
+  	 *
+  	 * @option shadowSize: Point = null
+  	 * Size of the shadow image in pixels.
+  	 *
+  	 * @option shadowAnchor: Point = null
+  	 * The coordinates of the "tip" of the shadow (relative to its top left corner) (the same
+  	 * as iconAnchor if not specified).
+  	 *
+  	 * @option className: String = ''
+  	 * A custom class name to assign to both icon and shadow images. Empty by default.
+  	 */
+
+  	options: {
+  		popupAnchor: [0, 0],
+  		tooltipAnchor: [0, 0],
+
+  		// @option crossOrigin: Boolean|String = false
+  		// Whether the crossOrigin attribute will be added to the tiles.
+  		// If a String is provided, all tiles will have their crossOrigin attribute set to the String provided. This is needed if you want to access tile pixel data.
+  		// Refer to [CORS Settings](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) for valid String values.
+  		crossOrigin: false
+  	},
+
+  	initialize: function (options) {
+  		setOptions(this, options);
+  	},
+
+  	// @method createIcon(oldIcon?: HTMLElement): HTMLElement
+  	// Called internally when the icon has to be shown, returns a `<img>` HTML element
+  	// styled according to the options.
+  	createIcon: function (oldIcon) {
+  		return this._createIcon('icon', oldIcon);
+  	},
+
+  	// @method createShadow(oldIcon?: HTMLElement): HTMLElement
+  	// As `createIcon`, but for the shadow beneath it.
+  	createShadow: function (oldIcon) {
+  		return this._createIcon('shadow', oldIcon);
+  	},
+
+  	_createIcon: function (name, oldIcon) {
+  		var src = this._getIconUrl(name);
+
+  		if (!src) {
+  			if (name === 'icon') {
+  				throw new Error('iconUrl not set in Icon options (see the docs).');
+  			}
+  			return null;
+  		}
+
+  		var img = this._createImg(src, oldIcon && oldIcon.tagName === 'IMG' ? oldIcon : null);
+  		this._setIconStyles(img, name);
+
+  		if (this.options.crossOrigin || this.options.crossOrigin === '') {
+  			img.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+  		}
+
+  		return img;
+  	},
+
+  	_setIconStyles: function (img, name) {
+  		var options = this.options;
+  		var sizeOption = options[name + 'Size'];
+
+  		if (typeof sizeOption === 'number') {
+  			sizeOption = [sizeOption, sizeOption];
+  		}
+
+  		var size = toPoint(sizeOption),
+  		    anchor = toPoint(name === 'shadow' && options.shadowAnchor || options.iconAnchor ||
+  		            size && size.divideBy(2, true));
+
+  		img.className = 'leaflet-marker-' + name + ' ' + (options.className || '');
+
+  		if (anchor) {
+  			img.style.marginLeft = (-anchor.x) + 'px';
+  			img.style.marginTop  = (-anchor.y) + 'px';
+  		}
+
+  		if (size) {
+  			img.style.width  = size.x + 'px';
+  			img.style.height = size.y + 'px';
+  		}
+  	},
+
+  	_createImg: function (src, el) {
+  		el = el || document.createElement('img');
+  		el.src = src;
+  		return el;
+  	},
+
+  	_getIconUrl: function (name) {
+  		return Browser.retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url'];
+  	}
+  });
+
+
+  // @factory L.icon(options: Icon options)
+  // Creates an icon instance with the given options.
+  function icon(options) {
+  	return new Icon(options);
+  }
+
+  /*
+   * @miniclass Icon.Default (Icon)
+   * @aka L.Icon.Default
+   * @section
+   *
+   * A trivial subclass of `Icon`, represents the icon to use in `Marker`s when
+   * no icon is specified. Points to the blue marker image distributed with Leaflet
+   * releases.
+   *
+   * In order to customize the default icon, just change the properties of `L.Icon.Default.prototype.options`
+   * (which is a set of `Icon options`).
+   *
+   * If you want to _completely_ replace the default icon, override the
+   * `L.Marker.prototype.options.icon` with your own icon instead.
+   */
+
+  var IconDefault = Icon.extend({
+
+  	options: {
+  		iconUrl:       'marker-icon.png',
+  		iconRetinaUrl: 'marker-icon-2x.png',
+  		shadowUrl:     'marker-shadow.png',
+  		iconSize:    [25, 41],
+  		iconAnchor:  [12, 41],
+  		popupAnchor: [1, -34],
+  		tooltipAnchor: [16, -28],
+  		shadowSize:  [41, 41]
+  	},
+
+  	_getIconUrl: function (name) {
+  		if (typeof IconDefault.imagePath !== 'string') {	// Deprecated, backwards-compatibility only
+  			IconDefault.imagePath = this._detectIconPath();
+  		}
+
+  		// @option imagePath: String
+  		// `Icon.Default` will try to auto-detect the location of the
+  		// blue icon images. If you are placing these images in a non-standard
+  		// way, set this option to point to the right path.
+  		return (this.options.imagePath || IconDefault.imagePath) + Icon.prototype._getIconUrl.call(this, name);
+  	},
+
+  	_stripUrl: function (path) {	// separate function to use in tests
+  		var strip = function (str, re, idx) {
+  			var match = re.exec(str);
+  			return match && match[idx];
+  		};
+  		path = strip(path, /^url\((['"])?(.+)\1\)$/, 2);
+  		return path && strip(path, /^(.*)marker-icon\.png$/, 1);
+  	},
+
+  	_detectIconPath: function () {
+  		var el = create$1('div',  'leaflet-default-icon-path', document.body);
+  		var path = getStyle(el, 'background-image') ||
+  		           getStyle(el, 'backgroundImage');	// IE8
+
+  		document.body.removeChild(el);
+  		path = this._stripUrl(path);
+  		if (path) { return path; }
+  		var link = document.querySelector('link[href$="leaflet.css"]');
+  		if (!link) { return ''; }
+  		return link.href.substring(0, link.href.length - 'leaflet.css'.length - 1);
+  	}
+  });
+
+  /*
+   * L.Handler.MarkerDrag is used internally by L.Marker to make the markers draggable.
+   */
+
+
+  /* @namespace Marker
+   * @section Interaction handlers
+   *
+   * Interaction handlers are properties of a marker instance that allow you to control interaction behavior in runtime, enabling or disabling certain features such as dragging (see `Handler` methods). Example:
+   *
+   * ```js
+   * marker.dragging.disable();
+   * ```
+   *
+   * @property dragging: Handler
+   * Marker dragging handler (by both mouse and touch). Only valid when the marker is on the map (Otherwise set [`marker.options.draggable`](#marker-draggable)).
+   */
+
+  var MarkerDrag = Handler.extend({
+  	initialize: function (marker) {
+  		this._marker = marker;
+  	},
+
+  	addHooks: function () {
+  		var icon = this._marker._icon;
+
+  		if (!this._draggable) {
+  			this._draggable = new Draggable(icon, icon, true);
+  		}
+
+  		this._draggable.on({
+  			dragstart: this._onDragStart,
+  			predrag: this._onPreDrag,
+  			drag: this._onDrag,
+  			dragend: this._onDragEnd
+  		}, this).enable();
+
+  		addClass(icon, 'leaflet-marker-draggable');
+  	},
+
+  	removeHooks: function () {
+  		this._draggable.off({
+  			dragstart: this._onDragStart,
+  			predrag: this._onPreDrag,
+  			drag: this._onDrag,
+  			dragend: this._onDragEnd
+  		}, this).disable();
+
+  		if (this._marker._icon) {
+  			removeClass(this._marker._icon, 'leaflet-marker-draggable');
+  		}
+  	},
+
+  	moved: function () {
+  		return this._draggable && this._draggable._moved;
+  	},
+
+  	_adjustPan: function (e) {
+  		var marker = this._marker,
+  		    map = marker._map,
+  		    speed = this._marker.options.autoPanSpeed,
+  		    padding = this._marker.options.autoPanPadding,
+  		    iconPos = getPosition(marker._icon),
+  		    bounds = map.getPixelBounds(),
+  		    origin = map.getPixelOrigin();
+
+  		var panBounds = toBounds(
+  			bounds.min._subtract(origin).add(padding),
+  			bounds.max._subtract(origin).subtract(padding)
+  		);
+
+  		if (!panBounds.contains(iconPos)) {
+  			// Compute incremental movement
+  			var movement = toPoint(
+  				(Math.max(panBounds.max.x, iconPos.x) - panBounds.max.x) / (bounds.max.x - panBounds.max.x) -
+  				(Math.min(panBounds.min.x, iconPos.x) - panBounds.min.x) / (bounds.min.x - panBounds.min.x),
+
+  				(Math.max(panBounds.max.y, iconPos.y) - panBounds.max.y) / (bounds.max.y - panBounds.max.y) -
+  				(Math.min(panBounds.min.y, iconPos.y) - panBounds.min.y) / (bounds.min.y - panBounds.min.y)
+  			).multiplyBy(speed);
+
+  			map.panBy(movement, {animate: false});
+
+  			this._draggable._newPos._add(movement);
+  			this._draggable._startPos._add(movement);
+
+  			setPosition(marker._icon, this._draggable._newPos);
+  			this._onDrag(e);
+
+  			this._panRequest = requestAnimFrame(this._adjustPan.bind(this, e));
+  		}
+  	},
+
+  	_onDragStart: function () {
+  		// @section Dragging events
+  		// @event dragstart: Event
+  		// Fired when the user starts dragging the marker.
+
+  		// @event movestart: Event
+  		// Fired when the marker starts moving (because of dragging).
+
+  		this._oldLatLng = this._marker.getLatLng();
+
+  		// When using ES6 imports it could not be set when `Popup` was not imported as well
+  		this._marker.closePopup && this._marker.closePopup();
+
+  		this._marker
+  			.fire('movestart')
+  			.fire('dragstart');
+  	},
+
+  	_onPreDrag: function (e) {
+  		if (this._marker.options.autoPan) {
+  			cancelAnimFrame(this._panRequest);
+  			this._panRequest = requestAnimFrame(this._adjustPan.bind(this, e));
+  		}
+  	},
+
+  	_onDrag: function (e) {
+  		var marker = this._marker,
+  		    shadow = marker._shadow,
+  		    iconPos = getPosition(marker._icon),
+  		    latlng = marker._map.layerPointToLatLng(iconPos);
+
+  		// update shadow position
+  		if (shadow) {
+  			setPosition(shadow, iconPos);
+  		}
+
+  		marker._latlng = latlng;
+  		e.latlng = latlng;
+  		e.oldLatLng = this._oldLatLng;
+
+  		// @event drag: Event
+  		// Fired repeatedly while the user drags the marker.
+  		marker
+  		    .fire('move', e)
+  		    .fire('drag', e);
+  	},
+
+  	_onDragEnd: function (e) {
+  		// @event dragend: DragEndEvent
+  		// Fired when the user stops dragging the marker.
+
+  		 cancelAnimFrame(this._panRequest);
+
+  		// @event moveend: Event
+  		// Fired when the marker stops moving (because of dragging).
+  		delete this._oldLatLng;
+  		this._marker
+  		    .fire('moveend')
+  		    .fire('dragend', e);
+  	}
+  });
+
+  /*
+   * @class Marker
+   * @inherits Interactive layer
+   * @aka L.Marker
+   * L.Marker is used to display clickable/draggable icons on the map. Extends `Layer`.
+   *
+   * @example
+   *
+   * ```js
+   * L.marker([50.5, 30.5]).addTo(map);
+   * ```
+   */
+
+  var Marker = Layer.extend({
+
+  	// @section
+  	// @aka Marker options
+  	options: {
+  		// @option icon: Icon = *
+  		// Icon instance to use for rendering the marker.
+  		// See [Icon documentation](#L.Icon) for details on how to customize the marker icon.
+  		// If not specified, a common instance of `L.Icon.Default` is used.
+  		icon: new IconDefault(),
+
+  		// Option inherited from "Interactive layer" abstract class
+  		interactive: true,
+
+  		// @option keyboard: Boolean = true
+  		// Whether the marker can be tabbed to with a keyboard and clicked by pressing enter.
+  		keyboard: true,
+
+  		// @option title: String = ''
+  		// Text for the browser tooltip that appear on marker hover (no tooltip by default).
+  		// [Useful for accessibility](https://leafletjs.com/examples/accessibility/#markers-must-be-labelled).
+  		title: '',
+
+  		// @option alt: String = 'Marker'
+  		// Text for the `alt` attribute of the icon image.
+  		// [Useful for accessibility](https://leafletjs.com/examples/accessibility/#markers-must-be-labelled).
+  		alt: 'Marker',
+
+  		// @option zIndexOffset: Number = 0
+  		// By default, marker images zIndex is set automatically based on its latitude. Use this option if you want to put the marker on top of all others (or below), specifying a high value like `1000` (or high negative value, respectively).
+  		zIndexOffset: 0,
+
+  		// @option opacity: Number = 1.0
+  		// The opacity of the marker.
+  		opacity: 1,
+
+  		// @option riseOnHover: Boolean = false
+  		// If `true`, the marker will get on top of others when you hover the mouse over it.
+  		riseOnHover: false,
+
+  		// @option riseOffset: Number = 250
+  		// The z-index offset used for the `riseOnHover` feature.
+  		riseOffset: 250,
+
+  		// @option pane: String = 'markerPane'
+  		// `Map pane` where the markers icon will be added.
+  		pane: 'markerPane',
+
+  		// @option shadowPane: String = 'shadowPane'
+  		// `Map pane` where the markers shadow will be added.
+  		shadowPane: 'shadowPane',
+
+  		// @option bubblingMouseEvents: Boolean = false
+  		// When `true`, a mouse event on this marker will trigger the same event on the map
+  		// (unless [`L.DomEvent.stopPropagation`](#domevent-stoppropagation) is used).
+  		bubblingMouseEvents: false,
+
+  		// @option autoPanOnFocus: Boolean = true
+  		// When `true`, the map will pan whenever the marker is focused (via
+  		// e.g. pressing `tab` on the keyboard) to ensure the marker is
+  		// visible within the map's bounds
+  		autoPanOnFocus: true,
+
+  		// @section Draggable marker options
+  		// @option draggable: Boolean = false
+  		// Whether the marker is draggable with mouse/touch or not.
+  		draggable: false,
+
+  		// @option autoPan: Boolean = false
+  		// Whether to pan the map when dragging this marker near its edge or not.
+  		autoPan: false,
+
+  		// @option autoPanPadding: Point = Point(50, 50)
+  		// Distance (in pixels to the left/right and to the top/bottom) of the
+  		// map edge to start panning the map.
+  		autoPanPadding: [50, 50],
+
+  		// @option autoPanSpeed: Number = 10
+  		// Number of pixels the map should pan by.
+  		autoPanSpeed: 10
+  	},
+
+  	/* @section
+  	 *
+  	 * In addition to [shared layer methods](#Layer) like `addTo()` and `remove()` and [popup methods](#Popup) like bindPopup() you can also use the following methods:
+  	 */
+
+  	initialize: function (latlng, options) {
+  		setOptions(this, options);
+  		this._latlng = toLatLng(latlng);
+  	},
+
+  	onAdd: function (map) {
+  		this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
+
+  		if (this._zoomAnimated) {
+  			map.on('zoomanim', this._animateZoom, this);
+  		}
+
+  		this._initIcon();
+  		this.update();
+  	},
+
+  	onRemove: function (map) {
+  		if (this.dragging && this.dragging.enabled()) {
+  			this.options.draggable = true;
+  			this.dragging.removeHooks();
+  		}
+  		delete this.dragging;
+
+  		if (this._zoomAnimated) {
+  			map.off('zoomanim', this._animateZoom, this);
+  		}
+
+  		this._removeIcon();
+  		this._removeShadow();
+  	},
+
+  	getEvents: function () {
+  		return {
+  			zoom: this.update,
+  			viewreset: this.update
+  		};
+  	},
+
+  	// @method getLatLng: LatLng
+  	// Returns the current geographical position of the marker.
+  	getLatLng: function () {
+  		return this._latlng;
+  	},
+
+  	// @method setLatLng(latlng: LatLng): this
+  	// Changes the marker position to the given point.
+  	setLatLng: function (latlng) {
+  		var oldLatLng = this._latlng;
+  		this._latlng = toLatLng(latlng);
+  		this.update();
+
+  		// @event move: Event
+  		// Fired when the marker is moved via [`setLatLng`](#marker-setlatlng) or by [dragging](#marker-dragging). Old and new coordinates are included in event arguments as `oldLatLng`, `latlng`.
+  		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng});
+  	},
+
+  	// @method setZIndexOffset(offset: Number): this
+  	// Changes the [zIndex offset](#marker-zindexoffset) of the marker.
+  	setZIndexOffset: function (offset) {
+  		this.options.zIndexOffset = offset;
+  		return this.update();
+  	},
+
+  	// @method getIcon: Icon
+  	// Returns the current icon used by the marker
+  	getIcon: function () {
+  		return this.options.icon;
+  	},
+
+  	// @method setIcon(icon: Icon): this
+  	// Changes the marker icon.
+  	setIcon: function (icon) {
+
+  		this.options.icon = icon;
+
+  		if (this._map) {
+  			this._initIcon();
+  			this.update();
+  		}
+
+  		if (this._popup) {
+  			this.bindPopup(this._popup, this._popup.options);
+  		}
+
+  		return this;
+  	},
+
+  	getElement: function () {
+  		return this._icon;
+  	},
+
+  	update: function () {
+
+  		if (this._icon && this._map) {
+  			var pos = this._map.latLngToLayerPoint(this._latlng).round();
+  			this._setPos(pos);
+  		}
+
+  		return this;
+  	},
+
+  	_initIcon: function () {
+  		var options = this.options,
+  		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+
+  		var icon = options.icon.createIcon(this._icon),
+  		    addIcon = false;
+
+  		// if we're not reusing the icon, remove the old one and init new one
+  		if (icon !== this._icon) {
+  			if (this._icon) {
+  				this._removeIcon();
+  			}
+  			addIcon = true;
+
+  			if (options.title) {
+  				icon.title = options.title;
+  			}
+
+  			if (icon.tagName === 'IMG') {
+  				icon.alt = options.alt || '';
+  			}
+  		}
+
+  		addClass(icon, classToAdd);
+
+  		if (options.keyboard) {
+  			icon.tabIndex = '0';
+  			icon.setAttribute('role', 'button');
+  		}
+
+  		this._icon = icon;
+
+  		if (options.riseOnHover) {
+  			this.on({
+  				mouseover: this._bringToFront,
+  				mouseout: this._resetZIndex
+  			});
+  		}
+
+  		if (this.options.autoPanOnFocus) {
+  			on(icon, 'focus', this._panOnFocus, this);
+  		}
+
+  		var newShadow = options.icon.createShadow(this._shadow),
+  		    addShadow = false;
+
+  		if (newShadow !== this._shadow) {
+  			this._removeShadow();
+  			addShadow = true;
+  		}
+
+  		if (newShadow) {
+  			addClass(newShadow, classToAdd);
+  			newShadow.alt = '';
+  		}
+  		this._shadow = newShadow;
+
+
+  		if (options.opacity < 1) {
+  			this._updateOpacity();
+  		}
+
+
+  		if (addIcon) {
+  			this.getPane().appendChild(this._icon);
+  		}
+  		this._initInteraction();
+  		if (newShadow && addShadow) {
+  			this.getPane(options.shadowPane).appendChild(this._shadow);
+  		}
+  	},
+
+  	_removeIcon: function () {
+  		if (this.options.riseOnHover) {
+  			this.off({
+  				mouseover: this._bringToFront,
+  				mouseout: this._resetZIndex
+  			});
+  		}
+
+  		if (this.options.autoPanOnFocus) {
+  			off(this._icon, 'focus', this._panOnFocus, this);
+  		}
+
+  		remove(this._icon);
+  		this.removeInteractiveTarget(this._icon);
+
+  		this._icon = null;
+  	},
+
+  	_removeShadow: function () {
+  		if (this._shadow) {
+  			remove(this._shadow);
+  		}
+  		this._shadow = null;
+  	},
+
+  	_setPos: function (pos) {
+
+  		if (this._icon) {
+  			setPosition(this._icon, pos);
+  		}
+
+  		if (this._shadow) {
+  			setPosition(this._shadow, pos);
+  		}
+
+  		this._zIndex = pos.y + this.options.zIndexOffset;
+
+  		this._resetZIndex();
+  	},
+
+  	_updateZIndex: function (offset) {
+  		if (this._icon) {
+  			this._icon.style.zIndex = this._zIndex + offset;
+  		}
+  	},
+
+  	_animateZoom: function (opt) {
+  		var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
+
+  		this._setPos(pos);
+  	},
+
+  	_initInteraction: function () {
+
+  		if (!this.options.interactive) { return; }
+
+  		addClass(this._icon, 'leaflet-interactive');
+
+  		this.addInteractiveTarget(this._icon);
+
+  		if (MarkerDrag) {
+  			var draggable = this.options.draggable;
+  			if (this.dragging) {
+  				draggable = this.dragging.enabled();
+  				this.dragging.disable();
+  			}
+
+  			this.dragging = new MarkerDrag(this);
+
+  			if (draggable) {
+  				this.dragging.enable();
+  			}
+  		}
+  	},
+
+  	// @method setOpacity(opacity: Number): this
+  	// Changes the opacity of the marker.
+  	setOpacity: function (opacity) {
+  		this.options.opacity = opacity;
+  		if (this._map) {
+  			this._updateOpacity();
+  		}
+
+  		return this;
+  	},
+
+  	_updateOpacity: function () {
+  		var opacity = this.options.opacity;
+
+  		if (this._icon) {
+  			setOpacity(this._icon, opacity);
+  		}
+
+  		if (this._shadow) {
+  			setOpacity(this._shadow, opacity);
+  		}
+  	},
+
+  	_bringToFront: function () {
+  		this._updateZIndex(this.options.riseOffset);
+  	},
+
+  	_resetZIndex: function () {
+  		this._updateZIndex(0);
+  	},
+
+  	_panOnFocus: function () {
+  		var map = this._map;
+  		if (!map) { return; }
+
+  		var iconOpts = this.options.icon.options;
+  		var size = iconOpts.iconSize ? toPoint(iconOpts.iconSize) : toPoint(0, 0);
+  		var anchor = iconOpts.iconAnchor ? toPoint(iconOpts.iconAnchor) : toPoint(0, 0);
+
+  		map.panInside(this._latlng, {
+  			paddingTopLeft: anchor,
+  			paddingBottomRight: size.subtract(anchor)
+  		});
+  	},
+
+  	_getPopupAnchor: function () {
+  		return this.options.icon.options.popupAnchor;
+  	},
+
+  	_getTooltipAnchor: function () {
+  		return this.options.icon.options.tooltipAnchor;
+  	}
+  });
+
+
+  // factory L.marker(latlng: LatLng, options? : Marker options)
+
+  // @factory L.marker(latlng: LatLng, options? : Marker options)
+  // Instantiates a Marker object given a geographical point and optionally an options object.
+  function marker(latlng, options) {
+  	return new Marker(latlng, options);
+  }
+
+  /*
+   * @class Path
+   * @aka L.Path
+   * @inherits Interactive layer
+   *
+   * An abstract class that contains options and constants shared between vector
+   * overlays (Polygon, Polyline, Circle). Do not use it directly. Extends `Layer`.
+   */
+
+  var Path = Layer.extend({
+
+  	// @section
+  	// @aka Path options
+  	options: {
+  		// @option stroke: Boolean = true
+  		// Whether to draw stroke along the path. Set it to `false` to disable borders on polygons or circles.
+  		stroke: true,
+
+  		// @option color: String = '#3388ff'
+  		// Stroke color
+  		color: '#3388ff',
+
+  		// @option weight: Number = 3
+  		// Stroke width in pixels
+  		weight: 3,
+
+  		// @option opacity: Number = 1.0
+  		// Stroke opacity
+  		opacity: 1,
+
+  		// @option lineCap: String= 'round'
+  		// A string that defines [shape to be used at the end](https://developer.mozilla.org/docs/Web/SVG/Attribute/stroke-linecap) of the stroke.
+  		lineCap: 'round',
+
+  		// @option lineJoin: String = 'round'
+  		// A string that defines [shape to be used at the corners](https://developer.mozilla.org/docs/Web/SVG/Attribute/stroke-linejoin) of the stroke.
+  		lineJoin: 'round',
+
+  		// @option dashArray: String = null
+  		// A string that defines the stroke [dash pattern](https://developer.mozilla.org/docs/Web/SVG/Attribute/stroke-dasharray). Doesn't work on `Canvas`-powered layers in [some old browsers](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/setLineDash#Browser_compatibility).
+  		dashArray: null,
+
+  		// @option dashOffset: String = null
+  		// A string that defines the [distance into the dash pattern to start the dash](https://developer.mozilla.org/docs/Web/SVG/Attribute/stroke-dashoffset). Doesn't work on `Canvas`-powered layers in [some old browsers](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/setLineDash#Browser_compatibility).
+  		dashOffset: null,
+
+  		// @option fill: Boolean = depends
+  		// Whether to fill the path with color. Set it to `false` to disable filling on polygons or circles.
+  		fill: false,
+
+  		// @option fillColor: String = *
+  		// Fill color. Defaults to the value of the [`color`](#path-color) option
+  		fillColor: null,
+
+  		// @option fillOpacity: Number = 0.2
+  		// Fill opacity.
+  		fillOpacity: 0.2,
+
+  		// @option fillRule: String = 'evenodd'
+  		// A string that defines [how the inside of a shape](https://developer.mozilla.org/docs/Web/SVG/Attribute/fill-rule) is determined.
+  		fillRule: 'evenodd',
+
+  		// className: '',
+
+  		// Option inherited from "Interactive layer" abstract class
+  		interactive: true,
+
+  		// @option bubblingMouseEvents: Boolean = true
+  		// When `true`, a mouse event on this path will trigger the same event on the map
+  		// (unless [`L.DomEvent.stopPropagation`](#domevent-stoppropagation) is used).
+  		bubblingMouseEvents: true
+  	},
+
+  	beforeAdd: function (map) {
+  		// Renderer is set here because we need to call renderer.getEvents
+  		// before this.getEvents.
+  		this._renderer = map.getRenderer(this);
+  	},
+
+  	onAdd: function () {
+  		this._renderer._initPath(this);
+  		this._reset();
+  		this._renderer._addPath(this);
+  	},
+
+  	onRemove: function () {
+  		this._renderer._removePath(this);
+  	},
+
+  	// @method redraw(): this
+  	// Redraws the layer. Sometimes useful after you changed the coordinates that the path uses.
+  	redraw: function () {
+  		if (this._map) {
+  			this._renderer._updatePath(this);
+  		}
+  		return this;
+  	},
+
+  	// @method setStyle(style: Path options): this
+  	// Changes the appearance of a Path based on the options in the `Path options` object.
+  	setStyle: function (style) {
+  		setOptions(this, style);
+  		if (this._renderer) {
+  			this._renderer._updateStyle(this);
+  			if (this.options.stroke && style && Object.prototype.hasOwnProperty.call(style, 'weight')) {
+  				this._updateBounds();
+  			}
+  		}
+  		return this;
+  	},
+
+  	// @method bringToFront(): this
+  	// Brings the layer to the top of all path layers.
+  	bringToFront: function () {
+  		if (this._renderer) {
+  			this._renderer._bringToFront(this);
+  		}
+  		return this;
+  	},
+
+  	// @method bringToBack(): this
+  	// Brings the layer to the bottom of all path layers.
+  	bringToBack: function () {
+  		if (this._renderer) {
+  			this._renderer._bringToBack(this);
+  		}
+  		return this;
+  	},
+
+  	getElement: function () {
+  		return this._path;
+  	},
+
+  	_reset: function () {
+  		// defined in child classes
+  		this._project();
+  		this._update();
+  	},
+
+  	_clickTolerance: function () {
+  		// used when doing hit detection for Canvas layers
+  		return (this.options.stroke ? this.options.weight / 2 : 0) +
+  		  (this._renderer.options.tolerance || 0);
+  	}
+  });
+
+  /*
+   * @class CircleMarker
+   * @aka L.CircleMarker
+   * @inherits Path
+   *
+   * A circle of a fixed size with radius specified in pixels. Extends `Path`.
+   */
+
+  var CircleMarker = Path.extend({
+
+  	// @section
+  	// @aka CircleMarker options
+  	options: {
+  		fill: true,
+
+  		// @option radius: Number = 10
+  		// Radius of the circle marker, in pixels
+  		radius: 10
+  	},
+
+  	initialize: function (latlng, options) {
+  		setOptions(this, options);
+  		this._latlng = toLatLng(latlng);
+  		this._radius = this.options.radius;
+  	},
+
+  	// @method setLatLng(latLng: LatLng): this
+  	// Sets the position of a circle marker to a new location.
+  	setLatLng: function (latlng) {
+  		var oldLatLng = this._latlng;
+  		this._latlng = toLatLng(latlng);
+  		this.redraw();
+
+  		// @event move: Event
+  		// Fired when the marker is moved via [`setLatLng`](#circlemarker-setlatlng). Old and new coordinates are included in event arguments as `oldLatLng`, `latlng`.
+  		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng});
+  	},
+
+  	// @method getLatLng(): LatLng
+  	// Returns the current geographical position of the circle marker
+  	getLatLng: function () {
+  		return this._latlng;
+  	},
+
+  	// @method setRadius(radius: Number): this
+  	// Sets the radius of a circle marker. Units are in pixels.
+  	setRadius: function (radius) {
+  		this.options.radius = this._radius = radius;
+  		return this.redraw();
+  	},
+
+  	// @method getRadius(): Number
+  	// Returns the current radius of the circle
+  	getRadius: function () {
+  		return this._radius;
+  	},
+
+  	setStyle : function (options) {
+  		var radius = options && options.radius || this._radius;
+  		Path.prototype.setStyle.call(this, options);
+  		this.setRadius(radius);
+  		return this;
+  	},
+
+  	_project: function () {
+  		this._point = this._map.latLngToLayerPoint(this._latlng);
+  		this._updateBounds();
+  	},
+
+  	_updateBounds: function () {
+  		var r = this._radius,
+  		    r2 = this._radiusY || r,
+  		    w = this._clickTolerance(),
+  		    p = [r + w, r2 + w];
+  		this._pxBounds = new Bounds(this._point.subtract(p), this._point.add(p));
+  	},
+
+  	_update: function () {
+  		if (this._map) {
+  			this._updatePath();
+  		}
+  	},
+
+  	_updatePath: function () {
+  		this._renderer._updateCircle(this);
+  	},
+
+  	_empty: function () {
+  		return this._radius && !this._renderer._bounds.intersects(this._pxBounds);
+  	},
+
+  	// Needed by the `Canvas` renderer for interactivity
+  	_containsPoint: function (p) {
+  		return p.distanceTo(this._point) <= this._radius + this._clickTolerance();
+  	}
+  });
+
+
+  // @factory L.circleMarker(latlng: LatLng, options?: CircleMarker options)
+  // Instantiates a circle marker object given a geographical point, and an optional options object.
+  function circleMarker(latlng, options) {
+  	return new CircleMarker(latlng, options);
+  }
+
+  /*
+   * @class Circle
+   * @aka L.Circle
+   * @inherits CircleMarker
+   *
+   * A class for drawing circle overlays on a map. Extends `CircleMarker`.
+   *
+   * It's an approximation and starts to diverge from a real circle closer to poles (due to projection distortion).
+   *
+   * @example
+   *
+   * ```js
+   * L.circle([50.5, 30.5], {radius: 200}).addTo(map);
+   * ```
+   */
+
+  var Circle = CircleMarker.extend({
+
+  	initialize: function (latlng, options, legacyOptions) {
+  		if (typeof options === 'number') {
+  			// Backwards compatibility with 0.7.x factory (latlng, radius, options?)
+  			options = extend({}, legacyOptions, {radius: options});
+  		}
+  		setOptions(this, options);
+  		this._latlng = toLatLng(latlng);
+
+  		if (isNaN(this.options.radius)) { throw new Error('Circle radius cannot be NaN'); }
+
+  		// @section
+  		// @aka Circle options
+  		// @option radius: Number; Radius of the circle, in meters.
+  		this._mRadius = this.options.radius;
+  	},
+
+  	// @method setRadius(radius: Number): this
+  	// Sets the radius of a circle. Units are in meters.
+  	setRadius: function (radius) {
+  		this._mRadius = radius;
+  		return this.redraw();
+  	},
+
+  	// @method getRadius(): Number
+  	// Returns the current radius of a circle. Units are in meters.
+  	getRadius: function () {
+  		return this._mRadius;
+  	},
+
+  	// @method getBounds(): LatLngBounds
+  	// Returns the `LatLngBounds` of the path.
+  	getBounds: function () {
+  		var half = [this._radius, this._radiusY || this._radius];
+
+  		return new LatLngBounds(
+  			this._map.layerPointToLatLng(this._point.subtract(half)),
+  			this._map.layerPointToLatLng(this._point.add(half)));
+  	},
+
+  	setStyle: Path.prototype.setStyle,
+
+  	_project: function () {
+
+  		var lng = this._latlng.lng,
+  		    lat = this._latlng.lat,
+  		    map = this._map,
+  		    crs = map.options.crs;
+
+  		if (crs.distance === Earth.distance) {
+  			var d = Math.PI / 180,
+  			    latR = (this._mRadius / Earth.R) / d,
+  			    top = map.project([lat + latR, lng]),
+  			    bottom = map.project([lat - latR, lng]),
+  			    p = top.add(bottom).divideBy(2),
+  			    lat2 = map.unproject(p).lat,
+  			    lngR = Math.acos((Math.cos(latR * d) - Math.sin(lat * d) * Math.sin(lat2 * d)) /
+  			            (Math.cos(lat * d) * Math.cos(lat2 * d))) / d;
+
+  			if (isNaN(lngR) || lngR === 0) {
+  				lngR = latR / Math.cos(Math.PI / 180 * lat); // Fallback for edge case, #2425
+  			}
+
+  			this._point = p.subtract(map.getPixelOrigin());
+  			this._radius = isNaN(lngR) ? 0 : p.x - map.project([lat2, lng - lngR]).x;
+  			this._radiusY = p.y - top.y;
+
+  		} else {
+  			var latlng2 = crs.unproject(crs.project(this._latlng).subtract([this._mRadius, 0]));
+
+  			this._point = map.latLngToLayerPoint(this._latlng);
+  			this._radius = this._point.x - map.latLngToLayerPoint(latlng2).x;
+  		}
+
+  		this._updateBounds();
+  	}
+  });
+
+  // @factory L.circle(latlng: LatLng, options?: Circle options)
+  // Instantiates a circle object given a geographical point, and an options object
+  // which contains the circle radius.
+  // @alternative
+  // @factory L.circle(latlng: LatLng, radius: Number, options?: Circle options)
+  // Obsolete way of instantiating a circle, for compatibility with 0.7.x code.
+  // Do not use in new applications or plugins.
+  function circle(latlng, options, legacyOptions) {
+  	return new Circle(latlng, options, legacyOptions);
+  }
+
+  /*
+   * @class Polyline
+   * @aka L.Polyline
+   * @inherits Path
+   *
+   * A class for drawing polyline overlays on a map. Extends `Path`.
+   *
+   * @example
+   *
+   * ```js
+   * // create a red polyline from an array of LatLng points
+   * var latlngs = [
+   * 	[45.51, -122.68],
+   * 	[37.77, -122.43],
+   * 	[34.04, -118.2]
+   * ];
+   *
+   * var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+   *
+   * // zoom the map to the polyline
+   * map.fitBounds(polyline.getBounds());
+   * ```
+   *
+   * You can also pass a multi-dimensional array to represent a `MultiPolyline` shape:
+   *
+   * ```js
+   * // create a red polyline from an array of arrays of LatLng points
+   * var latlngs = [
+   * 	[[45.51, -122.68],
+   * 	 [37.77, -122.43],
+   * 	 [34.04, -118.2]],
+   * 	[[40.78, -73.91],
+   * 	 [41.83, -87.62],
+   * 	 [32.76, -96.72]]
+   * ];
+   * ```
+   */
+
+
+  var Polyline = Path.extend({
+
+  	// @section
+  	// @aka Polyline options
+  	options: {
+  		// @option smoothFactor: Number = 1.0
+  		// How much to simplify the polyline on each zoom level. More means
+  		// better performance and smoother look, and less means more accurate representation.
+  		smoothFactor: 1.0,
+
+  		// @option noClip: Boolean = false
+  		// Disable polyline clipping.
+  		noClip: false
+  	},
+
+  	initialize: function (latlngs, options) {
+  		setOptions(this, options);
+  		this._setLatLngs(latlngs);
+  	},
+
+  	// @method getLatLngs(): LatLng[]
+  	// Returns an array of the points in the path, or nested arrays of points in case of multi-polyline.
+  	getLatLngs: function () {
+  		return this._latlngs;
+  	},
+
+  	// @method setLatLngs(latlngs: LatLng[]): this
+  	// Replaces all the points in the polyline with the given array of geographical points.
+  	setLatLngs: function (latlngs) {
+  		this._setLatLngs(latlngs);
+  		return this.redraw();
+  	},
+
+  	// @method isEmpty(): Boolean
+  	// Returns `true` if the Polyline has no LatLngs.
+  	isEmpty: function () {
+  		return !this._latlngs.length;
+  	},
+
+  	// @method closestLayerPoint(p: Point): Point
+  	// Returns the point closest to `p` on the Polyline.
+  	closestLayerPoint: function (p) {
+  		var minDistance = Infinity,
+  		    minPoint = null,
+  		    closest = _sqClosestPointOnSegment,
+  		    p1, p2;
+
+  		for (var j = 0, jLen = this._parts.length; j < jLen; j++) {
+  			var points = this._parts[j];
+
+  			for (var i = 1, len = points.length; i < len; i++) {
+  				p1 = points[i - 1];
+  				p2 = points[i];
+
+  				var sqDist = closest(p, p1, p2, true);
+
+  				if (sqDist < minDistance) {
+  					minDistance = sqDist;
+  					minPoint = closest(p, p1, p2);
+  				}
+  			}
+  		}
+  		if (minPoint) {
+  			minPoint.distance = Math.sqrt(minDistance);
+  		}
+  		return minPoint;
+  	},
+
+  	// @method getCenter(): LatLng
+  	// Returns the center ([centroid](https://en.wikipedia.org/wiki/Centroid)) of the polyline.
+  	getCenter: function () {
+  		// throws error when not yet added to map as this center calculation requires projected coordinates
+  		if (!this._map) {
+  			throw new Error('Must add layer to map before using getCenter()');
+  		}
+  		return polylineCenter(this._defaultShape(), this._map.options.crs);
+  	},
+
+  	// @method getBounds(): LatLngBounds
+  	// Returns the `LatLngBounds` of the path.
+  	getBounds: function () {
+  		return this._bounds;
+  	},
+
+  	// @method addLatLng(latlng: LatLng, latlngs?: LatLng[]): this
+  	// Adds a given point to the polyline. By default, adds to the first ring of
+  	// the polyline in case of a multi-polyline, but can be overridden by passing
+  	// a specific ring as a LatLng array (that you can earlier access with [`getLatLngs`](#polyline-getlatlngs)).
+  	addLatLng: function (latlng, latlngs) {
+  		latlngs = latlngs || this._defaultShape();
+  		latlng = toLatLng(latlng);
+  		latlngs.push(latlng);
+  		this._bounds.extend(latlng);
+  		return this.redraw();
+  	},
+
+  	_setLatLngs: function (latlngs) {
+  		this._bounds = new LatLngBounds();
+  		this._latlngs = this._convertLatLngs(latlngs);
+  	},
+
+  	_defaultShape: function () {
+  		return isFlat(this._latlngs) ? this._latlngs : this._latlngs[0];
+  	},
+
+  	// recursively convert latlngs input into actual LatLng instances; calculate bounds along the way
+  	_convertLatLngs: function (latlngs) {
+  		var result = [],
+  		    flat = isFlat(latlngs);
+
+  		for (var i = 0, len = latlngs.length; i < len; i++) {
+  			if (flat) {
+  				result[i] = toLatLng(latlngs[i]);
+  				this._bounds.extend(result[i]);
+  			} else {
+  				result[i] = this._convertLatLngs(latlngs[i]);
+  			}
+  		}
+
+  		return result;
+  	},
+
+  	_project: function () {
+  		var pxBounds = new Bounds();
+  		this._rings = [];
+  		this._projectLatlngs(this._latlngs, this._rings, pxBounds);
+
+  		if (this._bounds.isValid() && pxBounds.isValid()) {
+  			this._rawPxBounds = pxBounds;
+  			this._updateBounds();
+  		}
+  	},
+
+  	_updateBounds: function () {
+  		var w = this._clickTolerance(),
+  		    p = new Point(w, w);
+
+  		if (!this._rawPxBounds) {
+  			return;
+  		}
+
+  		this._pxBounds = new Bounds([
+  			this._rawPxBounds.min.subtract(p),
+  			this._rawPxBounds.max.add(p)
+  		]);
+  	},
+
+  	// recursively turns latlngs into a set of rings with projected coordinates
+  	_projectLatlngs: function (latlngs, result, projectedBounds) {
+  		var flat = latlngs[0] instanceof LatLng,
+  		    len = latlngs.length,
+  		    i, ring;
+
+  		if (flat) {
+  			ring = [];
+  			for (i = 0; i < len; i++) {
+  				ring[i] = this._map.latLngToLayerPoint(latlngs[i]);
+  				projectedBounds.extend(ring[i]);
+  			}
+  			result.push(ring);
+  		} else {
+  			for (i = 0; i < len; i++) {
+  				this._projectLatlngs(latlngs[i], result, projectedBounds);
+  			}
+  		}
+  	},
+
+  	// clip polyline by renderer bounds so that we have less to render for performance
+  	_clipPoints: function () {
+  		var bounds = this._renderer._bounds;
+
+  		this._parts = [];
+  		if (!this._pxBounds || !this._pxBounds.intersects(bounds)) {
+  			return;
+  		}
+
+  		if (this.options.noClip) {
+  			this._parts = this._rings;
+  			return;
+  		}
+
+  		var parts = this._parts,
+  		    i, j, k, len, len2, segment, points;
+
+  		for (i = 0, k = 0, len = this._rings.length; i < len; i++) {
+  			points = this._rings[i];
+
+  			for (j = 0, len2 = points.length; j < len2 - 1; j++) {
+  				segment = clipSegment(points[j], points[j + 1], bounds, j, true);
+
+  				if (!segment) { continue; }
+
+  				parts[k] = parts[k] || [];
+  				parts[k].push(segment[0]);
+
+  				// if segment goes out of screen, or it's the last one, it's the end of the line part
+  				if ((segment[1] !== points[j + 1]) || (j === len2 - 2)) {
+  					parts[k].push(segment[1]);
+  					k++;
+  				}
+  			}
+  		}
+  	},
+
+  	// simplify each clipped part of the polyline for performance
+  	_simplifyPoints: function () {
+  		var parts = this._parts,
+  		    tolerance = this.options.smoothFactor;
+
+  		for (var i = 0, len = parts.length; i < len; i++) {
+  			parts[i] = simplify(parts[i], tolerance);
+  		}
+  	},
+
+  	_update: function () {
+  		if (!this._map) { return; }
+
+  		this._clipPoints();
+  		this._simplifyPoints();
+  		this._updatePath();
+  	},
+
+  	_updatePath: function () {
+  		this._renderer._updatePoly(this);
+  	},
+
+  	// Needed by the `Canvas` renderer for interactivity
+  	_containsPoint: function (p, closed) {
+  		var i, j, k, len, len2, part,
+  		    w = this._clickTolerance();
+
+  		if (!this._pxBounds || !this._pxBounds.contains(p)) { return false; }
+
+  		// hit detection for polylines
+  		for (i = 0, len = this._parts.length; i < len; i++) {
+  			part = this._parts[i];
+
+  			for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
+  				if (!closed && (j === 0)) { continue; }
+
+  				if (pointToSegmentDistance(p, part[k], part[j]) <= w) {
+  					return true;
+  				}
+  			}
+  		}
+  		return false;
+  	}
+  });
+
+  // @factory L.polyline(latlngs: LatLng[], options?: Polyline options)
+  // Instantiates a polyline object given an array of geographical points and
+  // optionally an options object. You can create a `Polyline` object with
+  // multiple separate lines (`MultiPolyline`) by passing an array of arrays
+  // of geographic points.
+  function polyline(latlngs, options) {
+  	return new Polyline(latlngs, options);
+  }
+
+  // Retrocompat. Allow plugins to support Leaflet versions before and after 1.1.
+  Polyline._flat = _flat;
+
+  /*
+   * @class Polygon
+   * @aka L.Polygon
+   * @inherits Polyline
+   *
+   * A class for drawing polygon overlays on a map. Extends `Polyline`.
+   *
+   * Note that points you pass when creating a polygon shouldn't have an additional last point equal to the first one — it's better to filter out such points.
+   *
+   *
+   * @example
+   *
+   * ```js
+   * // create a red polygon from an array of LatLng points
+   * var latlngs = [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]];
+   *
+   * var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+   *
+   * // zoom the map to the polygon
+   * map.fitBounds(polygon.getBounds());
+   * ```
+   *
+   * You can also pass an array of arrays of latlngs, with the first array representing the outer shape and the other arrays representing holes in the outer shape:
+   *
+   * ```js
+   * var latlngs = [
+   *   [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]], // outer ring
+   *   [[37.29, -108.58],[40.71, -108.58],[40.71, -102.50],[37.29, -102.50]] // hole
+   * ];
+   * ```
+   *
+   * Additionally, you can pass a multi-dimensional array to represent a MultiPolygon shape.
+   *
+   * ```js
+   * var latlngs = [
+   *   [ // first polygon
+   *     [[37, -109.05],[41, -109.03],[41, -102.05],[37, -102.04]], // outer ring
+   *     [[37.29, -108.58],[40.71, -108.58],[40.71, -102.50],[37.29, -102.50]] // hole
+   *   ],
+   *   [ // second polygon
+   *     [[41, -111.03],[45, -111.04],[45, -104.05],[41, -104.05]]
+   *   ]
+   * ];
+   * ```
+   */
+
+  var Polygon = Polyline.extend({
+
+  	options: {
+  		fill: true
+  	},
+
+  	isEmpty: function () {
+  		return !this._latlngs.length || !this._latlngs[0].length;
+  	},
+
+  	// @method getCenter(): LatLng
+  	// Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the Polygon.
+  	getCenter: function () {
+  		// throws error when not yet added to map as this center calculation requires projected coordinates
+  		if (!this._map) {
+  			throw new Error('Must add layer to map before using getCenter()');
+  		}
+  		return polygonCenter(this._defaultShape(), this._map.options.crs);
+  	},
+
+  	_convertLatLngs: function (latlngs) {
+  		var result = Polyline.prototype._convertLatLngs.call(this, latlngs),
+  		    len = result.length;
+
+  		// remove last point if it equals first one
+  		if (len >= 2 && result[0] instanceof LatLng && result[0].equals(result[len - 1])) {
+  			result.pop();
+  		}
+  		return result;
+  	},
+
+  	_setLatLngs: function (latlngs) {
+  		Polyline.prototype._setLatLngs.call(this, latlngs);
+  		if (isFlat(this._latlngs)) {
+  			this._latlngs = [this._latlngs];
+  		}
+  	},
+
+  	_defaultShape: function () {
+  		return isFlat(this._latlngs[0]) ? this._latlngs[0] : this._latlngs[0][0];
+  	},
+
+  	_clipPoints: function () {
+  		// polygons need a different clipping algorithm so we redefine that
+
+  		var bounds = this._renderer._bounds,
+  		    w = this.options.weight,
+  		    p = new Point(w, w);
+
+  		// increase clip padding by stroke width to avoid stroke on clip edges
+  		bounds = new Bounds(bounds.min.subtract(p), bounds.max.add(p));
+
+  		this._parts = [];
+  		if (!this._pxBounds || !this._pxBounds.intersects(bounds)) {
+  			return;
+  		}
+
+  		if (this.options.noClip) {
+  			this._parts = this._rings;
+  			return;
+  		}
+
+  		for (var i = 0, len = this._rings.length, clipped; i < len; i++) {
+  			clipped = clipPolygon(this._rings[i], bounds, true);
+  			if (clipped.length) {
+  				this._parts.push(clipped);
+  			}
+  		}
+  	},
+
+  	_updatePath: function () {
+  		this._renderer._updatePoly(this, true);
+  	},
+
+  	// Needed by the `Canvas` renderer for interactivity
+  	_containsPoint: function (p) {
+  		var inside = false,
+  		    part, p1, p2, i, j, k, len, len2;
+
+  		if (!this._pxBounds || !this._pxBounds.contains(p)) { return false; }
+
+  		// ray casting algorithm for detecting if point is in polygon
+  		for (i = 0, len = this._parts.length; i < len; i++) {
+  			part = this._parts[i];
+
+  			for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
+  				p1 = part[j];
+  				p2 = part[k];
+
+  				if (((p1.y > p.y) !== (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) {
+  					inside = !inside;
+  				}
+  			}
+  		}
+
+  		// also check if it's on polygon stroke
+  		return inside || Polyline.prototype._containsPoint.call(this, p, true);
+  	}
+
+  });
+
+
+  // @factory L.polygon(latlngs: LatLng[], options?: Polyline options)
+  function polygon(latlngs, options) {
+  	return new Polygon(latlngs, options);
+  }
+
+  /*
+   * @class GeoJSON
+   * @aka L.GeoJSON
+   * @inherits FeatureGroup
+   *
+   * Represents a GeoJSON object or an array of GeoJSON objects. Allows you to parse
+   * GeoJSON data and display it on the map. Extends `FeatureGroup`.
+   *
+   * @example
+   *
+   * ```js
+   * L.geoJSON(data, {
+   * 	style: function (feature) {
+   * 		return {color: feature.properties.color};
+   * 	}
+   * }).bindPopup(function (layer) {
+   * 	return layer.feature.properties.description;
+   * }).addTo(map);
+   * ```
+   */
+
+  var GeoJSON = FeatureGroup.extend({
+
+  	/* @section
+  	 * @aka GeoJSON options
+  	 *
+  	 * @option pointToLayer: Function = *
+  	 * A `Function` defining how GeoJSON points spawn Leaflet layers. It is internally
+  	 * called when data is added, passing the GeoJSON point feature and its `LatLng`.
+  	 * The default is to spawn a default `Marker`:
+  	 * ```js
+  	 * function(geoJsonPoint, latlng) {
+  	 * 	return L.marker(latlng);
+  	 * }
+  	 * ```
+  	 *
+  	 * @option style: Function = *
+  	 * A `Function` defining the `Path options` for styling GeoJSON lines and polygons,
+  	 * called internally when data is added.
+  	 * The default value is to not override any defaults:
+  	 * ```js
+  	 * function (geoJsonFeature) {
+  	 * 	return {}
+  	 * }
+  	 * ```
+  	 *
+  	 * @option onEachFeature: Function = *
+  	 * A `Function` that will be called once for each created `Feature`, after it has
+  	 * been created and styled. Useful for attaching events and popups to features.
+  	 * The default is to do nothing with the newly created layers:
+  	 * ```js
+  	 * function (feature, layer) {}
+  	 * ```
+  	 *
+  	 * @option filter: Function = *
+  	 * A `Function` that will be used to decide whether to include a feature or not.
+  	 * The default is to include all features:
+  	 * ```js
+  	 * function (geoJsonFeature) {
+  	 * 	return true;
+  	 * }
+  	 * ```
+  	 * Note: dynamically changing the `filter` option will have effect only on newly
+  	 * added data. It will _not_ re-evaluate already included features.
+  	 *
+  	 * @option coordsToLatLng: Function = *
+  	 * A `Function` that will be used for converting GeoJSON coordinates to `LatLng`s.
+  	 * The default is the `coordsToLatLng` static method.
+  	 *
+  	 * @option markersInheritOptions: Boolean = false
+  	 * Whether default Markers for "Point" type Features inherit from group options.
+  	 */
+
+  	initialize: function (geojson, options) {
+  		setOptions(this, options);
+
+  		this._layers = {};
+
+  		if (geojson) {
+  			this.addData(geojson);
+  		}
+  	},
+
+  	// @method addData( <GeoJSON> data ): this
+  	// Adds a GeoJSON object to the layer.
+  	addData: function (geojson) {
+  		var features = isArray(geojson) ? geojson : geojson.features,
+  		    i, len, feature;
+
+  		if (features) {
+  			for (i = 0, len = features.length; i < len; i++) {
+  				// only add this if geometry or geometries are set and not null
+  				feature = features[i];
+  				if (feature.geometries || feature.geometry || feature.features || feature.coordinates) {
+  					this.addData(feature);
+  				}
+  			}
+  			return this;
+  		}
+
+  		var options = this.options;
+
+  		if (options.filter && !options.filter(geojson)) { return this; }
+
+  		var layer = geometryToLayer(geojson, options);
+  		if (!layer) {
+  			return this;
+  		}
+  		layer.feature = asFeature(geojson);
+
+  		layer.defaultOptions = layer.options;
+  		this.resetStyle(layer);
+
+  		if (options.onEachFeature) {
+  			options.onEachFeature(geojson, layer);
+  		}
+
+  		return this.addLayer(layer);
+  	},
+
+  	// @method resetStyle( <Path> layer? ): this
+  	// Resets the given vector layer's style to the original GeoJSON style, useful for resetting style after hover events.
+  	// If `layer` is omitted, the style of all features in the current layer is reset.
+  	resetStyle: function (layer) {
+  		if (layer === undefined) {
+  			return this.eachLayer(this.resetStyle, this);
+  		}
+  		// reset any custom styles
+  		layer.options = extend({}, layer.defaultOptions);
+  		this._setLayerStyle(layer, this.options.style);
+  		return this;
+  	},
+
+  	// @method setStyle( <Function> style ): this
+  	// Changes styles of GeoJSON vector layers with the given style function.
+  	setStyle: function (style) {
+  		return this.eachLayer(function (layer) {
+  			this._setLayerStyle(layer, style);
+  		}, this);
+  	},
+
+  	_setLayerStyle: function (layer, style) {
+  		if (layer.setStyle) {
+  			if (typeof style === 'function') {
+  				style = style(layer.feature);
+  			}
+  			layer.setStyle(style);
+  		}
+  	}
+  });
+
+  // @section
+  // There are several static functions which can be called without instantiating L.GeoJSON:
+
+  // @function geometryToLayer(featureData: Object, options?: GeoJSON options): Layer
+  // Creates a `Layer` from a given GeoJSON feature. Can use a custom
+  // [`pointToLayer`](#geojson-pointtolayer) and/or [`coordsToLatLng`](#geojson-coordstolatlng)
+  // functions if provided as options.
+  function geometryToLayer(geojson, options) {
+
+  	var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
+  	    coords = geometry ? geometry.coordinates : null,
+  	    layers = [],
+  	    pointToLayer = options && options.pointToLayer,
+  	    _coordsToLatLng = options && options.coordsToLatLng || coordsToLatLng,
+  	    latlng, latlngs, i, len;
+
+  	if (!coords && !geometry) {
+  		return null;
+  	}
+
+  	switch (geometry.type) {
+  	case 'Point':
+  		latlng = _coordsToLatLng(coords);
+  		return _pointToLayer(pointToLayer, geojson, latlng, options);
+
+  	case 'MultiPoint':
+  		for (i = 0, len = coords.length; i < len; i++) {
+  			latlng = _coordsToLatLng(coords[i]);
+  			layers.push(_pointToLayer(pointToLayer, geojson, latlng, options));
+  		}
+  		return new FeatureGroup(layers);
+
+  	case 'LineString':
+  	case 'MultiLineString':
+  		latlngs = coordsToLatLngs(coords, geometry.type === 'LineString' ? 0 : 1, _coordsToLatLng);
+  		return new Polyline(latlngs, options);
+
+  	case 'Polygon':
+  	case 'MultiPolygon':
+  		latlngs = coordsToLatLngs(coords, geometry.type === 'Polygon' ? 1 : 2, _coordsToLatLng);
+  		return new Polygon(latlngs, options);
+
+  	case 'GeometryCollection':
+  		for (i = 0, len = geometry.geometries.length; i < len; i++) {
+  			var geoLayer = geometryToLayer({
+  				geometry: geometry.geometries[i],
+  				type: 'Feature',
+  				properties: geojson.properties
+  			}, options);
+
+  			if (geoLayer) {
+  				layers.push(geoLayer);
+  			}
+  		}
+  		return new FeatureGroup(layers);
+
+  	case 'FeatureCollection':
+  		for (i = 0, len = geometry.features.length; i < len; i++) {
+  			var featureLayer = geometryToLayer(geometry.features[i], options);
+
+  			if (featureLayer) {
+  				layers.push(featureLayer);
+  			}
+  		}
+  		return new FeatureGroup(layers);
+
+  	default:
+  		throw new Error('Invalid GeoJSON object.');
+  	}
+  }
+
+  function _pointToLayer(pointToLayerFn, geojson, latlng, options) {
+  	return pointToLayerFn ?
+  		pointToLayerFn(geojson, latlng) :
+  		new Marker(latlng, options && options.markersInheritOptions && options);
+  }
+
+  // @function coordsToLatLng(coords: Array): LatLng
+  // Creates a `LatLng` object from an array of 2 numbers (longitude, latitude)
+  // or 3 numbers (longitude, latitude, altitude) used in GeoJSON for points.
+  function coordsToLatLng(coords) {
+  	return new LatLng(coords[1], coords[0], coords[2]);
+  }
+
+  // @function coordsToLatLngs(coords: Array, levelsDeep?: Number, coordsToLatLng?: Function): Array
+  // Creates a multidimensional array of `LatLng`s from a GeoJSON coordinates array.
+  // `levelsDeep` specifies the nesting level (0 is for an array of points, 1 for an array of arrays of points, etc., 0 by default).
+  // Can use a custom [`coordsToLatLng`](#geojson-coordstolatlng) function.
+  function coordsToLatLngs(coords, levelsDeep, _coordsToLatLng) {
+  	var latlngs = [];
+
+  	for (var i = 0, len = coords.length, latlng; i < len; i++) {
+  		latlng = levelsDeep ?
+  			coordsToLatLngs(coords[i], levelsDeep - 1, _coordsToLatLng) :
+  			(_coordsToLatLng || coordsToLatLng)(coords[i]);
+
+  		latlngs.push(latlng);
+  	}
+
+  	return latlngs;
+  }
+
+  // @function latLngToCoords(latlng: LatLng, precision?: Number|false): Array
+  // Reverse of [`coordsToLatLng`](#geojson-coordstolatlng)
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function.
+  function latLngToCoords(latlng, precision) {
+  	latlng = toLatLng(latlng);
+  	return latlng.alt !== undefined ?
+  		[formatNum(latlng.lng, precision), formatNum(latlng.lat, precision), formatNum(latlng.alt, precision)] :
+  		[formatNum(latlng.lng, precision), formatNum(latlng.lat, precision)];
+  }
+
+  // @function latLngsToCoords(latlngs: Array, levelsDeep?: Number, closed?: Boolean, precision?: Number|false): Array
+  // Reverse of [`coordsToLatLngs`](#geojson-coordstolatlngs)
+  // `closed` determines whether the first point should be appended to the end of the array to close the feature, only used when `levelsDeep` is 0. False by default.
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function.
+  function latLngsToCoords(latlngs, levelsDeep, closed, precision) {
+  	var coords = [];
+
+  	for (var i = 0, len = latlngs.length; i < len; i++) {
+  		// Check for flat arrays required to ensure unbalanced arrays are correctly converted in recursion
+  		coords.push(levelsDeep ?
+  			latLngsToCoords(latlngs[i], isFlat(latlngs[i]) ? 0 : levelsDeep - 1, closed, precision) :
+  			latLngToCoords(latlngs[i], precision));
+  	}
+
+  	if (!levelsDeep && closed && coords.length > 0) {
+  		coords.push(coords[0].slice());
+  	}
+
+  	return coords;
+  }
+
+  function getFeature(layer, newGeometry) {
+  	return layer.feature ?
+  		extend({}, layer.feature, {geometry: newGeometry}) :
+  		asFeature(newGeometry);
+  }
+
+  // @function asFeature(geojson: Object): Object
+  // Normalize GeoJSON geometries/features into GeoJSON features.
+  function asFeature(geojson) {
+  	if (geojson.type === 'Feature' || geojson.type === 'FeatureCollection') {
+  		return geojson;
+  	}
+
+  	return {
+  		type: 'Feature',
+  		properties: {},
+  		geometry: geojson
+  	};
+  }
+
+  var PointToGeoJSON = {
+  	toGeoJSON: function (precision) {
+  		return getFeature(this, {
+  			type: 'Point',
+  			coordinates: latLngToCoords(this.getLatLng(), precision)
+  		});
+  	}
+  };
+
+  // @namespace Marker
+  // @section Other methods
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
+  // Returns a [`GeoJSON`](https://en.wikipedia.org/wiki/GeoJSON) representation of the marker (as a GeoJSON `Point` Feature).
+  Marker.include(PointToGeoJSON);
+
+  // @namespace CircleMarker
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
+  // Returns a [`GeoJSON`](https://en.wikipedia.org/wiki/GeoJSON) representation of the circle marker (as a GeoJSON `Point` Feature).
+  Circle.include(PointToGeoJSON);
+  CircleMarker.include(PointToGeoJSON);
+
+
+  // @namespace Polyline
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
+  // Returns a [`GeoJSON`](https://en.wikipedia.org/wiki/GeoJSON) representation of the polyline (as a GeoJSON `LineString` or `MultiLineString` Feature).
+  Polyline.include({
+  	toGeoJSON: function (precision) {
+  		var multi = !isFlat(this._latlngs);
+
+  		var coords = latLngsToCoords(this._latlngs, multi ? 1 : 0, false, precision);
+
+  		return getFeature(this, {
+  			type: (multi ? 'Multi' : '') + 'LineString',
+  			coordinates: coords
+  		});
+  	}
+  });
+
+  // @namespace Polygon
+  // @method toGeoJSON(precision?: Number|false): Object
+  // Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
+  // Returns a [`GeoJSON`](https://en.wikipedia.org/wiki/GeoJSON) representation of the polygon (as a GeoJSON `Polygon` or `MultiPolygon` Feature).
+  Polygon.include({
+  	toGeoJSON: function (precision) {
+  		var holes = !isFlat(this._latlngs),
+  		    multi = holes && !isFlat(this._latlngs[0]);
+
+  		var coords = latLngsToCoords(this._latlngs, multi ? 2 : holes ? 1 : 0, true, precision);
+
+  		if (!holes) {
+  			coords = [coords];
+  		}
+
+  		return getFeature(this, {
+  			type: (multi ? 'Multi' : '') + 'Polygon',
+  			coordinates: coords
+  		});
+  	}
+  });
+
+
+  // @namespace LayerGroup
+  LayerGroup.include({
+  	toMultiPoint: function (precision) {
+  		var coords = [];
+
+  		this.eachLayer(function (layer) {
+  			coords.push(layer.toGeoJSON(precision).geometry.coordinates);
+  		});
+
+  		return getFeature(this, {
+  			type: 'MultiPoint',
+  			coordinates: coords
+  		});
+  	},
+
+  	// @method toGeoJSON(precision?: Number|false): Object
+  	// Coordinates values are rounded with [`formatNum`](#util-formatnum) function with given `precision`.
+  	// Returns a [`GeoJSON`](https://en.wikipedia.org/wiki/GeoJSON) representation of the layer group (as a GeoJSON `FeatureCollection`, `GeometryCollection`, or `MultiPoint`).
+  	toGeoJSON: function (precision) {
+
+  		var type = this.feature && this.feature.geometry && this.feature.geometry.type;
+
+  		if (type === 'MultiPoint') {
+  			return this.toMultiPoint(precision);
+  		}
+
+  		var isGeometryCollection = type === 'GeometryCollection',
+  		    jsons = [];
+
+  		this.eachLayer(function (layer) {
+  			if (layer.toGeoJSON) {
+  				var json = layer.toGeoJSON(precision);
+  				if (isGeometryCollection) {
+  					jsons.push(json.geometry);
+  				} else {
+  					var feature = asFeature(json);
+  					// Squash nested feature collections
+  					if (feature.type === 'FeatureCollection') {
+  						jsons.push.apply(jsons, feature.features);
+  					} else {
+  						jsons.push(feature);
+  					}
+  				}
+  			}
+  		});
+
+  		if (isGeometryCollection) {
+  			return getFeature(this, {
+  				geometries: jsons,
+  				type: 'GeometryCollection'
+  			});
+  		}
+
+  		return {
+  			type: 'FeatureCollection',
+  			features: jsons
+  		};
+  	}
+  });
+
+  // @namespace GeoJSON
+  // @factory L.geoJSON(geojson?: Object, options?: GeoJSON options)
+  // Creates a GeoJSON layer. Optionally accepts an object in
+  // [GeoJSON format](https://tools.ietf.org/html/rfc7946) to display on the map
+  // (you can alternatively add it later with `addData` method) and an `options` object.
+  function geoJSON(geojson, options) {
+  	return new GeoJSON(geojson, options);
+  }
+
+  // Backward compatibility.
+  var geoJson = geoJSON;
+
+  /*
+   * @class ImageOverlay
+   * @aka L.ImageOverlay
+   * @inherits Interactive layer
+   *
+   * Used to load and display a single image over specific bounds of the map. Extends `Layer`.
+   *
+   * @example
+   *
+   * ```js
+   * var imageUrl = 'https://maps.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+   * 	imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
+   * L.imageOverlay(imageUrl, imageBounds).addTo(map);
+   * ```
+   */
+
+  var ImageOverlay = Layer.extend({
+
+  	// @section
+  	// @aka ImageOverlay options
+  	options: {
+  		// @option opacity: Number = 1.0
+  		// The opacity of the image overlay.
+  		opacity: 1,
+
+  		// @option alt: String = ''
+  		// Text for the `alt` attribute of the image (useful for accessibility).
+  		alt: '',
+
+  		// @option interactive: Boolean = false
+  		// If `true`, the image overlay will emit [mouse events](#interactive-layer) when clicked or hovered.
+  		interactive: false,
+
+  		// @option crossOrigin: Boolean|String = false
+  		// Whether the crossOrigin attribute will be added to the image.
+  		// If a String is provided, the image will have its crossOrigin attribute set to the String provided. This is needed if you want to access image pixel data.
+  		// Refer to [CORS Settings](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) for valid String values.
+  		crossOrigin: false,
+
+  		// @option errorOverlayUrl: String = ''
+  		// URL to the overlay image to show in place of the overlay that failed to load.
+  		errorOverlayUrl: '',
+
+  		// @option zIndex: Number = 1
+  		// The explicit [zIndex](https://developer.mozilla.org/docs/Web/CSS/CSS_Positioning/Understanding_z_index) of the overlay layer.
+  		zIndex: 1,
+
+  		// @option className: String = ''
+  		// A custom class name to assign to the image. Empty by default.
+  		className: ''
+  	},
+
+  	initialize: function (url, bounds, options) { // (String, LatLngBounds, Object)
+  		this._url = url;
+  		this._bounds = toLatLngBounds(bounds);
+
+  		setOptions(this, options);
+  	},
+
+  	onAdd: function () {
+  		if (!this._image) {
+  			this._initImage();
+
+  			if (this.options.opacity < 1) {
+  				this._updateOpacity();
+  			}
+  		}
+
+  		if (this.options.interactive) {
+  			addClass(this._image, 'leaflet-interactive');
+  			this.addInteractiveTarget(this._image);
+  		}
+
+  		this.getPane().appendChild(this._image);
+  		this._reset();
+  	},
+
+  	onRemove: function () {
+  		remove(this._image);
+  		if (this.options.interactive) {
+  			this.removeInteractiveTarget(this._image);
+  		}
+  	},
+
+  	// @method setOpacity(opacity: Number): this
+  	// Sets the opacity of the overlay.
+  	setOpacity: function (opacity) {
+  		this.options.opacity = opacity;
+
+  		if (this._image) {
+  			this._updateOpacity();
+  		}
+  		return this;
+  	},
+
+  	setStyle: function (styleOpts) {
+  		if (styleOpts.opacity) {
+  			this.setOpacity(styleOpts.opacity);
+  		}
+  		return this;
+  	},
+
+  	// @method bringToFront(): this
+  	// Brings the layer to the top of all overlays.
+  	bringToFront: function () {
+  		if (this._map) {
+  			toFront(this._image);
+  		}
+  		return this;
+  	},
+
+  	// @method bringToBack(): this
+  	// Brings the layer to the bottom of all overlays.
+  	bringToBack: function () {
+  		if (this._map) {
+  			toBack(this._image);
+  		}
+  		return this;
+  	},
+
+  	// @method setUrl(url: String): this
+  	// Changes the URL of the image.
+  	setUrl: function (url) {
+  		this._url = url;
+
+  		if (this._image) {
+  			this._image.src = url;
+  		}
+  		return this;
+  	},
+
+  	// @method setBounds(bounds: LatLngBounds): this
+  	// Update the bounds that this ImageOverlay covers
+  	setBounds: function (bounds) {
+  		this._bounds = toLatLngBounds(bounds);
+
+  		if (this._map) {
+  			this._reset();
+  		}
+  		return this;
+  	},
+
+  	getEvents: function () {
+  		var events = {
+  			zoom: this._reset,
+  			viewreset: this._reset
+  		};
+
+  		if (this._zoomAnimated) {
+  			events.zoomanim = this._animateZoom;
+  		}
+
+  		return events;
+  	},
+
+  	// @method setZIndex(value: Number): this
+  	// Changes the [zIndex](#imageoverlay-zindex) of the image overlay.
+  	setZIndex: function (value) {
+  		this.options.zIndex = value;
+  		this._updateZIndex();
+  		return this;
+  	},
+
+  	// @method getBounds(): LatLngBounds
+  	// Get the bounds that this ImageOverlay covers
+  	getBounds: function () {
+  		return this._bounds;
+  	},
+
+  	// @method getElement(): HTMLElement
+  	// Returns the instance of [`HTMLImageElement`](https://developer.mozilla.org/docs/Web/API/HTMLImageElement)
+  	// used by this overlay.
+  	getElement: function () {
+  		return this._image;
+  	},
+
+  	_initImage: function () {
+  		var wasElementSupplied = this._url.tagName === 'IMG';
+  		var img = this._image = wasElementSupplied ? this._url : create$1('img');
+
+  		addClass(img, 'leaflet-image-layer');
+  		if (this._zoomAnimated) { addClass(img, 'leaflet-zoom-animated'); }
+  		if (this.options.className) { addClass(img, this.options.className); }
+
+  		img.onselectstart = falseFn;
+  		img.onmousemove = falseFn;
+
+  		// @event load: Event
+  		// Fired when the ImageOverlay layer has loaded its image
+  		img.onload = bind(this.fire, this, 'load');
+  		img.onerror = bind(this._overlayOnError, this, 'error');
+
+  		if (this.options.crossOrigin || this.options.crossOrigin === '') {
+  			img.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+  		}
+
+  		if (this.options.zIndex) {
+  			this._updateZIndex();
+  		}
+
+  		if (wasElementSupplied) {
+  			this._url = img.src;
+  			return;
+  		}
+
+  		img.src = this._url;
+  		img.alt = this.options.alt;
+  	},
+
+  	_animateZoom: function (e) {
+  		var scale = this._map.getZoomScale(e.zoom),
+  		    offset = this._map._latLngBoundsToNewLayerBounds(this._bounds, e.zoom, e.center).min;
+
+  		setTransform(this._image, offset, scale);
+  	},
+
+  	_reset: function () {
+  		var image = this._image,
+  		    bounds = new Bounds(
+  		        this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
+  		        this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
+  		    size = bounds.getSize();
+
+  		setPosition(image, bounds.min);
+
+  		image.style.width  = size.x + 'px';
+  		image.style.height = size.y + 'px';
+  	},
+
+  	_updateOpacity: function () {
+  		setOpacity(this._image, this.options.opacity);
+  	},
+
+  	_updateZIndex: function () {
+  		if (this._image && this.options.zIndex !== undefined && this.options.zIndex !== null) {
+  			this._image.style.zIndex = this.options.zIndex;
+  		}
+  	},
+
+  	_overlayOnError: function () {
+  		// @event error: Event
+  		// Fired when the ImageOverlay layer fails to load its image
+  		this.fire('error');
+
+  		var errorUrl = this.options.errorOverlayUrl;
+  		if (errorUrl && this._url !== errorUrl) {
+  			this._url = errorUrl;
+  			this._image.src = errorUrl;
+  		}
+  	},
+
+  	// @method getCenter(): LatLng
+  	// Returns the center of the ImageOverlay.
+  	getCenter: function () {
+  		return this._bounds.getCenter();
+  	}
+  });
+
+  // @factory L.imageOverlay(imageUrl: String, bounds: LatLngBounds, options?: ImageOverlay options)
+  // Instantiates an image overlay object given the URL of the image and the
+  // geographical bounds it is tied to.
+  var imageOverlay = function (url, bounds, options) {
+  	return new ImageOverlay(url, bounds, options);
+  };
+
+  /*
+   * @class VideoOverlay
+   * @aka L.VideoOverlay
+   * @inherits ImageOverlay
+   *
+   * Used to load and display a video player over specific bounds of the map. Extends `ImageOverlay`.
+   *
+   * A video overlay uses the [`<video>`](https://developer.mozilla.org/docs/Web/HTML/Element/video)
+   * HTML5 element.
+   *
+   * @example
+   *
+   * ```js
+   * var videoUrl = 'https://www.mapbox.com/bites/00188/patricia_nasa.webm',
+   * 	videoBounds = [[ 32, -130], [ 13, -100]];
+   * L.videoOverlay(videoUrl, videoBounds ).addTo(map);
+   * ```
+   */
+
+  var VideoOverlay = ImageOverlay.extend({
+
+  	// @section
+  	// @aka VideoOverlay options
+  	options: {
+  		// @option autoplay: Boolean = true
+  		// Whether the video starts playing automatically when loaded.
+  		// On some browsers autoplay will only work with `muted: true`
+  		autoplay: true,
+
+  		// @option loop: Boolean = true
+  		// Whether the video will loop back to the beginning when played.
+  		loop: true,
+
+  		// @option keepAspectRatio: Boolean = true
+  		// Whether the video will save aspect ratio after the projection.
+  		// Relevant for supported browsers. See [browser compatibility](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit)
+  		keepAspectRatio: true,
+
+  		// @option muted: Boolean = false
+  		// Whether the video starts on mute when loaded.
+  		muted: false,
+
+  		// @option playsInline: Boolean = true
+  		// Mobile browsers will play the video right where it is instead of open it up in fullscreen mode.
+  		playsInline: true
+  	},
+
+  	_initImage: function () {
+  		var wasElementSupplied = this._url.tagName === 'VIDEO';
+  		var vid = this._image = wasElementSupplied ? this._url : create$1('video');
+
+  		addClass(vid, 'leaflet-image-layer');
+  		if (this._zoomAnimated) { addClass(vid, 'leaflet-zoom-animated'); }
+  		if (this.options.className) { addClass(vid, this.options.className); }
+
+  		vid.onselectstart = falseFn;
+  		vid.onmousemove = falseFn;
+
+  		// @event load: Event
+  		// Fired when the video has finished loading the first frame
+  		vid.onloadeddata = bind(this.fire, this, 'load');
+
+  		if (wasElementSupplied) {
+  			var sourceElements = vid.getElementsByTagName('source');
+  			var sources = [];
+  			for (var j = 0; j < sourceElements.length; j++) {
+  				sources.push(sourceElements[j].src);
+  			}
+
+  			this._url = (sourceElements.length > 0) ? sources : [vid.src];
+  			return;
+  		}
+
+  		if (!isArray(this._url)) { this._url = [this._url]; }
+
+  		if (!this.options.keepAspectRatio && Object.prototype.hasOwnProperty.call(vid.style, 'objectFit')) {
+  			vid.style['objectFit'] = 'fill';
+  		}
+  		vid.autoplay = !!this.options.autoplay;
+  		vid.loop = !!this.options.loop;
+  		vid.muted = !!this.options.muted;
+  		vid.playsInline = !!this.options.playsInline;
+  		for (var i = 0; i < this._url.length; i++) {
+  			var source = create$1('source');
+  			source.src = this._url[i];
+  			vid.appendChild(source);
+  		}
+  	}
+
+  	// @method getElement(): HTMLVideoElement
+  	// Returns the instance of [`HTMLVideoElement`](https://developer.mozilla.org/docs/Web/API/HTMLVideoElement)
+  	// used by this overlay.
+  });
+
+
+  // @factory L.videoOverlay(video: String|Array|HTMLVideoElement, bounds: LatLngBounds, options?: VideoOverlay options)
+  // Instantiates an image overlay object given the URL of the video (or array of URLs, or even a video element) and the
+  // geographical bounds it is tied to.
+
+  function videoOverlay(video, bounds, options) {
+  	return new VideoOverlay(video, bounds, options);
+  }
+
+  /*
+   * @class SVGOverlay
+   * @aka L.SVGOverlay
+   * @inherits ImageOverlay
+   *
+   * Used to load, display and provide DOM access to an SVG file over specific bounds of the map. Extends `ImageOverlay`.
+   *
+   * An SVG overlay uses the [`<svg>`](https://developer.mozilla.org/docs/Web/SVG/Element/svg) element.
+   *
+   * @example
+   *
+   * ```js
+   * var svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+   * svgElement.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+   * svgElement.setAttribute('viewBox', "0 0 200 200");
+   * svgElement.innerHTML = '<rect width="200" height="200"/><rect x="75" y="23" width="50" height="50" style="fill:red"/><rect x="75" y="123" width="50" height="50" style="fill:#0013ff"/>';
+   * var svgElementBounds = [ [ 32, -130 ], [ 13, -100 ] ];
+   * L.svgOverlay(svgElement, svgElementBounds).addTo(map);
+   * ```
+   */
+
+  var SVGOverlay = ImageOverlay.extend({
+  	_initImage: function () {
+  		var el = this._image = this._url;
+
+  		addClass(el, 'leaflet-image-layer');
+  		if (this._zoomAnimated) { addClass(el, 'leaflet-zoom-animated'); }
+  		if (this.options.className) { addClass(el, this.options.className); }
+
+  		el.onselectstart = falseFn;
+  		el.onmousemove = falseFn;
+  	}
+
+  	// @method getElement(): SVGElement
+  	// Returns the instance of [`SVGElement`](https://developer.mozilla.org/docs/Web/API/SVGElement)
+  	// used by this overlay.
+  });
+
+
+  // @factory L.svgOverlay(svg: String|SVGElement, bounds: LatLngBounds, options?: SVGOverlay options)
+  // Instantiates an image overlay object given an SVG element and the geographical bounds it is tied to.
+  // A viewBox attribute is required on the SVG element to zoom in and out properly.
+
+  function svgOverlay(el, bounds, options) {
+  	return new SVGOverlay(el, bounds, options);
+  }
+
+  /*
+   * @class DivOverlay
+   * @inherits Interactive layer
+   * @aka L.DivOverlay
+   * Base model for L.Popup and L.Tooltip. Inherit from it for custom overlays like plugins.
+   */
+
+  // @namespace DivOverlay
+  var DivOverlay = Layer.extend({
+
+  	// @section
+  	// @aka DivOverlay options
+  	options: {
+  		// @option interactive: Boolean = false
+  		// If true, the popup/tooltip will listen to the mouse events.
+  		interactive: false,
+
+  		// @option offset: Point = Point(0, 0)
+  		// The offset of the overlay position.
+  		offset: [0, 0],
+
+  		// @option className: String = ''
+  		// A custom CSS class name to assign to the overlay.
+  		className: '',
+
+  		// @option pane: String = undefined
+  		// `Map pane` where the overlay will be added.
+  		pane: undefined,
+
+  		// @option content: String|HTMLElement|Function = ''
+  		// Sets the HTML content of the overlay while initializing. If a function is passed the source layer will be
+  		// passed to the function. The function should return a `String` or `HTMLElement` to be used in the overlay.
+  		content: ''
+  	},
+
+  	initialize: function (options, source) {
+  		if (options && (options instanceof LatLng || isArray(options))) {
+  			this._latlng = toLatLng(options);
+  			setOptions(this, source);
+  		} else {
+  			setOptions(this, options);
+  			this._source = source;
+  		}
+  		if (this.options.content) {
+  			this._content = this.options.content;
+  		}
+  	},
+
+  	// @method openOn(map: Map): this
+  	// Adds the overlay to the map.
+  	// Alternative to `map.openPopup(popup)`/`.openTooltip(tooltip)`.
+  	openOn: function (map) {
+  		map = arguments.length ? map : this._source._map; // experimental, not the part of public api
+  		if (!map.hasLayer(this)) {
+  			map.addLayer(this);
+  		}
+  		return this;
+  	},
+
+  	// @method close(): this
+  	// Closes the overlay.
+  	// Alternative to `map.closePopup(popup)`/`.closeTooltip(tooltip)`
+  	// and `layer.closePopup()`/`.closeTooltip()`.
+  	close: function () {
+  		if (this._map) {
+  			this._map.removeLayer(this);
+  		}
+  		return this;
+  	},
+
+  	// @method toggle(layer?: Layer): this
+  	// Opens or closes the overlay bound to layer depending on its current state.
+  	// Argument may be omitted only for overlay bound to layer.
+  	// Alternative to `layer.togglePopup()`/`.toggleTooltip()`.
+  	toggle: function (layer) {
+  		if (this._map) {
+  			this.close();
+  		} else {
+  			if (arguments.length) {
+  				this._source = layer;
+  			} else {
+  				layer = this._source;
+  			}
+  			this._prepareOpen();
+
+  			// open the overlay on the map
+  			this.openOn(layer._map);
+  		}
+  		return this;
+  	},
+
+  	onAdd: function (map) {
+  		this._zoomAnimated = map._zoomAnimated;
+
+  		if (!this._container) {
+  			this._initLayout();
+  		}
+
+  		if (map._fadeAnimated) {
+  			setOpacity(this._container, 0);
+  		}
+
+  		clearTimeout(this._removeTimeout);
+  		this.getPane().appendChild(this._container);
+  		this.update();
+
+  		if (map._fadeAnimated) {
+  			setOpacity(this._container, 1);
+  		}
+
+  		this.bringToFront();
+
+  		if (this.options.interactive) {
+  			addClass(this._container, 'leaflet-interactive');
+  			this.addInteractiveTarget(this._container);
+  		}
+  	},
+
+  	onRemove: function (map) {
+  		if (map._fadeAnimated) {
+  			setOpacity(this._container, 0);
+  			this._removeTimeout = setTimeout(bind(remove, undefined, this._container), 200);
+  		} else {
+  			remove(this._container);
+  		}
+
+  		if (this.options.interactive) {
+  			removeClass(this._container, 'leaflet-interactive');
+  			this.removeInteractiveTarget(this._container);
+  		}
+  	},
+
+  	// @namespace DivOverlay
+  	// @method getLatLng: LatLng
+  	// Returns the geographical point of the overlay.
+  	getLatLng: function () {
+  		return this._latlng;
+  	},
+
+  	// @method setLatLng(latlng: LatLng): this
+  	// Sets the geographical point where the overlay will open.
+  	setLatLng: function (latlng) {
+  		this._latlng = toLatLng(latlng);
+  		if (this._map) {
+  			this._updatePosition();
+  			this._adjustPan();
+  		}
+  		return this;
+  	},
+
+  	// @method getContent: String|HTMLElement
+  	// Returns the content of the overlay.
+  	getContent: function () {
+  		return this._content;
+  	},
+
+  	// @method setContent(htmlContent: String|HTMLElement|Function): this
+  	// Sets the HTML content of the overlay. If a function is passed the source layer will be passed to the function.
+  	// The function should return a `String` or `HTMLElement` to be used in the overlay.
+  	setContent: function (content) {
+  		this._content = content;
+  		this.update();
+  		return this;
+  	},
+
+  	// @method getElement: String|HTMLElement
+  	// Returns the HTML container of the overlay.
+  	getElement: function () {
+  		return this._container;
+  	},
+
+  	// @method update: null
+  	// Updates the overlay content, layout and position. Useful for updating the overlay after something inside changed, e.g. image loaded.
+  	update: function () {
+  		if (!this._map) { return; }
+
+  		this._container.style.visibility = 'hidden';
+
+  		this._updateContent();
+  		this._updateLayout();
+  		this._updatePosition();
+
+  		this._container.style.visibility = '';
+
+  		this._adjustPan();
+  	},
+
+  	getEvents: function () {
+  		var events = {
+  			zoom: this._updatePosition,
+  			viewreset: this._updatePosition
+  		};
+
+  		if (this._zoomAnimated) {
+  			events.zoomanim = this._animateZoom;
+  		}
+  		return events;
+  	},
+
+  	// @method isOpen: Boolean
+  	// Returns `true` when the overlay is visible on the map.
+  	isOpen: function () {
+  		return !!this._map && this._map.hasLayer(this);
+  	},
+
+  	// @method bringToFront: this
+  	// Brings this overlay in front of other overlays (in the same map pane).
+  	bringToFront: function () {
+  		if (this._map) {
+  			toFront(this._container);
+  		}
+  		return this;
+  	},
+
+  	// @method bringToBack: this
+  	// Brings this overlay to the back of other overlays (in the same map pane).
+  	bringToBack: function () {
+  		if (this._map) {
+  			toBack(this._container);
+  		}
+  		return this;
+  	},
+
+  	// prepare bound overlay to open: update latlng pos / content source (for FeatureGroup)
+  	_prepareOpen: function (latlng) {
+  		var source = this._source;
+  		if (!source._map) { return false; }
+
+  		if (source instanceof FeatureGroup) {
+  			source = null;
+  			var layers = this._source._layers;
+  			for (var id in layers) {
+  				if (layers[id]._map) {
+  					source = layers[id];
+  					break;
+  				}
+  			}
+  			if (!source) { return false; } // Unable to get source layer.
+
+  			// set overlay source to this layer
+  			this._source = source;
+  		}
+
+  		if (!latlng) {
+  			if (source.getCenter) {
+  				latlng = source.getCenter();
+  			} else if (source.getLatLng) {
+  				latlng = source.getLatLng();
+  			} else if (source.getBounds) {
+  				latlng = source.getBounds().getCenter();
+  			} else {
+  				throw new Error('Unable to get source layer LatLng.');
+  			}
+  		}
+  		this.setLatLng(latlng);
+
+  		if (this._map) {
+  			// update the overlay (content, layout, etc...)
+  			this.update();
+  		}
+
+  		return true;
+  	},
+
+  	_updateContent: function () {
+  		if (!this._content) { return; }
+
+  		var node = this._contentNode;
+  		var content = (typeof this._content === 'function') ? this._content(this._source || this) : this._content;
+
+  		if (typeof content === 'string') {
+  			node.innerHTML = content;
+  		} else {
+  			while (node.hasChildNodes()) {
+  				node.removeChild(node.firstChild);
+  			}
+  			node.appendChild(content);
+  		}
+
+  		// @namespace DivOverlay
+  		// @section DivOverlay events
+  		// @event contentupdate: Event
+  		// Fired when the content of the overlay is updated
+  		this.fire('contentupdate');
+  	},
+
+  	_updatePosition: function () {
+  		if (!this._map) { return; }
+
+  		var pos = this._map.latLngToLayerPoint(this._latlng),
+  		    offset = toPoint(this.options.offset),
+  		    anchor = this._getAnchor();
+
+  		if (this._zoomAnimated) {
+  			setPosition(this._container, pos.add(anchor));
+  		} else {
+  			offset = offset.add(pos).add(anchor);
+  		}
+
+  		var bottom = this._containerBottom = -offset.y,
+  		    left = this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x;
+
+  		// bottom position the overlay in case the height of the overlay changes (images loading etc)
+  		this._container.style.bottom = bottom + 'px';
+  		this._container.style.left = left + 'px';
+  	},
+
+  	_getAnchor: function () {
+  		return [0, 0];
+  	}
+
+  });
+
+  Map.include({
+  	_initOverlay: function (OverlayClass, content, latlng, options) {
+  		var overlay = content;
+  		if (!(overlay instanceof OverlayClass)) {
+  			overlay = new OverlayClass(options).setContent(content);
+  		}
+  		if (latlng) {
+  			overlay.setLatLng(latlng);
+  		}
+  		return overlay;
+  	}
+  });
+
+
+  Layer.include({
+  	_initOverlay: function (OverlayClass, old, content, options) {
+  		var overlay = content;
+  		if (overlay instanceof OverlayClass) {
+  			setOptions(overlay, options);
+  			overlay._source = this;
+  		} else {
+  			overlay = (old && !options) ? old : new OverlayClass(options, this);
+  			overlay.setContent(content);
+  		}
+  		return overlay;
+  	}
+  });
+
+  /*
+   * @class Popup
+   * @inherits DivOverlay
+   * @aka L.Popup
+   * Used to open popups in certain places of the map. Use [Map.openPopup](#map-openpopup) to
+   * open popups while making sure that only one popup is open at one time
+   * (recommended for usability), or use [Map.addLayer](#map-addlayer) to open as many as you want.
+   *
+   * @example
+   *
+   * If you want to just bind a popup to marker click and then open it, it's really easy:
+   *
+   * ```js
+   * marker.bindPopup(popupContent).openPopup();
+   * ```
+   * Path overlays like polylines also have a `bindPopup` method.
+   *
+   * A popup can be also standalone:
+   *
+   * ```js
+   * var popup = L.popup()
+   * 	.setLatLng(latlng)
+   * 	.setContent('<p>Hello world!<br />This is a nice popup.</p>')
+   * 	.openOn(map);
+   * ```
+   * or
+   * ```js
+   * var popup = L.popup(latlng, {content: '<p>Hello world!<br />This is a nice popup.</p>')
+   * 	.openOn(map);
+   * ```
+   */
+
+
+  // @namespace Popup
+  var Popup = DivOverlay.extend({
+
+  	// @section
+  	// @aka Popup options
+  	options: {
+  		// @option pane: String = 'popupPane'
+  		// `Map pane` where the popup will be added.
+  		pane: 'popupPane',
+
+  		// @option offset: Point = Point(0, 7)
+  		// The offset of the popup position.
+  		offset: [0, 7],
+
+  		// @option maxWidth: Number = 300
+  		// Max width of the popup, in pixels.
+  		maxWidth: 300,
+
+  		// @option minWidth: Number = 50
+  		// Min width of the popup, in pixels.
+  		minWidth: 50,
+
+  		// @option maxHeight: Number = null
+  		// If set, creates a scrollable container of the given height
+  		// inside a popup if its content exceeds it.
+  		// The scrollable container can be styled using the
+  		// `leaflet-popup-scrolled` CSS class selector.
+  		maxHeight: null,
+
+  		// @option autoPan: Boolean = true
+  		// Set it to `false` if you don't want the map to do panning animation
+  		// to fit the opened popup.
+  		autoPan: true,
+
+  		// @option autoPanPaddingTopLeft: Point = null
+  		// The margin between the popup and the top left corner of the map
+  		// view after autopanning was performed.
+  		autoPanPaddingTopLeft: null,
+
+  		// @option autoPanPaddingBottomRight: Point = null
+  		// The margin between the popup and the bottom right corner of the map
+  		// view after autopanning was performed.
+  		autoPanPaddingBottomRight: null,
+
+  		// @option autoPanPadding: Point = Point(5, 5)
+  		// Equivalent of setting both top left and bottom right autopan padding to the same value.
+  		autoPanPadding: [5, 5],
+
+  		// @option keepInView: Boolean = false
+  		// Set it to `true` if you want to prevent users from panning the popup
+  		// off of the screen while it is open.
+  		keepInView: false,
+
+  		// @option closeButton: Boolean = true
+  		// Controls the presence of a close button in the popup.
+  		closeButton: true,
+
+  		// @option autoClose: Boolean = true
+  		// Set it to `false` if you want to override the default behavior of
+  		// the popup closing when another popup is opened.
+  		autoClose: true,
+
+  		// @option closeOnEscapeKey: Boolean = true
+  		// Set it to `false` if you want to override the default behavior of
+  		// the ESC key for closing of the popup.
+  		closeOnEscapeKey: true,
+
+  		// @option closeOnClick: Boolean = *
+  		// Set it if you want to override the default behavior of the popup closing when user clicks
+  		// on the map. Defaults to the map's [`closePopupOnClick`](#map-closepopuponclick) option.
+
+  		// @option className: String = ''
+  		// A custom CSS class name to assign to the popup.
+  		className: ''
+  	},
+
+  	// @namespace Popup
+  	// @method openOn(map: Map): this
+  	// Alternative to `map.openPopup(popup)`.
+  	// Adds the popup to the map and closes the previous one.
+  	openOn: function (map) {
+  		map = arguments.length ? map : this._source._map; // experimental, not the part of public api
+
+  		if (!map.hasLayer(this) && map._popup && map._popup.options.autoClose) {
+  			map.removeLayer(map._popup);
+  		}
+  		map._popup = this;
+
+  		return DivOverlay.prototype.openOn.call(this, map);
+  	},
+
+  	onAdd: function (map) {
+  		DivOverlay.prototype.onAdd.call(this, map);
+
+  		// @namespace Map
+  		// @section Popup events
+  		// @event popupopen: PopupEvent
+  		// Fired when a popup is opened in the map
+  		map.fire('popupopen', {popup: this});
+
+  		if (this._source) {
+  			// @namespace Layer
+  			// @section Popup events
+  			// @event popupopen: PopupEvent
+  			// Fired when a popup bound to this layer is opened
+  			this._source.fire('popupopen', {popup: this}, true);
+  			// For non-path layers, we toggle the popup when clicking
+  			// again the layer, so prevent the map to reopen it.
+  			if (!(this._source instanceof Path)) {
+  				this._source.on('preclick', stopPropagation);
+  			}
+  		}
+  	},
+
+  	onRemove: function (map) {
+  		DivOverlay.prototype.onRemove.call(this, map);
+
+  		// @namespace Map
+  		// @section Popup events
+  		// @event popupclose: PopupEvent
+  		// Fired when a popup in the map is closed
+  		map.fire('popupclose', {popup: this});
+
+  		if (this._source) {
+  			// @namespace Layer
+  			// @section Popup events
+  			// @event popupclose: PopupEvent
+  			// Fired when a popup bound to this layer is closed
+  			this._source.fire('popupclose', {popup: this}, true);
+  			if (!(this._source instanceof Path)) {
+  				this._source.off('preclick', stopPropagation);
+  			}
+  		}
+  	},
+
+  	getEvents: function () {
+  		var events = DivOverlay.prototype.getEvents.call(this);
+
+  		if (this.options.closeOnClick !== undefined ? this.options.closeOnClick : this._map.options.closePopupOnClick) {
+  			events.preclick = this.close;
+  		}
+
+  		if (this.options.keepInView) {
+  			events.moveend = this._adjustPan;
+  		}
+
+  		return events;
+  	},
+
+  	_initLayout: function () {
+  		var prefix = 'leaflet-popup',
+  		    container = this._container = create$1('div',
+  			prefix + ' ' + (this.options.className || '') +
+  			' leaflet-zoom-animated');
+
+  		var wrapper = this._wrapper = create$1('div', prefix + '-content-wrapper', container);
+  		this._contentNode = create$1('div', prefix + '-content', wrapper);
+
+  		disableClickPropagation(container);
+  		disableScrollPropagation(this._contentNode);
+  		on(container, 'contextmenu', stopPropagation);
+
+  		this._tipContainer = create$1('div', prefix + '-tip-container', container);
+  		this._tip = create$1('div', prefix + '-tip', this._tipContainer);
+
+  		if (this.options.closeButton) {
+  			var closeButton = this._closeButton = create$1('a', prefix + '-close-button', container);
+  			closeButton.setAttribute('role', 'button'); // overrides the implicit role=link of <a> elements #7399
+  			closeButton.setAttribute('aria-label', 'Close popup');
+  			closeButton.href = '#close';
+  			closeButton.innerHTML = '<span aria-hidden="true">&#215;</span>';
+
+  			on(closeButton, 'click', function (ev) {
+  				preventDefault(ev);
+  				this.close();
+  			}, this);
+  		}
+  	},
+
+  	_updateLayout: function () {
+  		var container = this._contentNode,
+  		    style = container.style;
+
+  		style.width = '';
+  		style.whiteSpace = 'nowrap';
+
+  		var width = container.offsetWidth;
+  		width = Math.min(width, this.options.maxWidth);
+  		width = Math.max(width, this.options.minWidth);
+
+  		style.width = (width + 1) + 'px';
+  		style.whiteSpace = '';
+
+  		style.height = '';
+
+  		var height = container.offsetHeight,
+  		    maxHeight = this.options.maxHeight,
+  		    scrolledClass = 'leaflet-popup-scrolled';
+
+  		if (maxHeight && height > maxHeight) {
+  			style.height = maxHeight + 'px';
+  			addClass(container, scrolledClass);
+  		} else {
+  			removeClass(container, scrolledClass);
+  		}
+
+  		this._containerWidth = this._container.offsetWidth;
+  	},
+
+  	_animateZoom: function (e) {
+  		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
+  		    anchor = this._getAnchor();
+  		setPosition(this._container, pos.add(anchor));
+  	},
+
+  	_adjustPan: function () {
+  		if (!this.options.autoPan) { return; }
+  		if (this._map._panAnim) { this._map._panAnim.stop(); }
+
+  		// We can endlessly recurse if keepInView is set and the view resets.
+  		// Let's guard against that by exiting early if we're responding to our own autopan.
+  		if (this._autopanning) {
+  			this._autopanning = false;
+  			return;
+  		}
+
+  		var map = this._map,
+  		    marginBottom = parseInt(getStyle(this._container, 'marginBottom'), 10) || 0,
+  		    containerHeight = this._container.offsetHeight + marginBottom,
+  		    containerWidth = this._containerWidth,
+  		    layerPos = new Point(this._containerLeft, -containerHeight - this._containerBottom);
+
+  		layerPos._add(getPosition(this._container));
+
+  		var containerPos = map.layerPointToContainerPoint(layerPos),
+  		    padding = toPoint(this.options.autoPanPadding),
+  		    paddingTL = toPoint(this.options.autoPanPaddingTopLeft || padding),
+  		    paddingBR = toPoint(this.options.autoPanPaddingBottomRight || padding),
+  		    size = map.getSize(),
+  		    dx = 0,
+  		    dy = 0;
+
+  		if (containerPos.x + containerWidth + paddingBR.x > size.x) { // right
+  			dx = containerPos.x + containerWidth - size.x + paddingBR.x;
+  		}
+  		if (containerPos.x - dx - paddingTL.x < 0) { // left
+  			dx = containerPos.x - paddingTL.x;
+  		}
+  		if (containerPos.y + containerHeight + paddingBR.y > size.y) { // bottom
+  			dy = containerPos.y + containerHeight - size.y + paddingBR.y;
+  		}
+  		if (containerPos.y - dy - paddingTL.y < 0) { // top
+  			dy = containerPos.y - paddingTL.y;
+  		}
+
+  		// @namespace Map
+  		// @section Popup events
+  		// @event autopanstart: Event
+  		// Fired when the map starts autopanning when opening a popup.
+  		if (dx || dy) {
+  			// Track that we're autopanning, as this function will be re-ran on moveend
+  			if (this.options.keepInView) {
+  				this._autopanning = true;
+  			}
+
+  			map
+  			    .fire('autopanstart')
+  			    .panBy([dx, dy]);
+  		}
+  	},
+
+  	_getAnchor: function () {
+  		// Where should we anchor the popup on the source layer?
+  		return toPoint(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
+  	}
+
+  });
+
+  // @namespace Popup
+  // @factory L.popup(options?: Popup options, source?: Layer)
+  // Instantiates a `Popup` object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the popup with a reference to the Layer to which it refers.
+  // @alternative
+  // @factory L.popup(latlng: LatLng, options?: Popup options)
+  // Instantiates a `Popup` object given `latlng` where the popup will open and an optional `options` object that describes its appearance and location.
+  var popup = function (options, source) {
+  	return new Popup(options, source);
+  };
+
+
+  /* @namespace Map
+   * @section Interaction Options
+   * @option closePopupOnClick: Boolean = true
+   * Set it to `false` if you don't want popups to close when user clicks the map.
+   */
+  Map.mergeOptions({
+  	closePopupOnClick: true
+  });
+
+
+  // @namespace Map
+  // @section Methods for Layers and Controls
+  Map.include({
+  	// @method openPopup(popup: Popup): this
+  	// Opens the specified popup while closing the previously opened (to make sure only one is opened at one time for usability).
+  	// @alternative
+  	// @method openPopup(content: String|HTMLElement, latlng: LatLng, options?: Popup options): this
+  	// Creates a popup with the specified content and options and opens it in the given point on a map.
+  	openPopup: function (popup, latlng, options) {
+  		this._initOverlay(Popup, popup, latlng, options)
+  		  .openOn(this);
+
+  		return this;
+  	},
+
+  	// @method closePopup(popup?: Popup): this
+  	// Closes the popup previously opened with [openPopup](#map-openpopup) (or the given one).
+  	closePopup: function (popup) {
+  		popup = arguments.length ? popup : this._popup;
+  		if (popup) {
+  			popup.close();
+  		}
+  		return this;
+  	}
+  });
+
+  /*
+   * @namespace Layer
+   * @section Popup methods example
+   *
+   * All layers share a set of methods convenient for binding popups to it.
+   *
+   * ```js
+   * var layer = L.Polygon(latlngs).bindPopup('Hi There!').addTo(map);
+   * layer.openPopup();
+   * layer.closePopup();
+   * ```
+   *
+   * Popups will also be automatically opened when the layer is clicked on and closed when the layer is removed from the map or another popup is opened.
+   */
+
+  // @section Popup methods
+  Layer.include({
+
+  	// @method bindPopup(content: String|HTMLElement|Function|Popup, options?: Popup options): this
+  	// Binds a popup to the layer with the passed `content` and sets up the
+  	// necessary event listeners. If a `Function` is passed it will receive
+  	// the layer as the first argument and should return a `String` or `HTMLElement`.
+  	bindPopup: function (content, options) {
+  		this._popup = this._initOverlay(Popup, this._popup, content, options);
+  		if (!this._popupHandlersAdded) {
+  			this.on({
+  				click: this._openPopup,
+  				keypress: this._onKeyPress,
+  				remove: this.closePopup,
+  				move: this._movePopup
+  			});
+  			this._popupHandlersAdded = true;
+  		}
+
+  		return this;
+  	},
+
+  	// @method unbindPopup(): this
+  	// Removes the popup previously bound with `bindPopup`.
+  	unbindPopup: function () {
+  		if (this._popup) {
+  			this.off({
+  				click: this._openPopup,
+  				keypress: this._onKeyPress,
+  				remove: this.closePopup,
+  				move: this._movePopup
+  			});
+  			this._popupHandlersAdded = false;
+  			this._popup = null;
+  		}
+  		return this;
+  	},
+
+  	// @method openPopup(latlng?: LatLng): this
+  	// Opens the bound popup at the specified `latlng` or at the default popup anchor if no `latlng` is passed.
+  	openPopup: function (latlng) {
+  		if (this._popup) {
+  			if (!(this instanceof FeatureGroup)) {
+  				this._popup._source = this;
+  			}
+  			if (this._popup._prepareOpen(latlng || this._latlng)) {
+  				// open the popup on the map
+  				this._popup.openOn(this._map);
+  			}
+  		}
+  		return this;
+  	},
+
+  	// @method closePopup(): this
+  	// Closes the popup bound to this layer if it is open.
+  	closePopup: function () {
+  		if (this._popup) {
+  			this._popup.close();
+  		}
+  		return this;
+  	},
+
+  	// @method togglePopup(): this
+  	// Opens or closes the popup bound to this layer depending on its current state.
+  	togglePopup: function () {
+  		if (this._popup) {
+  			this._popup.toggle(this);
+  		}
+  		return this;
+  	},
+
+  	// @method isPopupOpen(): boolean
+  	// Returns `true` if the popup bound to this layer is currently open.
+  	isPopupOpen: function () {
+  		return (this._popup ? this._popup.isOpen() : false);
+  	},
+
+  	// @method setPopupContent(content: String|HTMLElement|Popup): this
+  	// Sets the content of the popup bound to this layer.
+  	setPopupContent: function (content) {
+  		if (this._popup) {
+  			this._popup.setContent(content);
+  		}
+  		return this;
+  	},
+
+  	// @method getPopup(): Popup
+  	// Returns the popup bound to this layer.
+  	getPopup: function () {
+  		return this._popup;
+  	},
+
+  	_openPopup: function (e) {
+  		if (!this._popup || !this._map) {
+  			return;
+  		}
+  		// prevent map click
+  		stop(e);
+
+  		var target = e.layer || e.target;
+  		if (this._popup._source === target && !(target instanceof Path)) {
+  			// treat it like a marker and figure out
+  			// if we should toggle it open/closed
+  			if (this._map.hasLayer(this._popup)) {
+  				this.closePopup();
+  			} else {
+  				this.openPopup(e.latlng);
+  			}
+  			return;
+  		}
+  		this._popup._source = target;
+  		this.openPopup(e.latlng);
+  	},
+
+  	_movePopup: function (e) {
+  		this._popup.setLatLng(e.latlng);
+  	},
+
+  	_onKeyPress: function (e) {
+  		if (e.originalEvent.keyCode === 13) {
+  			this._openPopup(e);
+  		}
+  	}
+  });
+
+  /*
+   * @class Tooltip
+   * @inherits DivOverlay
+   * @aka L.Tooltip
+   * Used to display small texts on top of map layers.
+   *
+   * @example
+   * If you want to just bind a tooltip to marker:
+   *
+   * ```js
+   * marker.bindTooltip("my tooltip text").openTooltip();
+   * ```
+   * Path overlays like polylines also have a `bindTooltip` method.
+   *
+   * A tooltip can be also standalone:
+   *
+   * ```js
+   * var tooltip = L.tooltip()
+   * 	.setLatLng(latlng)
+   * 	.setContent('Hello world!<br />This is a nice tooltip.')
+   * 	.addTo(map);
+   * ```
+   * or
+   * ```js
+   * var tooltip = L.tooltip(latlng, {content: 'Hello world!<br />This is a nice tooltip.'})
+   * 	.addTo(map);
+   * ```
+   *
+   *
+   * Note about tooltip offset. Leaflet takes two options in consideration
+   * for computing tooltip offsetting:
+   * - the `offset` Tooltip option: it defaults to [0, 0], and it's specific to one tooltip.
+   *   Add a positive x offset to move the tooltip to the right, and a positive y offset to
+   *   move it to the bottom. Negatives will move to the left and top.
+   * - the `tooltipAnchor` Icon option: this will only be considered for Marker. You
+   *   should adapt this value if you use a custom icon.
+   */
+
+
+  // @namespace Tooltip
+  var Tooltip = DivOverlay.extend({
+
+  	// @section
+  	// @aka Tooltip options
+  	options: {
+  		// @option pane: String = 'tooltipPane'
+  		// `Map pane` where the tooltip will be added.
+  		pane: 'tooltipPane',
+
+  		// @option offset: Point = Point(0, 0)
+  		// Optional offset of the tooltip position.
+  		offset: [0, 0],
+
+  		// @option direction: String = 'auto'
+  		// Direction where to open the tooltip. Possible values are: `right`, `left`,
+  		// `top`, `bottom`, `center`, `auto`.
+  		// `auto` will dynamically switch between `right` and `left` according to the tooltip
+  		// position on the map.
+  		direction: 'auto',
+
+  		// @option permanent: Boolean = false
+  		// Whether to open the tooltip permanently or only on mouseover.
+  		permanent: false,
+
+  		// @option sticky: Boolean = false
+  		// If true, the tooltip will follow the mouse instead of being fixed at the feature center.
+  		sticky: false,
+
+  		// @option opacity: Number = 0.9
+  		// Tooltip container opacity.
+  		opacity: 0.9
+  	},
+
+  	onAdd: function (map) {
+  		DivOverlay.prototype.onAdd.call(this, map);
+  		this.setOpacity(this.options.opacity);
+
+  		// @namespace Map
+  		// @section Tooltip events
+  		// @event tooltipopen: TooltipEvent
+  		// Fired when a tooltip is opened in the map.
+  		map.fire('tooltipopen', {tooltip: this});
+
+  		if (this._source) {
+  			this.addEventParent(this._source);
+
+  			// @namespace Layer
+  			// @section Tooltip events
+  			// @event tooltipopen: TooltipEvent
+  			// Fired when a tooltip bound to this layer is opened.
+  			this._source.fire('tooltipopen', {tooltip: this}, true);
+  		}
+  	},
+
+  	onRemove: function (map) {
+  		DivOverlay.prototype.onRemove.call(this, map);
+
+  		// @namespace Map
+  		// @section Tooltip events
+  		// @event tooltipclose: TooltipEvent
+  		// Fired when a tooltip in the map is closed.
+  		map.fire('tooltipclose', {tooltip: this});
+
+  		if (this._source) {
+  			this.removeEventParent(this._source);
+
+  			// @namespace Layer
+  			// @section Tooltip events
+  			// @event tooltipclose: TooltipEvent
+  			// Fired when a tooltip bound to this layer is closed.
+  			this._source.fire('tooltipclose', {tooltip: this}, true);
+  		}
+  	},
+
+  	getEvents: function () {
+  		var events = DivOverlay.prototype.getEvents.call(this);
+
+  		if (!this.options.permanent) {
+  			events.preclick = this.close;
+  		}
+
+  		return events;
+  	},
+
+  	_initLayout: function () {
+  		var prefix = 'leaflet-tooltip',
+  		    className = prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+
+  		this._contentNode = this._container = create$1('div', className);
+
+  		this._container.setAttribute('role', 'tooltip');
+  		this._container.setAttribute('id', 'leaflet-tooltip-' + stamp(this));
+  	},
+
+  	_updateLayout: function () {},
+
+  	_adjustPan: function () {},
+
+  	_setPosition: function (pos) {
+  		var subX, subY,
+  		    map = this._map,
+  		    container = this._container,
+  		    centerPoint = map.latLngToContainerPoint(map.getCenter()),
+  		    tooltipPoint = map.layerPointToContainerPoint(pos),
+  		    direction = this.options.direction,
+  		    tooltipWidth = container.offsetWidth,
+  		    tooltipHeight = container.offsetHeight,
+  		    offset = toPoint(this.options.offset),
+  		    anchor = this._getAnchor();
+
+  		if (direction === 'top') {
+  			subX = tooltipWidth / 2;
+  			subY = tooltipHeight;
+  		} else if (direction === 'bottom') {
+  			subX = tooltipWidth / 2;
+  			subY = 0;
+  		} else if (direction === 'center') {
+  			subX = tooltipWidth / 2;
+  			subY = tooltipHeight / 2;
+  		} else if (direction === 'right') {
+  			subX = 0;
+  			subY = tooltipHeight / 2;
+  		} else if (direction === 'left') {
+  			subX = tooltipWidth;
+  			subY = tooltipHeight / 2;
+  		} else if (tooltipPoint.x < centerPoint.x) {
+  			direction = 'right';
+  			subX = 0;
+  			subY = tooltipHeight / 2;
+  		} else {
+  			direction = 'left';
+  			subX = tooltipWidth + (offset.x + anchor.x) * 2;
+  			subY = tooltipHeight / 2;
+  		}
+
+  		pos = pos.subtract(toPoint(subX, subY, true)).add(offset).add(anchor);
+
+  		removeClass(container, 'leaflet-tooltip-right');
+  		removeClass(container, 'leaflet-tooltip-left');
+  		removeClass(container, 'leaflet-tooltip-top');
+  		removeClass(container, 'leaflet-tooltip-bottom');
+  		addClass(container, 'leaflet-tooltip-' + direction);
+  		setPosition(container, pos);
+  	},
+
+  	_updatePosition: function () {
+  		var pos = this._map.latLngToLayerPoint(this._latlng);
+  		this._setPosition(pos);
+  	},
+
+  	setOpacity: function (opacity) {
+  		this.options.opacity = opacity;
+
+  		if (this._container) {
+  			setOpacity(this._container, opacity);
+  		}
+  	},
+
+  	_animateZoom: function (e) {
+  		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
+  		this._setPosition(pos);
+  	},
+
+  	_getAnchor: function () {
+  		// Where should we anchor the tooltip on the source layer?
+  		return toPoint(this._source && this._source._getTooltipAnchor && !this.options.sticky ? this._source._getTooltipAnchor() : [0, 0]);
+  	}
+
+  });
+
+  // @namespace Tooltip
+  // @factory L.tooltip(options?: Tooltip options, source?: Layer)
+  // Instantiates a `Tooltip` object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the tooltip with a reference to the Layer to which it refers.
+  // @alternative
+  // @factory L.tooltip(latlng: LatLng, options?: Tooltip options)
+  // Instantiates a `Tooltip` object given `latlng` where the tooltip will open and an optional `options` object that describes its appearance and location.
+  var tooltip = function (options, source) {
+  	return new Tooltip(options, source);
+  };
+
+  // @namespace Map
+  // @section Methods for Layers and Controls
+  Map.include({
+
+  	// @method openTooltip(tooltip: Tooltip): this
+  	// Opens the specified tooltip.
+  	// @alternative
+  	// @method openTooltip(content: String|HTMLElement, latlng: LatLng, options?: Tooltip options): this
+  	// Creates a tooltip with the specified content and options and open it.
+  	openTooltip: function (tooltip, latlng, options) {
+  		this._initOverlay(Tooltip, tooltip, latlng, options)
+  		  .openOn(this);
+
+  		return this;
+  	},
+
+  	// @method closeTooltip(tooltip: Tooltip): this
+  	// Closes the tooltip given as parameter.
+  	closeTooltip: function (tooltip) {
+  		tooltip.close();
+  		return this;
+  	}
+
+  });
+
+  /*
+   * @namespace Layer
+   * @section Tooltip methods example
+   *
+   * All layers share a set of methods convenient for binding tooltips to it.
+   *
+   * ```js
+   * var layer = L.Polygon(latlngs).bindTooltip('Hi There!').addTo(map);
+   * layer.openTooltip();
+   * layer.closeTooltip();
+   * ```
+   */
+
+  // @section Tooltip methods
+  Layer.include({
+
+  	// @method bindTooltip(content: String|HTMLElement|Function|Tooltip, options?: Tooltip options): this
+  	// Binds a tooltip to the layer with the passed `content` and sets up the
+  	// necessary event listeners. If a `Function` is passed it will receive
+  	// the layer as the first argument and should return a `String` or `HTMLElement`.
+  	bindTooltip: function (content, options) {
+
+  		if (this._tooltip && this.isTooltipOpen()) {
+  			this.unbindTooltip();
+  		}
+
+  		this._tooltip = this._initOverlay(Tooltip, this._tooltip, content, options);
+  		this._initTooltipInteractions();
+
+  		if (this._tooltip.options.permanent && this._map && this._map.hasLayer(this)) {
+  			this.openTooltip();
+  		}
+
+  		return this;
+  	},
+
+  	// @method unbindTooltip(): this
+  	// Removes the tooltip previously bound with `bindTooltip`.
+  	unbindTooltip: function () {
+  		if (this._tooltip) {
+  			this._initTooltipInteractions(true);
+  			this.closeTooltip();
+  			this._tooltip = null;
+  		}
+  		return this;
+  	},
+
+  	_initTooltipInteractions: function (remove) {
+  		if (!remove && this._tooltipHandlersAdded) { return; }
+  		var onOff = remove ? 'off' : 'on',
+  		    events = {
+  			remove: this.closeTooltip,
+  			move: this._moveTooltip
+  		    };
+  		if (!this._tooltip.options.permanent) {
+  			events.mouseover = this._openTooltip;
+  			events.mouseout = this.closeTooltip;
+  			events.click = this._openTooltip;
+  			if (this._map) {
+  				this._addFocusListeners();
+  			} else {
+  				events.add = this._addFocusListeners;
+  			}
+  		} else {
+  			events.add = this._openTooltip;
+  		}
+  		if (this._tooltip.options.sticky) {
+  			events.mousemove = this._moveTooltip;
+  		}
+  		this[onOff](events);
+  		this._tooltipHandlersAdded = !remove;
+  	},
+
+  	// @method openTooltip(latlng?: LatLng): this
+  	// Opens the bound tooltip at the specified `latlng` or at the default tooltip anchor if no `latlng` is passed.
+  	openTooltip: function (latlng) {
+  		if (this._tooltip) {
+  			if (!(this instanceof FeatureGroup)) {
+  				this._tooltip._source = this;
+  			}
+  			if (this._tooltip._prepareOpen(latlng)) {
+  				// open the tooltip on the map
+  				this._tooltip.openOn(this._map);
+
+  				if (this.getElement) {
+  					this._setAriaDescribedByOnLayer(this);
+  				} else if (this.eachLayer) {
+  					this.eachLayer(this._setAriaDescribedByOnLayer, this);
+  				}
+  			}
+  		}
+  		return this;
+  	},
+
+  	// @method closeTooltip(): this
+  	// Closes the tooltip bound to this layer if it is open.
+  	closeTooltip: function () {
+  		if (this._tooltip) {
+  			return this._tooltip.close();
+  		}
+  	},
+
+  	// @method toggleTooltip(): this
+  	// Opens or closes the tooltip bound to this layer depending on its current state.
+  	toggleTooltip: function () {
+  		if (this._tooltip) {
+  			this._tooltip.toggle(this);
+  		}
+  		return this;
+  	},
+
+  	// @method isTooltipOpen(): boolean
+  	// Returns `true` if the tooltip bound to this layer is currently open.
+  	isTooltipOpen: function () {
+  		return this._tooltip.isOpen();
+  	},
+
+  	// @method setTooltipContent(content: String|HTMLElement|Tooltip): this
+  	// Sets the content of the tooltip bound to this layer.
+  	setTooltipContent: function (content) {
+  		if (this._tooltip) {
+  			this._tooltip.setContent(content);
+  		}
+  		return this;
+  	},
+
+  	// @method getTooltip(): Tooltip
+  	// Returns the tooltip bound to this layer.
+  	getTooltip: function () {
+  		return this._tooltip;
+  	},
+
+  	_addFocusListeners: function () {
+  		if (this.getElement) {
+  			this._addFocusListenersOnLayer(this);
+  		} else if (this.eachLayer) {
+  			this.eachLayer(this._addFocusListenersOnLayer, this);
+  		}
+  	},
+
+  	_addFocusListenersOnLayer: function (layer) {
+  		var el = typeof layer.getElement === 'function' && layer.getElement();
+  		if (el) {
+  			on(el, 'focus', function () {
+  				this._tooltip._source = layer;
+  				this.openTooltip();
+  			}, this);
+  			on(el, 'blur', this.closeTooltip, this);
+  		}
+  	},
+
+  	_setAriaDescribedByOnLayer: function (layer) {
+  		var el = typeof layer.getElement === 'function' && layer.getElement();
+  		if (el) {
+  			el.setAttribute('aria-describedby', this._tooltip._container.id);
+  		}
+  	},
+
+
+  	_openTooltip: function (e) {
+  		if (!this._tooltip || !this._map) {
+  			return;
+  		}
+
+  		// If the map is moving, we will show the tooltip after it's done.
+  		if (this._map.dragging && this._map.dragging.moving() && !this._openOnceFlag) {
+  			this._openOnceFlag = true;
+  			var that = this;
+  			this._map.once('moveend', function () {
+  				that._openOnceFlag = false;
+  				that._openTooltip(e);
+  			});
+  			return;
+  		}
+
+  		this._tooltip._source = e.layer || e.target;
+
+  		this.openTooltip(this._tooltip.options.sticky ? e.latlng : undefined);
+  	},
+
+  	_moveTooltip: function (e) {
+  		var latlng = e.latlng, containerPoint, layerPoint;
+  		if (this._tooltip.options.sticky && e.originalEvent) {
+  			containerPoint = this._map.mouseEventToContainerPoint(e.originalEvent);
+  			layerPoint = this._map.containerPointToLayerPoint(containerPoint);
+  			latlng = this._map.layerPointToLatLng(layerPoint);
+  		}
+  		this._tooltip.setLatLng(latlng);
+  	}
+  });
+
+  /*
+   * @class DivIcon
+   * @aka L.DivIcon
+   * @inherits Icon
+   *
+   * Represents a lightweight icon for markers that uses a simple `<div>`
+   * element instead of an image. Inherits from `Icon` but ignores the `iconUrl` and shadow options.
+   *
+   * @example
+   * ```js
+   * var myIcon = L.divIcon({className: 'my-div-icon'});
+   * // you can set .my-div-icon styles in CSS
+   *
+   * L.marker([50.505, 30.57], {icon: myIcon}).addTo(map);
+   * ```
+   *
+   * By default, it has a 'leaflet-div-icon' CSS class and is styled as a little white square with a shadow.
+   */
+
+  var DivIcon = Icon.extend({
+  	options: {
+  		// @section
+  		// @aka DivIcon options
+  		iconSize: [12, 12], // also can be set through CSS
+
+  		// iconAnchor: (Point),
+  		// popupAnchor: (Point),
+
+  		// @option html: String|HTMLElement = ''
+  		// Custom HTML code to put inside the div element, empty by default. Alternatively,
+  		// an instance of `HTMLElement`.
+  		html: false,
+
+  		// @option bgPos: Point = [0, 0]
+  		// Optional relative position of the background, in pixels
+  		bgPos: null,
+
+  		className: 'leaflet-div-icon'
+  	},
+
+  	createIcon: function (oldIcon) {
+  		var div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : document.createElement('div'),
+  		    options = this.options;
+
+  		if (options.html instanceof Element) {
+  			empty(div);
+  			div.appendChild(options.html);
+  		} else {
+  			div.innerHTML = options.html !== false ? options.html : '';
+  		}
+
+  		if (options.bgPos) {
+  			var bgPos = toPoint(options.bgPos);
+  			div.style.backgroundPosition = (-bgPos.x) + 'px ' + (-bgPos.y) + 'px';
+  		}
+  		this._setIconStyles(div, 'icon');
+
+  		return div;
+  	},
+
+  	createShadow: function () {
+  		return null;
+  	}
+  });
+
+  // @factory L.divIcon(options: DivIcon options)
+  // Creates a `DivIcon` instance with the given options.
+  function divIcon(options) {
+  	return new DivIcon(options);
+  }
+
+  Icon.Default = IconDefault;
+
+  /*
+   * @class GridLayer
+   * @inherits Layer
+   * @aka L.GridLayer
+   *
+   * Generic class for handling a tiled grid of HTML elements. This is the base class for all tile layers and replaces `TileLayer.Canvas`.
+   * GridLayer can be extended to create a tiled grid of HTML elements like `<canvas>`, `<img>` or `<div>`. GridLayer will handle creating and animating these DOM elements for you.
+   *
+   *
+   * @section Synchronous usage
+   * @example
+   *
+   * To create a custom layer, extend GridLayer and implement the `createTile()` method, which will be passed a `Point` object with the `x`, `y`, and `z` (zoom level) coordinates to draw your tile.
+   *
+   * ```js
+   * var CanvasLayer = L.GridLayer.extend({
+   *     createTile: function(coords){
+   *         // create a <canvas> element for drawing
+   *         var tile = L.DomUtil.create('canvas', 'leaflet-tile');
+   *
+   *         // setup tile width and height according to the options
+   *         var size = this.getTileSize();
+   *         tile.width = size.x;
+   *         tile.height = size.y;
+   *
+   *         // get a canvas context and draw something on it using coords.x, coords.y and coords.z
+   *         var ctx = tile.getContext('2d');
+   *
+   *         // return the tile so it can be rendered on screen
+   *         return tile;
+   *     }
+   * });
+   * ```
+   *
+   * @section Asynchronous usage
+   * @example
+   *
+   * Tile creation can also be asynchronous, this is useful when using a third-party drawing library. Once the tile is finished drawing it can be passed to the `done()` callback.
+   *
+   * ```js
+   * var CanvasLayer = L.GridLayer.extend({
+   *     createTile: function(coords, done){
+   *         var error;
+   *
+   *         // create a <canvas> element for drawing
+   *         var tile = L.DomUtil.create('canvas', 'leaflet-tile');
+   *
+   *         // setup tile width and height according to the options
+   *         var size = this.getTileSize();
+   *         tile.width = size.x;
+   *         tile.height = size.y;
+   *
+   *         // draw something asynchronously and pass the tile to the done() callback
+   *         setTimeout(function() {
+   *             done(error, tile);
+   *         }, 1000);
+   *
+   *         return tile;
+   *     }
+   * });
+   * ```
+   *
+   * @section
+   */
+
+
+  var GridLayer = Layer.extend({
+
+  	// @section
+  	// @aka GridLayer options
+  	options: {
+  		// @option tileSize: Number|Point = 256
+  		// Width and height of tiles in the grid. Use a number if width and height are equal, or `L.point(width, height)` otherwise.
+  		tileSize: 256,
+
+  		// @option opacity: Number = 1.0
+  		// Opacity of the tiles. Can be used in the `createTile()` function.
+  		opacity: 1,
+
+  		// @option updateWhenIdle: Boolean = (depends)
+  		// Load new tiles only when panning ends.
+  		// `true` by default on mobile browsers, in order to avoid too many requests and keep smooth navigation.
+  		// `false` otherwise in order to display new tiles _during_ panning, since it is easy to pan outside the
+  		// [`keepBuffer`](#gridlayer-keepbuffer) option in desktop browsers.
+  		updateWhenIdle: Browser.mobile,
+
+  		// @option updateWhenZooming: Boolean = true
+  		// By default, a smooth zoom animation (during a [touch zoom](#map-touchzoom) or a [`flyTo()`](#map-flyto)) will update grid layers every integer zoom level. Setting this option to `false` will update the grid layer only when the smooth animation ends.
+  		updateWhenZooming: true,
+
+  		// @option updateInterval: Number = 200
+  		// Tiles will not update more than once every `updateInterval` milliseconds when panning.
+  		updateInterval: 200,
+
+  		// @option zIndex: Number = 1
+  		// The explicit zIndex of the tile layer.
+  		zIndex: 1,
+
+  		// @option bounds: LatLngBounds = undefined
+  		// If set, tiles will only be loaded inside the set `LatLngBounds`.
+  		bounds: null,
+
+  		// @option minZoom: Number = 0
+  		// The minimum zoom level down to which this layer will be displayed (inclusive).
+  		minZoom: 0,
+
+  		// @option maxZoom: Number = undefined
+  		// The maximum zoom level up to which this layer will be displayed (inclusive).
+  		maxZoom: undefined,
+
+  		// @option maxNativeZoom: Number = undefined
+  		// Maximum zoom number the tile source has available. If it is specified,
+  		// the tiles on all zoom levels higher than `maxNativeZoom` will be loaded
+  		// from `maxNativeZoom` level and auto-scaled.
+  		maxNativeZoom: undefined,
+
+  		// @option minNativeZoom: Number = undefined
+  		// Minimum zoom number the tile source has available. If it is specified,
+  		// the tiles on all zoom levels lower than `minNativeZoom` will be loaded
+  		// from `minNativeZoom` level and auto-scaled.
+  		minNativeZoom: undefined,
+
+  		// @option noWrap: Boolean = false
+  		// Whether the layer is wrapped around the antimeridian. If `true`, the
+  		// GridLayer will only be displayed once at low zoom levels. Has no
+  		// effect when the [map CRS](#map-crs) doesn't wrap around. Can be used
+  		// in combination with [`bounds`](#gridlayer-bounds) to prevent requesting
+  		// tiles outside the CRS limits.
+  		noWrap: false,
+
+  		// @option pane: String = 'tilePane'
+  		// `Map pane` where the grid layer will be added.
+  		pane: 'tilePane',
+
+  		// @option className: String = ''
+  		// A custom class name to assign to the tile layer. Empty by default.
+  		className: '',
+
+  		// @option keepBuffer: Number = 2
+  		// When panning the map, keep this many rows and columns of tiles before unloading them.
+  		keepBuffer: 2
+  	},
+
+  	initialize: function (options) {
+  		setOptions(this, options);
+  	},
+
+  	onAdd: function () {
+  		this._initContainer();
+
+  		this._levels = {};
+  		this._tiles = {};
+
+  		this._resetView(); // implicit _update() call
+  	},
+
+  	beforeAdd: function (map) {
+  		map._addZoomLimit(this);
+  	},
+
+  	onRemove: function (map) {
+  		this._removeAllTiles();
+  		remove(this._container);
+  		map._removeZoomLimit(this);
+  		this._container = null;
+  		this._tileZoom = undefined;
+  	},
+
+  	// @method bringToFront: this
+  	// Brings the tile layer to the top of all tile layers.
+  	bringToFront: function () {
+  		if (this._map) {
+  			toFront(this._container);
+  			this._setAutoZIndex(Math.max);
+  		}
+  		return this;
+  	},
+
+  	// @method bringToBack: this
+  	// Brings the tile layer to the bottom of all tile layers.
+  	bringToBack: function () {
+  		if (this._map) {
+  			toBack(this._container);
+  			this._setAutoZIndex(Math.min);
+  		}
+  		return this;
+  	},
+
+  	// @method getContainer: HTMLElement
+  	// Returns the HTML element that contains the tiles for this layer.
+  	getContainer: function () {
+  		return this._container;
+  	},
+
+  	// @method setOpacity(opacity: Number): this
+  	// Changes the [opacity](#gridlayer-opacity) of the grid layer.
+  	setOpacity: function (opacity) {
+  		this.options.opacity = opacity;
+  		this._updateOpacity();
+  		return this;
+  	},
+
+  	// @method setZIndex(zIndex: Number): this
+  	// Changes the [zIndex](#gridlayer-zindex) of the grid layer.
+  	setZIndex: function (zIndex) {
+  		this.options.zIndex = zIndex;
+  		this._updateZIndex();
+
+  		return this;
+  	},
+
+  	// @method isLoading: Boolean
+  	// Returns `true` if any tile in the grid layer has not finished loading.
+  	isLoading: function () {
+  		return this._loading;
+  	},
+
+  	// @method redraw: this
+  	// Causes the layer to clear all the tiles and request them again.
+  	redraw: function () {
+  		if (this._map) {
+  			this._removeAllTiles();
+  			var tileZoom = this._clampZoom(this._map.getZoom());
+  			if (tileZoom !== this._tileZoom) {
+  				this._tileZoom = tileZoom;
+  				this._updateLevels();
+  			}
+  			this._update();
+  		}
+  		return this;
+  	},
+
+  	getEvents: function () {
+  		var events = {
+  			viewprereset: this._invalidateAll,
+  			viewreset: this._resetView,
+  			zoom: this._resetView,
+  			moveend: this._onMoveEnd
+  		};
+
+  		if (!this.options.updateWhenIdle) {
+  			// update tiles on move, but not more often than once per given interval
+  			if (!this._onMove) {
+  				this._onMove = throttle(this._onMoveEnd, this.options.updateInterval, this);
+  			}
+
+  			events.move = this._onMove;
+  		}
+
+  		if (this._zoomAnimated) {
+  			events.zoomanim = this._animateZoom;
+  		}
+
+  		return events;
+  	},
+
+  	// @section Extension methods
+  	// Layers extending `GridLayer` shall reimplement the following method.
+  	// @method createTile(coords: Object, done?: Function): HTMLElement
+  	// Called only internally, must be overridden by classes extending `GridLayer`.
+  	// Returns the `HTMLElement` corresponding to the given `coords`. If the `done` callback
+  	// is specified, it must be called when the tile has finished loading and drawing.
+  	createTile: function () {
+  		return document.createElement('div');
+  	},
+
+  	// @section
+  	// @method getTileSize: Point
+  	// Normalizes the [tileSize option](#gridlayer-tilesize) into a point. Used by the `createTile()` method.
+  	getTileSize: function () {
+  		var s = this.options.tileSize;
+  		return s instanceof Point ? s : new Point(s, s);
+  	},
+
+  	_updateZIndex: function () {
+  		if (this._container && this.options.zIndex !== undefined && this.options.zIndex !== null) {
+  			this._container.style.zIndex = this.options.zIndex;
+  		}
+  	},
+
+  	_setAutoZIndex: function (compare) {
+  		// go through all other layers of the same pane, set zIndex to max + 1 (front) or min - 1 (back)
+
+  		var layers = this.getPane().children,
+  		    edgeZIndex = -compare(-Infinity, Infinity); // -Infinity for max, Infinity for min
+
+  		for (var i = 0, len = layers.length, zIndex; i < len; i++) {
+
+  			zIndex = layers[i].style.zIndex;
+
+  			if (layers[i] !== this._container && zIndex) {
+  				edgeZIndex = compare(edgeZIndex, +zIndex);
+  			}
+  		}
+
+  		if (isFinite(edgeZIndex)) {
+  			this.options.zIndex = edgeZIndex + compare(-1, 1);
+  			this._updateZIndex();
+  		}
+  	},
+
+  	_updateOpacity: function () {
+  		if (!this._map) { return; }
+
+  		// IE doesn't inherit filter opacity properly, so we're forced to set it on tiles
+  		if (Browser.ielt9) { return; }
+
+  		setOpacity(this._container, this.options.opacity);
+
+  		var now = +new Date(),
+  		    nextFrame = false,
+  		    willPrune = false;
+
+  		for (var key in this._tiles) {
+  			var tile = this._tiles[key];
+  			if (!tile.current || !tile.loaded) { continue; }
+
+  			var fade = Math.min(1, (now - tile.loaded) / 200);
+
+  			setOpacity(tile.el, fade);
+  			if (fade < 1) {
+  				nextFrame = true;
+  			} else {
+  				if (tile.active) {
+  					willPrune = true;
+  				} else {
+  					this._onOpaqueTile(tile);
+  				}
+  				tile.active = true;
+  			}
+  		}
+
+  		if (willPrune && !this._noPrune) { this._pruneTiles(); }
+
+  		if (nextFrame) {
+  			cancelAnimFrame(this._fadeFrame);
+  			this._fadeFrame = requestAnimFrame(this._updateOpacity, this);
+  		}
+  	},
+
+  	_onOpaqueTile: falseFn,
+
+  	_initContainer: function () {
+  		if (this._container) { return; }
+
+  		this._container = create$1('div', 'leaflet-layer ' + (this.options.className || ''));
+  		this._updateZIndex();
+
+  		if (this.options.opacity < 1) {
+  			this._updateOpacity();
+  		}
+
+  		this.getPane().appendChild(this._container);
+  	},
+
+  	_updateLevels: function () {
+
+  		var zoom = this._tileZoom,
+  		    maxZoom = this.options.maxZoom;
+
+  		if (zoom === undefined) { return undefined; }
+
+  		for (var z in this._levels) {
+  			z = Number(z);
+  			if (this._levels[z].el.children.length || z === zoom) {
+  				this._levels[z].el.style.zIndex = maxZoom - Math.abs(zoom - z);
+  				this._onUpdateLevel(z);
+  			} else {
+  				remove(this._levels[z].el);
+  				this._removeTilesAtZoom(z);
+  				this._onRemoveLevel(z);
+  				delete this._levels[z];
+  			}
+  		}
+
+  		var level = this._levels[zoom],
+  		    map = this._map;
+
+  		if (!level) {
+  			level = this._levels[zoom] = {};
+
+  			level.el = create$1('div', 'leaflet-tile-container leaflet-zoom-animated', this._container);
+  			level.el.style.zIndex = maxZoom;
+
+  			level.origin = map.project(map.unproject(map.getPixelOrigin()), zoom).round();
+  			level.zoom = zoom;
+
+  			this._setZoomTransform(level, map.getCenter(), map.getZoom());
+
+  			// force the browser to consider the newly added element for transition
+  			falseFn(level.el.offsetWidth);
+
+  			this._onCreateLevel(level);
+  		}
+
+  		this._level = level;
+
+  		return level;
+  	},
+
+  	_onUpdateLevel: falseFn,
+
+  	_onRemoveLevel: falseFn,
+
+  	_onCreateLevel: falseFn,
+
+  	_pruneTiles: function () {
+  		if (!this._map) {
+  			return;
+  		}
+
+  		var key, tile;
+
+  		var zoom = this._map.getZoom();
+  		if (zoom > this.options.maxZoom ||
+  			zoom < this.options.minZoom) {
+  			this._removeAllTiles();
+  			return;
+  		}
+
+  		for (key in this._tiles) {
+  			tile = this._tiles[key];
+  			tile.retain = tile.current;
+  		}
+
+  		for (key in this._tiles) {
+  			tile = this._tiles[key];
+  			if (tile.current && !tile.active) {
+  				var coords = tile.coords;
+  				if (!this._retainParent(coords.x, coords.y, coords.z, coords.z - 5)) {
+  					this._retainChildren(coords.x, coords.y, coords.z, coords.z + 2);
+  				}
+  			}
+  		}
+
+  		for (key in this._tiles) {
+  			if (!this._tiles[key].retain) {
+  				this._removeTile(key);
+  			}
+  		}
+  	},
+
+  	_removeTilesAtZoom: function (zoom) {
+  		for (var key in this._tiles) {
+  			if (this._tiles[key].coords.z !== zoom) {
+  				continue;
+  			}
+  			this._removeTile(key);
+  		}
+  	},
+
+  	_removeAllTiles: function () {
+  		for (var key in this._tiles) {
+  			this._removeTile(key);
+  		}
+  	},
+
+  	_invalidateAll: function () {
+  		for (var z in this._levels) {
+  			remove(this._levels[z].el);
+  			this._onRemoveLevel(Number(z));
+  			delete this._levels[z];
+  		}
+  		this._removeAllTiles();
+
+  		this._tileZoom = undefined;
+  	},
+
+  	_retainParent: function (x, y, z, minZoom) {
+  		var x2 = Math.floor(x / 2),
+  		    y2 = Math.floor(y / 2),
+  		    z2 = z - 1,
+  		    coords2 = new Point(+x2, +y2);
+  		coords2.z = +z2;
+
+  		var key = this._tileCoordsToKey(coords2),
+  		    tile = this._tiles[key];
+
+  		if (tile && tile.active) {
+  			tile.retain = true;
+  			return true;
+
+  		} else if (tile && tile.loaded) {
+  			tile.retain = true;
+  		}
+
+  		if (z2 > minZoom) {
+  			return this._retainParent(x2, y2, z2, minZoom);
+  		}
+
+  		return false;
+  	},
+
+  	_retainChildren: function (x, y, z, maxZoom) {
+
+  		for (var i = 2 * x; i < 2 * x + 2; i++) {
+  			for (var j = 2 * y; j < 2 * y + 2; j++) {
+
+  				var coords = new Point(i, j);
+  				coords.z = z + 1;
+
+  				var key = this._tileCoordsToKey(coords),
+  				    tile = this._tiles[key];
+
+  				if (tile && tile.active) {
+  					tile.retain = true;
+  					continue;
+
+  				} else if (tile && tile.loaded) {
+  					tile.retain = true;
+  				}
+
+  				if (z + 1 < maxZoom) {
+  					this._retainChildren(i, j, z + 1, maxZoom);
+  				}
+  			}
+  		}
+  	},
+
+  	_resetView: function (e) {
+  		var animating = e && (e.pinch || e.flyTo);
+  		this._setView(this._map.getCenter(), this._map.getZoom(), animating, animating);
+  	},
+
+  	_animateZoom: function (e) {
+  		this._setView(e.center, e.zoom, true, e.noUpdate);
+  	},
+
+  	_clampZoom: function (zoom) {
+  		var options = this.options;
+
+  		if (undefined !== options.minNativeZoom && zoom < options.minNativeZoom) {
+  			return options.minNativeZoom;
+  		}
+
+  		if (undefined !== options.maxNativeZoom && options.maxNativeZoom < zoom) {
+  			return options.maxNativeZoom;
+  		}
+
+  		return zoom;
+  	},
+
+  	_setView: function (center, zoom, noPrune, noUpdate) {
+  		var tileZoom = Math.round(zoom);
+  		if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
+  		    (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
+  			tileZoom = undefined;
+  		} else {
+  			tileZoom = this._clampZoom(tileZoom);
+  		}
+
+  		var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
+
+  		if (!noUpdate || tileZoomChanged) {
+
+  			this._tileZoom = tileZoom;
+
+  			if (this._abortLoading) {
+  				this._abortLoading();
+  			}
+
+  			this._updateLevels();
+  			this._resetGrid();
+
+  			if (tileZoom !== undefined) {
+  				this._update(center);
+  			}
+
+  			if (!noPrune) {
+  				this._pruneTiles();
+  			}
+
+  			// Flag to prevent _updateOpacity from pruning tiles during
+  			// a zoom anim or a pinch gesture
+  			this._noPrune = !!noPrune;
+  		}
+
+  		this._setZoomTransforms(center, zoom);
+  	},
+
+  	_setZoomTransforms: function (center, zoom) {
+  		for (var i in this._levels) {
+  			this._setZoomTransform(this._levels[i], center, zoom);
+  		}
+  	},
+
+  	_setZoomTransform: function (level, center, zoom) {
+  		var scale = this._map.getZoomScale(zoom, level.zoom),
+  		    translate = level.origin.multiplyBy(scale)
+  		        .subtract(this._map._getNewPixelOrigin(center, zoom)).round();
+
+  		if (Browser.any3d) {
+  			setTransform(level.el, translate, scale);
+  		} else {
+  			setPosition(level.el, translate);
+  		}
+  	},
+
+  	_resetGrid: function () {
+  		var map = this._map,
+  		    crs = map.options.crs,
+  		    tileSize = this._tileSize = this.getTileSize(),
+  		    tileZoom = this._tileZoom;
+
+  		var bounds = this._map.getPixelWorldBounds(this._tileZoom);
+  		if (bounds) {
+  			this._globalTileRange = this._pxBoundsToTileRange(bounds);
+  		}
+
+  		this._wrapX = crs.wrapLng && !this.options.noWrap && [
+  			Math.floor(map.project([0, crs.wrapLng[0]], tileZoom).x / tileSize.x),
+  			Math.ceil(map.project([0, crs.wrapLng[1]], tileZoom).x / tileSize.y)
+  		];
+  		this._wrapY = crs.wrapLat && !this.options.noWrap && [
+  			Math.floor(map.project([crs.wrapLat[0], 0], tileZoom).y / tileSize.x),
+  			Math.ceil(map.project([crs.wrapLat[1], 0], tileZoom).y / tileSize.y)
+  		];
+  	},
+
+  	_onMoveEnd: function () {
+  		if (!this._map || this._map._animatingZoom) { return; }
+
+  		this._update();
+  	},
+
+  	_getTiledPixelBounds: function (center) {
+  		var map = this._map,
+  		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
+  		    scale = map.getZoomScale(mapZoom, this._tileZoom),
+  		    pixelCenter = map.project(center, this._tileZoom).floor(),
+  		    halfSize = map.getSize().divideBy(scale * 2);
+
+  		return new Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
+  	},
+
+  	// Private method to load tiles in the grid's active zoom level according to map bounds
+  	_update: function (center) {
+  		var map = this._map;
+  		if (!map) { return; }
+  		var zoom = this._clampZoom(map.getZoom());
+
+  		if (center === undefined) { center = map.getCenter(); }
+  		if (this._tileZoom === undefined) { return; }	// if out of minzoom/maxzoom
+
+  		var pixelBounds = this._getTiledPixelBounds(center),
+  		    tileRange = this._pxBoundsToTileRange(pixelBounds),
+  		    tileCenter = tileRange.getCenter(),
+  		    queue = [],
+  		    margin = this.options.keepBuffer,
+  		    noPruneRange = new Bounds(tileRange.getBottomLeft().subtract([margin, -margin]),
+  		                              tileRange.getTopRight().add([margin, -margin]));
+
+  		// Sanity check: panic if the tile range contains Infinity somewhere.
+  		if (!(isFinite(tileRange.min.x) &&
+  		      isFinite(tileRange.min.y) &&
+  		      isFinite(tileRange.max.x) &&
+  		      isFinite(tileRange.max.y))) { throw new Error('Attempted to load an infinite number of tiles'); }
+
+  		for (var key in this._tiles) {
+  			var c = this._tiles[key].coords;
+  			if (c.z !== this._tileZoom || !noPruneRange.contains(new Point(c.x, c.y))) {
+  				this._tiles[key].current = false;
+  			}
+  		}
+
+  		// _update just loads more tiles. If the tile zoom level differs too much
+  		// from the map's, let _setView reset levels and prune old tiles.
+  		if (Math.abs(zoom - this._tileZoom) > 1) { this._setView(center, zoom); return; }
+
+  		// create a queue of coordinates to load tiles from
+  		for (var j = tileRange.min.y; j <= tileRange.max.y; j++) {
+  			for (var i = tileRange.min.x; i <= tileRange.max.x; i++) {
+  				var coords = new Point(i, j);
+  				coords.z = this._tileZoom;
+
+  				if (!this._isValidTile(coords)) { continue; }
+
+  				var tile = this._tiles[this._tileCoordsToKey(coords)];
+  				if (tile) {
+  					tile.current = true;
+  				} else {
+  					queue.push(coords);
+  				}
+  			}
+  		}
+
+  		// sort tile queue to load tiles in order of their distance to center
+  		queue.sort(function (a, b) {
+  			return a.distanceTo(tileCenter) - b.distanceTo(tileCenter);
+  		});
+
+  		if (queue.length !== 0) {
+  			// if it's the first batch of tiles to load
+  			if (!this._loading) {
+  				this._loading = true;
+  				// @event loading: Event
+  				// Fired when the grid layer starts loading tiles.
+  				this.fire('loading');
+  			}
+
+  			// create DOM fragment to append tiles in one batch
+  			var fragment = document.createDocumentFragment();
+
+  			for (i = 0; i < queue.length; i++) {
+  				this._addTile(queue[i], fragment);
+  			}
+
+  			this._level.el.appendChild(fragment);
+  		}
+  	},
+
+  	_isValidTile: function (coords) {
+  		var crs = this._map.options.crs;
+
+  		if (!crs.infinite) {
+  			// don't load tile if it's out of bounds and not wrapped
+  			var bounds = this._globalTileRange;
+  			if ((!crs.wrapLng && (coords.x < bounds.min.x || coords.x > bounds.max.x)) ||
+  			    (!crs.wrapLat && (coords.y < bounds.min.y || coords.y > bounds.max.y))) { return false; }
+  		}
+
+  		if (!this.options.bounds) { return true; }
+
+  		// don't load tile if it doesn't intersect the bounds in options
+  		var tileBounds = this._tileCoordsToBounds(coords);
+  		return toLatLngBounds(this.options.bounds).overlaps(tileBounds);
+  	},
+
+  	_keyToBounds: function (key) {
+  		return this._tileCoordsToBounds(this._keyToTileCoords(key));
+  	},
+
+  	_tileCoordsToNwSe: function (coords) {
+  		var map = this._map,
+  		    tileSize = this.getTileSize(),
+  		    nwPoint = coords.scaleBy(tileSize),
+  		    sePoint = nwPoint.add(tileSize),
+  		    nw = map.unproject(nwPoint, coords.z),
+  		    se = map.unproject(sePoint, coords.z);
+  		return [nw, se];
+  	},
+
+  	// converts tile coordinates to its geographical bounds
+  	_tileCoordsToBounds: function (coords) {
+  		var bp = this._tileCoordsToNwSe(coords),
+  		    bounds = new LatLngBounds(bp[0], bp[1]);
+
+  		if (!this.options.noWrap) {
+  			bounds = this._map.wrapLatLngBounds(bounds);
+  		}
+  		return bounds;
+  	},
+  	// converts tile coordinates to key for the tile cache
+  	_tileCoordsToKey: function (coords) {
+  		return coords.x + ':' + coords.y + ':' + coords.z;
+  	},
+
+  	// converts tile cache key to coordinates
+  	_keyToTileCoords: function (key) {
+  		var k = key.split(':'),
+  		    coords = new Point(+k[0], +k[1]);
+  		coords.z = +k[2];
+  		return coords;
+  	},
+
+  	_removeTile: function (key) {
+  		var tile = this._tiles[key];
+  		if (!tile) { return; }
+
+  		remove(tile.el);
+
+  		delete this._tiles[key];
+
+  		// @event tileunload: TileEvent
+  		// Fired when a tile is removed (e.g. when a tile goes off the screen).
+  		this.fire('tileunload', {
+  			tile: tile.el,
+  			coords: this._keyToTileCoords(key)
+  		});
+  	},
+
+  	_initTile: function (tile) {
+  		addClass(tile, 'leaflet-tile');
+
+  		var tileSize = this.getTileSize();
+  		tile.style.width = tileSize.x + 'px';
+  		tile.style.height = tileSize.y + 'px';
+
+  		tile.onselectstart = falseFn;
+  		tile.onmousemove = falseFn;
+
+  		// update opacity on tiles in IE7-8 because of filter inheritance problems
+  		if (Browser.ielt9 && this.options.opacity < 1) {
+  			setOpacity(tile, this.options.opacity);
+  		}
+  	},
+
+  	_addTile: function (coords, container) {
+  		var tilePos = this._getTilePos(coords),
+  		    key = this._tileCoordsToKey(coords);
+
+  		var tile = this.createTile(this._wrapCoords(coords), bind(this._tileReady, this, coords));
+
+  		this._initTile(tile);
+
+  		// if createTile is defined with a second argument ("done" callback),
+  		// we know that tile is async and will be ready later; otherwise
+  		if (this.createTile.length < 2) {
+  			// mark tile as ready, but delay one frame for opacity animation to happen
+  			requestAnimFrame(bind(this._tileReady, this, coords, null, tile));
+  		}
+
+  		setPosition(tile, tilePos);
+
+  		// save tile in cache
+  		this._tiles[key] = {
+  			el: tile,
+  			coords: coords,
+  			current: true
+  		};
+
+  		container.appendChild(tile);
+  		// @event tileloadstart: TileEvent
+  		// Fired when a tile is requested and starts loading.
+  		this.fire('tileloadstart', {
+  			tile: tile,
+  			coords: coords
+  		});
+  	},
+
+  	_tileReady: function (coords, err, tile) {
+  		if (err) {
+  			// @event tileerror: TileErrorEvent
+  			// Fired when there is an error loading a tile.
+  			this.fire('tileerror', {
+  				error: err,
+  				tile: tile,
+  				coords: coords
+  			});
+  		}
+
+  		var key = this._tileCoordsToKey(coords);
+
+  		tile = this._tiles[key];
+  		if (!tile) { return; }
+
+  		tile.loaded = +new Date();
+  		if (this._map._fadeAnimated) {
+  			setOpacity(tile.el, 0);
+  			cancelAnimFrame(this._fadeFrame);
+  			this._fadeFrame = requestAnimFrame(this._updateOpacity, this);
+  		} else {
+  			tile.active = true;
+  			this._pruneTiles();
+  		}
+
+  		if (!err) {
+  			addClass(tile.el, 'leaflet-tile-loaded');
+
+  			// @event tileload: TileEvent
+  			// Fired when a tile loads.
+  			this.fire('tileload', {
+  				tile: tile.el,
+  				coords: coords
+  			});
+  		}
+
+  		if (this._noTilesToLoad()) {
+  			this._loading = false;
+  			// @event load: Event
+  			// Fired when the grid layer loaded all visible tiles.
+  			this.fire('load');
+
+  			if (Browser.ielt9 || !this._map._fadeAnimated) {
+  				requestAnimFrame(this._pruneTiles, this);
+  			} else {
+  				// Wait a bit more than 0.2 secs (the duration of the tile fade-in)
+  				// to trigger a pruning.
+  				setTimeout(bind(this._pruneTiles, this), 250);
+  			}
+  		}
+  	},
+
+  	_getTilePos: function (coords) {
+  		return coords.scaleBy(this.getTileSize()).subtract(this._level.origin);
+  	},
+
+  	_wrapCoords: function (coords) {
+  		var newCoords = new Point(
+  			this._wrapX ? wrapNum(coords.x, this._wrapX) : coords.x,
+  			this._wrapY ? wrapNum(coords.y, this._wrapY) : coords.y);
+  		newCoords.z = coords.z;
+  		return newCoords;
+  	},
+
+  	_pxBoundsToTileRange: function (bounds) {
+  		var tileSize = this.getTileSize();
+  		return new Bounds(
+  			bounds.min.unscaleBy(tileSize).floor(),
+  			bounds.max.unscaleBy(tileSize).ceil().subtract([1, 1]));
+  	},
+
+  	_noTilesToLoad: function () {
+  		for (var key in this._tiles) {
+  			if (!this._tiles[key].loaded) { return false; }
+  		}
+  		return true;
+  	}
+  });
+
+  // @factory L.gridLayer(options?: GridLayer options)
+  // Creates a new instance of GridLayer with the supplied options.
+  function gridLayer(options) {
+  	return new GridLayer(options);
+  }
+
+  /*
+   * @class TileLayer
+   * @inherits GridLayer
+   * @aka L.TileLayer
+   * Used to load and display tile layers on the map. Note that most tile servers require attribution, which you can set under `Layer`. Extends `GridLayer`.
+   *
+   * @example
+   *
+   * ```js
+   * L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+   * ```
+   *
+   * @section URL template
+   * @example
+   *
+   * A string of the following form:
+   *
+   * ```
+   * 'https://{s}.somedomain.com/blabla/{z}/{x}/{y}{r}.png'
+   * ```
+   *
+   * `{s}` means one of the available subdomains (used sequentially to help with browser parallel requests per domain limitation; subdomain values are specified in options; `a`, `b` or `c` by default, can be omitted), `{z}` — zoom level, `{x}` and `{y}` — tile coordinates. `{r}` can be used to add "&commat;2x" to the URL to load retina tiles.
+   *
+   * You can use custom keys in the template, which will be [evaluated](#util-template) from TileLayer options, like this:
+   *
+   * ```
+   * L.tileLayer('https://{s}.somedomain.com/{foo}/{z}/{x}/{y}.png', {foo: 'bar'});
+   * ```
+   */
+
+
+  var TileLayer = GridLayer.extend({
+
+  	// @section
+  	// @aka TileLayer options
+  	options: {
+  		// @option minZoom: Number = 0
+  		// The minimum zoom level down to which this layer will be displayed (inclusive).
+  		minZoom: 0,
+
+  		// @option maxZoom: Number = 18
+  		// The maximum zoom level up to which this layer will be displayed (inclusive).
+  		maxZoom: 18,
+
+  		// @option subdomains: String|String[] = 'abc'
+  		// Subdomains of the tile service. Can be passed in the form of one string (where each letter is a subdomain name) or an array of strings.
+  		subdomains: 'abc',
+
+  		// @option errorTileUrl: String = ''
+  		// URL to the tile image to show in place of the tile that failed to load.
+  		errorTileUrl: '',
+
+  		// @option zoomOffset: Number = 0
+  		// The zoom number used in tile URLs will be offset with this value.
+  		zoomOffset: 0,
+
+  		// @option tms: Boolean = false
+  		// If `true`, inverses Y axis numbering for tiles (turn this on for [TMS](https://en.wikipedia.org/wiki/Tile_Map_Service) services).
+  		tms: false,
+
+  		// @option zoomReverse: Boolean = false
+  		// If set to true, the zoom number used in tile URLs will be reversed (`maxZoom - zoom` instead of `zoom`)
+  		zoomReverse: false,
+
+  		// @option detectRetina: Boolean = false
+  		// If `true` and user is on a retina display, it will request four tiles of half the specified size and a bigger zoom level in place of one to utilize the high resolution.
+  		detectRetina: false,
+
+  		// @option crossOrigin: Boolean|String = false
+  		// Whether the crossOrigin attribute will be added to the tiles.
+  		// If a String is provided, all tiles will have their crossOrigin attribute set to the String provided. This is needed if you want to access tile pixel data.
+  		// Refer to [CORS Settings](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) for valid String values.
+  		crossOrigin: false,
+
+  		// @option referrerPolicy: Boolean|String = false
+  		// Whether the referrerPolicy attribute will be added to the tiles.
+  		// If a String is provided, all tiles will have their referrerPolicy attribute set to the String provided.
+  		// This may be needed if your map's rendering context has a strict default but your tile provider expects a valid referrer
+  		// (e.g. to validate an API token).
+  		// Refer to [HTMLImageElement.referrerPolicy](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/referrerPolicy) for valid String values.
+  		referrerPolicy: false
+  	},
+
+  	initialize: function (url, options) {
+
+  		this._url = url;
+
+  		options = setOptions(this, options);
+
+  		// detecting retina displays, adjusting tileSize and zoom levels
+  		if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
+
+  			options.tileSize = Math.floor(options.tileSize / 2);
+
+  			if (!options.zoomReverse) {
+  				options.zoomOffset++;
+  				options.maxZoom = Math.max(options.minZoom, options.maxZoom - 1);
+  			} else {
+  				options.zoomOffset--;
+  				options.minZoom = Math.min(options.maxZoom, options.minZoom + 1);
+  			}
+
+  			options.minZoom = Math.max(0, options.minZoom);
+  		} else if (!options.zoomReverse) {
+  			// make sure maxZoom is gte minZoom
+  			options.maxZoom = Math.max(options.minZoom, options.maxZoom);
+  		} else {
+  			// make sure minZoom is lte maxZoom
+  			options.minZoom = Math.min(options.maxZoom, options.minZoom);
+  		}
+
+  		if (typeof options.subdomains === 'string') {
+  			options.subdomains = options.subdomains.split('');
+  		}
+
+  		this.on('tileunload', this._onTileRemove);
+  	},
+
+  	// @method setUrl(url: String, noRedraw?: Boolean): this
+  	// Updates the layer's URL template and redraws it (unless `noRedraw` is set to `true`).
+  	// If the URL does not change, the layer will not be redrawn unless
+  	// the noRedraw parameter is set to false.
+  	setUrl: function (url, noRedraw) {
+  		if (this._url === url && noRedraw === undefined) {
+  			noRedraw = true;
+  		}
+
+  		this._url = url;
+
+  		if (!noRedraw) {
+  			this.redraw();
+  		}
+  		return this;
+  	},
+
+  	// @method createTile(coords: Object, done?: Function): HTMLElement
+  	// Called only internally, overrides GridLayer's [`createTile()`](#gridlayer-createtile)
+  	// to return an `<img>` HTML element with the appropriate image URL given `coords`. The `done`
+  	// callback is called when the tile has been loaded.
+  	createTile: function (coords, done) {
+  		var tile = document.createElement('img');
+
+  		on(tile, 'load', bind(this._tileOnLoad, this, done, tile));
+  		on(tile, 'error', bind(this._tileOnError, this, done, tile));
+
+  		if (this.options.crossOrigin || this.options.crossOrigin === '') {
+  			tile.crossOrigin = this.options.crossOrigin === true ? '' : this.options.crossOrigin;
+  		}
+
+  		// for this new option we follow the documented behavior
+  		// more closely by only setting the property when string
+  		if (typeof this.options.referrerPolicy === 'string') {
+  			tile.referrerPolicy = this.options.referrerPolicy;
+  		}
+
+  		// The alt attribute is set to the empty string,
+  		// allowing screen readers to ignore the decorative image tiles.
+  		// https://www.w3.org/WAI/tutorials/images/decorative/
+  		// https://www.w3.org/TR/html-aria/#el-img-empty-alt
+  		tile.alt = '';
+
+  		tile.src = this.getTileUrl(coords);
+
+  		return tile;
+  	},
+
+  	// @section Extension methods
+  	// @uninheritable
+  	// Layers extending `TileLayer` might reimplement the following method.
+  	// @method getTileUrl(coords: Object): String
+  	// Called only internally, returns the URL for a tile given its coordinates.
+  	// Classes extending `TileLayer` can override this function to provide custom tile URL naming schemes.
+  	getTileUrl: function (coords) {
+  		var data = {
+  			r: Browser.retina ? '@2x' : '',
+  			s: this._getSubdomain(coords),
+  			x: coords.x,
+  			y: coords.y,
+  			z: this._getZoomForUrl()
+  		};
+  		if (this._map && !this._map.options.crs.infinite) {
+  			var invertedY = this._globalTileRange.max.y - coords.y;
+  			if (this.options.tms) {
+  				data['y'] = invertedY;
+  			}
+  			data['-y'] = invertedY;
+  		}
+
+  		return template(this._url, extend(data, this.options));
+  	},
+
+  	_tileOnLoad: function (done, tile) {
+  		// For https://github.com/Leaflet/Leaflet/issues/3332
+  		if (Browser.ielt9) {
+  			setTimeout(bind(done, this, null, tile), 0);
+  		} else {
+  			done(null, tile);
+  		}
+  	},
+
+  	_tileOnError: function (done, tile, e) {
+  		var errorUrl = this.options.errorTileUrl;
+  		if (errorUrl && tile.getAttribute('src') !== errorUrl) {
+  			tile.src = errorUrl;
+  		}
+  		done(e, tile);
+  	},
+
+  	_onTileRemove: function (e) {
+  		e.tile.onload = null;
+  	},
+
+  	_getZoomForUrl: function () {
+  		var zoom = this._tileZoom,
+  		maxZoom = this.options.maxZoom,
+  		zoomReverse = this.options.zoomReverse,
+  		zoomOffset = this.options.zoomOffset;
+
+  		if (zoomReverse) {
+  			zoom = maxZoom - zoom;
+  		}
+
+  		return zoom + zoomOffset;
+  	},
+
+  	_getSubdomain: function (tilePoint) {
+  		var index = Math.abs(tilePoint.x + tilePoint.y) % this.options.subdomains.length;
+  		return this.options.subdomains[index];
+  	},
+
+  	// stops loading all tiles in the background layer
+  	_abortLoading: function () {
+  		var i, tile;
+  		for (i in this._tiles) {
+  			if (this._tiles[i].coords.z !== this._tileZoom) {
+  				tile = this._tiles[i].el;
+
+  				tile.onload = falseFn;
+  				tile.onerror = falseFn;
+
+  				if (!tile.complete) {
+  					tile.src = emptyImageUrl;
+  					var coords = this._tiles[i].coords;
+  					remove(tile);
+  					delete this._tiles[i];
+  					// @event tileabort: TileEvent
+  					// Fired when a tile was loading but is now not wanted.
+  					this.fire('tileabort', {
+  						tile: tile,
+  						coords: coords
+  					});
+  				}
+  			}
+  		}
+  	},
+
+  	_removeTile: function (key) {
+  		var tile = this._tiles[key];
+  		if (!tile) { return; }
+
+  		// Cancels any pending http requests associated with the tile
+  		tile.el.setAttribute('src', emptyImageUrl);
+
+  		return GridLayer.prototype._removeTile.call(this, key);
+  	},
+
+  	_tileReady: function (coords, err, tile) {
+  		if (!this._map || (tile && tile.getAttribute('src') === emptyImageUrl)) {
+  			return;
+  		}
+
+  		return GridLayer.prototype._tileReady.call(this, coords, err, tile);
+  	}
+  });
+
+
+  // @factory L.tilelayer(urlTemplate: String, options?: TileLayer options)
+  // Instantiates a tile layer object given a `URL template` and optionally an options object.
+
+  function tileLayer(url, options) {
+  	return new TileLayer(url, options);
+  }
+
+  /*
+   * @class TileLayer.WMS
+   * @inherits TileLayer
+   * @aka L.TileLayer.WMS
+   * Used to display [WMS](https://en.wikipedia.org/wiki/Web_Map_Service) services as tile layers on the map. Extends `TileLayer`.
+   *
+   * @example
+   *
+   * ```js
+   * var nexrad = L.tileLayer.wms("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
+   * 	layers: 'nexrad-n0r-900913',
+   * 	format: 'image/png',
+   * 	transparent: true,
+   * 	attribution: "Weather data © 2012 IEM Nexrad"
+   * });
+   * ```
+   */
+
+  var TileLayerWMS = TileLayer.extend({
+
+  	// @section
+  	// @aka TileLayer.WMS options
+  	// If any custom options not documented here are used, they will be sent to the
+  	// WMS server as extra parameters in each request URL. This can be useful for
+  	// [non-standard vendor WMS parameters](https://docs.geoserver.org/stable/en/user/services/wms/vendor.html).
+  	defaultWmsParams: {
+  		service: 'WMS',
+  		request: 'GetMap',
+
+  		// @option layers: String = ''
+  		// **(required)** Comma-separated list of WMS layers to show.
+  		layers: '',
+
+  		// @option styles: String = ''
+  		// Comma-separated list of WMS styles.
+  		styles: '',
+
+  		// @option format: String = 'image/jpeg'
+  		// WMS image format (use `'image/png'` for layers with transparency).
+  		format: 'image/jpeg',
+
+  		// @option transparent: Boolean = false
+  		// If `true`, the WMS service will return images with transparency.
+  		transparent: false,
+
+  		// @option version: String = '1.1.1'
+  		// Version of the WMS service to use
+  		version: '1.1.1'
+  	},
+
+  	options: {
+  		// @option crs: CRS = null
+  		// Coordinate Reference System to use for the WMS requests, defaults to
+  		// map CRS. Don't change this if you're not sure what it means.
+  		crs: null,
+
+  		// @option uppercase: Boolean = false
+  		// If `true`, WMS request parameter keys will be uppercase.
+  		uppercase: false
+  	},
+
+  	initialize: function (url, options) {
+
+  		this._url = url;
+
+  		var wmsParams = extend({}, this.defaultWmsParams);
+
+  		// all keys that are not TileLayer options go to WMS params
+  		for (var i in options) {
+  			if (!(i in this.options)) {
+  				wmsParams[i] = options[i];
+  			}
+  		}
+
+  		options = setOptions(this, options);
+
+  		var realRetina = options.detectRetina && Browser.retina ? 2 : 1;
+  		var tileSize = this.getTileSize();
+  		wmsParams.width = tileSize.x * realRetina;
+  		wmsParams.height = tileSize.y * realRetina;
+
+  		this.wmsParams = wmsParams;
+  	},
+
+  	onAdd: function (map) {
+
+  		this._crs = this.options.crs || map.options.crs;
+  		this._wmsVersion = parseFloat(this.wmsParams.version);
+
+  		var projectionKey = this._wmsVersion >= 1.3 ? 'crs' : 'srs';
+  		this.wmsParams[projectionKey] = this._crs.code;
+
+  		TileLayer.prototype.onAdd.call(this, map);
+  	},
+
+  	getTileUrl: function (coords) {
+
+  		var tileBounds = this._tileCoordsToNwSe(coords),
+  		    crs = this._crs,
+  		    bounds = toBounds(crs.project(tileBounds[0]), crs.project(tileBounds[1])),
+  		    min = bounds.min,
+  		    max = bounds.max,
+  		    bbox = (this._wmsVersion >= 1.3 && this._crs === EPSG4326 ?
+  		    [min.y, min.x, max.y, max.x] :
+  		    [min.x, min.y, max.x, max.y]).join(','),
+  		    url = TileLayer.prototype.getTileUrl.call(this, coords);
+  		return url +
+  			getParamString(this.wmsParams, url, this.options.uppercase) +
+  			(this.options.uppercase ? '&BBOX=' : '&bbox=') + bbox;
+  	},
+
+  	// @method setParams(params: Object, noRedraw?: Boolean): this
+  	// Merges an object with the new parameters and re-requests tiles on the current screen (unless `noRedraw` was set to true).
+  	setParams: function (params, noRedraw) {
+
+  		extend(this.wmsParams, params);
+
+  		if (!noRedraw) {
+  			this.redraw();
+  		}
+
+  		return this;
+  	}
+  });
+
+
+  // @factory L.tileLayer.wms(baseUrl: String, options: TileLayer.WMS options)
+  // Instantiates a WMS tile layer object given a base URL of the WMS service and a WMS parameters/options object.
+  function tileLayerWMS(url, options) {
+  	return new TileLayerWMS(url, options);
+  }
+
+  TileLayer.WMS = TileLayerWMS;
+  tileLayer.wms = tileLayerWMS;
+
+  /*
+   * @class Renderer
+   * @inherits Layer
+   * @aka L.Renderer
+   *
+   * Base class for vector renderer implementations (`SVG`, `Canvas`). Handles the
+   * DOM container of the renderer, its bounds, and its zoom animation.
+   *
+   * A `Renderer` works as an implicit layer group for all `Path`s - the renderer
+   * itself can be added or removed to the map. All paths use a renderer, which can
+   * be implicit (the map will decide the type of renderer and use it automatically)
+   * or explicit (using the [`renderer`](#path-renderer) option of the path).
+   *
+   * Do not use this class directly, use `SVG` and `Canvas` instead.
+   *
+   * @event update: Event
+   * Fired when the renderer updates its bounds, center and zoom, for example when
+   * its map has moved
+   */
+
+  var Renderer = Layer.extend({
+
+  	// @section
+  	// @aka Renderer options
+  	options: {
+  		// @option padding: Number = 0.1
+  		// How much to extend the clip area around the map view (relative to its size)
+  		// e.g. 0.1 would be 10% of map view in each direction
+  		padding: 0.1
+  	},
+
+  	initialize: function (options) {
+  		setOptions(this, options);
+  		stamp(this);
+  		this._layers = this._layers || {};
+  	},
+
+  	onAdd: function () {
+  		if (!this._container) {
+  			this._initContainer(); // defined by renderer implementations
+
+  			// always keep transform-origin as 0 0
+  			addClass(this._container, 'leaflet-zoom-animated');
+  		}
+
+  		this.getPane().appendChild(this._container);
+  		this._update();
+  		this.on('update', this._updatePaths, this);
+  	},
+
+  	onRemove: function () {
+  		this.off('update', this._updatePaths, this);
+  		this._destroyContainer();
+  	},
+
+  	getEvents: function () {
+  		var events = {
+  			viewreset: this._reset,
+  			zoom: this._onZoom,
+  			moveend: this._update,
+  			zoomend: this._onZoomEnd
+  		};
+  		if (this._zoomAnimated) {
+  			events.zoomanim = this._onAnimZoom;
+  		}
+  		return events;
+  	},
+
+  	_onAnimZoom: function (ev) {
+  		this._updateTransform(ev.center, ev.zoom);
+  	},
+
+  	_onZoom: function () {
+  		this._updateTransform(this._map.getCenter(), this._map.getZoom());
+  	},
+
+  	_updateTransform: function (center, zoom) {
+  		var scale = this._map.getZoomScale(zoom, this._zoom),
+  		    viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
+  		    currentCenterPoint = this._map.project(this._center, zoom),
+
+  		    topLeftOffset = viewHalf.multiplyBy(-scale).add(currentCenterPoint)
+  				  .subtract(this._map._getNewPixelOrigin(center, zoom));
+
+  		if (Browser.any3d) {
+  			setTransform(this._container, topLeftOffset, scale);
+  		} else {
+  			setPosition(this._container, topLeftOffset);
+  		}
+  	},
+
+  	_reset: function () {
+  		this._update();
+  		this._updateTransform(this._center, this._zoom);
+
+  		for (var id in this._layers) {
+  			this._layers[id]._reset();
+  		}
+  	},
+
+  	_onZoomEnd: function () {
+  		for (var id in this._layers) {
+  			this._layers[id]._project();
+  		}
+  	},
+
+  	_updatePaths: function () {
+  		for (var id in this._layers) {
+  			this._layers[id]._update();
+  		}
+  	},
+
+  	_update: function () {
+  		// Update pixel bounds of renderer container (for positioning/sizing/clipping later)
+  		// Subclasses are responsible of firing the 'update' event.
+  		var p = this.options.padding,
+  		    size = this._map.getSize(),
+  		    min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+
+  		this._bounds = new Bounds(min, min.add(size.multiplyBy(1 + p * 2)).round());
+
+  		this._center = this._map.getCenter();
+  		this._zoom = this._map.getZoom();
+  	}
+  });
+
+  /*
+   * @class Canvas
+   * @inherits Renderer
+   * @aka L.Canvas
+   *
+   * Allows vector layers to be displayed with [`<canvas>`](https://developer.mozilla.org/docs/Web/API/Canvas_API).
+   * Inherits `Renderer`.
+   *
+   * Due to [technical limitations](https://caniuse.com/canvas), Canvas is not
+   * available in all web browsers, notably IE8, and overlapping geometries might
+   * not display properly in some edge cases.
+   *
+   * @example
+   *
+   * Use Canvas by default for all paths in the map:
+   *
+   * ```js
+   * var map = L.map('map', {
+   * 	renderer: L.canvas()
+   * });
+   * ```
+   *
+   * Use a Canvas renderer with extra padding for specific vector geometries:
+   *
+   * ```js
+   * var map = L.map('map');
+   * var myRenderer = L.canvas({ padding: 0.5 });
+   * var line = L.polyline( coordinates, { renderer: myRenderer } );
+   * var circle = L.circle( center, { renderer: myRenderer } );
+   * ```
+   */
+
+  var Canvas = Renderer.extend({
+
+  	// @section
+  	// @aka Canvas options
+  	options: {
+  		// @option tolerance: Number = 0
+  		// How much to extend the click tolerance around a path/object on the map.
+  		tolerance: 0
+  	},
+
+  	getEvents: function () {
+  		var events = Renderer.prototype.getEvents.call(this);
+  		events.viewprereset = this._onViewPreReset;
+  		return events;
+  	},
+
+  	_onViewPreReset: function () {
+  		// Set a flag so that a viewprereset+moveend+viewreset only updates&redraws once
+  		this._postponeUpdatePaths = true;
+  	},
+
+  	onAdd: function () {
+  		Renderer.prototype.onAdd.call(this);
+
+  		// Redraw vectors since canvas is cleared upon removal,
+  		// in case of removing the renderer itself from the map.
+  		this._draw();
+  	},
+
+  	_initContainer: function () {
+  		var container = this._container = document.createElement('canvas');
+
+  		on(container, 'mousemove', this._onMouseMove, this);
+  		on(container, 'click dblclick mousedown mouseup contextmenu', this._onClick, this);
+  		on(container, 'mouseout', this._handleMouseOut, this);
+  		container['_leaflet_disable_events'] = true;
+
+  		this._ctx = container.getContext('2d');
+  	},
+
+  	_destroyContainer: function () {
+  		cancelAnimFrame(this._redrawRequest);
+  		delete this._ctx;
+  		remove(this._container);
+  		off(this._container);
+  		delete this._container;
+  	},
+
+  	_updatePaths: function () {
+  		if (this._postponeUpdatePaths) { return; }
+
+  		var layer;
+  		this._redrawBounds = null;
+  		for (var id in this._layers) {
+  			layer = this._layers[id];
+  			layer._update();
+  		}
+  		this._redraw();
+  	},
+
+  	_update: function () {
+  		if (this._map._animatingZoom && this._bounds) { return; }
+
+  		Renderer.prototype._update.call(this);
+
+  		var b = this._bounds,
+  		    container = this._container,
+  		    size = b.getSize(),
+  		    m = Browser.retina ? 2 : 1;
+
+  		setPosition(container, b.min);
+
+  		// set canvas size (also clearing it); use double size on retina
+  		container.width = m * size.x;
+  		container.height = m * size.y;
+  		container.style.width = size.x + 'px';
+  		container.style.height = size.y + 'px';
+
+  		if (Browser.retina) {
+  			this._ctx.scale(2, 2);
+  		}
+
+  		// translate so we use the same path coordinates after canvas element moves
+  		this._ctx.translate(-b.min.x, -b.min.y);
+
+  		// Tell paths to redraw themselves
+  		this.fire('update');
+  	},
+
+  	_reset: function () {
+  		Renderer.prototype._reset.call(this);
+
+  		if (this._postponeUpdatePaths) {
+  			this._postponeUpdatePaths = false;
+  			this._updatePaths();
+  		}
+  	},
+
+  	_initPath: function (layer) {
+  		this._updateDashArray(layer);
+  		this._layers[stamp(layer)] = layer;
+
+  		var order = layer._order = {
+  			layer: layer,
+  			prev: this._drawLast,
+  			next: null
+  		};
+  		if (this._drawLast) { this._drawLast.next = order; }
+  		this._drawLast = order;
+  		this._drawFirst = this._drawFirst || this._drawLast;
+  	},
+
+  	_addPath: function (layer) {
+  		this._requestRedraw(layer);
+  	},
+
+  	_removePath: function (layer) {
+  		var order = layer._order;
+  		var next = order.next;
+  		var prev = order.prev;
+
+  		if (next) {
+  			next.prev = prev;
+  		} else {
+  			this._drawLast = prev;
+  		}
+  		if (prev) {
+  			prev.next = next;
+  		} else {
+  			this._drawFirst = next;
+  		}
+
+  		delete layer._order;
+
+  		delete this._layers[stamp(layer)];
+
+  		this._requestRedraw(layer);
+  	},
+
+  	_updatePath: function (layer) {
+  		// Redraw the union of the layer's old pixel
+  		// bounds and the new pixel bounds.
+  		this._extendRedrawBounds(layer);
+  		layer._project();
+  		layer._update();
+  		// The redraw will extend the redraw bounds
+  		// with the new pixel bounds.
+  		this._requestRedraw(layer);
+  	},
+
+  	_updateStyle: function (layer) {
+  		this._updateDashArray(layer);
+  		this._requestRedraw(layer);
+  	},
+
+  	_updateDashArray: function (layer) {
+  		if (typeof layer.options.dashArray === 'string') {
+  			var parts = layer.options.dashArray.split(/[, ]+/),
+  			    dashArray = [],
+  			    dashValue,
+  			    i;
+  			for (i = 0; i < parts.length; i++) {
+  				dashValue = Number(parts[i]);
+  				// Ignore dash array containing invalid lengths
+  				if (isNaN(dashValue)) { return; }
+  				dashArray.push(dashValue);
+  			}
+  			layer.options._dashArray = dashArray;
+  		} else {
+  			layer.options._dashArray = layer.options.dashArray;
+  		}
+  	},
+
+  	_requestRedraw: function (layer) {
+  		if (!this._map) { return; }
+
+  		this._extendRedrawBounds(layer);
+  		this._redrawRequest = this._redrawRequest || requestAnimFrame(this._redraw, this);
+  	},
+
+  	_extendRedrawBounds: function (layer) {
+  		if (layer._pxBounds) {
+  			var padding = (layer.options.weight || 0) + 1;
+  			this._redrawBounds = this._redrawBounds || new Bounds();
+  			this._redrawBounds.extend(layer._pxBounds.min.subtract([padding, padding]));
+  			this._redrawBounds.extend(layer._pxBounds.max.add([padding, padding]));
+  		}
+  	},
+
+  	_redraw: function () {
+  		this._redrawRequest = null;
+
+  		if (this._redrawBounds) {
+  			this._redrawBounds.min._floor();
+  			this._redrawBounds.max._ceil();
+  		}
+
+  		this._clear(); // clear layers in redraw bounds
+  		this._draw(); // draw layers
+
+  		this._redrawBounds = null;
+  	},
+
+  	_clear: function () {
+  		var bounds = this._redrawBounds;
+  		if (bounds) {
+  			var size = bounds.getSize();
+  			this._ctx.clearRect(bounds.min.x, bounds.min.y, size.x, size.y);
+  		} else {
+  			this._ctx.save();
+  			this._ctx.setTransform(1, 0, 0, 1, 0, 0);
+  			this._ctx.clearRect(0, 0, this._container.width, this._container.height);
+  			this._ctx.restore();
+  		}
+  	},
+
+  	_draw: function () {
+  		var layer, bounds = this._redrawBounds;
+  		this._ctx.save();
+  		if (bounds) {
+  			var size = bounds.getSize();
+  			this._ctx.beginPath();
+  			this._ctx.rect(bounds.min.x, bounds.min.y, size.x, size.y);
+  			this._ctx.clip();
+  		}
+
+  		this._drawing = true;
+
+  		for (var order = this._drawFirst; order; order = order.next) {
+  			layer = order.layer;
+  			if (!bounds || (layer._pxBounds && layer._pxBounds.intersects(bounds))) {
+  				layer._updatePath();
+  			}
+  		}
+
+  		this._drawing = false;
+
+  		this._ctx.restore();  // Restore state before clipping.
+  	},
+
+  	_updatePoly: function (layer, closed) {
+  		if (!this._drawing) { return; }
+
+  		var i, j, len2, p,
+  		    parts = layer._parts,
+  		    len = parts.length,
+  		    ctx = this._ctx;
+
+  		if (!len) { return; }
+
+  		ctx.beginPath();
+
+  		for (i = 0; i < len; i++) {
+  			for (j = 0, len2 = parts[i].length; j < len2; j++) {
+  				p = parts[i][j];
+  				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
+  			}
+  			if (closed) {
+  				ctx.closePath();
+  			}
+  		}
+
+  		this._fillStroke(ctx, layer);
+
+  		// TODO optimization: 1 fill/stroke for all features with equal style instead of 1 for each feature
+  	},
+
+  	_updateCircle: function (layer) {
+
+  		if (!this._drawing || layer._empty()) { return; }
+
+  		var p = layer._point,
+  		    ctx = this._ctx,
+  		    r = Math.max(Math.round(layer._radius), 1),
+  		    s = (Math.max(Math.round(layer._radiusY), 1) || r) / r;
+
+  		if (s !== 1) {
+  			ctx.save();
+  			ctx.scale(1, s);
+  		}
+
+  		ctx.beginPath();
+  		ctx.arc(p.x, p.y / s, r, 0, Math.PI * 2, false);
+
+  		if (s !== 1) {
+  			ctx.restore();
+  		}
+
+  		this._fillStroke(ctx, layer);
+  	},
+
+  	_fillStroke: function (ctx, layer) {
+  		var options = layer.options;
+
+  		if (options.fill) {
+  			ctx.globalAlpha = options.fillOpacity;
+  			ctx.fillStyle = options.fillColor || options.color;
+  			ctx.fill(options.fillRule || 'evenodd');
+  		}
+
+  		if (options.stroke && options.weight !== 0) {
+  			if (ctx.setLineDash) {
+  				ctx.setLineDash(layer.options && layer.options._dashArray || []);
+  			}
+  			ctx.globalAlpha = options.opacity;
+  			ctx.lineWidth = options.weight;
+  			ctx.strokeStyle = options.color;
+  			ctx.lineCap = options.lineCap;
+  			ctx.lineJoin = options.lineJoin;
+  			ctx.stroke();
+  		}
+  	},
+
+  	// Canvas obviously doesn't have mouse events for individual drawn objects,
+  	// so we emulate that by calculating what's under the mouse on mousemove/click manually
+
+  	_onClick: function (e) {
+  		var point = this._map.mouseEventToLayerPoint(e), layer, clickedLayer;
+
+  		for (var order = this._drawFirst; order; order = order.next) {
+  			layer = order.layer;
+  			if (layer.options.interactive && layer._containsPoint(point)) {
+  				if (!(e.type === 'click' || e.type === 'preclick') || !this._map._draggableMoved(layer)) {
+  					clickedLayer = layer;
+  				}
+  			}
+  		}
+  		this._fireEvent(clickedLayer ? [clickedLayer] : false, e);
+  	},
+
+  	_onMouseMove: function (e) {
+  		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return; }
+
+  		var point = this._map.mouseEventToLayerPoint(e);
+  		this._handleMouseHover(e, point);
+  	},
+
+
+  	_handleMouseOut: function (e) {
+  		var layer = this._hoveredLayer;
+  		if (layer) {
+  			// if we're leaving the layer, fire mouseout
+  			removeClass(this._container, 'leaflet-interactive');
+  			this._fireEvent([layer], e, 'mouseout');
+  			this._hoveredLayer = null;
+  			this._mouseHoverThrottled = false;
+  		}
+  	},
+
+  	_handleMouseHover: function (e, point) {
+  		if (this._mouseHoverThrottled) {
+  			return;
+  		}
+
+  		var layer, candidateHoveredLayer;
+
+  		for (var order = this._drawFirst; order; order = order.next) {
+  			layer = order.layer;
+  			if (layer.options.interactive && layer._containsPoint(point)) {
+  				candidateHoveredLayer = layer;
+  			}
+  		}
+
+  		if (candidateHoveredLayer !== this._hoveredLayer) {
+  			this._handleMouseOut(e);
+
+  			if (candidateHoveredLayer) {
+  				addClass(this._container, 'leaflet-interactive'); // change cursor
+  				this._fireEvent([candidateHoveredLayer], e, 'mouseover');
+  				this._hoveredLayer = candidateHoveredLayer;
+  			}
+  		}
+
+  		this._fireEvent(this._hoveredLayer ? [this._hoveredLayer] : false, e);
+
+  		this._mouseHoverThrottled = true;
+  		setTimeout(bind(function () {
+  			this._mouseHoverThrottled = false;
+  		}, this), 32);
+  	},
+
+  	_fireEvent: function (layers, e, type) {
+  		this._map._fireDOMEvent(e, type || e.type, layers);
+  	},
+
+  	_bringToFront: function (layer) {
+  		var order = layer._order;
+
+  		if (!order) { return; }
+
+  		var next = order.next;
+  		var prev = order.prev;
+
+  		if (next) {
+  			next.prev = prev;
+  		} else {
+  			// Already last
+  			return;
+  		}
+  		if (prev) {
+  			prev.next = next;
+  		} else if (next) {
+  			// Update first entry unless this is the
+  			// single entry
+  			this._drawFirst = next;
+  		}
+
+  		order.prev = this._drawLast;
+  		this._drawLast.next = order;
+
+  		order.next = null;
+  		this._drawLast = order;
+
+  		this._requestRedraw(layer);
+  	},
+
+  	_bringToBack: function (layer) {
+  		var order = layer._order;
+
+  		if (!order) { return; }
+
+  		var next = order.next;
+  		var prev = order.prev;
+
+  		if (prev) {
+  			prev.next = next;
+  		} else {
+  			// Already first
+  			return;
+  		}
+  		if (next) {
+  			next.prev = prev;
+  		} else if (prev) {
+  			// Update last entry unless this is the
+  			// single entry
+  			this._drawLast = prev;
+  		}
+
+  		order.prev = null;
+
+  		order.next = this._drawFirst;
+  		this._drawFirst.prev = order;
+  		this._drawFirst = order;
+
+  		this._requestRedraw(layer);
+  	}
+  });
+
+  // @factory L.canvas(options?: Renderer options)
+  // Creates a Canvas renderer with the given options.
+  function canvas(options) {
+  	return Browser.canvas ? new Canvas(options) : null;
+  }
+
+  /*
+   * Thanks to Dmitry Baranovsky and his Raphael library for inspiration!
+   */
+
+
+  var vmlCreate = (function () {
+  	try {
+  		document.namespaces.add('lvml', 'urn:schemas-microsoft-com:vml');
+  		return function (name) {
+  			return document.createElement('<lvml:' + name + ' class="lvml">');
+  		};
+  	} catch (e) {
+  		// Do not return fn from catch block so `e` can be garbage collected
+  		// See https://github.com/Leaflet/Leaflet/pull/7279
+  	}
+  	return function (name) {
+  		return document.createElement('<' + name + ' xmlns="urn:schemas-microsoft.com:vml" class="lvml">');
+  	};
+  })();
+
+
+  /*
+   * @class SVG
+   *
+   *
+   * VML was deprecated in 2012, which means VML functionality exists only for backwards compatibility
+   * with old versions of Internet Explorer.
+   */
+
+  // mixin to redefine some SVG methods to handle VML syntax which is similar but with some differences
+  var vmlMixin = {
+
+  	_initContainer: function () {
+  		this._container = create$1('div', 'leaflet-vml-container');
+  	},
+
+  	_update: function () {
+  		if (this._map._animatingZoom) { return; }
+  		Renderer.prototype._update.call(this);
+  		this.fire('update');
+  	},
+
+  	_initPath: function (layer) {
+  		var container = layer._container = vmlCreate('shape');
+
+  		addClass(container, 'leaflet-vml-shape ' + (this.options.className || ''));
+
+  		container.coordsize = '1 1';
+
+  		layer._path = vmlCreate('path');
+  		container.appendChild(layer._path);
+
+  		this._updateStyle(layer);
+  		this._layers[stamp(layer)] = layer;
+  	},
+
+  	_addPath: function (layer) {
+  		var container = layer._container;
+  		this._container.appendChild(container);
+
+  		if (layer.options.interactive) {
+  			layer.addInteractiveTarget(container);
+  		}
+  	},
+
+  	_removePath: function (layer) {
+  		var container = layer._container;
+  		remove(container);
+  		layer.removeInteractiveTarget(container);
+  		delete this._layers[stamp(layer)];
+  	},
+
+  	_updateStyle: function (layer) {
+  		var stroke = layer._stroke,
+  		    fill = layer._fill,
+  		    options = layer.options,
+  		    container = layer._container;
+
+  		container.stroked = !!options.stroke;
+  		container.filled = !!options.fill;
+
+  		if (options.stroke) {
+  			if (!stroke) {
+  				stroke = layer._stroke = vmlCreate('stroke');
+  			}
+  			container.appendChild(stroke);
+  			stroke.weight = options.weight + 'px';
+  			stroke.color = options.color;
+  			stroke.opacity = options.opacity;
+
+  			if (options.dashArray) {
+  				stroke.dashStyle = isArray(options.dashArray) ?
+  				    options.dashArray.join(' ') :
+  				    options.dashArray.replace(/( *, *)/g, ' ');
+  			} else {
+  				stroke.dashStyle = '';
+  			}
+  			stroke.endcap = options.lineCap.replace('butt', 'flat');
+  			stroke.joinstyle = options.lineJoin;
+
+  		} else if (stroke) {
+  			container.removeChild(stroke);
+  			layer._stroke = null;
+  		}
+
+  		if (options.fill) {
+  			if (!fill) {
+  				fill = layer._fill = vmlCreate('fill');
+  			}
+  			container.appendChild(fill);
+  			fill.color = options.fillColor || options.color;
+  			fill.opacity = options.fillOpacity;
+
+  		} else if (fill) {
+  			container.removeChild(fill);
+  			layer._fill = null;
+  		}
+  	},
+
+  	_updateCircle: function (layer) {
+  		var p = layer._point.round(),
+  		    r = Math.round(layer._radius),
+  		    r2 = Math.round(layer._radiusY || r);
+
+  		this._setPath(layer, layer._empty() ? 'M0 0' :
+  			'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r2 + ' 0,' + (65535 * 360));
+  	},
+
+  	_setPath: function (layer, path) {
+  		layer._path.v = path;
+  	},
+
+  	_bringToFront: function (layer) {
+  		toFront(layer._container);
+  	},
+
+  	_bringToBack: function (layer) {
+  		toBack(layer._container);
+  	}
+  };
+
+  var create = Browser.vml ? vmlCreate : svgCreate;
+
+  /*
+   * @class SVG
+   * @inherits Renderer
+   * @aka L.SVG
+   *
+   * Allows vector layers to be displayed with [SVG](https://developer.mozilla.org/docs/Web/SVG).
+   * Inherits `Renderer`.
+   *
+   * Due to [technical limitations](https://caniuse.com/svg), SVG is not
+   * available in all web browsers, notably Android 2.x and 3.x.
+   *
+   * Although SVG is not available on IE7 and IE8, these browsers support
+   * [VML](https://en.wikipedia.org/wiki/Vector_Markup_Language)
+   * (a now deprecated technology), and the SVG renderer will fall back to VML in
+   * this case.
+   *
+   * @example
+   *
+   * Use SVG by default for all paths in the map:
+   *
+   * ```js
+   * var map = L.map('map', {
+   * 	renderer: L.svg()
+   * });
+   * ```
+   *
+   * Use a SVG renderer with extra padding for specific vector geometries:
+   *
+   * ```js
+   * var map = L.map('map');
+   * var myRenderer = L.svg({ padding: 0.5 });
+   * var line = L.polyline( coordinates, { renderer: myRenderer } );
+   * var circle = L.circle( center, { renderer: myRenderer } );
+   * ```
+   */
+
+  var SVG = Renderer.extend({
+
+  	_initContainer: function () {
+  		this._container = create('svg');
+
+  		// makes it possible to click through svg root; we'll reset it back in individual paths
+  		this._container.setAttribute('pointer-events', 'none');
+
+  		this._rootGroup = create('g');
+  		this._container.appendChild(this._rootGroup);
+  	},
+
+  	_destroyContainer: function () {
+  		remove(this._container);
+  		off(this._container);
+  		delete this._container;
+  		delete this._rootGroup;
+  		delete this._svgSize;
+  	},
+
+  	_update: function () {
+  		if (this._map._animatingZoom && this._bounds) { return; }
+
+  		Renderer.prototype._update.call(this);
+
+  		var b = this._bounds,
+  		    size = b.getSize(),
+  		    container = this._container;
+
+  		// set size of svg-container if changed
+  		if (!this._svgSize || !this._svgSize.equals(size)) {
+  			this._svgSize = size;
+  			container.setAttribute('width', size.x);
+  			container.setAttribute('height', size.y);
+  		}
+
+  		// movement: update container viewBox so that we don't have to change coordinates of individual layers
+  		setPosition(container, b.min);
+  		container.setAttribute('viewBox', [b.min.x, b.min.y, size.x, size.y].join(' '));
+
+  		this.fire('update');
+  	},
+
+  	// methods below are called by vector layers implementations
+
+  	_initPath: function (layer) {
+  		var path = layer._path = create('path');
+
+  		// @namespace Path
+  		// @option className: String = null
+  		// Custom class name set on an element. Only for SVG renderer.
+  		if (layer.options.className) {
+  			addClass(path, layer.options.className);
+  		}
+
+  		if (layer.options.interactive) {
+  			addClass(path, 'leaflet-interactive');
+  		}
+
+  		this._updateStyle(layer);
+  		this._layers[stamp(layer)] = layer;
+  	},
+
+  	_addPath: function (layer) {
+  		if (!this._rootGroup) { this._initContainer(); }
+  		this._rootGroup.appendChild(layer._path);
+  		layer.addInteractiveTarget(layer._path);
+  	},
+
+  	_removePath: function (layer) {
+  		remove(layer._path);
+  		layer.removeInteractiveTarget(layer._path);
+  		delete this._layers[stamp(layer)];
+  	},
+
+  	_updatePath: function (layer) {
+  		layer._project();
+  		layer._update();
+  	},
+
+  	_updateStyle: function (layer) {
+  		var path = layer._path,
+  		    options = layer.options;
+
+  		if (!path) { return; }
+
+  		if (options.stroke) {
+  			path.setAttribute('stroke', options.color);
+  			path.setAttribute('stroke-opacity', options.opacity);
+  			path.setAttribute('stroke-width', options.weight);
+  			path.setAttribute('stroke-linecap', options.lineCap);
+  			path.setAttribute('stroke-linejoin', options.lineJoin);
+
+  			if (options.dashArray) {
+  				path.setAttribute('stroke-dasharray', options.dashArray);
+  			} else {
+  				path.removeAttribute('stroke-dasharray');
+  			}
+
+  			if (options.dashOffset) {
+  				path.setAttribute('stroke-dashoffset', options.dashOffset);
+  			} else {
+  				path.removeAttribute('stroke-dashoffset');
+  			}
+  		} else {
+  			path.setAttribute('stroke', 'none');
+  		}
+
+  		if (options.fill) {
+  			path.setAttribute('fill', options.fillColor || options.color);
+  			path.setAttribute('fill-opacity', options.fillOpacity);
+  			path.setAttribute('fill-rule', options.fillRule || 'evenodd');
+  		} else {
+  			path.setAttribute('fill', 'none');
+  		}
+  	},
+
+  	_updatePoly: function (layer, closed) {
+  		this._setPath(layer, pointsToPath(layer._parts, closed));
+  	},
+
+  	_updateCircle: function (layer) {
+  		var p = layer._point,
+  		    r = Math.max(Math.round(layer._radius), 1),
+  		    r2 = Math.max(Math.round(layer._radiusY), 1) || r,
+  		    arc = 'a' + r + ',' + r2 + ' 0 1,0 ';
+
+  		// drawing a circle with two half-arcs
+  		var d = layer._empty() ? 'M0 0' :
+  			'M' + (p.x - r) + ',' + p.y +
+  			arc + (r * 2) + ',0 ' +
+  			arc + (-r * 2) + ',0 ';
+
+  		this._setPath(layer, d);
+  	},
+
+  	_setPath: function (layer, path) {
+  		layer._path.setAttribute('d', path);
+  	},
+
+  	// SVG does not have the concept of zIndex so we resort to changing the DOM order of elements
+  	_bringToFront: function (layer) {
+  		toFront(layer._path);
+  	},
+
+  	_bringToBack: function (layer) {
+  		toBack(layer._path);
+  	}
+  });
+
+  if (Browser.vml) {
+  	SVG.include(vmlMixin);
+  }
+
+  // @namespace SVG
+  // @factory L.svg(options?: Renderer options)
+  // Creates a SVG renderer with the given options.
+  function svg(options) {
+  	return Browser.svg || Browser.vml ? new SVG(options) : null;
+  }
+
+  Map.include({
+  	// @namespace Map; @method getRenderer(layer: Path): Renderer
+  	// Returns the instance of `Renderer` that should be used to render the given
+  	// `Path`. It will ensure that the `renderer` options of the map and paths
+  	// are respected, and that the renderers do exist on the map.
+  	getRenderer: function (layer) {
+  		// @namespace Path; @option renderer: Renderer
+  		// Use this specific instance of `Renderer` for this path. Takes
+  		// precedence over the map's [default renderer](#map-renderer).
+  		var renderer = layer.options.renderer || this._getPaneRenderer(layer.options.pane) || this.options.renderer || this._renderer;
+
+  		if (!renderer) {
+  			renderer = this._renderer = this._createRenderer();
+  		}
+
+  		if (!this.hasLayer(renderer)) {
+  			this.addLayer(renderer);
+  		}
+  		return renderer;
+  	},
+
+  	_getPaneRenderer: function (name) {
+  		if (name === 'overlayPane' || name === undefined) {
+  			return false;
+  		}
+
+  		var renderer = this._paneRenderers[name];
+  		if (renderer === undefined) {
+  			renderer = this._createRenderer({pane: name});
+  			this._paneRenderers[name] = renderer;
+  		}
+  		return renderer;
+  	},
+
+  	_createRenderer: function (options) {
+  		// @namespace Map; @option preferCanvas: Boolean = false
+  		// Whether `Path`s should be rendered on a `Canvas` renderer.
+  		// By default, all `Path`s are rendered in a `SVG` renderer.
+  		return (this.options.preferCanvas && canvas(options)) || svg(options);
+  	}
+  });
+
+  /*
+   * L.Rectangle extends Polygon and creates a rectangle when passed a LatLngBounds object.
+   */
+
+  /*
+   * @class Rectangle
+   * @aka L.Rectangle
+   * @inherits Polygon
+   *
+   * A class for drawing rectangle overlays on a map. Extends `Polygon`.
+   *
+   * @example
+   *
+   * ```js
+   * // define rectangle geographical bounds
+   * var bounds = [[54.559322, -5.767822], [56.1210604, -3.021240]];
+   *
+   * // create an orange rectangle
+   * L.rectangle(bounds, {color: "#ff7800", weight: 1}).addTo(map);
+   *
+   * // zoom the map to the rectangle bounds
+   * map.fitBounds(bounds);
+   * ```
+   *
+   */
+
+
+  var Rectangle = Polygon.extend({
+  	initialize: function (latLngBounds, options) {
+  		Polygon.prototype.initialize.call(this, this._boundsToLatLngs(latLngBounds), options);
+  	},
+
+  	// @method setBounds(latLngBounds: LatLngBounds): this
+  	// Redraws the rectangle with the passed bounds.
+  	setBounds: function (latLngBounds) {
+  		return this.setLatLngs(this._boundsToLatLngs(latLngBounds));
+  	},
+
+  	_boundsToLatLngs: function (latLngBounds) {
+  		latLngBounds = toLatLngBounds(latLngBounds);
+  		return [
+  			latLngBounds.getSouthWest(),
+  			latLngBounds.getNorthWest(),
+  			latLngBounds.getNorthEast(),
+  			latLngBounds.getSouthEast()
+  		];
+  	}
+  });
+
+
+  // @factory L.rectangle(latLngBounds: LatLngBounds, options?: Polyline options)
+  function rectangle(latLngBounds, options) {
+  	return new Rectangle(latLngBounds, options);
+  }
+
+  SVG.create = create;
+  SVG.pointsToPath = pointsToPath;
+
+  GeoJSON.geometryToLayer = geometryToLayer;
+  GeoJSON.coordsToLatLng = coordsToLatLng;
+  GeoJSON.coordsToLatLngs = coordsToLatLngs;
+  GeoJSON.latLngToCoords = latLngToCoords;
+  GeoJSON.latLngsToCoords = latLngsToCoords;
+  GeoJSON.getFeature = getFeature;
+  GeoJSON.asFeature = asFeature;
+
+  /*
+   * L.Handler.BoxZoom is used to add shift-drag zoom interaction to the map
+   * (zoom to a selected bounding box), enabled by default.
+   */
+
+  // @namespace Map
+  // @section Interaction Options
+  Map.mergeOptions({
+  	// @option boxZoom: Boolean = true
+  	// Whether the map can be zoomed to a rectangular area specified by
+  	// dragging the mouse while pressing the shift key.
+  	boxZoom: true
+  });
+
+  var BoxZoom = Handler.extend({
+  	initialize: function (map) {
+  		this._map = map;
+  		this._container = map._container;
+  		this._pane = map._panes.overlayPane;
+  		this._resetStateTimeout = 0;
+  		map.on('unload', this._destroy, this);
+  	},
+
+  	addHooks: function () {
+  		on(this._container, 'mousedown', this._onMouseDown, this);
+  	},
+
+  	removeHooks: function () {
+  		off(this._container, 'mousedown', this._onMouseDown, this);
+  	},
+
+  	moved: function () {
+  		return this._moved;
+  	},
+
+  	_destroy: function () {
+  		remove(this._pane);
+  		delete this._pane;
+  	},
+
+  	_resetState: function () {
+  		this._resetStateTimeout = 0;
+  		this._moved = false;
+  	},
+
+  	_clearDeferredResetState: function () {
+  		if (this._resetStateTimeout !== 0) {
+  			clearTimeout(this._resetStateTimeout);
+  			this._resetStateTimeout = 0;
+  		}
+  	},
+
+  	_onMouseDown: function (e) {
+  		if (!e.shiftKey || ((e.which !== 1) && (e.button !== 1))) { return false; }
+
+  		// Clear the deferred resetState if it hasn't executed yet, otherwise it
+  		// will interrupt the interaction and orphan a box element in the container.
+  		this._clearDeferredResetState();
+  		this._resetState();
+
+  		disableTextSelection();
+  		disableImageDrag();
+
+  		this._startPoint = this._map.mouseEventToContainerPoint(e);
+
+  		on(document, {
+  			contextmenu: stop,
+  			mousemove: this._onMouseMove,
+  			mouseup: this._onMouseUp,
+  			keydown: this._onKeyDown
+  		}, this);
+  	},
+
+  	_onMouseMove: function (e) {
+  		if (!this._moved) {
+  			this._moved = true;
+
+  			this._box = create$1('div', 'leaflet-zoom-box', this._container);
+  			addClass(this._container, 'leaflet-crosshair');
+
+  			this._map.fire('boxzoomstart');
+  		}
+
+  		this._point = this._map.mouseEventToContainerPoint(e);
+
+  		var bounds = new Bounds(this._point, this._startPoint),
+  		    size = bounds.getSize();
+
+  		setPosition(this._box, bounds.min);
+
+  		this._box.style.width  = size.x + 'px';
+  		this._box.style.height = size.y + 'px';
+  	},
+
+  	_finish: function () {
+  		if (this._moved) {
+  			remove(this._box);
+  			removeClass(this._container, 'leaflet-crosshair');
+  		}
+
+  		enableTextSelection();
+  		enableImageDrag();
+
+  		off(document, {
+  			contextmenu: stop,
+  			mousemove: this._onMouseMove,
+  			mouseup: this._onMouseUp,
+  			keydown: this._onKeyDown
+  		}, this);
+  	},
+
+  	_onMouseUp: function (e) {
+  		if ((e.which !== 1) && (e.button !== 1)) { return; }
+
+  		this._finish();
+
+  		if (!this._moved) { return; }
+  		// Postpone to next JS tick so internal click event handling
+  		// still see it as "moved".
+  		this._clearDeferredResetState();
+  		this._resetStateTimeout = setTimeout(bind(this._resetState, this), 0);
+
+  		var bounds = new LatLngBounds(
+  		        this._map.containerPointToLatLng(this._startPoint),
+  		        this._map.containerPointToLatLng(this._point));
+
+  		this._map
+  			.fitBounds(bounds)
+  			.fire('boxzoomend', {boxZoomBounds: bounds});
+  	},
+
+  	_onKeyDown: function (e) {
+  		if (e.keyCode === 27) {
+  			this._finish();
+  			this._clearDeferredResetState();
+  			this._resetState();
+  		}
+  	}
+  });
+
+  // @section Handlers
+  // @property boxZoom: Handler
+  // Box (shift-drag with mouse) zoom handler.
+  Map.addInitHook('addHandler', 'boxZoom', BoxZoom);
+
+  /*
+   * L.Handler.DoubleClickZoom is used to handle double-click zoom on the map, enabled by default.
+   */
+
+  // @namespace Map
+  // @section Interaction Options
+
+  Map.mergeOptions({
+  	// @option doubleClickZoom: Boolean|String = true
+  	// Whether the map can be zoomed in by double clicking on it and
+  	// zoomed out by double clicking while holding shift. If passed
+  	// `'center'`, double-click zoom will zoom to the center of the
+  	//  view regardless of where the mouse was.
+  	doubleClickZoom: true
+  });
+
+  var DoubleClickZoom = Handler.extend({
+  	addHooks: function () {
+  		this._map.on('dblclick', this._onDoubleClick, this);
+  	},
+
+  	removeHooks: function () {
+  		this._map.off('dblclick', this._onDoubleClick, this);
+  	},
+
+  	_onDoubleClick: function (e) {
+  		var map = this._map,
+  		    oldZoom = map.getZoom(),
+  		    delta = map.options.zoomDelta,
+  		    zoom = e.originalEvent.shiftKey ? oldZoom - delta : oldZoom + delta;
+
+  		if (map.options.doubleClickZoom === 'center') {
+  			map.setZoom(zoom);
+  		} else {
+  			map.setZoomAround(e.containerPoint, zoom);
+  		}
+  	}
+  });
+
+  // @section Handlers
+  //
+  // Map properties include interaction handlers that allow you to control
+  // interaction behavior in runtime, enabling or disabling certain features such
+  // as dragging or touch zoom (see `Handler` methods). For example:
+  //
+  // ```js
+  // map.doubleClickZoom.disable();
+  // ```
+  //
+  // @property doubleClickZoom: Handler
+  // Double click zoom handler.
+  Map.addInitHook('addHandler', 'doubleClickZoom', DoubleClickZoom);
+
+  /*
+   * L.Handler.MapDrag is used to make the map draggable (with panning inertia), enabled by default.
+   */
+
+  // @namespace Map
+  // @section Interaction Options
+  Map.mergeOptions({
+  	// @option dragging: Boolean = true
+  	// Whether the map is draggable with mouse/touch or not.
+  	dragging: true,
+
+  	// @section Panning Inertia Options
+  	// @option inertia: Boolean = *
+  	// If enabled, panning of the map will have an inertia effect where
+  	// the map builds momentum while dragging and continues moving in
+  	// the same direction for some time. Feels especially nice on touch
+  	// devices. Enabled by default.
+  	inertia: true,
+
+  	// @option inertiaDeceleration: Number = 3000
+  	// The rate with which the inertial movement slows down, in pixels/second².
+  	inertiaDeceleration: 3400, // px/s^2
+
+  	// @option inertiaMaxSpeed: Number = Infinity
+  	// Max speed of the inertial movement, in pixels/second.
+  	inertiaMaxSpeed: Infinity, // px/s
+
+  	// @option easeLinearity: Number = 0.2
+  	easeLinearity: 0.2,
+
+  	// TODO refactor, move to CRS
+  	// @option worldCopyJump: Boolean = false
+  	// With this option enabled, the map tracks when you pan to another "copy"
+  	// of the world and seamlessly jumps to the original one so that all overlays
+  	// like markers and vector layers are still visible.
+  	worldCopyJump: false,
+
+  	// @option maxBoundsViscosity: Number = 0.0
+  	// If `maxBounds` is set, this option will control how solid the bounds
+  	// are when dragging the map around. The default value of `0.0` allows the
+  	// user to drag outside the bounds at normal speed, higher values will
+  	// slow down map dragging outside bounds, and `1.0` makes the bounds fully
+  	// solid, preventing the user from dragging outside the bounds.
+  	maxBoundsViscosity: 0.0
+  });
+
+  var Drag = Handler.extend({
+  	addHooks: function () {
+  		if (!this._draggable) {
+  			var map = this._map;
+
+  			this._draggable = new Draggable(map._mapPane, map._container);
+
+  			this._draggable.on({
+  				dragstart: this._onDragStart,
+  				drag: this._onDrag,
+  				dragend: this._onDragEnd
+  			}, this);
+
+  			this._draggable.on('predrag', this._onPreDragLimit, this);
+  			if (map.options.worldCopyJump) {
+  				this._draggable.on('predrag', this._onPreDragWrap, this);
+  				map.on('zoomend', this._onZoomEnd, this);
+
+  				map.whenReady(this._onZoomEnd, this);
+  			}
+  		}
+  		addClass(this._map._container, 'leaflet-grab leaflet-touch-drag');
+  		this._draggable.enable();
+  		this._positions = [];
+  		this._times = [];
+  	},
+
+  	removeHooks: function () {
+  		removeClass(this._map._container, 'leaflet-grab');
+  		removeClass(this._map._container, 'leaflet-touch-drag');
+  		this._draggable.disable();
+  	},
+
+  	moved: function () {
+  		return this._draggable && this._draggable._moved;
+  	},
+
+  	moving: function () {
+  		return this._draggable && this._draggable._moving;
+  	},
+
+  	_onDragStart: function () {
+  		var map = this._map;
+
+  		map._stop();
+  		if (this._map.options.maxBounds && this._map.options.maxBoundsViscosity) {
+  			var bounds = toLatLngBounds(this._map.options.maxBounds);
+
+  			this._offsetLimit = toBounds(
+  				this._map.latLngToContainerPoint(bounds.getNorthWest()).multiplyBy(-1),
+  				this._map.latLngToContainerPoint(bounds.getSouthEast()).multiplyBy(-1)
+  					.add(this._map.getSize()));
+
+  			this._viscosity = Math.min(1.0, Math.max(0.0, this._map.options.maxBoundsViscosity));
+  		} else {
+  			this._offsetLimit = null;
+  		}
+
+  		map
+  		    .fire('movestart')
+  		    .fire('dragstart');
+
+  		if (map.options.inertia) {
+  			this._positions = [];
+  			this._times = [];
+  		}
+  	},
+
+  	_onDrag: function (e) {
+  		if (this._map.options.inertia) {
+  			var time = this._lastTime = +new Date(),
+  			    pos = this._lastPos = this._draggable._absPos || this._draggable._newPos;
+
+  			this._positions.push(pos);
+  			this._times.push(time);
+
+  			this._prunePositions(time);
+  		}
+
+  		this._map
+  		    .fire('move', e)
+  		    .fire('drag', e);
+  	},
+
+  	_prunePositions: function (time) {
+  		while (this._positions.length > 1 && time - this._times[0] > 50) {
+  			this._positions.shift();
+  			this._times.shift();
+  		}
+  	},
+
+  	_onZoomEnd: function () {
+  		var pxCenter = this._map.getSize().divideBy(2),
+  		    pxWorldCenter = this._map.latLngToLayerPoint([0, 0]);
+
+  		this._initialWorldOffset = pxWorldCenter.subtract(pxCenter).x;
+  		this._worldWidth = this._map.getPixelWorldBounds().getSize().x;
+  	},
+
+  	_viscousLimit: function (value, threshold) {
+  		return value - (value - threshold) * this._viscosity;
+  	},
+
+  	_onPreDragLimit: function () {
+  		if (!this._viscosity || !this._offsetLimit) { return; }
+
+  		var offset = this._draggable._newPos.subtract(this._draggable._startPos);
+
+  		var limit = this._offsetLimit;
+  		if (offset.x < limit.min.x) { offset.x = this._viscousLimit(offset.x, limit.min.x); }
+  		if (offset.y < limit.min.y) { offset.y = this._viscousLimit(offset.y, limit.min.y); }
+  		if (offset.x > limit.max.x) { offset.x = this._viscousLimit(offset.x, limit.max.x); }
+  		if (offset.y > limit.max.y) { offset.y = this._viscousLimit(offset.y, limit.max.y); }
+
+  		this._draggable._newPos = this._draggable._startPos.add(offset);
+  	},
+
+  	_onPreDragWrap: function () {
+  		// TODO refactor to be able to adjust map pane position after zoom
+  		var worldWidth = this._worldWidth,
+  		    halfWidth = Math.round(worldWidth / 2),
+  		    dx = this._initialWorldOffset,
+  		    x = this._draggable._newPos.x,
+  		    newX1 = (x - halfWidth + dx) % worldWidth + halfWidth - dx,
+  		    newX2 = (x + halfWidth + dx) % worldWidth - halfWidth - dx,
+  		    newX = Math.abs(newX1 + dx) < Math.abs(newX2 + dx) ? newX1 : newX2;
+
+  		this._draggable._absPos = this._draggable._newPos.clone();
+  		this._draggable._newPos.x = newX;
+  	},
+
+  	_onDragEnd: function (e) {
+  		var map = this._map,
+  		    options = map.options,
+
+  		    noInertia = !options.inertia || e.noInertia || this._times.length < 2;
+
+  		map.fire('dragend', e);
+
+  		if (noInertia) {
+  			map.fire('moveend');
+
+  		} else {
+  			this._prunePositions(+new Date());
+
+  			var direction = this._lastPos.subtract(this._positions[0]),
+  			    duration = (this._lastTime - this._times[0]) / 1000,
+  			    ease = options.easeLinearity,
+
+  			    speedVector = direction.multiplyBy(ease / duration),
+  			    speed = speedVector.distanceTo([0, 0]),
+
+  			    limitedSpeed = Math.min(options.inertiaMaxSpeed, speed),
+  			    limitedSpeedVector = speedVector.multiplyBy(limitedSpeed / speed),
+
+  			    decelerationDuration = limitedSpeed / (options.inertiaDeceleration * ease),
+  			    offset = limitedSpeedVector.multiplyBy(-decelerationDuration / 2).round();
+
+  			if (!offset.x && !offset.y) {
+  				map.fire('moveend');
+
+  			} else {
+  				offset = map._limitOffset(offset, map.options.maxBounds);
+
+  				requestAnimFrame(function () {
+  					map.panBy(offset, {
+  						duration: decelerationDuration,
+  						easeLinearity: ease,
+  						noMoveStart: true,
+  						animate: true
+  					});
+  				});
+  			}
+  		}
+  	}
+  });
+
+  // @section Handlers
+  // @property dragging: Handler
+  // Map dragging handler (by both mouse and touch).
+  Map.addInitHook('addHandler', 'dragging', Drag);
+
+  /*
+   * L.Map.Keyboard is handling keyboard interaction with the map, enabled by default.
+   */
+
+  // @namespace Map
+  // @section Keyboard Navigation Options
+  Map.mergeOptions({
+  	// @option keyboard: Boolean = true
+  	// Makes the map focusable and allows users to navigate the map with keyboard
+  	// arrows and `+`/`-` keys.
+  	keyboard: true,
+
+  	// @option keyboardPanDelta: Number = 80
+  	// Amount of pixels to pan when pressing an arrow key.
+  	keyboardPanDelta: 80
+  });
+
+  var Keyboard = Handler.extend({
+
+  	keyCodes: {
+  		left:    [37],
+  		right:   [39],
+  		down:    [40],
+  		up:      [38],
+  		zoomIn:  [187, 107, 61, 171],
+  		zoomOut: [189, 109, 54, 173]
+  	},
+
+  	initialize: function (map) {
+  		this._map = map;
+
+  		this._setPanDelta(map.options.keyboardPanDelta);
+  		this._setZoomDelta(map.options.zoomDelta);
+  	},
+
+  	addHooks: function () {
+  		var container = this._map._container;
+
+  		// make the container focusable by tabbing
+  		if (container.tabIndex <= 0) {
+  			container.tabIndex = '0';
+  		}
+
+  		on(container, {
+  			focus: this._onFocus,
+  			blur: this._onBlur,
+  			mousedown: this._onMouseDown
+  		}, this);
+
+  		this._map.on({
+  			focus: this._addHooks,
+  			blur: this._removeHooks
+  		}, this);
+  	},
+
+  	removeHooks: function () {
+  		this._removeHooks();
+
+  		off(this._map._container, {
+  			focus: this._onFocus,
+  			blur: this._onBlur,
+  			mousedown: this._onMouseDown
+  		}, this);
+
+  		this._map.off({
+  			focus: this._addHooks,
+  			blur: this._removeHooks
+  		}, this);
+  	},
+
+  	_onMouseDown: function () {
+  		if (this._focused) { return; }
+
+  		var body = document.body,
+  		    docEl = document.documentElement,
+  		    top = body.scrollTop || docEl.scrollTop,
+  		    left = body.scrollLeft || docEl.scrollLeft;
+
+  		this._map._container.focus();
+
+  		window.scrollTo(left, top);
+  	},
+
+  	_onFocus: function () {
+  		this._focused = true;
+  		this._map.fire('focus');
+  	},
+
+  	_onBlur: function () {
+  		this._focused = false;
+  		this._map.fire('blur');
+  	},
+
+  	_setPanDelta: function (panDelta) {
+  		var keys = this._panKeys = {},
+  		    codes = this.keyCodes,
+  		    i, len;
+
+  		for (i = 0, len = codes.left.length; i < len; i++) {
+  			keys[codes.left[i]] = [-1 * panDelta, 0];
+  		}
+  		for (i = 0, len = codes.right.length; i < len; i++) {
+  			keys[codes.right[i]] = [panDelta, 0];
+  		}
+  		for (i = 0, len = codes.down.length; i < len; i++) {
+  			keys[codes.down[i]] = [0, panDelta];
+  		}
+  		for (i = 0, len = codes.up.length; i < len; i++) {
+  			keys[codes.up[i]] = [0, -1 * panDelta];
+  		}
+  	},
+
+  	_setZoomDelta: function (zoomDelta) {
+  		var keys = this._zoomKeys = {},
+  		    codes = this.keyCodes,
+  		    i, len;
+
+  		for (i = 0, len = codes.zoomIn.length; i < len; i++) {
+  			keys[codes.zoomIn[i]] = zoomDelta;
+  		}
+  		for (i = 0, len = codes.zoomOut.length; i < len; i++) {
+  			keys[codes.zoomOut[i]] = -zoomDelta;
+  		}
+  	},
+
+  	_addHooks: function () {
+  		on(document, 'keydown', this._onKeyDown, this);
+  	},
+
+  	_removeHooks: function () {
+  		off(document, 'keydown', this._onKeyDown, this);
+  	},
+
+  	_onKeyDown: function (e) {
+  		if (e.altKey || e.ctrlKey || e.metaKey) { return; }
+
+  		var key = e.keyCode,
+  		    map = this._map,
+  		    offset;
+
+  		if (key in this._panKeys) {
+  			if (!map._panAnim || !map._panAnim._inProgress) {
+  				offset = this._panKeys[key];
+  				if (e.shiftKey) {
+  					offset = toPoint(offset).multiplyBy(3);
+  				}
+
+  				if (map.options.maxBounds) {
+  					offset = map._limitOffset(toPoint(offset), map.options.maxBounds);
+  				}
+
+  				if (map.options.worldCopyJump) {
+  					var newLatLng = map.wrapLatLng(map.unproject(map.project(map.getCenter()).add(offset)));
+  					map.panTo(newLatLng);
+  				} else {
+  					map.panBy(offset);
+  				}
+  			}
+  		} else if (key in this._zoomKeys) {
+  			map.setZoom(map.getZoom() + (e.shiftKey ? 3 : 1) * this._zoomKeys[key]);
+
+  		} else if (key === 27 && map._popup && map._popup.options.closeOnEscapeKey) {
+  			map.closePopup();
+
+  		} else {
+  			return;
+  		}
+
+  		stop(e);
+  	}
+  });
+
+  // @section Handlers
+  // @section Handlers
+  // @property keyboard: Handler
+  // Keyboard navigation handler.
+  Map.addInitHook('addHandler', 'keyboard', Keyboard);
+
+  /*
+   * L.Handler.ScrollWheelZoom is used by L.Map to enable mouse scroll wheel zoom on the map.
+   */
+
+  // @namespace Map
+  // @section Interaction Options
+  Map.mergeOptions({
+  	// @section Mouse wheel options
+  	// @option scrollWheelZoom: Boolean|String = true
+  	// Whether the map can be zoomed by using the mouse wheel. If passed `'center'`,
+  	// it will zoom to the center of the view regardless of where the mouse was.
+  	scrollWheelZoom: true,
+
+  	// @option wheelDebounceTime: Number = 40
+  	// Limits the rate at which a wheel can fire (in milliseconds). By default
+  	// user can't zoom via wheel more often than once per 40 ms.
+  	wheelDebounceTime: 40,
+
+  	// @option wheelPxPerZoomLevel: Number = 60
+  	// How many scroll pixels (as reported by [L.DomEvent.getWheelDelta](#domevent-getwheeldelta))
+  	// mean a change of one full zoom level. Smaller values will make wheel-zooming
+  	// faster (and vice versa).
+  	wheelPxPerZoomLevel: 60
+  });
+
+  var ScrollWheelZoom = Handler.extend({
+  	addHooks: function () {
+  		on(this._map._container, 'wheel', this._onWheelScroll, this);
+
+  		this._delta = 0;
+  	},
+
+  	removeHooks: function () {
+  		off(this._map._container, 'wheel', this._onWheelScroll, this);
+  	},
+
+  	_onWheelScroll: function (e) {
+  		var delta = getWheelDelta(e);
+
+  		var debounce = this._map.options.wheelDebounceTime;
+
+  		this._delta += delta;
+  		this._lastMousePos = this._map.mouseEventToContainerPoint(e);
+
+  		if (!this._startTime) {
+  			this._startTime = +new Date();
+  		}
+
+  		var left = Math.max(debounce - (+new Date() - this._startTime), 0);
+
+  		clearTimeout(this._timer);
+  		this._timer = setTimeout(bind(this._performZoom, this), left);
+
+  		stop(e);
+  	},
+
+  	_performZoom: function () {
+  		var map = this._map,
+  		    zoom = map.getZoom(),
+  		    snap = this._map.options.zoomSnap || 0;
+
+  		map._stop(); // stop panning and fly animations if any
+
+  		// map the delta with a sigmoid function to -4..4 range leaning on -1..1
+  		var d2 = this._delta / (this._map.options.wheelPxPerZoomLevel * 4),
+  		    d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
+  		    d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
+  		    delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
+
+  		this._delta = 0;
+  		this._startTime = null;
+
+  		if (!delta) { return; }
+
+  		if (map.options.scrollWheelZoom === 'center') {
+  			map.setZoom(zoom + delta);
+  		} else {
+  			map.setZoomAround(this._lastMousePos, zoom + delta);
+  		}
+  	}
+  });
+
+  // @section Handlers
+  // @property scrollWheelZoom: Handler
+  // Scroll wheel zoom handler.
+  Map.addInitHook('addHandler', 'scrollWheelZoom', ScrollWheelZoom);
+
+  /*
+   * L.Map.TapHold is used to simulate `contextmenu` event on long hold,
+   * which otherwise is not fired by mobile Safari.
+   */
+
+  var tapHoldDelay = 600;
+
+  // @namespace Map
+  // @section Interaction Options
+  Map.mergeOptions({
+  	// @section Touch interaction options
+  	// @option tapHold: Boolean
+  	// Enables simulation of `contextmenu` event, default is `true` for mobile Safari.
+  	tapHold: Browser.touchNative && Browser.safari && Browser.mobile,
+
+  	// @option tapTolerance: Number = 15
+  	// The max number of pixels a user can shift his finger during touch
+  	// for it to be considered a valid tap.
+  	tapTolerance: 15
+  });
+
+  var TapHold = Handler.extend({
+  	addHooks: function () {
+  		on(this._map._container, 'touchstart', this._onDown, this);
+  	},
+
+  	removeHooks: function () {
+  		off(this._map._container, 'touchstart', this._onDown, this);
+  	},
+
+  	_onDown: function (e) {
+  		clearTimeout(this._holdTimeout);
+  		if (e.touches.length !== 1) { return; }
+
+  		var first = e.touches[0];
+  		this._startPos = this._newPos = new Point(first.clientX, first.clientY);
+
+  		this._holdTimeout = setTimeout(bind(function () {
+  			this._cancel();
+  			if (!this._isTapValid()) { return; }
+
+  			// prevent simulated mouse events https://w3c.github.io/touch-events/#mouse-events
+  			on(document, 'touchend', preventDefault);
+  			on(document, 'touchend touchcancel', this._cancelClickPrevent);
+  			this._simulateEvent('contextmenu', first);
+  		}, this), tapHoldDelay);
+
+  		on(document, 'touchend touchcancel contextmenu', this._cancel, this);
+  		on(document, 'touchmove', this._onMove, this);
+  	},
+
+  	_cancelClickPrevent: function cancelClickPrevent() {
+  		off(document, 'touchend', preventDefault);
+  		off(document, 'touchend touchcancel', cancelClickPrevent);
+  	},
+
+  	_cancel: function () {
+  		clearTimeout(this._holdTimeout);
+  		off(document, 'touchend touchcancel contextmenu', this._cancel, this);
+  		off(document, 'touchmove', this._onMove, this);
+  	},
+
+  	_onMove: function (e) {
+  		var first = e.touches[0];
+  		this._newPos = new Point(first.clientX, first.clientY);
+  	},
+
+  	_isTapValid: function () {
+  		return this._newPos.distanceTo(this._startPos) <= this._map.options.tapTolerance;
+  	},
+
+  	_simulateEvent: function (type, e) {
+  		var simulatedEvent = new MouseEvent(type, {
+  			bubbles: true,
+  			cancelable: true,
+  			view: window,
+  			// detail: 1,
+  			screenX: e.screenX,
+  			screenY: e.screenY,
+  			clientX: e.clientX,
+  			clientY: e.clientY,
+  			// button: 2,
+  			// buttons: 2
+  		});
+
+  		simulatedEvent._simulated = true;
+
+  		e.target.dispatchEvent(simulatedEvent);
+  	}
+  });
+
+  // @section Handlers
+  // @property tapHold: Handler
+  // Long tap handler to simulate `contextmenu` event (useful in mobile Safari).
+  Map.addInitHook('addHandler', 'tapHold', TapHold);
+
+  /*
+   * L.Handler.TouchZoom is used by L.Map to add pinch zoom on supported mobile browsers.
+   */
+
+  // @namespace Map
+  // @section Interaction Options
+  Map.mergeOptions({
+  	// @section Touch interaction options
+  	// @option touchZoom: Boolean|String = *
+  	// Whether the map can be zoomed by touch-dragging with two fingers. If
+  	// passed `'center'`, it will zoom to the center of the view regardless of
+  	// where the touch events (fingers) were. Enabled for touch-capable web
+  	// browsers.
+  	touchZoom: Browser.touch,
+
+  	// @option bounceAtZoomLimits: Boolean = true
+  	// Set it to false if you don't want the map to zoom beyond min/max zoom
+  	// and then bounce back when pinch-zooming.
+  	bounceAtZoomLimits: true
+  });
+
+  var TouchZoom = Handler.extend({
+  	addHooks: function () {
+  		addClass(this._map._container, 'leaflet-touch-zoom');
+  		on(this._map._container, 'touchstart', this._onTouchStart, this);
+  	},
+
+  	removeHooks: function () {
+  		removeClass(this._map._container, 'leaflet-touch-zoom');
+  		off(this._map._container, 'touchstart', this._onTouchStart, this);
+  	},
+
+  	_onTouchStart: function (e) {
+  		var map = this._map;
+  		if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) { return; }
+
+  		var p1 = map.mouseEventToContainerPoint(e.touches[0]),
+  		    p2 = map.mouseEventToContainerPoint(e.touches[1]);
+
+  		this._centerPoint = map.getSize()._divideBy(2);
+  		this._startLatLng = map.containerPointToLatLng(this._centerPoint);
+  		if (map.options.touchZoom !== 'center') {
+  			this._pinchStartLatLng = map.containerPointToLatLng(p1.add(p2)._divideBy(2));
+  		}
+
+  		this._startDist = p1.distanceTo(p2);
+  		this._startZoom = map.getZoom();
+
+  		this._moved = false;
+  		this._zooming = true;
+
+  		map._stop();
+
+  		on(document, 'touchmove', this._onTouchMove, this);
+  		on(document, 'touchend touchcancel', this._onTouchEnd, this);
+
+  		preventDefault(e);
+  	},
+
+  	_onTouchMove: function (e) {
+  		if (!e.touches || e.touches.length !== 2 || !this._zooming) { return; }
+
+  		var map = this._map,
+  		    p1 = map.mouseEventToContainerPoint(e.touches[0]),
+  		    p2 = map.mouseEventToContainerPoint(e.touches[1]),
+  		    scale = p1.distanceTo(p2) / this._startDist;
+
+  		this._zoom = map.getScaleZoom(scale, this._startZoom);
+
+  		if (!map.options.bounceAtZoomLimits && (
+  			(this._zoom < map.getMinZoom() && scale < 1) ||
+  			(this._zoom > map.getMaxZoom() && scale > 1))) {
+  			this._zoom = map._limitZoom(this._zoom);
+  		}
+
+  		if (map.options.touchZoom === 'center') {
+  			this._center = this._startLatLng;
+  			if (scale === 1) { return; }
+  		} else {
+  			// Get delta from pinch to center, so centerLatLng is delta applied to initial pinchLatLng
+  			var delta = p1._add(p2)._divideBy(2)._subtract(this._centerPoint);
+  			if (scale === 1 && delta.x === 0 && delta.y === 0) { return; }
+  			this._center = map.unproject(map.project(this._pinchStartLatLng, this._zoom).subtract(delta), this._zoom);
+  		}
+
+  		if (!this._moved) {
+  			map._moveStart(true, false);
+  			this._moved = true;
+  		}
+
+  		cancelAnimFrame(this._animRequest);
+
+  		var moveFn = bind(map._move, map, this._center, this._zoom, {pinch: true, round: false}, undefined);
+  		this._animRequest = requestAnimFrame(moveFn, this, true);
+
+  		preventDefault(e);
+  	},
+
+  	_onTouchEnd: function () {
+  		if (!this._moved || !this._zooming) {
+  			this._zooming = false;
+  			return;
+  		}
+
+  		this._zooming = false;
+  		cancelAnimFrame(this._animRequest);
+
+  		off(document, 'touchmove', this._onTouchMove, this);
+  		off(document, 'touchend touchcancel', this._onTouchEnd, this);
+
+  		// Pinch updates GridLayers' levels only when zoomSnap is off, so zoomSnap becomes noUpdate.
+  		if (this._map.options.zoomAnimation) {
+  			this._map._animateZoom(this._center, this._map._limitZoom(this._zoom), true, this._map.options.zoomSnap);
+  		} else {
+  			this._map._resetView(this._center, this._map._limitZoom(this._zoom));
+  		}
+  	}
+  });
+
+  // @section Handlers
+  // @property touchZoom: Handler
+  // Touch zoom handler.
+  Map.addInitHook('addHandler', 'touchZoom', TouchZoom);
+
+  Map.BoxZoom = BoxZoom;
+  Map.DoubleClickZoom = DoubleClickZoom;
+  Map.Drag = Drag;
+  Map.Keyboard = Keyboard;
+  Map.ScrollWheelZoom = ScrollWheelZoom;
+  Map.TapHold = TapHold;
+  Map.TouchZoom = TouchZoom;
+
+  exports.Bounds = Bounds;
+  exports.Browser = Browser;
+  exports.CRS = CRS;
+  exports.Canvas = Canvas;
+  exports.Circle = Circle;
+  exports.CircleMarker = CircleMarker;
+  exports.Class = Class;
+  exports.Control = Control;
+  exports.DivIcon = DivIcon;
+  exports.DivOverlay = DivOverlay;
+  exports.DomEvent = DomEvent;
+  exports.DomUtil = DomUtil;
+  exports.Draggable = Draggable;
+  exports.Evented = Evented;
+  exports.FeatureGroup = FeatureGroup;
+  exports.GeoJSON = GeoJSON;
+  exports.GridLayer = GridLayer;
+  exports.Handler = Handler;
+  exports.Icon = Icon;
+  exports.ImageOverlay = ImageOverlay;
+  exports.LatLng = LatLng;
+  exports.LatLngBounds = LatLngBounds;
+  exports.Layer = Layer;
+  exports.LayerGroup = LayerGroup;
+  exports.LineUtil = LineUtil;
+  exports.Map = Map;
+  exports.Marker = Marker;
+  exports.Mixin = Mixin;
+  exports.Path = Path;
+  exports.Point = Point;
+  exports.PolyUtil = PolyUtil;
+  exports.Polygon = Polygon;
+  exports.Polyline = Polyline;
+  exports.Popup = Popup;
+  exports.PosAnimation = PosAnimation;
+  exports.Projection = index;
+  exports.Rectangle = Rectangle;
+  exports.Renderer = Renderer;
+  exports.SVG = SVG;
+  exports.SVGOverlay = SVGOverlay;
+  exports.TileLayer = TileLayer;
+  exports.Tooltip = Tooltip;
+  exports.Transformation = Transformation;
+  exports.Util = Util;
+  exports.VideoOverlay = VideoOverlay;
+  exports.bind = bind;
+  exports.bounds = toBounds;
+  exports.canvas = canvas;
+  exports.circle = circle;
+  exports.circleMarker = circleMarker;
+  exports.control = control;
+  exports.divIcon = divIcon;
+  exports.extend = extend;
+  exports.featureGroup = featureGroup;
+  exports.geoJSON = geoJSON;
+  exports.geoJson = geoJson;
+  exports.gridLayer = gridLayer;
+  exports.icon = icon;
+  exports.imageOverlay = imageOverlay;
+  exports.latLng = toLatLng;
+  exports.latLngBounds = toLatLngBounds;
+  exports.layerGroup = layerGroup;
+  exports.map = createMap;
+  exports.marker = marker;
+  exports.point = toPoint;
+  exports.polygon = polygon;
+  exports.polyline = polyline;
+  exports.popup = popup;
+  exports.rectangle = rectangle;
+  exports.setOptions = setOptions;
+  exports.stamp = stamp;
+  exports.svg = svg;
+  exports.svgOverlay = svgOverlay;
+  exports.tileLayer = tileLayer;
+  exports.tooltip = tooltip;
+  exports.transformation = toTransformation;
+  exports.version = version;
+  exports.videoOverlay = videoOverlay;
+
+  var oldL = window.L;
+  exports.noConflict = function() {
+  	window.L = oldL;
+  	return this;
+  }
+  // Always export us to window global (see #2364)
+  window.L = exports;
+
+}));
+//# sourceMappingURL=leaflet-src.js.map
 
 
 /***/ }),
@@ -123437,6 +140121,66 @@ Sortable.mount(Remove, Revert);
 
 /***/ }),
 
+/***/ "./node_modules/leaflet-draw/dist/leaflet.draw.css":
+/*!*********************************************************!*\
+  !*** ./node_modules/leaflet-draw/dist/leaflet.draw.css ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_draw_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./leaflet.draw.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet-draw/dist/leaflet.draw.css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_draw_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_draw_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/leaflet/dist/leaflet.css":
+/*!***********************************************!*\
+  !*** ./node_modules/leaflet/dist/leaflet.css ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./leaflet.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/leaflet/dist/leaflet.css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_leaflet_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/select2/dist/css/select2.min.css":
 /*!*******************************************************!*\
   !*** ./node_modules/select2/dist/css/select2.min.css ***!
@@ -123527,6 +140271,36 @@ var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMP
 
 /***/ }),
 
+/***/ "./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css":
+/*!***************************************************************************!*\
+  !*** ./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_vue2_daterange_picker_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./vue2-daterange-picker.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_vue2_daterange_picker_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_vue2_daterange_picker_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./node_modules/vue2-google-maps/dist/components/map.vue?vue&type=style&index=0&id=85ca06a4&lang=css":
 /*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./node_modules/vue2-google-maps/dist/components/map.vue?vue&type=style&index=0&id=85ca06a4&lang=css ***!
@@ -123614,6 +140388,96 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseIcon_vue_vue_type_style_index_0_id_ea971156_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_style_index_0_id_703277bb_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_style_index_0_id_703277bb_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_style_index_0_id_703277bb_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_style_index_0_id_a0260928_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_style_index_0_id_a0260928_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_style_index_0_id_a0260928_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_style_index_0_id_2f412a0c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_style_index_0_id_2f412a0c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_style_index_0_id_2f412a0c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -134929,6 +151793,324 @@ component.options.__file = "resources/js/components/BaseIcon.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/CommandPalette.vue":
+/*!****************************************************!*\
+  !*** ./resources/js/components/CommandPalette.vue ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommandPalette.vue?vue&type=template&id=2e1bb04a */ "./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a");
+/* harmony import */ var _CommandPalette_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CommandPalette.vue?vue&type=script&lang=js */ "./resources/js/components/CommandPalette.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CommandPalette_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/CommandPalette.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/CustomFieldDate.vue":
+/*!*****************************************************!*\
+  !*** ./resources/js/components/CustomFieldDate.vue ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CustomFieldDate.vue?vue&type=template&id=2955643c */ "./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c");
+/* harmony import */ var _CustomFieldDate_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CustomFieldDate.vue?vue&type=script&lang=js */ "./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _CustomFieldDate_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__.render,
+  _CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/CustomFieldDate.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/DataTable.vue":
+/*!***********************************************!*\
+  !*** ./resources/js/components/DataTable.vue ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DataTable.vue?vue&type=template&id=4b997e69 */ "./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69");
+/* harmony import */ var _DataTable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DataTable.vue?vue&type=script&lang=js */ "./resources/js/components/DataTable.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _DataTable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__.render,
+  _DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/DataTable.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/GooglePlaceSearch.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/components/GooglePlaceSearch.vue ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true */ "./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true");
+/* harmony import */ var _GooglePlaceSearch_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GooglePlaceSearch.vue?vue&type=script&lang=js */ "./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js");
+/* harmony import */ var _GooglePlaceSearch_vue_vue_type_style_index_0_id_703277bb_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css */ "./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _GooglePlaceSearch_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "703277bb",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/GooglePlaceSearch.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ModuleIcon.vue":
+/*!************************************************!*\
+  !*** ./resources/js/components/ModuleIcon.vue ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ModuleIcon.vue?vue&type=template&id=d4b639a0 */ "./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0");
+/* harmony import */ var _ModuleIcon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ModuleIcon.vue?vue&type=script&lang=js */ "./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ModuleIcon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ModuleIcon.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/OsmMapPicker.vue":
+/*!**************************************************!*\
+  !*** ./resources/js/components/OsmMapPicker.vue ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true */ "./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true");
+/* harmony import */ var _OsmMapPicker_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OsmMapPicker.vue?vue&type=script&lang=js */ "./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js");
+/* harmony import */ var _OsmMapPicker_vue_vue_type_style_index_0_id_a0260928_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css */ "./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _OsmMapPicker_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "a0260928",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/OsmMapPicker.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/ReorderToggle.vue":
+/*!***************************************************!*\
+  !*** ./resources/js/components/ReorderToggle.vue ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ReorderToggle.vue?vue&type=template&id=2be18c54 */ "./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54");
+/* harmony import */ var _ReorderToggle_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReorderToggle.vue?vue&type=script&lang=js */ "./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ReorderToggle_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__.render,
+  _ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/ReorderToggle.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/TableCount.vue":
+/*!************************************************!*\
+  !*** ./resources/js/components/TableCount.vue ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TableCount.vue?vue&type=template&id=2f412a0c&scoped=true */ "./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true");
+/* harmony import */ var _TableCount_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TableCount.vue?vue&type=script&lang=js */ "./resources/js/components/TableCount.vue?vue&type=script&lang=js");
+/* harmony import */ var _TableCount_vue_vue_type_style_index_0_id_2f412a0c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css */ "./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+;
+
+
+/* normalize component */
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _TableCount_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  _TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  "2f412a0c",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/TableCount.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/mixins/Permissions.vue":
 /*!*********************************************!*\
   !*** ./resources/js/mixins/Permissions.vue ***!
@@ -134983,6 +152165,134 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/CommandPalette.vue?vue&type=script&lang=js":
+/*!****************************************************************************!*\
+  !*** ./resources/js/components/CommandPalette.vue?vue&type=script&lang=js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CommandPalette_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CommandPalette.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CommandPalette_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js":
+/*!*****************************************************************************!*\
+  !*** ./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CustomFieldDate_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CustomFieldDate.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CustomFieldDate_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/DataTable.vue?vue&type=script&lang=js":
+/*!***********************************************************************!*\
+  !*** ./resources/js/components/DataTable.vue?vue&type=script&lang=js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DataTable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DataTable.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_DataTable_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GooglePlaceSearch.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js":
+/*!************************************************************************!*\
+  !*** ./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ModuleIcon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModuleIcon.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ModuleIcon_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./OsmMapPicker.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js":
+/*!***************************************************************************!*\
+  !*** ./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReorderToggle_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReorderToggle.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ReorderToggle_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/TableCount.vue?vue&type=script&lang=js":
+/*!************************************************************************!*\
+  !*** ./resources/js/components/TableCount.vue?vue&type=script&lang=js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TableCount.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=script&lang=js");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/mixins/Permissions.vue?vue&type=script&lang=js":
 /*!*********************************************************************!*\
   !*** ./resources/js/mixins/Permissions.vue?vue&type=script&lang=js ***!
@@ -135034,6 +152344,45 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseIcon_vue_vue_type_style_index_0_id_ea971156_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BaseIcon.vue?vue&type=style&index=0&id=ea971156&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/BaseIcon.vue?vue&type=style&index=0&id=ea971156&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css ***!
+  \***************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_style_index_0_id_703277bb_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=style&index=0&id=703277bb&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css":
+/*!**********************************************************************************************************!*\
+  !*** ./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css ***!
+  \**********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_style_index_0_id_a0260928_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=style&index=0&id=a0260928&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_style_index_0_id_2f412a0c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=style&index=0&id=2f412a0c&scoped=true&lang=css");
 
 
 /***/ }),
@@ -135200,6 +152549,142 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseIcon_vue_vue_type_template_id_ea971156_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BaseIcon_vue_vue_type_template_id_ea971156_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BaseIcon.vue?vue&type=template&id=ea971156&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/BaseIcon.vue?vue&type=template&id=ea971156&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CommandPalette_vue_vue_type_template_id_2e1bb04a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CommandPalette.vue?vue&type=template&id=2e1bb04a */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CustomFieldDate_vue_vue_type_template_id_2955643c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./CustomFieldDate.vue?vue&type=template&id=2955643c */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69":
+/*!*****************************************************************************!*\
+  !*** ./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69 ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_DataTable_vue_vue_type_template_id_4b997e69__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./DataTable.vue?vue&type=template&id=4b997e69 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_GooglePlaceSearch_vue_vue_type_template_id_703277bb_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0 ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ModuleIcon_vue_vue_type_template_id_d4b639a0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ModuleIcon.vue?vue&type=template&id=d4b639a0 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_OsmMapPicker_vue_vue_type_template_id_a0260928_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54 ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ReorderToggle_vue_vue_type_template_id_2be18c54__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./ReorderToggle.vue?vue&type=template&id=2be18c54 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true":
+/*!******************************************************************************************!*\
+  !*** ./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TableCount_vue_vue_type_template_id_2f412a0c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TableCount.vue?vue&type=template&id=2f412a0c&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true");
 
 
 /***/ }),
@@ -135409,6 +152894,959 @@ var render = function () {
       },
     },
   })
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CommandPalette.vue?vue&type=template&id=2e1bb04a ***!
+  \*************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "cmdk-host" }, [
+    _vm.open
+      ? _c(
+          "div",
+          {
+            staticClass: "cmdk",
+            attrs: {
+              role: "dialog",
+              "aria-modal": "true",
+              "aria-label": _vm.tr("quick_search", "Quick search"),
+            },
+            on: {
+              mousedown: function ($event) {
+                if ($event.target !== $event.currentTarget) {
+                  return null
+                }
+                return _vm.close.apply(null, arguments)
+              },
+            },
+          },
+          [
+            _c("div", { staticClass: "cmdk__panel" }, [
+              _c("div", { staticClass: "cmdk__search" }, [
+                _c("i", {
+                  staticClass: "bi bi-search cmdk__search-icon",
+                  attrs: { "aria-hidden": "true" },
+                }),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.q,
+                      expression: "q",
+                    },
+                  ],
+                  ref: "input",
+                  staticClass: "cmdk__input",
+                  attrs: {
+                    type: "text",
+                    autocomplete: "off",
+                    spellcheck: "false",
+                    placeholder: _vm.tr(
+                      "quick_search_placeholder",
+                      "Search pages and settings…"
+                    ),
+                  },
+                  domProps: { value: _vm.q },
+                  on: {
+                    keydown: [
+                      function ($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k($event.keyCode, "down", 40, $event.key, [
+                            "Down",
+                            "ArrowDown",
+                          ])
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        return _vm.move(1)
+                      },
+                      function ($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k($event.keyCode, "up", 38, $event.key, [
+                            "Up",
+                            "ArrowUp",
+                          ])
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        return _vm.move(-1)
+                      },
+                      function ($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        return _vm.go(_vm.results[_vm.active])
+                      },
+                      function ($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k($event.keyCode, "esc", 27, $event.key, [
+                            "Esc",
+                            "Escape",
+                          ])
+                        ) {
+                          return null
+                        }
+                        $event.preventDefault()
+                        return _vm.close.apply(null, arguments)
+                      },
+                    ],
+                    input: function ($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.q = $event.target.value
+                    },
+                  },
+                }),
+                _vm._v(" "),
+                _c("kbd", { staticClass: "cmdk__kbd" }, [_vm._v("Esc")]),
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { ref: "list", staticClass: "cmdk__list" },
+                [
+                  _vm._l(_vm.results, function (item, i) {
+                    return [
+                      i === 0 || _vm.results[i - 1].group !== item.group
+                        ? _c(
+                            "div",
+                            {
+                              key: "g-" + item.group + i,
+                              staticClass: "cmdk__group",
+                            },
+                            [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(item.group) +
+                                  "\n                "
+                              ),
+                            ]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          key: item.key,
+                          staticClass: "cmdk__item",
+                          class: { "is-active": i === _vm.active },
+                          attrs: { type: "button", "data-idx": i },
+                          on: {
+                            mousemove: function ($event) {
+                              _vm.active = i
+                            },
+                            click: function ($event) {
+                              return _vm.go(item)
+                            },
+                          },
+                        },
+                        [
+                          _c("span", { staticClass: "cmdk__icon" }, [
+                            _c("i", { class: item.icon }),
+                          ]),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "cmdk__text" }, [
+                            _c("span", { staticClass: "cmdk__title" }, [
+                              _vm._v(_vm._s(item.title)),
+                            ]),
+                          ]),
+                          _vm._v(" "),
+                          _c("i", {
+                            staticClass: "bi bi-arrow-return-left cmdk__enter",
+                            attrs: { "aria-hidden": "true" },
+                          }),
+                        ]
+                      ),
+                    ]
+                  }),
+                  _vm._v(" "),
+                  !_vm.results.length
+                    ? _c("div", { staticClass: "cmdk__empty" }, [
+                        _c("i", { staticClass: "bi bi-search" }),
+                        _vm._v(" "),
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr("no_results_found", "No results found")
+                            )
+                          ),
+                        ]),
+                      ])
+                    : _vm._e(),
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "cmdk__foot" }, [
+                _c("span", [
+                  _c("kbd", [_vm._v("↑")]),
+                  _c("kbd", [_vm._v("↓")]),
+                  _vm._v(" " + _vm._s(_vm.tr("navigate", "Navigate"))),
+                ]),
+                _vm._v(" "),
+                _c("span", [
+                  _c("kbd", [_vm._v("↵")]),
+                  _vm._v(" " + _vm._s(_vm.tr("open", "Open"))),
+                ]),
+                _vm._v(" "),
+                _c("span", [
+                  _c("kbd", [_vm._v("Esc")]),
+                  _vm._v(" " + _vm._s(_vm.tr("close", "Close"))),
+                ]),
+              ]),
+            ]),
+          ]
+        )
+      : _vm._e(),
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c":
+/*!**************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/CustomFieldDate.vue?vue&type=template&id=2955643c ***!
+  \**************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("date-range-picker", {
+    staticClass: "w-100 custom-field-date",
+    attrs: {
+      "single-date-picker": true,
+      "auto-apply": true,
+      "show-dropdowns": true,
+      "append-to-body": true,
+      ranges: false,
+      "locale-data": _vm.localeData,
+    },
+    on: { update: _vm.onUpdate },
+    scopedSlots: _vm._u([
+      {
+        key: "input",
+        fn: function () {
+          return [
+            _c(
+              "span",
+              {
+                staticClass:
+                  "d-flex justify-content-between align-items-center w-100",
+                staticStyle: { cursor: "pointer" },
+              },
+              [
+                _c("span", { class: { "text-muted": !_vm.value } }, [
+                  _vm._v(_vm._s(_vm.display || _vm.placeholder)),
+                ]),
+                _vm._v(" "),
+                _c("i", { staticClass: "fa fa-calendar text-muted" }),
+              ]
+            ),
+          ]
+        },
+        proxy: true,
+      },
+    ]),
+    model: {
+      value: _vm.range,
+      callback: function ($$v) {
+        _vm.range = $$v
+      },
+      expression: "range",
+    },
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69":
+/*!********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/DataTable.vue?vue&type=template&id=4b997e69 ***!
+  \********************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "data-table" }, [
+    _c(
+      "div",
+      { staticClass: "data-table__scroll" },
+      [
+        _c(
+          "b-table",
+          _vm._g(
+            _vm._b(
+              {
+                class: [
+                  "figma-table",
+                  "figma-order-table",
+                  "mb-0",
+                  _vm.tableClass,
+                ],
+                attrs: {
+                  items: _vm.items,
+                  fields: _vm.fields,
+                  busy: _vm.busy,
+                  "current-page": _vm.localPaging ? _vm.currentPage : undefined,
+                  "per-page": _vm.localPaging ? _vm.perPage : undefined,
+                  stacked: _vm.stacked,
+                  small: _vm.small,
+                  bordered: false,
+                  "show-empty": "",
+                  "tbody-tr-class": _vm.tbodyTrClass,
+                  "empty-text": _vm.emptyText || undefined,
+                  "empty-filtered-text": _vm.emptyFilteredText || undefined,
+                },
+                scopedSlots: _vm._u(
+                  [
+                    _vm._l(_vm.$scopedSlots, function (_, name) {
+                      return {
+                        key: name,
+                        fn: function (slotData) {
+                          return [_vm._t(name, null, null, slotData)]
+                        },
+                      }
+                    }),
+                    !_vm.$scopedSlots["table-busy"]
+                      ? {
+                          key: "table-busy",
+                          fn: function () {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "data-table__state" },
+                                [
+                                  _c("b-spinner", {
+                                    staticClass: "align-middle me-2",
+                                    attrs: { small: "" },
+                                  }),
+                                  _vm._v(" "),
+                                  _c("span", [
+                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                  ]),
+                                ],
+                                1
+                              ),
+                            ]
+                          },
+                          proxy: true,
+                        }
+                      : null,
+                    !_vm.$scopedSlots.empty
+                      ? {
+                          key: "empty",
+                          fn: function (scope) {
+                            return [
+                              _c("div", { staticClass: "data-table__state" }, [
+                                _c("i", {
+                                  staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                                }),
+                                _vm._v(" "),
+                                _c("span", [_vm._v(_vm._s(scope.emptyText))]),
+                              ]),
+                            ]
+                          },
+                        }
+                      : null,
+                    !_vm.$scopedSlots.emptyfiltered
+                      ? {
+                          key: "emptyfiltered",
+                          fn: function (scope) {
+                            return [
+                              _c("div", { staticClass: "data-table__state" }, [
+                                _c("i", {
+                                  staticClass:
+                                    "fa fa-search fa-2x d-block mb-2",
+                                }),
+                                _vm._v(" "),
+                                _c("span", [
+                                  _vm._v(_vm._s(scope.emptyFilteredText)),
+                                ]),
+                              ]),
+                            ]
+                          },
+                        }
+                      : null,
+                  ],
+                  null,
+                  true
+                ),
+              },
+              "b-table",
+              _vm.$attrs,
+              false
+            ),
+            _vm.$listeners
+          )
+        ),
+      ],
+      1
+    ),
+    _vm._v(" "),
+    !_vm.hideFooter
+      ? _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
+          _c(
+            "div",
+            { staticClass: "d-flex align-items-center gap-2 flex-wrap" },
+            [
+              _c("label", { staticClass: "showing-results-text mb-0" }, [
+                _vm._v(_vm._s(_vm.__("per_page"))),
+              ]),
+              _vm._v(" "),
+              _c("b-form-select", {
+                staticClass: "w-auto",
+                attrs: {
+                  value: _vm.perPage,
+                  options: _vm.pageOptions || _vm.$pageOptions,
+                  size: "sm",
+                },
+                on: {
+                  change: function ($event) {
+                    return _vm.$emit("update:perPage", $event)
+                  },
+                },
+              }),
+              _vm._v(" "),
+              _c("table-count", {
+                attrs: {
+                  "current-page": _vm.currentPage,
+                  "per-page": _vm.perPage,
+                  "total-rows": _vm.totalRows,
+                },
+              }),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "d-flex align-items-center gap-3" },
+            [
+              _vm._t("footer-end"),
+              _vm._v(" "),
+              _c("b-pagination", {
+                staticClass: "figma-pagination mb-0",
+                attrs: {
+                  value: _vm.currentPage,
+                  "total-rows": _vm.totalRows,
+                  "per-page": _vm.perPage,
+                  align: "right",
+                  "hide-goto-end-buttons": "",
+                  "hide-ellipsis": "",
+                  "prev-text": "<",
+                  "next-text": ">",
+                },
+                on: {
+                  input: function ($event) {
+                    return _vm.$emit("update:currentPage", $event)
+                  },
+                },
+              }),
+            ],
+            2
+          ),
+        ])
+      : _vm._e(),
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/GooglePlaceSearch.vue?vue&type=template&id=703277bb&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    {
+      staticClass: "position-relative google-place-search",
+      staticStyle: { flex: "1 1 auto", "min-width": "0" },
+    },
+    [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.query,
+            expression: "query",
+          },
+        ],
+        staticClass: "form-control",
+        attrs: {
+          type: "search",
+          id: _vm.inputId,
+          placeholder: _vm.placeholder,
+          autocomplete: "off",
+        },
+        domProps: { value: _vm.query },
+        on: {
+          input: [
+            function ($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.query = $event.target.value
+            },
+            _vm.onInput,
+          ],
+          focus: function ($event) {
+            _vm.showSuggestions = _vm.suggestions.length > 0
+          },
+          blur: _vm.hideSoon,
+        },
+      }),
+      _vm._v(" "),
+      _vm.showSuggestions && _vm.suggestions.length
+        ? _c(
+            "ul",
+            { staticClass: "list-group google-place-suggestions" },
+            _vm._l(_vm.suggestions, function (s) {
+              return _c(
+                "li",
+                {
+                  key: s.placePrediction.placeId,
+                  staticClass: "list-group-item list-group-item-action",
+                  staticStyle: { cursor: "pointer" },
+                  on: {
+                    mousedown: function ($event) {
+                      $event.preventDefault()
+                      return _vm.select(s)
+                    },
+                  },
+                },
+                [
+                  _vm._v(
+                    "\n            " +
+                      _vm._s(s.placePrediction.text.text) +
+                      "\n        "
+                  ),
+                ]
+              )
+            }),
+            0
+          )
+        : _vm._e(),
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ModuleIcon.vue?vue&type=template&id=d4b639a0 ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("span", {
+    staticClass: "module-icon-mask",
+    class: { "module-icon-mask--tile": _vm.tile },
+    style: {
+      "--mi-size": _vm.size + "px",
+      "--mi-url": _vm.src ? 'url("' + _vm.src + '")' : "none",
+    },
+    attrs: { role: "img", "aria-label": _vm.alt },
+  })
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true":
+/*!***********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/OsmMapPicker.vue?vue&type=template&id=a0260928&scoped=true ***!
+  \***********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "osm-map-picker" }, [
+    _vm.enableDrawing
+      ? _c(
+          "div",
+          { staticClass: "osm-draw-toolbar mb-2" },
+          [
+            !_vm.drawingActive
+              ? [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-success mr-1",
+                      attrs: { type: "button" },
+                      on: { click: _vm.startDrawPolygon },
+                    },
+                    [_vm._v(_vm._s(_vm.__("draw_polygon")))]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-secondary mr-1",
+                      attrs: { type: "button" },
+                      on: { click: _vm.startDrawCircle },
+                    },
+                    [_vm._v(_vm._s(_vm.__("draw_circle")))]
+                  ),
+                  _vm._v(" "),
+                  _vm.boundaryType
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-sm btn-danger",
+                          attrs: { type: "button" },
+                          on: { click: _vm.clearBoundary },
+                        },
+                        [_vm._v(_vm._s(_vm.__("clear_boundary")))]
+                      )
+                    : _vm._e(),
+                ]
+              : [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-primary mr-1",
+                      attrs: { type: "button" },
+                      on: { click: _vm.finishDrawing },
+                    },
+                    [_vm._v(_vm._s(_vm.__("finish")))]
+                  ),
+                  _vm._v(" "),
+                  _vm.boundaryType !== "circle"
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-sm btn-secondary mr-1",
+                          attrs: { type: "button" },
+                          on: { click: _vm.deleteLastPoint },
+                        },
+                        [_vm._v(_vm._s(_vm.__("delete_last_point")))]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-outline-secondary",
+                      attrs: { type: "button" },
+                      on: { click: _vm.cancelDrawing },
+                    },
+                    [_vm._v(_vm._s(_vm.__("cancel")))]
+                  ),
+                ],
+          ],
+          2
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.showSearchBox
+      ? _c(
+          "div",
+          { staticClass: "input-group position-relative" },
+          [
+            _c("input", {
+              staticClass: "form-control",
+              attrs: {
+                type: "search",
+                placeholder: _vm.placeholder,
+                autocomplete: "off",
+              },
+              domProps: { value: _vm.query },
+              on: {
+                input: function ($event) {
+                  return _vm.onQueryInput($event.target.value)
+                },
+                focus: function ($event) {
+                  _vm.showSuggestions = _vm.suggestions.length > 0
+                },
+              },
+            }),
+            _vm._v(" "),
+            _vm._t("append"),
+            _vm._v(" "),
+            _vm.showSuggestions && _vm.suggestions.length
+              ? _c(
+                  "ul",
+                  { staticClass: "list-group osm-suggestions" },
+                  _vm._l(_vm.suggestions, function (s) {
+                    return _c(
+                      "li",
+                      {
+                        key: s.placePrediction.placeId,
+                        staticClass: "list-group-item list-group-item-action",
+                        staticStyle: { cursor: "pointer" },
+                        on: {
+                          mousedown: function ($event) {
+                            $event.preventDefault()
+                            return _vm.selectSuggestion(s)
+                          },
+                        },
+                      },
+                      [
+                        _vm._v(
+                          "\n                " +
+                            _vm._s(s.placePrediction.text.text) +
+                            "\n            "
+                        ),
+                      ]
+                    )
+                  }),
+                  0
+                )
+              : _vm._e(),
+          ],
+          2
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c("div", {
+      ref: "mapEl",
+      style: { width: "100%", height: _vm.height, marginTop: "5px" },
+    }),
+    _vm._v(" "),
+    _vm.enableDrawing
+      ? _c(
+          "div",
+          { staticClass: "text-muted font-size-13 mt-1" },
+          [
+            !_vm.boundaryType
+              ? [_vm._v(_vm._s(_vm.__("no_polygon_drawn_yet")))]
+              : _vm._e(),
+          ],
+          2
+        )
+      : _vm._e(),
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/ReorderToggle.vue?vue&type=template&id=2be18c54 ***!
+  \************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "button",
+    {
+      staticClass: "reorder-toggle",
+      class: { "is-on": _vm.value },
+      attrs: {
+        type: "button",
+        role: "switch",
+        "aria-checked": _vm.value ? "true" : "false",
+        disabled: _vm.disabled,
+        title: _vm.value
+          ? _vm.onHint || _vm.__("drag_to_reorder") || "Drag to reorder"
+          : "",
+      },
+      on: { click: _vm.toggle },
+    },
+    [
+      _c("i", { staticClass: "reorder-toggle__icon", class: _vm.icon }),
+      _vm._v(" "),
+      _c("span", { staticClass: "reorder-toggle__label" }, [
+        _vm._v(
+          _vm._s(_vm.label || _vm.__("enable_drag_and_drop") || "Re-order")
+        ),
+      ]),
+      _vm._v(" "),
+      _vm._m(0),
+    ]
+  )
+}
+var staticRenderFns = [
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "span",
+      {
+        staticClass: "reorder-toggle__switch",
+        attrs: { "aria-hidden": "true" },
+      },
+      [_c("span", { staticClass: "reorder-toggle__knob" })]
+    )
+  },
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true":
+/*!*********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/TableCount.vue?vue&type=template&id=2f412a0c&scoped=true ***!
+  \*********************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render),
+/* harmony export */   staticRenderFns: () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    {
+      staticClass:
+        "table-count text-muted small d-inline-flex align-items-center flex-wrap",
+    },
+    [
+      _vm.total > 0
+        ? [
+            _c("span", [_vm._v(_vm._s(_vm.labelShowing))]),
+            _vm._v(" "),
+            _c(
+              "span",
+              { staticClass: "table-count__num font-weight-bold mx-1" },
+              [_vm._v(_vm._s(_vm.from) + "–" + _vm._s(_vm.to))]
+            ),
+            _vm._v(" "),
+            _c("span", [_vm._v(_vm._s(_vm.labelOf))]),
+            _vm._v(" "),
+            _c(
+              "span",
+              { staticClass: "table-count__num font-weight-bold mx-1" },
+              [_vm._v(_vm._s(_vm.total))]
+            ),
+            _vm._v(" "),
+            _c("span", [_vm._v(_vm._s(_vm.labelItems))]),
+          ]
+        : [
+            _c(
+              "span",
+              { staticClass: "table-count__num font-weight-bold me-1" },
+              [_vm._v("0")]
+            ),
+            _vm._v(" "),
+            _c("span", [_vm._v(_vm._s(_vm.labelItems))]),
+          ],
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -150872,6 +169310,17 @@ Vue.compile = compileToFunctions;
 
 /***/ }),
 
+/***/ "./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.umd.min.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/vue2-daterange-picker/dist/vue2-daterange-picker.umd.min.js ***!
+  \**********************************************************************************/
+/***/ (function(module) {
+
+(function(t,e){ true?module.exports=e():0})("undefined"!==typeof self?self:this,(function(){return function(t){var e={};function n(r){if(e[r])return e[r].exports;var a=e[r]={i:r,l:!1,exports:{}};return t[r].call(a.exports,a,a.exports,n),a.l=!0,a.exports}return n.m=t,n.c=e,n.d=function(t,e,r){n.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:r})},n.r=function(t){"undefined"!==typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},n.t=function(t,e){if(1&e&&(t=n(t)),8&e)return t;if(4&e&&"object"===typeof t&&t&&t.__esModule)return t;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var a in t)n.d(r,a,function(e){return t[e]}.bind(null,a));return r},n.n=function(t){var e=t&&t.__esModule?function(){return t["default"]}:function(){return t};return n.d(e,"a",e),e},n.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},n.p="",n(n.s="fb15")}({"00ee":function(t,e,n){var r=n("b622"),a=r("toStringTag"),i={};i[a]="z",t.exports="[object z]"===String(i)},"057f":function(t,e,n){var r=n("fc6a"),a=n("241c").f,i={}.toString,o="object"==typeof window&&window&&Object.getOwnPropertyNames?Object.getOwnPropertyNames(window):[],s=function(t){try{return a(t)}catch(e){return o.slice()}};t.exports.f=function(t){return o&&"[object Window]"==i.call(t)?s(t):a(r(t))}},"06cf":function(t,e,n){var r=n("83ab"),a=n("d1e7"),i=n("5c6c"),o=n("fc6a"),s=n("c04e"),c=n("5135"),u=n("0cfb"),l=Object.getOwnPropertyDescriptor;e.f=r?l:function(t,e){if(t=o(t),e=s(e,!0),u)try{return l(t,e)}catch(n){}if(c(t,e))return i(!a.f.call(t,e),t[e])}},"0cfb":function(t,e,n){var r=n("83ab"),a=n("d039"),i=n("cc12");t.exports=!r&&!a((function(){return 7!=Object.defineProperty(i("div"),"a",{get:function(){return 7}}).a}))},"0e58":function(t,e,n){"use strict";var r=n("beb7"),a=n.n(r);a.a},"14c3":function(t,e,n){var r=n("c6b6"),a=n("9263");t.exports=function(t,e){var n=t.exec;if("function"===typeof n){var i=n.call(t,e);if("object"!==typeof i)throw TypeError("RegExp exec method returned something other than an Object or null");return i}if("RegExp"!==r(t))throw TypeError("RegExp#exec called on incompatible receiver");return a.call(t,e)}},"159b":function(t,e,n){var r=n("da84"),a=n("fdbc"),i=n("17c2"),o=n("9112");for(var s in a){var c=r[s],u=c&&c.prototype;if(u&&u.forEach!==i)try{o(u,"forEach",i)}catch(l){u.forEach=i}}},"17c2":function(t,e,n){"use strict";var r=n("b727").forEach,a=n("b301");t.exports=a("forEach")?function(t){return r(this,t,arguments.length>1?arguments[1]:void 0)}:[].forEach},"18e6":function(t,e,n){},"1be4":function(t,e,n){var r=n("d066");t.exports=r("document","documentElement")},"1c0b":function(t,e){t.exports=function(t){if("function"!=typeof t)throw TypeError(String(t)+" is not a function");return t}},"1c7e":function(t,e,n){var r=n("b622"),a=r("iterator"),i=!1;try{var o=0,s={next:function(){return{done:!!o++}},return:function(){i=!0}};s[a]=function(){return this},Array.from(s,(function(){throw 2}))}catch(c){}t.exports=function(t,e){if(!e&&!i)return!1;var n=!1;try{var r={};r[a]=function(){return{next:function(){return{done:n=!0}}}},t(r)}catch(c){}return n}},"1d80":function(t,e){t.exports=function(t){if(void 0==t)throw TypeError("Can't call method on "+t);return t}},"1dde":function(t,e,n){var r=n("d039"),a=n("b622"),i=n("60ae"),o=a("species");t.exports=function(t){return i>=51||!r((function(){var e=[],n=e.constructor={};return n[o]=function(){return{foo:1}},1!==e[t](Boolean).foo}))}},"23cb":function(t,e,n){var r=n("a691"),a=Math.max,i=Math.min;t.exports=function(t,e){var n=r(t);return n<0?a(n+e,0):i(n,e)}},"23e7":function(t,e,n){var r=n("da84"),a=n("06cf").f,i=n("9112"),o=n("6eeb"),s=n("ce4e"),c=n("e893"),u=n("94ca");t.exports=function(t,e){var n,l,f,d,h,p,m=t.target,g=t.global,v=t.stat;if(l=g?r:v?r[m]||s(m,{}):(r[m]||{}).prototype,l)for(f in e){if(h=e[f],t.noTargetGet?(p=a(l,f),d=p&&p.value):d=l[f],n=u(g?f:m+(v?".":"#")+f,t.forced),!n&&void 0!==d){if(typeof h===typeof d)continue;c(h,d)}(t.sham||d&&d.sham)&&i(h,"sham",!0),o(l,f,h,t)}}},"241c":function(t,e,n){var r=n("ca84"),a=n("7839"),i=a.concat("length","prototype");e.f=Object.getOwnPropertyNames||function(t){return r(t,i)}},"25f0":function(t,e,n){"use strict";var r=n("6eeb"),a=n("825a"),i=n("d039"),o=n("ad6d"),s="toString",c=RegExp.prototype,u=c[s],l=i((function(){return"/a/b"!=u.call({source:"a",flags:"b"})})),f=u.name!=s;(l||f)&&r(RegExp.prototype,s,(function(){var t=a(this),e=String(t.source),n=t.flags,r=String(void 0===n&&t instanceof RegExp&&!("flags"in c)?o.call(t):n);return"/"+e+"/"+r}),{unsafe:!0})},"35a1":function(t,e,n){var r=n("f5df"),a=n("3f8c"),i=n("b622"),o=i("iterator");t.exports=function(t){if(void 0!=t)return t[o]||t["@@iterator"]||a[r(t)]}},"37e8":function(t,e,n){var r=n("83ab"),a=n("9bf2"),i=n("825a"),o=n("df75");t.exports=r?Object.defineProperties:function(t,e){i(t);var n,r=o(e),s=r.length,c=0;while(s>c)a.f(t,n=r[c++],e[n]);return t}},"3bbe":function(t,e,n){var r=n("861d");t.exports=function(t){if(!r(t)&&null!==t)throw TypeError("Can't set "+String(t)+" as a prototype");return t}},"3ca3":function(t,e,n){"use strict";var r=n("6547").charAt,a=n("69f3"),i=n("7dd0"),o="String Iterator",s=a.set,c=a.getterFor(o);i(String,"String",(function(t){s(this,{type:o,string:String(t),index:0})}),(function(){var t,e=c(this),n=e.string,a=e.index;return a>=n.length?{value:void 0,done:!0}:(t=r(n,a),e.index+=t.length,{value:t,done:!1})}))},"3f8c":function(t,e){t.exports={}},"428f":function(t,e,n){var r=n("da84");t.exports=r},"44ad":function(t,e,n){var r=n("d039"),a=n("c6b6"),i="".split;t.exports=r((function(){return!Object("z").propertyIsEnumerable(0)}))?function(t){return"String"==a(t)?i.call(t,""):Object(t)}:Object},"44d2":function(t,e,n){var r=n("b622"),a=n("7c73"),i=n("9112"),o=r("unscopables"),s=Array.prototype;void 0==s[o]&&i(s,o,a(null)),t.exports=function(t){s[o][t]=!0}},"466d":function(t,e,n){"use strict";var r=n("d784"),a=n("825a"),i=n("50c4"),o=n("1d80"),s=n("8aa5"),c=n("14c3");r("match",1,(function(t,e,n){return[function(e){var n=o(this),r=void 0==e?void 0:e[t];return void 0!==r?r.call(e,n):new RegExp(e)[t](String(n))},function(t){var r=n(e,t,this);if(r.done)return r.value;var o=a(t),u=String(this);if(!o.global)return c(o,u);var l=o.unicode;o.lastIndex=0;var f,d=[],h=0;while(null!==(f=c(o,u))){var p=String(f[0]);d[h]=p,""===p&&(o.lastIndex=s(u,i(o.lastIndex),l)),h++}return 0===h?null:d}]}))},4930:function(t,e,n){var r=n("d039");t.exports=!!Object.getOwnPropertySymbols&&!r((function(){return!String(Symbol())}))},"4d64":function(t,e,n){var r=n("fc6a"),a=n("50c4"),i=n("23cb"),o=function(t){return function(e,n,o){var s,c=r(e),u=a(c.length),l=i(o,u);if(t&&n!=n){while(u>l)if(s=c[l++],s!=s)return!0}else for(;u>l;l++)if((t||l in c)&&c[l]===n)return t||l||0;return!t&&-1}};t.exports={includes:o(!0),indexOf:o(!1)}},"4de4":function(t,e,n){"use strict";var r=n("23e7"),a=n("b727").filter,i=n("d039"),o=n("1dde"),s=o("filter"),c=s&&!i((function(){[].filter.call({length:-1,0:1},(function(t){throw t}))}));r({target:"Array",proto:!0,forced:!s||!c},{filter:function(t){return a(this,t,arguments.length>1?arguments[1]:void 0)}})},"4df4":function(t,e,n){"use strict";var r=n("f8c2"),a=n("7b0b"),i=n("9bdd"),o=n("e95a"),s=n("50c4"),c=n("8418"),u=n("35a1");t.exports=function(t){var e,n,l,f,d,h=a(t),p="function"==typeof this?this:Array,m=arguments.length,g=m>1?arguments[1]:void 0,v=void 0!==g,y=0,b=u(h);if(v&&(g=r(g,m>2?arguments[2]:void 0,2)),void 0==b||p==Array&&o(b))for(e=s(h.length),n=new p(e);e>y;y++)c(n,y,v?g(h[y],y):h[y]);else for(f=b.call(h),d=f.next,n=new p;!(l=d.call(f)).done;y++)c(n,y,v?i(f,g,[l.value,y],!0):l.value);return n.length=y,n}},"50c4":function(t,e,n){var r=n("a691"),a=Math.min;t.exports=function(t){return t>0?a(r(t),9007199254740991):0}},5135:function(t,e){var n={}.hasOwnProperty;t.exports=function(t,e){return n.call(t,e)}},5319:function(t,e,n){"use strict";var r=n("d784"),a=n("825a"),i=n("7b0b"),o=n("50c4"),s=n("a691"),c=n("1d80"),u=n("8aa5"),l=n("14c3"),f=Math.max,d=Math.min,h=Math.floor,p=/\$([$&'`]|\d\d?|<[^>]*>)/g,m=/\$([$&'`]|\d\d?)/g,g=function(t){return void 0===t?t:String(t)};r("replace",2,(function(t,e,n){return[function(n,r){var a=c(this),i=void 0==n?void 0:n[t];return void 0!==i?i.call(n,a,r):e.call(String(a),n,r)},function(t,i){var c=n(e,t,this,i);if(c.done)return c.value;var h=a(t),p=String(this),m="function"===typeof i;m||(i=String(i));var v=h.global;if(v){var y=h.unicode;h.lastIndex=0}var b=[];while(1){var D=l(h,p);if(null===D)break;if(b.push(D),!v)break;var w=String(D[0]);""===w&&(h.lastIndex=u(p,o(h.lastIndex),y))}for(var x="",S=0,M=0;M<b.length;M++){D=b[M];for(var k=String(D[0]),_=f(d(s(D.index),p.length),0),O=[],T=1;T<D.length;T++)O.push(g(D[T]));var C=D.groups;if(m){var P=[k].concat(O,_,p);void 0!==C&&P.push(C);var j=String(i.apply(void 0,P))}else j=r(k,p,_,O,C,i);_>=S&&(x+=p.slice(S,_)+j,S=_+k.length)}return x+p.slice(S)}];function r(t,n,r,a,o,s){var c=r+t.length,u=a.length,l=m;return void 0!==o&&(o=i(o),l=p),e.call(s,l,(function(e,i){var s;switch(i.charAt(0)){case"$":return"$";case"&":return t;case"`":return n.slice(0,r);case"'":return n.slice(c);case"<":s=o[i.slice(1,-1)];break;default:var l=+i;if(0===l)return e;if(l>u){var f=h(l/10);return 0===f?e:f<=u?void 0===a[f-1]?i.charAt(1):a[f-1]+i.charAt(1):e}s=a[l-1]}return void 0===s?"":s}))}}))},"53ca":function(t,e,n){"use strict";n.d(e,"a",(function(){return a}));n("a4d3"),n("e01a"),n("d28b"),n("e260"),n("d3b7"),n("3ca3"),n("ddb0");function r(t){return r="function"===typeof Symbol&&"symbol"===typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"===typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},r(t)}function a(t){return a="function"===typeof Symbol&&"symbol"===r(Symbol.iterator)?function(t){return r(t)}:function(t){return t&&"function"===typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":r(t)},a(t)}},5692:function(t,e,n){var r=n("c430"),a=n("c6cd");(t.exports=function(t,e){return a[t]||(a[t]=void 0!==e?e:{})})("versions",[]).push({version:"3.5.0",mode:r?"pure":"global",copyright:"© 2019 Denis Pushkarev (zloirock.ru)"})},"56ef":function(t,e,n){var r=n("d066"),a=n("241c"),i=n("7418"),o=n("825a");t.exports=r("Reflect","ownKeys")||function(t){var e=a.f(o(t)),n=i.f;return n?e.concat(n(t)):e}},5899:function(t,e){t.exports="\t\n\v\f\r                　\u2028\u2029\ufeff"},"58a8":function(t,e,n){var r=n("1d80"),a=n("5899"),i="["+a+"]",o=RegExp("^"+i+i+"*"),s=RegExp(i+i+"*$"),c=function(t){return function(e){var n=String(r(e));return 1&t&&(n=n.replace(o,"")),2&t&&(n=n.replace(s,"")),n}};t.exports={start:c(1),end:c(2),trim:c(3)}},"5c6c":function(t,e){t.exports=function(t,e){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:e}}},"60ae":function(t,e,n){var r,a,i=n("da84"),o=n("b39a"),s=i.process,c=s&&s.versions,u=c&&c.v8;u?(r=u.split("."),a=r[0]+r[1]):o&&(r=o.match(/Edge\/(\d+)/),(!r||r[1]>=74)&&(r=o.match(/Chrome\/(\d+)/),r&&(a=r[1]))),t.exports=a&&+a},6547:function(t,e,n){var r=n("a691"),a=n("1d80"),i=function(t){return function(e,n){var i,o,s=String(a(e)),c=r(n),u=s.length;return c<0||c>=u?t?"":void 0:(i=s.charCodeAt(c),i<55296||i>56319||c+1===u||(o=s.charCodeAt(c+1))<56320||o>57343?t?s.charAt(c):i:t?s.slice(c,c+2):o-56320+(i-55296<<10)+65536)}};t.exports={codeAt:i(!1),charAt:i(!0)}},"65f0":function(t,e,n){var r=n("861d"),a=n("e8b5"),i=n("b622"),o=i("species");t.exports=function(t,e){var n;return a(t)&&(n=t.constructor,"function"!=typeof n||n!==Array&&!a(n.prototype)?r(n)&&(n=n[o],null===n&&(n=void 0)):n=void 0),new(void 0===n?Array:n)(0===e?0:e)}},"69f3":function(t,e,n){var r,a,i,o=n("7f9a"),s=n("da84"),c=n("861d"),u=n("9112"),l=n("5135"),f=n("f772"),d=n("d012"),h=s.WeakMap,p=function(t){return i(t)?a(t):r(t,{})},m=function(t){return function(e){var n;if(!c(e)||(n=a(e)).type!==t)throw TypeError("Incompatible receiver, "+t+" required");return n}};if(o){var g=new h,v=g.get,y=g.has,b=g.set;r=function(t,e){return b.call(g,t,e),e},a=function(t){return v.call(g,t)||{}},i=function(t){return y.call(g,t)}}else{var D=f("state");d[D]=!0,r=function(t,e){return u(t,D,e),e},a=function(t){return l(t,D)?t[D]:{}},i=function(t){return l(t,D)}}t.exports={set:r,get:a,has:i,enforce:p,getterFor:m}},"6eeb":function(t,e,n){var r=n("da84"),a=n("9112"),i=n("5135"),o=n("ce4e"),s=n("8925"),c=n("69f3"),u=c.get,l=c.enforce,f=String(String).split("String");(t.exports=function(t,e,n,s){var c=!!s&&!!s.unsafe,u=!!s&&!!s.enumerable,d=!!s&&!!s.noTargetGet;"function"==typeof n&&("string"!=typeof e||i(n,"name")||a(n,"name",e),l(n).source=f.join("string"==typeof e?e:"")),t!==r?(c?!d&&t[e]&&(u=!0):delete t[e],u?t[e]=n:a(t,e,n)):u?t[e]=n:o(e,n)})(Function.prototype,"toString",(function(){return"function"==typeof this&&u(this).source||s(this)}))},7156:function(t,e,n){var r=n("861d"),a=n("d2bb");t.exports=function(t,e,n){var i,o;return a&&"function"==typeof(i=e.constructor)&&i!==n&&r(o=i.prototype)&&o!==n.prototype&&a(t,o),t}},7418:function(t,e){e.f=Object.getOwnPropertySymbols},"746f":function(t,e,n){var r=n("428f"),a=n("5135"),i=n("c032"),o=n("9bf2").f;t.exports=function(t){var e=r.Symbol||(r.Symbol={});a(e,t)||o(e,t,{value:i.f(t)})}},7839:function(t,e){t.exports=["constructor","hasOwnProperty","isPrototypeOf","propertyIsEnumerable","toLocaleString","toString","valueOf"]},"7a50":function(t,e,n){"use strict";n.r(e);n("a4d3"),n("4de4"),n("d81d"),n("fb6a"),n("e439"),n("dbb4"),n("b64b"),n("159b");var r=n("ade3"),a=(n("d3b7"),n("466d"),n("5319"),n("53ca")),i=function(){var t=/d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZWN]|"[^"]*"|'[^']*'/g,e=/\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,n=/[^-+\dA-Z]/g;return function(r,a,l,f){if(1!==arguments.length||"string"!==u(r)||/\d/.test(r)||(a=r,r=void 0),r=r||new Date,r instanceof Date||(r=new Date(r)),isNaN(r))throw TypeError("Invalid date");a=String(i.masks[a]||a||i.masks["default"]);var d=a.slice(0,4);"UTC:"!==d&&"GMT:"!==d||(a=a.slice(4),l=!0,"GMT:"===d&&(f=!0));var h=l?"getUTC":"get",p=r[h+"Date"](),m=r[h+"Day"](),g=r[h+"Month"](),v=r[h+"FullYear"](),y=r[h+"Hours"](),b=r[h+"Minutes"](),D=r[h+"Seconds"](),w=r[h+"Milliseconds"](),x=l?0:r.getTimezoneOffset(),S=s(r),M=c(r),k={d:p,dd:o(p),ddd:i.i18n.dayNames[m],dddd:i.i18n.dayNames[m+7],m:g+1,mm:o(g+1),mmm:i.i18n.monthNames[g],mmmm:i.i18n.monthNames[g+12],yy:String(v).slice(2),yyyy:v,h:y%12||12,hh:o(y%12||12),H:y,HH:o(y),M:b,MM:o(b),s:D,ss:o(D),l:o(w,3),L:o(Math.round(w/10)),t:y<12?i.i18n.timeNames[0]:i.i18n.timeNames[1],tt:y<12?i.i18n.timeNames[2]:i.i18n.timeNames[3],T:y<12?i.i18n.timeNames[4]:i.i18n.timeNames[5],TT:y<12?i.i18n.timeNames[6]:i.i18n.timeNames[7],Z:f?"GMT":l?"UTC":(String(r).match(e)||[""]).pop().replace(n,""),o:(x>0?"-":"+")+o(100*Math.floor(Math.abs(x)/60)+Math.abs(x)%60,4),S:["th","st","nd","rd"][p%10>3?0:(p%100-p%10!=10)*p%10],W:S,N:M};return a.replace(t,(function(t){return t in k?k[t]:t.slice(1,t.length-1)}))}}();function o(t,e){t=String(t),e=e||2;while(t.length<e)t="0"+t;return t}function s(t){var e=new Date(t.getFullYear(),t.getMonth(),t.getDate());e.setDate(e.getDate()-(e.getDay()+6)%7+3);var n=new Date(e.getFullYear(),0,4);n.setDate(n.getDate()-(n.getDay()+6)%7+3);var r=e.getTimezoneOffset()-n.getTimezoneOffset();e.setHours(e.getHours()-r);var a=(e-n)/6048e5;return 1+Math.floor(a)}function c(t){var e=t.getDay();return 0===e&&(e=7),e}function u(t){return null===t?"null":void 0===t?"undefined":"object"!==Object(a["a"])(t)?Object(a["a"])(t):Array.isArray(t)?"array":{}.toString.call(t).slice(8,-1).toLowerCase()}function l(t,e){var n=Object.keys(t);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(t);e&&(r=r.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),n.push.apply(n,r)}return n}function f(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{};e%2?l(Object(n),!0).forEach((function(e){Object(r["a"])(t,e,n[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(n)):l(Object(n)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(n,e))}))}return t}i.masks={default:"ddd mmm dd yyyy HH:MM:ss",shortDate:"m/d/yy",mediumDate:"mmm d, yyyy",longDate:"mmmm d, yyyy",fullDate:"dddd, mmmm d, yyyy",shortTime:"h:MM TT",mediumTime:"h:MM:ss TT",longTime:"h:MM:ss TT Z",isoDate:"yyyy-mm-dd",isoTime:"HH:MM:ss",isoDateTime:"yyyy-mm-dd'T'HH:MM:sso",isoUtcDateTime:"UTC:yyyy-mm-dd'T'HH:MM:ss'Z'",expiresHeaderFormat:"ddd, dd mmm yyyy HH:MM:ss Z"},i.i18n={dayNames:["Sun","Mon","Tue","Wed","Thu","Fri","Sat","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],monthNames:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","January","February","March","April","May","June","July","August","September","October","November","December"],timeNames:["a","p","am","pm","A","P","AM","PM"]};var d={isSame:function(t,e,n){var r=new Date(t),a=new Date(e);return"date"===n&&(r.setHours(0,0,0,0),a.setHours(0,0,0,0)),r.getTime()===a.getTime()},daysInMonth:function(t,e){return new Date(t,e,0).getDate()},weekNumber:function(t){return s(t)},format:function(t,e){return i(t,e)},nextMonth:function(t){var e=new Date(t.getTime());return e.setDate(1),e.setMonth(e.getMonth()+1),e},prevMonth:function(t){var e=new Date(t.getTime());return e.setDate(1),e.setMonth(e.getMonth()-1),e},validateDateRange:function(t,e,n){var r=new Date(n),a=new Date(e);return n&&t.getTime()>r.getTime()?r:e&&t.getTime()<a.getTime()?a:t},localeData:function(t){var e={direction:"ltr",format:"mm/dd/yyyy",separator:" - ",applyLabel:"Apply",cancelLabel:"Cancel",weekLabel:"W",customRangeLabel:"Custom Range",daysOfWeek:i.i18n.dayNames.slice(0,7).map((function(t){return t.substring(0,2)})),monthNames:i.i18n.monthNames.slice(0,12),firstDay:0};return f({},e,{},t)},yearMonth:function(t){var e=t.getMonth()+1;return t.getFullYear()+(e<10?"0":"")+e},isValidDate:function(t){return t instanceof Date&&!isNaN(t)}};e["default"]=d},"7b0b":function(t,e,n){var r=n("1d80");t.exports=function(t){return Object(r(t))}},"7c73":function(t,e,n){var r=n("825a"),a=n("37e8"),i=n("7839"),o=n("d012"),s=n("1be4"),c=n("cc12"),u=n("f772"),l=u("IE_PROTO"),f="prototype",d=function(){},h=function(){var t,e=c("iframe"),n=i.length,r="<",a="script",o=">",u="java"+a+":";e.style.display="none",s.appendChild(e),e.src=String(u),t=e.contentWindow.document,t.open(),t.write(r+a+o+"document.F=Object"+r+"/"+a+o),t.close(),h=t.F;while(n--)delete h[f][i[n]];return h()};t.exports=Object.create||function(t,e){var n;return null!==t?(d[f]=r(t),n=new d,d[f]=null,n[l]=t):n=h(),void 0===e?n:a(n,e)},o[l]=!0},"7db0":function(t,e,n){"use strict";var r=n("23e7"),a=n("b727").find,i=n("44d2"),o="find",s=!0;o in[]&&Array(1)[o]((function(){s=!1})),r({target:"Array",proto:!0,forced:s},{find:function(t){return a(this,t,arguments.length>1?arguments[1]:void 0)}}),i(o)},"7dd0":function(t,e,n){"use strict";var r=n("23e7"),a=n("9ed3"),i=n("e163"),o=n("d2bb"),s=n("d44e"),c=n("9112"),u=n("6eeb"),l=n("b622"),f=n("c430"),d=n("3f8c"),h=n("ae93"),p=h.IteratorPrototype,m=h.BUGGY_SAFARI_ITERATORS,g=l("iterator"),v="keys",y="values",b="entries",D=function(){return this};t.exports=function(t,e,n,l,h,w,x){a(n,e,l);var S,M,k,_=function(t){if(t===h&&j)return j;if(!m&&t in C)return C[t];switch(t){case v:return function(){return new n(this,t)};case y:return function(){return new n(this,t)};case b:return function(){return new n(this,t)}}return function(){return new n(this)}},O=e+" Iterator",T=!1,C=t.prototype,P=C[g]||C["@@iterator"]||h&&C[h],j=!m&&P||_(h),A="Array"==e&&C.entries||P;if(A&&(S=i(A.call(new t)),p!==Object.prototype&&S.next&&(f||i(S)===p||(o?o(S,p):"function"!=typeof S[g]&&c(S,g,D)),s(S,O,!0,!0),f&&(d[O]=D))),h==y&&P&&P.name!==y&&(T=!0,j=function(){return P.call(this)}),f&&!x||C[g]===j||c(C,g,j),d[e]=j,h)if(M={values:_(y),keys:w?j:_(v),entries:_(b)},x)for(k in M)!m&&!T&&k in C||u(C,k,M[k]);else r({target:e,proto:!0,forced:m||T},M);return M}},"7f9a":function(t,e,n){var r=n("da84"),a=n("8925"),i=r.WeakMap;t.exports="function"===typeof i&&/native code/.test(a(i))},"825a":function(t,e,n){var r=n("861d");t.exports=function(t){if(!r(t))throw TypeError(String(t)+" is not an object");return t}},"83ab":function(t,e,n){var r=n("d039");t.exports=!r((function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a}))},8418:function(t,e,n){"use strict";var r=n("c04e"),a=n("9bf2"),i=n("5c6c");t.exports=function(t,e,n){var o=r(e);o in t?a.f(t,o,i(0,n)):t[o]=n}},"861d":function(t,e){t.exports=function(t){return"object"===typeof t?null!==t:"function"===typeof t}},8925:function(t,e,n){var r=n("c6cd"),a=Function.toString;"function"!=typeof r.inspectSource&&(r.inspectSource=function(t){return a.call(t)}),t.exports=r.inspectSource},"8aa5":function(t,e,n){"use strict";var r=n("6547").charAt;t.exports=function(t,e,n){return e+(n?r(t,e).length:1)}},"8b2e":function(t,e,n){},"90e3":function(t,e){var n=0,r=Math.random();t.exports=function(t){return"Symbol("+String(void 0===t?"":t)+")_"+(++n+r).toString(36)}},9112:function(t,e,n){var r=n("83ab"),a=n("9bf2"),i=n("5c6c");t.exports=r?function(t,e,n){return a.f(t,e,i(1,n))}:function(t,e,n){return t[e]=n,t}},9263:function(t,e,n){"use strict";var r=n("ad6d"),a=RegExp.prototype.exec,i=String.prototype.replace,o=a,s=function(){var t=/a/,e=/b*/g;return a.call(t,"a"),a.call(e,"a"),0!==t.lastIndex||0!==e.lastIndex}(),c=void 0!==/()??/.exec("")[1],u=s||c;u&&(o=function(t){var e,n,o,u,l=this;return c&&(n=new RegExp("^"+l.source+"$(?!\\s)",r.call(l))),s&&(e=l.lastIndex),o=a.call(l,t),s&&o&&(l.lastIndex=l.global?o.index+o[0].length:e),c&&o&&o.length>1&&i.call(o[0],n,(function(){for(u=1;u<arguments.length-2;u++)void 0===arguments[u]&&(o[u]=void 0)})),o}),t.exports=o},"94ca":function(t,e,n){var r=n("d039"),a=/#|\.prototype\./,i=function(t,e){var n=s[o(t)];return n==u||n!=c&&("function"==typeof e?r(e):!!e)},o=i.normalize=function(t){return String(t).replace(a,".").toLowerCase()},s=i.data={},c=i.NATIVE="N",u=i.POLYFILL="P";t.exports=i},"9bdd":function(t,e,n){var r=n("825a");t.exports=function(t,e,n,a){try{return a?e(r(n)[0],n[1]):e(n)}catch(o){var i=t["return"];throw void 0!==i&&r(i.call(t)),o}}},"9bf2":function(t,e,n){var r=n("83ab"),a=n("0cfb"),i=n("825a"),o=n("c04e"),s=Object.defineProperty;e.f=r?s:function(t,e,n){if(i(t),e=o(e,!0),i(n),a)try{return s(t,e,n)}catch(r){}if("get"in n||"set"in n)throw TypeError("Accessors not supported");return"value"in n&&(t[e]=n.value),t}},"9d0d":function(t,e,n){"use strict";var r=n("8b2e"),a=n.n(r);a.a},"9ed3":function(t,e,n){"use strict";var r=n("ae93").IteratorPrototype,a=n("7c73"),i=n("5c6c"),o=n("d44e"),s=n("3f8c"),c=function(){return this};t.exports=function(t,e,n){var u=e+" Iterator";return t.prototype=a(r,{next:i(1,n)}),o(t,u,!1,!0),s[u]=c,t}},a4d3:function(t,e,n){"use strict";var r=n("23e7"),a=n("da84"),i=n("d066"),o=n("c430"),s=n("83ab"),c=n("4930"),u=n("fdbf"),l=n("d039"),f=n("5135"),d=n("e8b5"),h=n("861d"),p=n("825a"),m=n("7b0b"),g=n("fc6a"),v=n("c04e"),y=n("5c6c"),b=n("7c73"),D=n("df75"),w=n("241c"),x=n("057f"),S=n("7418"),M=n("06cf"),k=n("9bf2"),_=n("d1e7"),O=n("9112"),T=n("6eeb"),C=n("5692"),P=n("f772"),j=n("d012"),A=n("90e3"),N=n("b622"),R=n("c032"),$=n("746f"),E=n("d44e"),U=n("69f3"),F=n("b727").forEach,I=P("hidden"),L="Symbol",H="prototype",B=N("toPrimitive"),Y=U.set,W=U.getterFor(L),V=Object[H],G=a.Symbol,z=i("JSON","stringify"),J=M.f,Z=k.f,X=x.f,q=_.f,K=C("symbols"),Q=C("op-symbols"),tt=C("string-to-symbol-registry"),et=C("symbol-to-string-registry"),nt=C("wks"),rt=a.QObject,at=!rt||!rt[H]||!rt[H].findChild,it=s&&l((function(){return 7!=b(Z({},"a",{get:function(){return Z(this,"a",{value:7}).a}})).a}))?function(t,e,n){var r=J(V,e);r&&delete V[e],Z(t,e,n),r&&t!==V&&Z(V,e,r)}:Z,ot=function(t,e){var n=K[t]=b(G[H]);return Y(n,{type:L,tag:t,description:e}),s||(n.description=e),n},st=c&&"symbol"==typeof G.iterator?function(t){return"symbol"==typeof t}:function(t){return Object(t)instanceof G},ct=function(t,e,n){t===V&&ct(Q,e,n),p(t);var r=v(e,!0);return p(n),f(K,r)?(n.enumerable?(f(t,I)&&t[I][r]&&(t[I][r]=!1),n=b(n,{enumerable:y(0,!1)})):(f(t,I)||Z(t,I,y(1,{})),t[I][r]=!0),it(t,r,n)):Z(t,r,n)},ut=function(t,e){p(t);var n=g(e),r=D(n).concat(pt(n));return F(r,(function(e){s&&!ft.call(n,e)||ct(t,e,n[e])})),t},lt=function(t,e){return void 0===e?b(t):ut(b(t),e)},ft=function(t){var e=v(t,!0),n=q.call(this,e);return!(this===V&&f(K,e)&&!f(Q,e))&&(!(n||!f(this,e)||!f(K,e)||f(this,I)&&this[I][e])||n)},dt=function(t,e){var n=g(t),r=v(e,!0);if(n!==V||!f(K,r)||f(Q,r)){var a=J(n,r);return!a||!f(K,r)||f(n,I)&&n[I][r]||(a.enumerable=!0),a}},ht=function(t){var e=X(g(t)),n=[];return F(e,(function(t){f(K,t)||f(j,t)||n.push(t)})),n},pt=function(t){var e=t===V,n=X(e?Q:g(t)),r=[];return F(n,(function(t){!f(K,t)||e&&!f(V,t)||r.push(K[t])})),r};if(c||(G=function(){if(this instanceof G)throw TypeError("Symbol is not a constructor");var t=arguments.length&&void 0!==arguments[0]?String(arguments[0]):void 0,e=A(t),n=function(t){this===V&&n.call(Q,t),f(this,I)&&f(this[I],e)&&(this[I][e]=!1),it(this,e,y(1,t))};return s&&at&&it(V,e,{configurable:!0,set:n}),ot(e,t)},T(G[H],"toString",(function(){return W(this).tag})),_.f=ft,k.f=ct,M.f=dt,w.f=x.f=ht,S.f=pt,s&&(Z(G[H],"description",{configurable:!0,get:function(){return W(this).description}}),o||T(V,"propertyIsEnumerable",ft,{unsafe:!0}))),u||(R.f=function(t){return ot(N(t),t)}),r({global:!0,wrap:!0,forced:!c,sham:!c},{Symbol:G}),F(D(nt),(function(t){$(t)})),r({target:L,stat:!0,forced:!c},{for:function(t){var e=String(t);if(f(tt,e))return tt[e];var n=G(e);return tt[e]=n,et[n]=e,n},keyFor:function(t){if(!st(t))throw TypeError(t+" is not a symbol");if(f(et,t))return et[t]},useSetter:function(){at=!0},useSimple:function(){at=!1}}),r({target:"Object",stat:!0,forced:!c,sham:!s},{create:lt,defineProperty:ct,defineProperties:ut,getOwnPropertyDescriptor:dt}),r({target:"Object",stat:!0,forced:!c},{getOwnPropertyNames:ht,getOwnPropertySymbols:pt}),r({target:"Object",stat:!0,forced:l((function(){S.f(1)}))},{getOwnPropertySymbols:function(t){return S.f(m(t))}}),z){var mt=!c||l((function(){var t=G();return"[null]"!=z([t])||"{}"!=z({a:t})||"{}"!=z(Object(t))}));r({target:"JSON",stat:!0,forced:mt},{stringify:function(t,e,n){var r,a=[t],i=1;while(arguments.length>i)a.push(arguments[i++]);if(r=e,(h(e)||void 0!==t)&&!st(t))return d(e)||(e=function(t,e){if("function"==typeof r&&(e=r.call(this,t,e)),!st(e))return e}),a[1]=e,z.apply(null,a)}})}G[H][B]||O(G[H],B,G[H].valueOf),E(G,L),j[I]=!0},a630:function(t,e,n){var r=n("23e7"),a=n("4df4"),i=n("1c7e"),o=!i((function(t){Array.from(t)}));r({target:"Array",stat:!0,forced:o},{from:a})},a691:function(t,e){var n=Math.ceil,r=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?r:n)(t)}},a6da:function(t,e,n){var r={"./native":"7a50","./native.js":"7a50"};function a(t){var e=i(t);return n(e)}function i(t){if(!n.o(r,t)){var e=new Error("Cannot find module '"+t+"'");throw e.code="MODULE_NOT_FOUND",e}return r[t]}a.keys=function(){return Object.keys(r)},a.resolve=i,t.exports=a,a.id="a6da"},a9e3:function(t,e,n){"use strict";var r=n("83ab"),a=n("da84"),i=n("94ca"),o=n("6eeb"),s=n("5135"),c=n("c6b6"),u=n("7156"),l=n("c04e"),f=n("d039"),d=n("7c73"),h=n("241c").f,p=n("06cf").f,m=n("9bf2").f,g=n("58a8").trim,v="Number",y=a[v],b=y.prototype,D=c(d(b))==v,w=function(t){var e,n,r,a,i,o,s,c,u=l(t,!1);if("string"==typeof u&&u.length>2)if(u=g(u),e=u.charCodeAt(0),43===e||45===e){if(n=u.charCodeAt(2),88===n||120===n)return NaN}else if(48===e){switch(u.charCodeAt(1)){case 66:case 98:r=2,a=49;break;case 79:case 111:r=8,a=55;break;default:return+u}for(i=u.slice(2),o=i.length,s=0;s<o;s++)if(c=i.charCodeAt(s),c<48||c>a)return NaN;return parseInt(i,r)}return+u};if(i(v,!y(" 0o1")||!y("0b1")||y("+0x1"))){for(var x,S=function(t){var e=arguments.length<1?0:t,n=this;return n instanceof S&&(D?f((function(){b.valueOf.call(n)})):c(n)!=v)?u(new y(w(e)),n,S):w(e)},M=r?h(y):"MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger".split(","),k=0;M.length>k;k++)s(y,x=M[k])&&!s(S,x)&&m(S,x,p(y,x));S.prototype=b,b.constructor=S,o(a,v,S)}},ad6d:function(t,e,n){"use strict";var r=n("825a");t.exports=function(){var t=r(this),e="";return t.global&&(e+="g"),t.ignoreCase&&(e+="i"),t.multiline&&(e+="m"),t.dotAll&&(e+="s"),t.unicode&&(e+="u"),t.sticky&&(e+="y"),e}},ade3:function(t,e,n){"use strict";function r(t,e,n){return e in t?Object.defineProperty(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}n.d(e,"a",(function(){return r}))},ae93:function(t,e,n){"use strict";var r,a,i,o=n("e163"),s=n("9112"),c=n("5135"),u=n("b622"),l=n("c430"),f=u("iterator"),d=!1,h=function(){return this};[].keys&&(i=[].keys(),"next"in i?(a=o(o(i)),a!==Object.prototype&&(r=a)):d=!0),void 0==r&&(r={}),l||c(r,f)||s(r,f,h),t.exports={IteratorPrototype:r,BUGGY_SAFARI_ITERATORS:d}},b041:function(t,e,n){"use strict";var r=n("00ee"),a=n("f5df");t.exports=r?{}.toString:function(){return"[object "+a(this)+"]"}},b301:function(t,e,n){"use strict";var r=n("d039");t.exports=function(t,e){var n=[][t];return!n||!r((function(){n.call(null,e||function(){throw 1},1)}))}},b39a:function(t,e,n){var r=n("d066");t.exports=r("navigator","userAgent")||""},b622:function(t,e,n){var r=n("da84"),a=n("5692"),i=n("5135"),o=n("90e3"),s=n("4930"),c=n("fdbf"),u=a("wks"),l=r.Symbol,f=c?l:o;t.exports=function(t){return i(u,t)||(s&&i(l,t)?u[t]=l[t]:u[t]=f("Symbol."+t)),u[t]}},b64b:function(t,e,n){var r=n("23e7"),a=n("7b0b"),i=n("df75"),o=n("d039"),s=o((function(){i(1)}));r({target:"Object",stat:!0,forced:s},{keys:function(t){return i(a(t))}})},b727:function(t,e,n){var r=n("f8c2"),a=n("44ad"),i=n("7b0b"),o=n("50c4"),s=n("65f0"),c=[].push,u=function(t){var e=1==t,n=2==t,u=3==t,l=4==t,f=6==t,d=5==t||f;return function(h,p,m,g){for(var v,y,b=i(h),D=a(b),w=r(p,m,3),x=o(D.length),S=0,M=g||s,k=e?M(h,x):n?M(h,0):void 0;x>S;S++)if((d||S in D)&&(v=D[S],y=w(v,S,b),t))if(e)k[S]=y;else if(y)switch(t){case 3:return!0;case 5:return v;case 6:return S;case 2:c.call(k,v)}else if(l)return!1;return f?-1:u||l?l:k}};t.exports={forEach:u(0),map:u(1),filter:u(2),some:u(3),every:u(4),find:u(5),findIndex:u(6)}},beb7:function(t,e,n){},c032:function(t,e,n){var r=n("b622");e.f=r},c04e:function(t,e,n){var r=n("861d");t.exports=function(t,e){if(!r(t))return t;var n,a;if(e&&"function"==typeof(n=t.toString)&&!r(a=n.call(t)))return a;if("function"==typeof(n=t.valueOf)&&!r(a=n.call(t)))return a;if(!e&&"function"==typeof(n=t.toString)&&!r(a=n.call(t)))return a;throw TypeError("Can't convert object to primitive value")}},c430:function(t,e){t.exports=!1},c6b6:function(t,e){var n={}.toString;t.exports=function(t){return n.call(t).slice(8,-1)}},c6cd:function(t,e,n){var r=n("da84"),a=n("ce4e"),i="__core-js_shared__",o=r[i]||a(i,{});t.exports=o},c8ba:function(t,e){var n;n=function(){return this}();try{n=n||new Function("return this")()}catch(r){"object"===typeof window&&(n=window)}t.exports=n},ca84:function(t,e,n){var r=n("5135"),a=n("fc6a"),i=n("4d64").indexOf,o=n("d012");t.exports=function(t,e){var n,s=a(t),c=0,u=[];for(n in s)!r(o,n)&&r(s,n)&&u.push(n);while(e.length>c)r(s,n=e[c++])&&(~i(u,n)||u.push(n));return u}},cc12:function(t,e,n){var r=n("da84"),a=n("861d"),i=r.document,o=a(i)&&a(i.createElement);t.exports=function(t){return o?i.createElement(t):{}}},ce4e:function(t,e,n){var r=n("da84"),a=n("9112");t.exports=function(t,e){try{a(r,t,e)}catch(n){r[t]=e}return e}},ce5f:function(t,e,n){"use strict";var r=n("18e6"),a=n.n(r);a.a},d012:function(t,e){t.exports={}},d039:function(t,e){t.exports=function(t){try{return!!t()}catch(e){return!0}}},d066:function(t,e,n){var r=n("428f"),a=n("da84"),i=function(t){return"function"==typeof t?t:void 0};t.exports=function(t,e){return arguments.length<2?i(r[t])||i(a[t]):r[t]&&r[t][e]||a[t]&&a[t][e]}},d1e7:function(t,e,n){"use strict";var r={}.propertyIsEnumerable,a=Object.getOwnPropertyDescriptor,i=a&&!r.call({1:2},1);e.f=i?function(t){var e=a(this,t);return!!e&&e.enumerable}:r},d28b:function(t,e,n){var r=n("746f");r("iterator")},d2bb:function(t,e,n){var r=n("825a"),a=n("3bbe");t.exports=Object.setPrototypeOf||("__proto__"in{}?function(){var t,e=!1,n={};try{t=Object.getOwnPropertyDescriptor(Object.prototype,"__proto__").set,t.call(n,[]),e=n instanceof Array}catch(i){}return function(n,i){return r(n),a(i),e?t.call(n,i):n.__proto__=i,n}}():void 0)},d3b7:function(t,e,n){var r=n("00ee"),a=n("6eeb"),i=n("b041");r||a(Object.prototype,"toString",i,{unsafe:!0})},d44e:function(t,e,n){var r=n("9bf2").f,a=n("5135"),i=n("b622"),o=i("toStringTag");t.exports=function(t,e,n){t&&!a(t=n?t:t.prototype,o)&&r(t,o,{configurable:!0,value:e})}},d784:function(t,e,n){"use strict";var r=n("9112"),a=n("6eeb"),i=n("d039"),o=n("b622"),s=n("9263"),c=o("species"),u=!i((function(){var t=/./;return t.exec=function(){var t=[];return t.groups={a:"7"},t},"7"!=="".replace(t,"$<a>")})),l=!i((function(){var t=/(?:)/,e=t.exec;t.exec=function(){return e.apply(this,arguments)};var n="ab".split(t);return 2!==n.length||"a"!==n[0]||"b"!==n[1]}));t.exports=function(t,e,n,f){var d=o(t),h=!i((function(){var e={};return e[d]=function(){return 7},7!=""[t](e)})),p=h&&!i((function(){var e=!1,n=/a/;return"split"===t&&(n={},n.constructor={},n.constructor[c]=function(){return n},n.flags="",n[d]=/./[d]),n.exec=function(){return e=!0,null},n[d](""),!e}));if(!h||!p||"replace"===t&&!u||"split"===t&&!l){var m=/./[d],g=n(d,""[t],(function(t,e,n,r,a){return e.exec===s?h&&!a?{done:!0,value:m.call(e,n,r)}:{done:!0,value:t.call(n,e,r)}:{done:!1}})),v=g[0],y=g[1];a(String.prototype,t,v),a(RegExp.prototype,d,2==e?function(t,e){return y.call(t,this,e)}:function(t){return y.call(t,this)}),f&&r(RegExp.prototype[d],"sham",!0)}}},d81d:function(t,e,n){"use strict";var r=n("23e7"),a=n("b727").map,i=n("d039"),o=n("1dde"),s=o("map"),c=s&&!i((function(){[].map.call({length:-1,0:1},(function(t){throw t}))}));r({target:"Array",proto:!0,forced:!s||!c},{map:function(t){return a(this,t,arguments.length>1?arguments[1]:void 0)}})},da84:function(t,e,n){(function(e){var n=function(t){return t&&t.Math==Math&&t};t.exports=n("object"==typeof globalThis&&globalThis)||n("object"==typeof window&&window)||n("object"==typeof self&&self)||n("object"==typeof e&&e)||Function("return this")()}).call(this,n("c8ba"))},dbb4:function(t,e,n){var r=n("23e7"),a=n("83ab"),i=n("56ef"),o=n("fc6a"),s=n("06cf"),c=n("8418");r({target:"Object",stat:!0,sham:!a},{getOwnPropertyDescriptors:function(t){var e,n,r=o(t),a=s.f,u=i(r),l={},f=0;while(u.length>f)n=a(r,e=u[f++]),void 0!==n&&c(l,e,n);return l}})},ddb0:function(t,e,n){var r=n("da84"),a=n("fdbc"),i=n("e260"),o=n("9112"),s=n("b622"),c=s("iterator"),u=s("toStringTag"),l=i.values;for(var f in a){var d=r[f],h=d&&d.prototype;if(h){if(h[c]!==l)try{o(h,c,l)}catch(m){h[c]=l}if(h[u]||o(h,u,f),a[f])for(var p in i)if(h[p]!==i[p])try{o(h,p,i[p])}catch(m){h[p]=i[p]}}}},df75:function(t,e,n){var r=n("ca84"),a=n("7839");t.exports=Object.keys||function(t){return r(t,a)}},e01a:function(t,e,n){"use strict";var r=n("23e7"),a=n("83ab"),i=n("da84"),o=n("5135"),s=n("861d"),c=n("9bf2").f,u=n("e893"),l=i.Symbol;if(a&&"function"==typeof l&&(!("description"in l.prototype)||void 0!==l().description)){var f={},d=function(){var t=arguments.length<1||void 0===arguments[0]?void 0:String(arguments[0]),e=this instanceof d?new l(t):void 0===t?l():l(t);return""===t&&(f[e]=!0),e};u(d,l);var h=d.prototype=l.prototype;h.constructor=d;var p=h.toString,m="Symbol(test)"==String(l("test")),g=/^Symbol\((.*)\)[^)]+$/;c(h,"description",{configurable:!0,get:function(){var t=s(this)?this.valueOf():this,e=p.call(t);if(o(f,t))return"";var n=m?e.slice(7,-1):e.replace(g,"$1");return""===n?void 0:n}}),r({global:!0,forced:!0},{Symbol:d})}},e163:function(t,e,n){var r=n("5135"),a=n("7b0b"),i=n("f772"),o=n("e177"),s=i("IE_PROTO"),c=Object.prototype;t.exports=o?Object.getPrototypeOf:function(t){return t=a(t),r(t,s)?t[s]:"function"==typeof t.constructor&&t instanceof t.constructor?t.constructor.prototype:t instanceof Object?c:null}},e177:function(t,e,n){var r=n("d039");t.exports=!r((function(){function t(){}return t.prototype.constructor=null,Object.getPrototypeOf(new t)!==t.prototype}))},e260:function(t,e,n){"use strict";var r=n("fc6a"),a=n("44d2"),i=n("3f8c"),o=n("69f3"),s=n("7dd0"),c="Array Iterator",u=o.set,l=o.getterFor(c);t.exports=s(Array,"Array",(function(t,e){u(this,{type:c,target:r(t),index:0,kind:e})}),(function(){var t=l(this),e=t.target,n=t.kind,r=t.index++;return!e||r>=e.length?(t.target=void 0,{value:void 0,done:!0}):"keys"==n?{value:r,done:!1}:"values"==n?{value:e[r],done:!1}:{value:[r,e[r]],done:!1}}),"values"),i.Arguments=i.Array,a("keys"),a("values"),a("entries")},e439:function(t,e,n){var r=n("23e7"),a=n("d039"),i=n("fc6a"),o=n("06cf").f,s=n("83ab"),c=a((function(){o(1)})),u=!s||c;r({target:"Object",stat:!0,forced:u,sham:!s},{getOwnPropertyDescriptor:function(t,e){return o(i(t),e)}})},e893:function(t,e,n){var r=n("5135"),a=n("56ef"),i=n("06cf"),o=n("9bf2");t.exports=function(t,e){for(var n=a(e),s=o.f,c=i.f,u=0;u<n.length;u++){var l=n[u];r(t,l)||s(t,l,c(e,l))}}},e8b5:function(t,e,n){var r=n("c6b6");t.exports=Array.isArray||function(t){return"Array"==r(t)}},e95a:function(t,e,n){var r=n("b622"),a=n("3f8c"),i=r("iterator"),o=Array.prototype;t.exports=function(t){return void 0!==t&&(a.Array===t||o[i]===t)}},f5df:function(t,e,n){var r=n("00ee"),a=n("c6b6"),i=n("b622"),o=i("toStringTag"),s="Arguments"==a(function(){return arguments}()),c=function(t,e){try{return t[e]}catch(n){}};t.exports=r?a:function(t){var e,n,r;return void 0===t?"Undefined":null===t?"Null":"string"==typeof(n=c(e=Object(t),o))?n:s?a(e):"Object"==(r=a(e))&&"function"==typeof e.callee?"Arguments":r}},f6fd:function(t,e){(function(t){var e="currentScript",n=t.getElementsByTagName("script");e in t||Object.defineProperty(t,e,{get:function(){try{throw new Error}catch(r){var t,e=(/.*at [^\(]*\((.*):.+:.+\)$/gi.exec(r.stack)||[!1])[1];for(t in n)if(n[t].src==e||"interactive"==n[t].readyState)return n[t];return null}}})})(document)},f772:function(t,e,n){var r=n("5692"),a=n("90e3"),i=r("keys");t.exports=function(t){return i[t]||(i[t]=a(t))}},f8c2:function(t,e,n){var r=n("1c0b");t.exports=function(t,e,n){if(r(t),void 0===e)return t;switch(n){case 0:return function(){return t.call(e)};case 1:return function(n){return t.call(e,n)};case 2:return function(n,r){return t.call(e,n,r)};case 3:return function(n,r,a){return t.call(e,n,r,a)}}return function(){return t.apply(e,arguments)}}},fb15:function(t,e,n){"use strict";var r;(n.r(e),"undefined"!==typeof window)&&(n("f6fd"),(r=window.document.currentScript)&&(r=r.src.match(/(.+\/)[^/]+\.js(\?.*)?$/))&&(n.p=r[1]));var a=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"vue-daterange-picker",class:{inline:"inline"===t.opens}},[n("div",{ref:"toggle",class:t.controlContainerClass,on:{click:t.onClickPicker}},[t._t("input",[n("i",{staticClass:"glyphicon glyphicon-calendar fa fa-calendar"}),t._v(" "),n("span",[t._v(t._s(t.rangeText))]),n("b",{staticClass:"caret"})],{startDate:t.start,endDate:t.end,ranges:t.ranges,rangeText:t.rangeText})],2),n("transition",{attrs:{name:"slide-fade",mode:"out-in"}},[t.open||"inline"===t.opens?n("div",{directives:[{name:"append-to-body",rawName:"v-append-to-body"}],ref:"dropdown",staticClass:"daterangepicker ltr",class:t.pickerStyles},[t._t("header",null,{rangeText:t.rangeText,locale:t.locale,clickCancel:t.clickCancel,clickApply:t.clickedApply,in_selection:t.in_selection,autoApply:t.autoApply}),n("div",{staticClass:"calendars"},[t.showRanges?t._t("ranges",[n("calendar-ranges",{attrs:{"always-show-calendars":t.alwaysShowCalendars,"locale-data":t.locale,ranges:t.ranges,selected:{startDate:t.start,endDate:t.end}},on:{"click-range":t.clickRange,"show-custom-range":function(e){t.showCustomRangeCalendars=!0}}})],{startDate:t.start,endDate:t.end,ranges:t.ranges,clickRange:t.clickRange}):t._e(),t.showCalendars?n("div",{staticClass:"calendars-container"},[n("div",{staticClass:"drp-calendar col left",class:{single:t.singleDatePicker}},[t._e(),n("div",{staticClass:"calendar-table"},[n("calendar",{attrs:{monthDate:t.monthDate,"locale-data":t.locale,start:t.start,end:t.end,minDate:t.min,maxDate:t.max,"show-dropdowns":t.showDropdowns,"date-format":t.dateFormatFn,showWeekNumbers:t.showWeekNumbers},on:{"change-month":t.changeLeftMonth,"date-click":t.dateClick,"hover-date":t.hoverDate},scopedSlots:t._u([{key:"date-slot",fn:function(e){return t._t("date",null,null,e)}}],null,!0)})],1),t.timePicker&&t.start?n("calendar-time",{attrs:{"miniute-increment":t.timePickerIncrement,hour24:t.timePicker24Hour,"second-picker":t.timePickerSeconds,"current-time":t.start,readonly:t.readonly},on:{update:t.onUpdateStartTime}}):t._e()],1),t.singleDatePicker?t._e():n("div",{staticClass:"drp-calendar col right"},[t._e(),n("div",{staticClass:"calendar-table"},[n("calendar",{attrs:{monthDate:t.nextMonthDate,"locale-data":t.locale,start:t.start,end:t.end,minDate:t.min,maxDate:t.max,"show-dropdowns":t.showDropdowns,"date-format":t.dateFormatFn,showWeekNumbers:t.showWeekNumbers},on:{"change-month":t.changeRightMonth,"date-click":t.dateClick,"hover-date":t.hoverDate},scopedSlots:t._u([{key:"date-slot",fn:function(e){return t._t("date",null,null,e)}}],null,!0)})],1),t.timePicker&&t.end?n("calendar-time",{attrs:{"miniute-increment":t.timePickerIncrement,hour24:t.timePicker24Hour,"second-picker":t.timePickerSeconds,"current-time":t.end,readonly:t.readonly},on:{update:t.onUpdateEndTime}}):t._e()],1)]):t._e()],2),t._t("footer",[t.autoApply?t._e():n("div",{staticClass:"drp-buttons"},[t.showCalendars?n("span",{staticClass:"drp-selected"},[t._v(t._s(t.rangeText))]):t._e(),t.readonly?t._e():n("button",{staticClass:"cancelBtn btn btn-sm btn-secondary",attrs:{type:"button"},on:{click:t.clickCancel}},[t._v(t._s(t.locale.cancelLabel)+" ")]),t.readonly?t._e():n("button",{staticClass:"applyBtn btn btn-sm btn-success",attrs:{disabled:t.in_selection,type:"button"},on:{click:t.clickedApply}},[t._v(t._s(t.locale.applyLabel)+" ")])])],{rangeText:t.rangeText,locale:t.locale,clickCancel:t.clickCancel,clickApply:t.clickedApply,in_selection:t.in_selection,autoApply:t.autoApply})],2):t._e()])],1)},i=[],o=(n("a4d3"),n("4de4"),n("7db0"),n("a9e3"),n("e439"),n("dbb4"),n("b64b"),n("159b"),n("53ca"));function s(t){if(Array.isArray(t)){for(var e=0,n=new Array(t.length);e<t.length;e++)n[e]=t[e];return n}}n("e01a"),n("d28b"),n("a630"),n("e260"),n("d3b7"),n("25f0"),n("3ca3"),n("ddb0");function c(t){if(Symbol.iterator in Object(t)||"[object Arguments]"===Object.prototype.toString.call(t))return Array.from(t)}function u(){throw new TypeError("Invalid attempt to spread non-iterable instance")}function l(t){return s(t)||c(t)||u()}var f=n("ade3"),d=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"native";return t instanceof Object?t:"string"===typeof t||t instanceof String?n("a6da")("./"+t).default:void 0},h={props:{dateUtil:{type:[Object,String],default:"native"}},beforeCreate:function(){this.$dateUtil=d("native")}},p=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("table",{staticClass:"table-condensed"},[n("thead",[n("tr",[n("th",{staticClass:"prev available",attrs:{tabindex:"0"},on:{click:t.prevMonthClick}},[n("span")]),t.showDropdowns?n("th",{staticClass:"month",attrs:{colspan:t.showWeekNumbers?6:5}},[n("div",{staticClass:"row mx-1"},[n("select",{directives:[{name:"model",rawName:"v-model",value:t.month,expression:"month"}],staticClass:"monthselect col",on:{change:function(e){var n=Array.prototype.filter.call(e.target.options,(function(t){return t.selected})).map((function(t){var e="_value"in t?t._value:t.value;return e}));t.month=e.target.multiple?n:n[0]}}},t._l(t.months,(function(e,r){return n("option",{key:r,attrs:{disabled:!e.enabled},domProps:{value:e.value+1}},[t._v(t._s(e.label))])})),0),n("input",{directives:[{name:"model",rawName:"v-model",value:t.year,expression:"year"}],ref:"yearSelect",staticClass:"yearselect col",attrs:{type:"number"},domProps:{value:t.year},on:{blur:t.checkYear,input:function(e){e.target.composing||(t.year=e.target.value)}}})])]):n("th",{staticClass:"month",attrs:{colspan:t.showWeekNumbers?6:5}},[t._v(t._s(t.monthName)+" "+t._s(t.year))]),n("th",{staticClass:"next available",attrs:{tabindex:"0"},on:{click:t.nextMonthClick}},[n("span")])])]),n("tbody",[n("tr",[t.showWeekNumbers?n("th",{staticClass:"week"},[t._v(t._s(t.locale.weekLabel))]):t._e(),t._l(t.locale.daysOfWeek,(function(e,r){return n("th",{key:r},[t._v(t._s(e))])}))],2),t._l(t.calendar,(function(e,r){return n("tr",{key:r},[t.showWeekNumbers&&(r%7||0===r)?n("td",{staticClass:"week"},[t._v(" "+t._s(t.$dateUtil.weekNumber(e[0]))+" ")]):t._e(),t._l(e,(function(e,r){return n("td",{key:r,class:t.dayClass(e),attrs:{"data-date":e.toISOString().substring(0,10)},on:{click:function(n){return t.$emit("date-click",e)},mouseover:function(n){return t.$emit("hover-date",e)}}},[t._t("date-slot",[t._v(" "+t._s(e.getDate())+" ")],{date:e})],2)}))],2)}))],2)])},m=[],g=(n("d81d"),{mixins:[h],name:"calendar",props:{monthDate:Date,localeData:Object,start:Date,end:Date,minDate:Date,maxDate:Date,showDropdowns:{type:Boolean,default:!1},showWeekNumbers:{type:Boolean,default:!1},dateFormat:{type:Function,default:null}},data:function(){var t=this.monthDate||this.start||new Date;return{currentMonthDate:t,year_text:t.getFullYear()}},methods:{prevMonthClick:function(){this.changeMonthDate(this.$dateUtil.prevMonth(this.currentMonthDate))},nextMonthClick:function(){this.changeMonthDate(this.$dateUtil.nextMonth(this.currentMonthDate))},changeMonthDate:function(t){var e=!(arguments.length>1&&void 0!==arguments[1])||arguments[1],n=this.$dateUtil.yearMonth(this.currentMonthDate);this.currentMonthDate=this.$dateUtil.validateDateRange(t,this.minDate,this.maxDate),e&&n!==this.$dateUtil.yearMonth(this.currentMonthDate)&&this.$emit("change-month",{month:this.currentMonthDate.getMonth()+1,year:this.currentMonthDate.getFullYear()}),this.checkYear()},dayClass:function(t){var e=new Date(t);e.setHours(0,0,0,0);var n=new Date(this.start);n.setHours(0,0,0,0);var r=new Date(this.end);r.setHours(0,0,0,0);var a=new Date(e);a.setHours(23,59,59,999);var i={off:t.getMonth()+1!==this.month,weekend:6===t.getDay()||0===t.getDay(),today:e.setHours(0,0,0,0)==(new Date).setHours(0,0,0,0),active:e.setHours(0,0,0,0)==new Date(this.start).setHours(0,0,0,0)||e.setHours(0,0,0,0)==new Date(this.end).setHours(0,0,0,0),"in-range":e>=n&&e<=r,"start-date":e.getTime()===n.getTime(),"end-date":e.getTime()===r.getTime(),disabled:this.minDate&&a.getTime()<this.minDate.getTime()||this.maxDate&&e.getTime()>this.maxDate.getTime()};return this.dateFormat?this.dateFormat(i,t):i},checkYear:function(){var t=this;this.$refs.yearSelect!==document.activeElement&&this.$nextTick((function(){t.year_text=t.monthDate.getFullYear()}))}},computed:{monthName:function(){return this.locale.monthNames[this.currentMonthDate.getMonth()]},year:{get:function(){return this.year_text},set:function(t){this.year_text=t;var e=this.$dateUtil.validateDateRange(new Date(t,this.month,1),this.minDate,this.maxDate);this.$dateUtil.isValidDate(e)&&this.$emit("change-month",{month:e.getMonth(),year:e.getFullYear()})}},month:{get:function(){return this.currentMonthDate.getMonth()+1},set:function(t){var e=this.$dateUtil.validateDateRange(new Date(this.year,t-1,1),this.minDate,this.maxDate);this.$emit("change-month",{month:e.getMonth()+1,year:e.getFullYear()})}},calendar:function(){for(var t=this.month,e=this.currentMonthDate.getFullYear(),n=new Date(e,t-1,1),r=this.$dateUtil.prevMonth(n).getMonth()+1,a=this.$dateUtil.prevMonth(n).getFullYear(),i=new Date(a,t-1,0).getDate(),o=n.getDay(),s=[],c=0;c<6;c++)s[c]=[];var u=i-o+this.locale.firstDay+1;u>i&&(u-=7),o===this.locale.firstDay&&(u=i-6);for(var l=new Date(a,r-1,u,12,0,0),f=0,d=0,h=0;f<42;f++,d++,l.setDate(l.getDate()+1))f>0&&d%7===0&&(d=0,h++),s[h][d]=new Date(l.getTime());return s},months:function(){var t=this;return this.locale.monthNames.map((function(e,n){return{label:e,value:n,enabled:(!t.maxDate||t.maxDate>=new Date(t.year,n,1))&&(!t.minDate||t.minDate<=new Date(t.year,n+1,0))}}))},locale:function(){return this.$dateUtil.localeData(this.localeData)}},watch:{monthDate:function(t){this.currentMonthDate.getTime()!==t.getTime()&&this.changeMonthDate(t,!1)}}}),v=g;n("9d0d");function y(t,e,n,r,a,i,o,s){var c,u="function"===typeof t?t.options:t;if(e&&(u.render=e,u.staticRenderFns=n,u._compiled=!0),r&&(u.functional=!0),i&&(u._scopeId="data-v-"+i),o?(c=function(t){t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext,t||"undefined"===typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),a&&a.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(o)},u._ssrRegister=c):a&&(c=s?function(){a.call(this,this.$root.$options.shadowRoot)}:a),c)if(u.functional){u._injectStyles=c;var l=u.render;u.render=function(t,e){return c.call(e),l(t,e)}}else{var f=u.beforeCreate;u.beforeCreate=f?[].concat(f,c):[c]}return{exports:t,options:u}}var b=y(v,p,m,!1,null,"98ac2448",null),D=b.exports,w=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"calendar-time"},[n("select",{directives:[{name:"model",rawName:"v-model",value:t.hour,expression:"hour"}],staticClass:"hourselect form-control mr-1",attrs:{disabled:t.readonly},on:{change:function(e){var n=Array.prototype.filter.call(e.target.options,(function(t){return t.selected})).map((function(t){var e="_value"in t?t._value:t.value;return e}));t.hour=e.target.multiple?n:n[0]}}},t._l(t.hours,(function(e){return n("option",{key:e,domProps:{value:e}},[t._v(t._s(t._f("formatNumber")(e)))])})),0),t._v(" :"),n("select",{directives:[{name:"model",rawName:"v-model",value:t.minute,expression:"minute"}],staticClass:"minuteselect form-control ml-1",attrs:{disabled:t.readonly},on:{change:function(e){var n=Array.prototype.filter.call(e.target.options,(function(t){return t.selected})).map((function(t){var e="_value"in t?t._value:t.value;return e}));t.minute=e.target.multiple?n:n[0]}}},t._l(t.minutes,(function(e){return n("option",{key:e,domProps:{value:e}},[t._v(t._s(t._f("formatNumber")(e)))])})),0),t.secondPicker?[t._v(" :"),n("select",{directives:[{name:"model",rawName:"v-model",value:t.second,expression:"second"}],staticClass:"secondselect form-control ml-1",attrs:{disabled:t.readonly},on:{change:function(e){var n=Array.prototype.filter.call(e.target.options,(function(t){return t.selected})).map((function(t){var e="_value"in t?t._value:t.value;return e}));t.second=e.target.multiple?n:n[0]}}},t._l(60,(function(e){return n("option",{key:e-1,domProps:{value:e-1}},[t._v(t._s(t._f("formatNumber")(e-1)))])})),0)]:t._e(),t.hour24?t._e():n("select",{directives:[{name:"model",rawName:"v-model",value:t.ampm,expression:"ampm"}],staticClass:"ampmselect",attrs:{disabled:t.readonly},on:{change:function(e){var n=Array.prototype.filter.call(e.target.options,(function(t){return t.selected})).map((function(t){var e="_value"in t?t._value:t.value;return e}));t.ampm=e.target.multiple?n:n[0]}}},[n("option",{attrs:{value:"AM"}},[t._v("AM")]),n("option",{attrs:{value:"PM"}},[t._v("PM")])])],2)},x=[],S={filters:{formatNumber:function(t){return t<10?"0"+t.toString():t.toString()}},props:{miniuteIncrement:{type:Number,default:5},hour24:{type:Boolean,default:!0},secondPicker:{type:Boolean,default:!1},currentTime:{default:function(){return new Date}},readonly:{type:Boolean,default:!1}},data:function(){var t=this.currentTime?this.currentTime:new Date,e=t.getHours();return{hour:this.hour24?e:e%12||12,minute:t.getMinutes()-t.getMinutes()%this.miniuteIncrement,second:t.getSeconds(),ampm:e<12?"AM":"PM"}},computed:{hours:function(){for(var t=[],e=this.hour24?24:12,n=0;n<e;n++)t.push(this.hour24?n:n+1);return t},minutes:function(){for(var t=[],e=60,n=0;n<e;n+=this.miniuteIncrement)t.push(n);return t}},watch:{hour:function(){this.onChange()},minute:function(){this.onChange()},second:function(){this.onChange()},ampm:function(){this.onChange()}},methods:{getHour:function(){return this.hour24?this.hour:12===this.hour?"AM"===this.ampm?0:12:this.hour+("PM"===this.ampm?12:0)},onChange:function(){this.$emit("update",{hours:this.getHour(),minutes:this.minute,seconds:this.second})}}},M=S,k=y(M,w,x,!1,null,null,null),_=k.exports,O=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"ranges"},[t.ranges?n("ul",[t._l(t.listedRanges,(function(e){return n("li",{key:e.label,class:t.range_class(e),attrs:{"data-range-key":e.label,tabindex:"0"},on:{click:function(n){return t.clickRange(e.value)}}},[t._v(t._s(e.label)+" ")])})),t.showCustomRangeLabel?n("li",{class:{active:t.customRangeActive||!t.selectedRange},attrs:{tabindex:"0"},on:{click:t.clickCustomRange}},[t._v(" "+t._s(t.localeData.customRangeLabel)+" ")]):t._e()],2):t._e()])},T=[],C={mixins:[h],props:{ranges:Object,selected:Object,localeData:Object,alwaysShowCalendars:Boolean},data:function(){return{customRangeActive:!1}},methods:{clickRange:function(t){this.customRangeActive=!1,this.$emit("click-range",t)},clickCustomRange:function(){this.customRangeActive=!0,this.$emit("show-custom-range")},range_class:function(t){return{active:!0===t.selected}}},computed:{listedRanges:function(){var t=this;return!!this.ranges&&Object.keys(this.ranges).map((function(e){return{label:e,value:t.ranges[e],selected:t.$dateUtil.isSame(t.selected.startDate,t.ranges[e][0])&&t.$dateUtil.isSame(t.selected.endDate,t.ranges[e][1])}}))},selectedRange:function(){return this.listedRanges.find((function(t){return!0===t.selected}))},showCustomRangeLabel:function(){return!this.alwaysShowCalendars}}},P=C,j=y(P,O,T,!1,null,null,null),A=j.exports,N={inserted:function(t,e,n){var r=n.context;if(r.appendToBody){var a=r.$refs.toggle.getBoundingClientRect(),i=a.height,o=a.top,s=a.left,c=a.width,u=a.right;t.unbindPosition=r.calculatePosition(t,r,{width:c,top:window.scrollY+o+i,left:window.scrollX+s,right:u}),document.body.appendChild(t)}else r.$el.appendChild(t)},unbind:function(t,e,n){var r=n.context;r.appendToBody&&(t.unbindPosition&&"function"===typeof t.unbindPosition&&t.unbindPosition(),t.parentNode&&t.parentNode.removeChild(t))}};function R(t,e){var n=Object.keys(t);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(t);e&&(r=r.filter((function(e){return Object.getOwnPropertyDescriptor(t,e).enumerable}))),n.push.apply(n,r)}return n}function $(t){for(var e=1;e<arguments.length;e++){var n=null!=arguments[e]?arguments[e]:{};e%2?R(Object(n),!0).forEach((function(e){Object(f["a"])(t,e,n[e])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(n)):R(Object(n)).forEach((function(e){Object.defineProperty(t,e,Object.getOwnPropertyDescriptor(n,e))}))}return t}var E={inheritAttrs:!1,components:{Calendar:D,CalendarTime:_,CalendarRanges:A},mixins:[h],directives:{appendToBody:N},model:{prop:"dateRange",event:"update"},props:{minDate:{type:[String,Date],default:function(){return null}},maxDate:{type:[String,Date],default:function(){return null}},showWeekNumbers:{type:Boolean,default:!1},linkedCalendars:{type:Boolean,default:!0},singleDatePicker:{type:[Boolean,String],default:!1},showDropdowns:{type:Boolean,default:!1},timePicker:{type:Boolean,default:!1},timePickerIncrement:{type:Number,default:5},timePicker24Hour:{type:Boolean,default:!0},timePickerSeconds:{type:Boolean,default:!1},autoApply:{type:Boolean,default:!1},localeData:{type:Object,default:function(){return{}}},dateRange:{type:[Object],default:null,required:!0},ranges:{type:[Object,Boolean],default:function(){var t=new Date;t.setHours(0,0,0,0);var e=new Date;e.setHours(11,59,59,999);var n=new Date;n.setDate(t.getDate()-1),n.setHours(0,0,0,0);var r=new Date;r.setDate(t.getDate()-1),r.setHours(11,59,59,999);var a=new Date(t.getFullYear(),t.getMonth(),1),i=new Date(t.getFullYear(),t.getMonth()+1,0,11,59,59,999);return{Today:[t,e],Yesterday:[n,r],"This month":[a,i],"This year":[new Date(t.getFullYear(),0,1),new Date(t.getFullYear(),11,31,11,59,59,999)],"Last month":[new Date(t.getFullYear(),t.getMonth()-1,1),new Date(t.getFullYear(),t.getMonth(),0,11,59,59,999)]}}},opens:{type:String,default:"center"},dateFormat:Function,alwaysShowCalendars:{type:Boolean,default:!0},disabled:{type:Boolean,default:!1},controlContainerClass:{type:[Object,String],default:"form-control reportrange-text"},appendToBody:{type:Boolean,default:!1},calculatePosition:{type:Function,default:function(t,e,n){var r=n.width,a=n.top,i=n.left,o=n.right;"center"===e.opens?t.style.left=i+r/2+"px":"left"===e.opens?t.style.right=window.innerWidth-o+"px":"right"===e.opens&&(t.style.left=i+"px"),t.style.top=a+"px"}},closeOnEsc:{type:Boolean,default:!0},readonly:{type:Boolean}},data:function(){var t=d(),e={locale:t.localeData($({},this.localeData))},n=this.dateRange.startDate||null,r=this.dateRange.endDate||null;if(e.monthDate=n?new Date(n):new Date,e.nextMonthDate=t.nextMonth(e.monthDate),e.start=n?new Date(n):null,this.singleDatePicker&&"range"!==this.singleDatePicker?e.end=e.start:e.end=r?new Date(r):null,e.in_selection=!1,e.open=!1,e.showCustomRangeCalendars=!1,0!==e.locale.firstDay){var a=e.locale.firstDay,i=l(e.locale.daysOfWeek);while(a>0)i.push(i.shift()),a--;e.locale.daysOfWeek=i}return e},methods:{selectMonthDate:function(){var t=this.end||new Date;!1!==this.singleDatePicker?this.changeLeftMonth({year:t.getFullYear(),month:t.getMonth()+1}):this.changeRightMonth({year:t.getFullYear(),month:t.getMonth()+1})},dateFormatFn:function(t,e){var n=new Date(e);n.setHours(0,0,0,0);var r=new Date(this.start);r.setHours(0,0,0,0);var a=new Date(this.end);return a.setHours(0,0,0,0),t["in-range"]=n>=r&&n<=a,this.dateFormat?this.dateFormat(t,e):t},changeLeftMonth:function(t){var e=new Date(t.year,t.month-1,1);this.monthDate=e,(this.linkedCalendars||this.$dateUtil.yearMonth(this.monthDate)>=this.$dateUtil.yearMonth(this.nextMonthDate))&&(this.nextMonthDate=this.$dateUtil.validateDateRange(this.$dateUtil.nextMonth(e),this.minDate,this.maxDate),this.singleDatePicker||this.$dateUtil.yearMonth(this.monthDate)!==this.$dateUtil.yearMonth(this.nextMonthDate)||(this.monthDate=this.$dateUtil.validateDateRange(this.$dateUtil.prevMonth(this.monthDate),this.minDate,this.maxDate))),this.$emit("change-month",this.monthDate,0)},changeRightMonth:function(t){var e=new Date(t.year,t.month-1,1);this.nextMonthDate=e,(this.linkedCalendars||this.$dateUtil.yearMonth(this.nextMonthDate)<=this.$dateUtil.yearMonth(this.monthDate))&&(this.monthDate=this.$dateUtil.validateDateRange(this.$dateUtil.prevMonth(e),this.minDate,this.maxDate),this.$dateUtil.yearMonth(this.monthDate)===this.$dateUtil.yearMonth(this.nextMonthDate)&&(this.nextMonthDate=this.$dateUtil.validateDateRange(this.$dateUtil.nextMonth(this.nextMonthDate),this.minDate,this.maxDate))),this.$dateUtil.yearMonth(this.monthDate)===this.$dateUtil.yearMonth(this.nextMonthDate)&&(this.nextMonthDate=this.$dateUtil.nextMonth(this.nextMonthDate)),this.$emit("change-month",this.nextMonthDate,1)},normalizeDatetime:function(t,e){var n=new Date(t);return this.timePicker&&e&&(n.setHours(e.getHours()),n.setMinutes(e.getMinutes()),n.setSeconds(e.getSeconds()),n.setMilliseconds(e.getMilliseconds())),n},dateClick:function(t){if(this.readonly)return!1;this.in_selection?(this.in_selection=!1,this.$emit("finish-selection",t),this.onSelect(),this.autoApply&&this.clickedApply()):(this.start=this.normalizeDatetime(t,this.start),this.end=this.normalizeDatetime(t,this.end),this.singleDatePicker&&"range"!==this.singleDatePicker?(this.onSelect(),this.autoApply&&this.clickedApply()):(this.in_selection=this.end,this.$emit("start-selection",this.start)))},hoverDate:function(t){if(this.readonly)return!1;var e=this.normalizeDatetime(t,this.end),n=this.normalizeDatetime(t,this.start);this.in_selection&&(this.in_selection<=e&&(this.end=e),this.in_selection>=n&&(this.start=n)),this.$emit("hover-date",t)},onClickPicker:function(){this.disabled||this.togglePicker(null,!0)},togglePicker:function(t,e){this.open="boolean"===typeof t?t:!this.open,!0===e&&this.$emit("toggle",this.open,this.togglePicker)},clickedApply:function(){this.togglePicker(!1,!0),this.$emit("update",{startDate:this.start,endDate:this.singleDatePicker&&"range"!==this.singleDatePicker?this.start:this.end})},clickCancel:function(){if(this.open){var t=this.dateRange.startDate,e=this.dateRange.endDate;this.start=t?new Date(t):null,this.end=e?new Date(e):null,this.in_selection=!1,this.togglePicker(!1,!0)}},onSelect:function(){this.$emit("select",{startDate:this.start,endDate:this.end})},clickAway:function(t){t&&t.target&&!this.$el.contains(t.target)&&this.$refs.dropdown&&!this.$refs.dropdown.contains(t.target)&&this.clickCancel()},clickRange:function(t){this.in_selection=!1,this.$dateUtil.isValidDate(t[0])&&this.$dateUtil.isValidDate(t[1])?(this.start=this.$dateUtil.validateDateRange(new Date(t[0]),this.minDate,this.maxDate),this.end=this.$dateUtil.validateDateRange(new Date(t[1]),this.minDate,this.maxDate),this.changeLeftMonth({month:this.start.getMonth()+1,year:this.start.getFullYear()}),!1===this.linkedCalendars&&this.changeRightMonth({month:this.end.getMonth()+1,year:this.end.getFullYear()})):(this.start=null,this.end=null),this.onSelect(),this.autoApply&&this.clickedApply()},onUpdateStartTime:function(t){var e=new Date(this.start);e.setHours(t.hours),e.setMinutes(t.minutes),e.setSeconds(t.seconds),this.start=this.$dateUtil.validateDateRange(e,this.minDate,this.maxDate),this.autoApply&&this.$emit("update",{startDate:this.start,endDate:this.singleDatePicker&&"range"!==this.singleDatePicker?this.start:this.end})},onUpdateEndTime:function(t){var e=new Date(this.end);e.setHours(t.hours),e.setMinutes(t.minutes),e.setSeconds(t.seconds),this.end=this.$dateUtil.validateDateRange(e,this.minDate,this.maxDate),this.autoApply&&this.$emit("update",{startDate:this.start,endDate:this.end})},handleEscape:function(t){this.open&&27===t.keyCode&&this.closeOnEsc&&this.clickCancel()}},computed:{showRanges:function(){return!1!==this.ranges&&!this.readonly},showCalendars:function(){return this.alwaysShowCalendars||this.showCustomRangeCalendars},startText:function(){return null===this.start?"":this.$dateUtil.format(this.start,this.locale.format)},endText:function(){return null===this.end?"":this.$dateUtil.format(this.end,this.locale.format)},rangeText:function(){var t=this.startText;return this.singleDatePicker&&"range"!==this.singleDatePicker||(t+=this.locale.separator+this.endText),t},min:function(){return this.minDate?new Date(this.minDate):null},max:function(){return this.maxDate?new Date(this.maxDate):null},pickerStyles:function(){var t;return t={"show-calendar":this.open||"inline"===this.opens,"show-ranges":this.showRanges,"show-weeknumbers":this.showWeekNumbers,single:this.singleDatePicker},Object(f["a"])(t,"opens"+this.opens,!0),Object(f["a"])(t,"linked",this.linkedCalendars),Object(f["a"])(t,"hide-calendars",!this.showCalendars),t},isClear:function(){return!this.dateRange.startDate||!this.dateRange.endDate},isDirty:function(){var t=new Date(this.dateRange.startDate),e=new Date(this.dateRange.endDate);return!this.isClear&&(this.start.getTime()!==t.getTime()||this.end.getTime()!==e.getTime())}},watch:{minDate:function(){this.selectMonthDate()},maxDate:function(){this.selectMonthDate()},"dateRange.startDate":function(t){this.$dateUtil.isValidDate(new Date(t))&&(this.start=t&&!this.isClear&&this.$dateUtil.isValidDate(new Date(t))?new Date(t):null,this.isClear?(this.start=null,this.end=null):(this.start=new Date(this.dateRange.startDate),this.end=new Date(this.dateRange.endDate)))},"dateRange.endDate":function(t){this.$dateUtil.isValidDate(new Date(t))&&(this.end=t&&!this.isClear?new Date(t):null,this.isClear?(this.start=null,this.end=null):(this.start=new Date(this.dateRange.startDate),this.end=new Date(this.dateRange.endDate)))},open:{handler:function(t){var e=this;"object"===("undefined"===typeof document?"undefined":Object(o["a"])(document))&&(this.selectMonthDate(),this.$nextTick((function(){t?document.body.addEventListener("click",e.clickAway):document.body.removeEventListener("click",e.clickAway),t?document.addEventListener("keydown",e.handleEscape):document.removeEventListener("keydown",e.handleEscape),!e.alwaysShowCalendars&&e.ranges&&(e.showCustomRangeCalendars=!Object.keys(e.ranges).find((function(t){return e.$dateUtil.isSame(e.start,e.ranges[t][0],"date")&&e.$dateUtil.isSame(e.end,e.ranges[t][1],"date")})))})))},immediate:!0}}},U=E,F=(n("0e58"),n("ce5f"),y(U,a,i,!1,null,"1ebd09d2",null)),I=F.exports,L=I;e["default"]=L},fb6a:function(t,e,n){"use strict";var r=n("23e7"),a=n("861d"),i=n("e8b5"),o=n("23cb"),s=n("50c4"),c=n("fc6a"),u=n("8418"),l=n("1dde"),f=n("b622"),d=f("species"),h=[].slice,p=Math.max;r({target:"Array",proto:!0,forced:!l("slice")},{slice:function(t,e){var n,r,l,f=c(this),m=s(f.length),g=o(t,m),v=o(void 0===e?m:e,m);if(i(f)&&(n=f.constructor,"function"!=typeof n||n!==Array&&!i(n.prototype)?a(n)&&(n=n[d],null===n&&(n=void 0)):n=void 0,n===Array||void 0===n))return h.call(f,g,v);for(r=new(void 0===n?Array:n)(p(v-g,0)),l=0;g<v;g++,l++)g in f&&u(r,l,f[g]);return r.length=l,r}})},fc6a:function(t,e,n){var r=n("44ad"),a=n("1d80");t.exports=function(t){return r(a(t))}},fdbc:function(t,e){t.exports={CSSRuleList:0,CSSStyleDeclaration:0,CSSValueList:0,ClientRectList:0,DOMRectList:0,DOMStringList:0,DOMTokenList:1,DataTransferItemList:0,FileList:0,HTMLAllCollection:0,HTMLCollection:0,HTMLFormElement:0,HTMLSelectElement:0,MediaList:0,MimeTypeArray:0,NamedNodeMap:0,NodeList:1,PaintRequestList:0,Plugin:0,PluginArray:0,SVGLengthList:0,SVGNumberList:0,SVGPathSegList:0,SVGPointList:0,SVGStringList:0,SVGTransformList:0,SourceBufferList:0,StyleSheetList:0,TextTrackCueList:0,TextTrackList:0,TouchList:0}},fdbf:function(t,e,n){var r=n("4930");t.exports=r&&!Symbol.sham&&"symbol"==typeof Symbol()}})}));
+//# sourceMappingURL=vue2-daterange-picker.umd.min.js.map
+
+/***/ }),
+
 /***/ "./node_modules/vue2-google-maps/dist/components/autocompleteImpl.js":
 /*!***************************************************************************!*\
   !*** ./node_modules/vue2-google-maps/dist/components/autocompleteImpl.js ***!
@@ -154121,10 +172570,8 @@ function h(tag, key, args) {
 /******/ 	(() => {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
-/******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_views_Install_vue":1,"resources_js_views_Login_vue":1,"resources_js_views_ForgotPassword_vue":1,"resources_js_views_ResetPassword_vue":1,"resources_js_containers_TheContainer_vue":1,"resources_js_containers_TheContainerSeller_vue":1,"resources_js_containers_TheContainerDeliveryBoy_vue":1,"resources_js_views_Settings_vue":1,"resources_js_views_Dashboard_vue":1,"resources_js_views_Orders_Orders_vue":1,"resources_js_views_Orders_ViewOrder_vue":1,"resources_js_views_Orders_InvoiceOrder_vue":1,"resources_js_views_Orders_SelfPickupOrders_vue":1,"resources_js_views_Orders_ViewSelfPickupOrder_vue":1,"resources_js_views_NotificationPanel_vue":1,"resources_js_views_Category_ManageCategories_vue":1,"resources_js_views_Category_CategoriesOrder_vue":1,"resources_js_views_Product_Products_vue":1,"resources_js_views_Product_EditProduct_vue":1,"resources_js_views_Product_ApproveRequests_vue":1,"resources_js_views_Product_ViewProduct_vue":1,"resources_js_views_Product_Taxes_Taxes_vue":1,"resources_js_views_Product_Media_vue":1,"resources_js_views_Product_ProductOrder_vue":1,"resources_js_views_Product_ProductRatings_vue":1,"resources_js_views_Product_BulkUpload_vue":1,"resources_js_views_Product_BulkUpdate_vue":1,"resources_js_views_Product_Brands_Brands_vue":1,"resources_js_views_Product_Addons_Addons_vue":1,"resources_js_views_Product_Attributes_Attributes_vue":1,"resources_js_views_CustomFields_CustomFields_vue":1,"resources_js_views_Product_ManageStock_vue":1,"resources_js_views_Seller_Sellers_vue":1,"resources_js_views_Seller_RegisteredSellers_vue":1,"resources_js_views_Seller_EditSeller_vue":1,"resources_js_views_Seller_WalletTransactions_SellerWalletTransactions_vue":1,"resources_js_views_HomeSliders_HomeSliders_vue":1,"resources_js_views_PromoCode_PromoCode_vue":1,"resources_js_views_Setting_TimeSlots_TimeSlots_vue":1,"resources_js_views_Setting_StoreSettings_vue":1,"resources_js_views_Setting_ThemeSettings_vue":1,"resources_js_views_Setting_PaymentMethods_vue":1,"resources_js_views_Setting_AdditionalCharges_vue":1,"resources_js_views_Setting_ContactUs_vue":1,"resources_js_views_Setting_AboutUs_vue":1,"resources_js_views_Setting_PrivacyPolicy_vue":1,"resources_js_views_Setting_PrivacyPolicyDeliveryBoy_vue":1,"resources_js_views_Setting_PrivacyPolicySeller_vue":1,"resources_js_views_Setting_FirebaseSettings_vue":1,"resources_js_views_Setting_NotificationTemplates_NotificationTemplates_vue":1,"resources_js_views_Setting_SmsSettings_vue":1,"resources_js_views_Setting_SmsTemplates_SmsTemplates_vue":1,"resources_js_views_Setting_SeoSettings_SeoSettings_vue":1,"resources_js_views_Notifications_Notifications_vue":1,"resources_js_views_Emails_Emails_vue":1,"resources_js_views_Emails_EmailTemplates_vue":1,"resources_js_views_Sections_Sections_vue":1,"resources_js_views_Modules_Modules_vue":1,"resources_js_views_Offers_Offers_vue":1,"resources_js_views_Offers_PopupOffer_vue":1,"resources_js_views_DeliveryBoys_DeliveryBoys_vue":1,"resources_js_views_DeliveryBoys_EditDeliveryBoy_vue":1,"resources_js_views_DeliveryBoys_RegisteredDeliveryBoys_vue":1,"resources_js_views_DeliveryBoys_FundTransfers_FundTransfers_vue":1,"resources_js_views_DeliveryBoys_CashCollection_CashCollection_vue":1,"resources_js_views_WebSetings_GeneralWebSettings_vue":1,"resources_js_views_Blogs_BlogCategories_vue":1,"resources_js_views_Blogs_Blogs_vue":1,"resources_js_views_Subscriptions_Subscriptions_vue":1,"resources_js_views_Subscriptions_SubscriptionsFaqs_vue":1,"resources_js_views_WebSetings_SocialMedia_SocialMedia_vue":1,"resources_js_views_Customers_Customers_vue":1,"resources_js_views_Customers_WalletTransactions_WalletTransactions_vue":1,"resources_js_views_Customers_Transactions_vue":1,"resources_js_views_Customers_Wishlists_vue":1,"resources_js_views_Customers_ProductRequests_vue":1,"resources_js_views_WithdrawalRequests_WithdrawalRequests_vue":1,"resources_js_views_ReturnRequests_ReturnRequests_vue":1,"resources_js_views_Reports_SalesReports_vue":1,"resources_js_views_Reports_PosReports_vue":1,"resources_js_views_Reports_ProductSalesReports_vue":1,"resources_js_views_Reports_CommissionReports_vue":1,"resources_js_views_SystemUsers_SystemUsers_vue":1,"resources_js_views_Role_Role_vue":1,"resources_js_views_errors_404_vue":1,"resources_js_views_errors_403_vue":1,"resources_js_views_errors_500_vue":1,"resources_js_views_Setting_PurchaseCode_vue":1,"resources_js_views_Setting_SystemUpdater_vue":1,"resources_js_views_City_City_vue":1,"resources_js_views_City_EditCity_vue":1,"resources_js_views_Faqs_Faqs_vue":1,"resources_js_views_Dashboard_ProductInfo_vue":1,"resources_js_views_Languages_Languages_vue":1,"resources_js_views_Countries_Countries_vue":1,"resources_js_views_Sellers_SellerRegister_vue":1,"resources_js_views_Sellers_SellerDetails_vue":1,"resources_js_views_Sellers_SellerLogin_vue":1,"resources_js_views_Sellers_Dashboard_vue":1,"resources_js_views_Sellers_ProductInfo_vue":1,"resources_js_views_Sellers_Orders_vue":1,"resources_js_views_Sellers_Categories_vue":1,"resources_js_views_Sellers_WithdrawalRequests_WithdrawalRequests_vue":1,"resources_js_views_Sellers_ProductSalesReports_vue":1,"resources_js_views_Sellers_SalesReports_vue":1,"resources_js_views_Sellers_Taxes_vue":1,"resources_js_views_Sellers_Brands_vue":1,"resources_js_views_Sellers_Addons_vue":1,"resources_js_views_Sellers_PointOfSale_vue":1,"resources_js_views_Sellers_PosReport_vue":1,"resources_js_views_Sellers_Settings_vue":1,"resources_js_views_DeliveryBoy_DeliveryBoyRegister_vue":1,"resources_js_views_DeliveryBoy_DeliveryBoyDetails_vue":1,"resources_js_views_DeliveryBoy_DeliveryBoyLogin_vue":1,"resources_js_views_DeliveryBoy_Dashboard_vue":1,"resources_js_views_DeliveryBoy_Orders_vue":1,"resources_js_views_DeliveryBoy_WithdrawalRequests_WithdrawalRequests_vue":1,"resources_js_views_DeliveryBoy_FundTransfers_vue":1,"resources_js_views_DeliveryBoy_CashCollection_vue":1,"resources_js_views_DeliveryBoy_ProductSalesReports_vue":1,"resources_js_views_DeliveryBoy_SalesReports_vue":1,"resources_js_views_DeliveryBoys_Salary_DeliveryBoySalary_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
-/******/ 			return undefined;
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_views_Install_vue":"e7145720b6546258","resources_js_views_Login_vue":"449f65e79923164e","resources_js_views_ForgotPassword_vue":"a074dfe888d14836","resources_js_views_ResetPassword_vue":"c3395b89d3bb4c90","resources_js_containers_TheContainer_vue":"cc6ee7b6f809b15b","resources_js_containers_TheContainerSeller_vue":"72d4394b91faa8d2","resources_js_containers_TheContainerDeliveryBoy_vue":"9e4876b741e0a777","resources_js_views_Settings_vue":"0708777e45ec642b","resources_js_views_Dashboard_vue":"188d679b5fc0ff9a","resources_js_views_Orders_Orders_vue":"56f38fc3b1ef6434","resources_js_views_Orders_ViewOrder_vue":"e9da12f75856679a","resources_js_views_Orders_InvoiceOrder_vue":"d01c0965d60e3fec","resources_js_views_Orders_SelfPickupOrders_vue":"395dd90edbf38c1d","resources_js_views_Orders_ViewSelfPickupOrder_vue":"ec0c993bc9587061","resources_js_views_NotificationPanel_vue":"a3c24bc3b41943cb","manage_categories":"22f5834849faeb07","resources_js_views_Product_Products_vue":"cc31f66346294914","resources_js_views_Product_EditProduct_vue":"20a0c33a66490a59","resources_js_views_Product_ApproveRequests_vue":"cdfa87494108c499","resources_js_views_Product_ViewProduct_vue":"8f936f7faed276bb","resources_js_views_Product_Taxes_Taxes_vue":"f844aacbf424ddfb","resources_js_views_Product_Media_vue":"f0f60aa659518947","resources_js_views_Product_ProductOrder_vue":"a90a4d2cc326eb7f","resources_js_views_Product_ProductRatings_vue":"93b0b4561027d507","resources_js_views_Product_BulkUpload_vue":"7b085faf7e1e8df5","resources_js_views_Product_BulkUpdate_vue":"00390bc1183d25fa","resources_js_views_Product_Brands_Brands_vue":"55a43302dd7e3302","resources_js_views_Product_Addons_Addons_vue":"e98fe05a0282ba3b","resources_js_views_Product_Attributes_Attributes_vue":"4b6d0ebd6d814923","resources_js_views_CustomFields_CustomFields_vue":"38e9c858dbea2153","resources_js_views_Product_ManageStock_vue":"b983ce1dee287303","resources_js_views_Seller_Sellers_vue":"be2ce82c740f1d27","resources_js_views_Seller_RegisteredSellers_vue":"673929b2dbe8f8e3","resources_js_views_Seller_EditSeller_vue":"78eeb6c489bb8076","resources_js_views_Seller_WalletTransactions_SellerWalletTransactions_vue":"64fc9572da176e34","resources_js_views_HomeSliders_HomeSliders_vue":"3afaa2b516dedc59","resources_js_views_PromoCode_PromoCode_vue":"aea54302b5549236","resources_js_views_Setting_TimeSlots_TimeSlots_vue":"d3789306b6b65cc4","resources_js_views_Setting_StoreSettings_vue":"59b65abb23c8994c","resources_js_views_Setting_SettingsHub_vue":"60e07822c01a730e","resources_js_views_Setting_ThemeSettings_vue":"a65220f6c6dc3f3e","resources_js_views_Setting_PaymentMethods_vue":"07e3e206b22ca544","resources_js_views_Setting_AdditionalCharges_vue":"6b2aa8fb9650649a","resources_js_views_Setting_ContactUs_vue":"c1dab1253f23a59c","resources_js_views_Setting_AboutUs_vue":"c4294a761db31774","resources_js_views_Setting_PrivacyPolicy_vue":"f5601a5e7492d916","resources_js_views_Setting_PrivacyPolicyDeliveryBoy_vue":"40055e967c512a3a","resources_js_views_Setting_PrivacyPolicySeller_vue":"fa140e5ef668a9df","resources_js_views_Setting_FirebaseSettings_vue":"88bd9e3a6b035d01","resources_js_views_Setting_NotificationTemplates_NotificationTemplates_vue":"370e57a7b3220714","resources_js_views_Setting_SmsSettings_vue":"e768e9bd6cdc1c56","resources_js_views_Setting_DeeplinkSettings_vue":"58d52c47d8979713","resources_js_views_Setting_RealtimeSettings_vue":"6bced0b2149dae58","resources_js_views_Setting_ModuleDeliverySettings_vue":"601131d2bf49f575","resources_js_views_Setting_SmsTemplates_SmsTemplates_vue":"fe4e5112bcc4d682","resources_js_views_Setting_SeoSettings_SeoSettings_vue":"c664890f58738263","resources_js_views_Notifications_Notifications_vue":"745d56f908cb5d9b","resources_js_views_Emails_Emails_vue":"2e0213e92159c218","resources_js_views_Emails_EmailTemplates_vue":"4d5a49b4d0017413","resources_js_views_Sections_Sections_vue":"c9a73bd464d85c16","resources_js_views_Modules_Modules_vue":"e0890dde3f2af506","resources_js_views_Offers_Offers_vue":"eb720ab58707dead","resources_js_views_Offers_PopupOffer_vue":"fe48978e2c6c37f7","resources_js_views_DeliveryBoys_DeliveryBoys_vue":"8df76ae970dfa059","resources_js_views_DeliveryBoys_EditDeliveryBoy_vue":"b021c6dd3695cd84","resources_js_views_DeliveryBoys_RegisteredDeliveryBoys_vue":"95bfac625f8d654f","resources_js_views_DeliveryBoys_FundTransfers_FundTransfers_vue":"b792b44963635bdb","resources_js_views_DeliveryBoys_CashCollection_CashCollection_vue":"e25a0d0ee421ad42","resources_js_views_WebSetings_GeneralWebSettings_vue":"9fa816325db537b6","resources_js_views_Blogs_BlogCategories_vue":"3fc8a7bdc9ca1e02","resources_js_views_Blogs_Blogs_vue":"b5fc9aea9470d483","resources_js_views_Subscriptions_Subscriptions_vue":"5e30a69db8a6ea30","resources_js_views_Subscriptions_SubscriptionsFaqs_vue":"867f070890f54b8c","resources_js_views_WebSetings_SocialMedia_SocialMedia_vue":"7ad8dea0647daa93","resources_js_views_Customers_Customers_vue":"cb02bc7eea31d4fa","resources_js_views_Customers_WalletTransactions_WalletTransactions_vue":"e4263558daa3c858","resources_js_views_Customers_Transactions_vue":"bddc0451875f9a94","resources_js_views_Customers_Wishlists_vue":"0c0901dffe11a7b4","resources_js_views_Customers_ProductRequests_vue":"da5e05e0e840672e","resources_js_views_WithdrawalRequests_WithdrawalRequests_vue":"a13786a532cd320e","resources_js_views_ReturnRequests_ReturnRequests_vue":"29c38975632d7c70","resources_js_views_Reports_SalesReports_vue":"a4d1cbffb969db90","resources_js_views_Reports_PosReports_vue":"ffaa49e50913190a","resources_js_views_Reports_ProductSalesReports_vue":"3de2b2c2d5c39e19","resources_js_views_Reports_CommissionReports_vue":"ad2e40400edfbde5","resources_js_views_SystemUsers_SystemUsers_vue":"9b3123b1008bb3bc","resources_js_views_Role_Role_vue":"d7fd510a94b3455c","resources_js_views_errors_404_vue":"4a4bf316f55aa15b","resources_js_views_errors_403_vue":"7c202c0c7c28610d","resources_js_views_errors_500_vue":"0eeec41a3da0f971","resources_js_views_Setting_PurchaseCode_vue":"3a21e162bb575805","resources_js_views_Setting_SystemUpdater_vue":"d24c66290898556b","resources_js_views_City_City_vue":"a01e9e5b957b7daa","resources_js_views_City_EditCity_vue":"a5658f75568bf3cb","resources_js_views_Faqs_Faqs_vue":"901c6a2664b5e108","resources_js_views_Dashboard_ProductInfo_vue":"2fa62cc73959ddcb","resources_js_views_Languages_Languages_vue":"32fe355546f0e772","resources_js_views_Countries_Countries_vue":"036ae5c2954245e3","resources_js_views_Sellers_SellerRegister_vue":"088e631e2ae07846","resources_js_views_Sellers_SellerDetails_vue":"30c8ebad48f38cba","resources_js_views_Sellers_SellerLogin_vue":"917acc0679dbce6c","resources_js_views_Sellers_Dashboard_vue":"fa29c0cdc6b8b7a2","resources_js_views_Sellers_ProductInfo_vue":"5383513838a8fd93","resources_js_views_Sellers_Orders_vue":"6d987a32c8e54e7a","resources_js_views_Sellers_Categories_vue":"c316056edea7e0b3","resources_js_views_Sellers_WithdrawalRequests_WithdrawalRequests_vue":"cb87680ac786bc11","resources_js_views_Sellers_ProductSalesReports_vue":"71dcad0fd495fa1f","resources_js_views_Sellers_SalesReports_vue":"3f41f6b2f0e46cd0","resources_js_views_Sellers_Taxes_vue":"4bc8da7ac8aa4f38","resources_js_views_Sellers_Brands_vue":"7b6135fd5ede921c","resources_js_views_Sellers_AbandonedCarts_vue":"9c983b53a3c79145","resources_js_views_Sellers_MyDeliveryFleet_vue":"30e621fe7ed65fa1","resources_js_views_Sellers_DeliveryBoyRequests_vue":"937ae60bb5f165a4","resources_js_views_Sellers_Addons_vue":"a59705990eb4faeb","resources_js_views_Sellers_PointOfSale_vue":"f37c61b6933979e3","resources_js_views_Sellers_PosReport_vue":"6825654faa7acf4b","resources_js_views_Sellers_Settings_vue":"ea7dae398a034409","resources_js_views_DeliveryBoy_DeliveryBoyRegister_vue":"25baba8b449f3396","resources_js_views_DeliveryBoy_DeliveryBoyDetails_vue":"05d8f6ff935d54f2","resources_js_views_DeliveryBoy_DeliveryBoyLogin_vue":"a1893bb3fe6d37d0","resources_js_views_DeliveryBoy_Dashboard_vue":"1f9629f7b571607d","resources_js_views_DeliveryBoy_Orders_vue":"9925f8dc9a0b3a8b","resources_js_views_DeliveryBoy_WithdrawalRequests_WithdrawalRequests_vue":"8dd11d292ef124d9","resources_js_views_DeliveryBoy_FundTransfers_vue":"8d53e0a12e88400d","resources_js_views_DeliveryBoy_CashCollection_vue":"ae14695a537b16e4","resources_js_views_DeliveryBoy_ProductSalesReports_vue":"df860aa11dd69d2c","resources_js_views_DeliveryBoy_SalesReports_vue":"f644ddc8bb572770","resources_js_views_DeliveryBoys_Salary_DeliveryBoySalary_vue":"c07ef58bc4394613"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

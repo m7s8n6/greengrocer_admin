@@ -1,21 +1,14 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('popup_offer') }}</h3>
-                    </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard')
-                                }}</router-link></li>
-                                <li class="breadcrumb-item active" aria-current="page">{{ __('popup_offer') }}</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('popup_offer') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link></li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('popup_offer') }}</li>
+                    </ol>
+                </nav>
             </div>
         </div>
         <section class="section">
@@ -23,10 +16,10 @@
                 <div class="col-12 col-md-12 order-md-1 order-last">
                     <form method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
                         <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">{{ __('popup_offer') }}</h4>
+                            <!-- Title removed: the page heading already says "Popup Offer". -->
+                            <div class="card-header d-flex justify-content-end">
                                 <span class="pull-right">
-                                    <button type="button" class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    <button type="button" class="btn btn-figma-columns d-flex align-items-center gap-2"
                                         v-b-tooltip.hover :title="__('refresh')" @click="getPopupData()">
                                         <i class="fa fa-refresh" aria-hidden="true"></i>
                                         <span>{{ __('refresh') }}</span>
@@ -36,10 +29,9 @@
                             <div class="card-body">
                                 <div class="row">
 
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-12 col-md-6 col-lg-4">
                                         <div class="form-group">
-                                            <label class="control-label"> {{ __('popup_offer_enabled_on_off')
-                                            }}</label><br>
+                                            <label class="control-label d-block">{{ __('popup_offer_enabled_on_off') }}</label>
                                             <b-form-radio-group v-model="popup_enabled" :options="[
                                                 { text: __('ON'), 'value': 1 },
                                                 { text: __('OFF'), 'value': 0 },
@@ -47,8 +39,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group col-md-4">
-                                        <label> {{ __('type') }}</label>
+                                    <div class="form-group col-12 col-md-6 col-lg-4">
+                                        <label>{{ __('type') }}</label>
                                         <select class="form-control form-select" v-model="popup_type"
                                             @change="popup_type_id = ''" required>
                                             <option value="default"> {{ __('default') }}</option>
@@ -57,15 +49,15 @@
                                             <option value="popup_url"> {{ __('popup_url') }}</option>
                                         </select>
                                     </div>
-                                    <div class="form-group col-md-4" v-if="popup_enabled == 1">
-                                        <label> {{ __('start_date') }}</label>
+                                    <div class="form-group col-12 col-md-6 col-lg-4" v-if="popup_enabled == 1">
+                                        <label>{{ __('start_date') }}</label>
                                         <input type="date" required class="form-control" v-model="popup_start_date">
                                     </div>
-                                    <div class="form-group col-md-4" v-if="popup_enabled == 1">
-                                        <label> {{ __('end_date') }}</label>
+                                    <div class="form-group col-12 col-md-6 col-lg-4" v-if="popup_enabled == 1">
+                                        <label>{{ __('end_date') }}</label>
                                         <input type="date" required class="form-control" v-model="popup_end_date">
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-12 col-md-6 col-lg-8">
                                         <div class="form-group" v-if="popup_type == 'category'">
                                             <label>{{ __('category') }}</label>
                                             <select class="form-control form-select" v-model="popup_type_id">
@@ -75,7 +67,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group" v-if="popup_type == 'product'">
-                                            <label> {{ __('products') }}</label>
+                                            <label>{{ __('products') }}</label>
                                             <select class="form-control form-select" v-model="popup_type_id">
                                                 <option value=""> {{ __('select_product') }}</option>
                                                 <option v-for="product in products" :value="product.id">{{ product.name
@@ -83,7 +75,7 @@
                                             </select>
                                         </div>
                                         <div class="form-group" v-if="popup_type == 'popup_url'">
-                                            <label> {{ __('link') }}</label>
+                                            <label>{{ __('link') }}</label>
                                             <input type="url" class="form-control" v-model="popup_url"
                                                 placeholder="Enter Link">
                                         </div>
@@ -91,7 +83,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label>{{ __('image') }}</label>
-                                            <p class="text-muted">{{
+                                            <p class="text-muted small mb-2">{{
                                                 __('please_choose_square_image_of_larger_than_500_500') }}</p>
                                             <span v-if="error" class="error">{{ error }}</span>
                                             <input type="file" name="slider_image" accept="image/*"
@@ -99,16 +91,16 @@
                                             <div class="file-input-div bg-gray-100" @click="$refs.file_image.click()"
                                                 @drop="dropFile" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
                                                 <template v-if="image && image.name !== ''">
-                                                    <label> {{ __('selected_file_name') }}{{ image.name }}</label>
+                                                    <label>{{ __('selected_file_name') }}{{ image.name }}</label>
                                                 </template>
                                                 <template v-else>
                                                     <label><i class="fa fa-cloud-upload-alt fa-2x"></i></label>
                                                     <label>{{ __('drop_files_here_or_click_to_upload') }}</label>
                                                 </template>
                                             </div>
-                                            <div class="row" v-if="image_url">
-                                                <div class="col-md-4">
-                                                    <img class="img-thumbnail custom-image" :src="image_url"
+                                            <div class="row mt-3" v-if="image_url">
+                                                <div class="col-6 col-md-3">
+                                                    <img class="custom-image" :src="image_url"
                                                         title='Popup Offer Image' alt='Popup Offer Image' />
                                                 </div>
                                             </div>
@@ -116,8 +108,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <b-button type="submit" variant="primary" :disabled="isLoading">{{ __('save') }}
+                            <div class="card-footer d-flex justify-content-end">
+                                <b-button v-if="$can('popup_offer')" type="submit" variant="primary" :disabled="isLoading">{{ __('save') }}
                                     <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                 </b-button>
                             </div>
@@ -171,18 +163,9 @@ export default {
                     this.popup_start_date = this.record.popup_start_date ?? "";
                     this.popup_end_date = this.record.popup_end_date ?? "";
                     this.image_url = this.record.popup_image ?? "";
-
-                    this.record.map((item, index) => {
-                        if (item.value === '0' || item.value === '1') {
-                            this.firebase[item.variable] = (item.value === '0') ? 0 : 1;
-                        } else {
-                            this.firebase[item.variable] = item.value;
-                        }
-                    });
-
                 }
             }).catch(error => {
-                if (error.request.statusText) {
+                if (error.request && error.request.statusText) {
                     this.showError(error.request.statusText);
                 } else if (error.message) {
                     this.showError(error.message);
@@ -233,7 +216,7 @@ export default {
                     this.isLoading = false
                     this.categories = response.data.data;
                 }).catch(error => {
-                    if (error.request.statusText) {
+                    if (error.request && error.request.statusText) {
                         this.showError(error.request.statusText);
                     } else if (error.message) {
                         this.showError(error.message);
@@ -250,7 +233,7 @@ export default {
                     this.isLoading = false
                     this.products = response.data.data;
                 }).catch(error => {
-                    if (error.request.statusText) {
+                    if (error.request && error.request.statusText) {
                         this.showError(error.request.statusText);
                     } else if (error.message) {
                         this.showError(error.message);
@@ -312,7 +295,7 @@ export default {
                 }
 
             }).catch(error => {
-                if (error.request.statusText) {
+                if (error.request && error.request.statusText) {
                     this.showError(error.request.statusText);
                 } else if (error.message) {
                     this.showError(error.message);
@@ -326,3 +309,16 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.custom-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
+</style>

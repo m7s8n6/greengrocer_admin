@@ -1,13 +1,11 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('manage_citys_center_points_latitude_longitude') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
+            <div class="page-title mb-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <h3 class="mb-0">{{ __('manage_citys_center_points_latitude_longitude') }}</h3>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
                                 <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
                             </li>
@@ -24,24 +22,24 @@
                             <div
                                 class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                                 <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
-                                    <div class="figma-search-container" style="min-width: 250px;">
+                                    <div class="figma-search-container">
                                         <i class="fa fa-search text-muted"></i>
                                         <input v-model="filter" type="text" class="figma-search-input"
                                             :placeholder="__('search')">
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                        @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
+                                        <i class="fa fa-refresh"></i>
+                                        <span>{{ __('refresh') }}</span>
+                                    </button>
                                     <router-link to="/cities/create"
                                         class="btn btn-figma-filter d-flex align-items-center gap-2"
                                         v-if="$can('city_create')">
                                         <i class="fa fa-plus"></i>
                                         <span>{{ __('add_new_city') }}</span>
                                     </router-link>
-                                    <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                        @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
-                                        <i class="fa fa-refresh"></i>
-                                        <span>{{ __('refresh') }}</span>
-                                    </button>
                                 </div>
                             </div>
 
@@ -53,10 +51,16 @@
                                     show-empty small empty-text="There are no cities to show" :key="tableKey"
                                     class="figma-table mb-0" :tbody-tr-class="() => 'figma-tr align-middle'">
                                     <template #table-busy>
-                                        <div class="text-center text-black my-2">
+                                        <div class="text-center text-muted my-3">
                                             <b-spinner class="align-middle"></b-spinner>
                                             <strong>{{ __('loading') }}...</strong>
                                         </div>
+                                    </template>
+                                    <template #empty="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                    </template>
+                                    <template #emptyfiltered="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
                                     </template>
                                     <template #cell(actions)="row">
                                         <div class="d-flex gap-2">
@@ -78,12 +82,8 @@
                                 </b-table>
                             </div>
 
-                            <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span
-                                        class="showing-bold">{{ totalRows
-                                        }}</span>
-                                </div>
+                            <div class="figma-table-footer flex-wrap gap-3">
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                         align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
@@ -255,8 +255,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true

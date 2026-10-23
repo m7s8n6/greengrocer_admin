@@ -33,7 +33,7 @@
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
                                 </button>
-                                <router-link to="/manage_products/create" class="btn btn-figma-columns d-flex align-items-center gap-2">
+                                <router-link to="/manage_products/create" class="btn btn-figma-filter d-flex align-items-center gap-2">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_product') }}</span>
                                 </router-link>
@@ -56,9 +56,17 @@
                                 stacked="md"
                                 show-empty
                                 small
-                                class="mb-0">
+                                class="figma-table mb-0"
+                                :tbody-tr-class="() => 'figma-tr align-middle'">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -67,10 +75,10 @@
                                     {{ row.item.seller_name }}
                                 </template>
                                 <template #cell(image)="row">
-                                    <img :src="$storageUrl + row.item.image" height="50" v-if="row.item.image"/>
+                                    <img :src="$storageUrl + row.item.image" height="44" width="44" v-if="row.item.image"/>
                                 </template>
                                 <template #cell(actions)="row">
-                                    <div style="width: 120px">
+                                    <div class="d-flex gap-2 justify-content-center">
                                         <router-link
                                             :to="{ name: 'ViewProduct',params: { id: row.item.id, record : row.item }}"
                                             v-b-tooltip.hover :title="__('view')" class="figma-action-btn">
@@ -81,7 +89,7 @@
                                             v-b-tooltip.hover :title="__('edit')" class="figma-action-btn">
                                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </router-link>
-                                        <button class="figma-action-btn" v-b-tooltip.hover :title="__('delete')"
+                                        <button class="figma-action-btn figma-delete-btn" v-b-tooltip.hover :title="__('delete')"
                                                 @click="deleteRecord(row.index,row.item.product_variant_id)">
                                             <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                                         </button>
@@ -90,9 +98,13 @@
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageStart }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                             </div>
@@ -114,11 +126,11 @@ export default {
             fields: [
                 {key: 'product_variant_id', label: __('id'), sortable: true, sortDirection: 'desc'},
                 {key: 'product_id', label: __('product_id'), sortable: true, sortDirection: 'desc'},
-                {key: 'seller_name', label: __('seller_name'), class: 'text-center', sortable: true},
-                {key: 'name', label: __('name'), sortable: true, class: 'text-center'},
+                {key: 'seller_name', label: __('seller_name'), sortable: true},
+                {key: 'name', label: __('name'), sortable: true},
                 {key: 'image', label: __('image'), class: 'text-center'},
-                {key: 'price', label: __('price'), class: 'text-center', sortable: true},
-                {key: 'discounted_price', label: __('discounted_price'), class: 'text-center', sortable: true},
+                {key: 'price', label: __('price'), sortable: true},
+                {key: 'discounted_price', label: __('discounted_price'), sortable: true},
                 {key: 'actions', label: __('actions')}
             ],
             totalRows: 1,
@@ -180,8 +192,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {

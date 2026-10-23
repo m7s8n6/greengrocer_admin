@@ -24,7 +24,8 @@ function validateAdmin()
     $todayDate = Carbon::now();
     $today = $todayDate->format('d-m-Y');
     $last_date = Cache::get('validate_admin');
-    $interval = $todayDate->diffInDays($last_date);
+  //  $interval = $todayDate->diffInDays($last_date);
+    $interval = abs((int) $todayDate->diffInDays($last_date));
     if (is_null(Cache::get('validate_admin'))) {
         Cache::forever('validate_admin', $today);
     }
@@ -84,6 +85,16 @@ function isDemoMode()
     return $isDemoMode;
 }
 
+/**
+ * Demo flag exposed to clients as is_demo_mode_on (0/1). Apps use it to pre-fill or clear
+ * the default login credentials. The admin toggle (Login Setting tab) writes DEMO_MODE to
+ * .env, so this follows the same switch as isDemoMode().
+ */
+function isDemoModeOn()
+{
+    return filter_var(isDemoMode(), FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+}
+
 function isDevMode()
 {
     return env('DEV_MODE');
@@ -95,7 +106,7 @@ function currentVersion()
     $version = file_get_contents($versionFilePath);
     $version = trim($version);
     if ($version == "") {
-        $version = "4.0.1";
+        $version = "4.0.2";
     }
     return $version;
 }

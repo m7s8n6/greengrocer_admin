@@ -12,10 +12,7 @@
 
 namespace Composer\Package\Loader;
 
-use Composer\Exception\SecurityException;
 use Composer\Package\BasePackage;
-use Composer\Package\PackageInterface;
-use Composer\Package\RootPackageInterface;
 use Composer\Pcre\Preg;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Package\Version\VersionParser;
@@ -23,7 +20,6 @@ use Composer\Repository\PlatformRepository;
 use Composer\Semver\Constraint\MatchNoneConstraint;
 use Composer\Semver\Intervals;
 use Composer\Spdx\SpdxLicenses;
-use Composer\Util\Perforce;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
@@ -97,7 +93,7 @@ class ValidatingArrayLoader implements LoaderInterface
                     continue;
                 }
                 if (!is_string($platform)) {
-                    $this->errors[] = 'config.platform.' . $key . ' : invalid value ('.get_debug_type($platform).' '.var_export($platform, true).'): expected string or false';
+                    $this->errors[] = 'config.platform.' . $key . ' : invalid value ('.gettype($platform).' '.var_export($platform, true).'): expected string or false';
                     continue;
                 }
                 try {
@@ -117,21 +113,6 @@ class ValidatingArrayLoader implements LoaderInterface
                 $this->validateString('bin');
             } else {
                 $this->validateFlatArray('bin');
-            }
-            // A ".." path segment in a bin escapes the package install directory and lets the
-            // package chmod/point at an arbitrary host file during install (GHSA-gjfg-22fp-rrxx).
-            if (isset($this->config['bin']) && is_string($this->config['bin'])) {
-                if (Preg::isMatch('{(?:^|[\\\\/])\.\.(?:[\\\\/]|$)}', $this->config['bin'])) {
-                    $this->errors[] = 'bin : invalid value ('.$this->config['bin'].'), must not contain a ".." path component';
-                    unset($this->config['bin']);
-                }
-            } elseif (isset($this->config['bin']) && is_array($this->config['bin'])) {
-                foreach ($this->config['bin'] as $key => $bin) {
-                    if (is_string($bin) && Preg::isMatch('{(?:^|[\\\\/])\.\.(?:[\\\\/]|$)}', $bin)) {
-                        $this->errors[] = 'bin.'.$key.' : invalid value ('.$bin.'), must not contain a ".." path component';
-                        unset($this->config['bin'][$key]);
-                    }
-                }
             }
         }
 
@@ -205,7 +186,7 @@ class ValidatingArrayLoader implements LoaderInterface
         if ($this->validateArray('authors')) {
             foreach ($this->config['authors'] as $key => $author) {
                 if (!is_array($author)) {
-                    $this->errors[] = 'authors.'.$key.' : should be an array, '.get_debug_type($author).' given';
+                    $this->errors[] = 'authors.'.$key.' : should be an array, '.gettype($author).' given';
                     unset($this->config['authors'][$key]);
                     continue;
                 }
@@ -264,7 +245,7 @@ class ValidatingArrayLoader implements LoaderInterface
         if ($this->validateArray('funding') && !empty($this->config['funding'])) {
             foreach ($this->config['funding'] as $key => $fundingOption) {
                 if (!is_array($fundingOption)) {
-                    $this->errors[] = 'funding.'.$key.' : should be an array, '.get_debug_type($fundingOption).' given';
+                    $this->errors[] = 'funding.'.$key.' : should be an array, '.gettype($fundingOption).' given';
                     unset($this->config['funding'][$key]);
                     continue;
                 }
@@ -287,143 +268,10 @@ class ValidatingArrayLoader implements LoaderInterface
             }
         }
 
-        if (isset($this->config['php-ext']) && $this->validateArray('php-ext')) {
-            if (!in_array($this->config['type'] ?? '', ['php-ext', 'php-ext-zend'], true)) {
-                $this->errors[] = 'php-ext can only be set by packages of type "php-ext" or "php-ext-zend" which must be C extensions';
-                unset($this->config['php-ext']);
-            }
-
-            $phpExt = &$this->config['php-ext'];
-
-            if (isset($phpExt['extension-name']) && !is_string($phpExt['extension-name'])) {
-                $this->errors[] = 'php-ext.extension-name : should be a string, '.get_debug_type($phpExt['extension-name']).' given';
-                unset($phpExt['extension-name']);
-            }
-
-            if (isset($phpExt['priority']) && !is_int($phpExt['priority'])) {
-                $this->errors[] = 'php-ext.priority : should be an integer, '.get_debug_type($phpExt['priority']).' given';
-                unset($phpExt['priority']);
-            }
-
-            if (isset($phpExt['support-zts']) && !is_bool($phpExt['support-zts'])) {
-                $this->errors[] = 'php-ext.support-zts : should be a boolean, '.get_debug_type($phpExt['support-zts']).' given';
-                unset($phpExt['support-zts']);
-            }
-
-            if (isset($phpExt['support-nts']) && !is_bool($phpExt['support-nts'])) {
-                $this->errors[] = 'php-ext.support-nts : should be a boolean, '.get_debug_type($phpExt['support-nts']).' given';
-                unset($phpExt['support-nts']);
-            }
-
-            if (isset($phpExt['build-path']) && !is_string($phpExt['build-path']) && !is_null($phpExt['build-path'])) {
-                $this->errors[] = 'php-ext.build-path : should be a string or null, '.get_debug_type($phpExt['build-path']).' given';
-                unset($phpExt['build-path']);
-            }
-
-            if (isset($phpExt['download-url-method'])) {
-                if (!is_array($phpExt['download-url-method']) && !is_string($phpExt['download-url-method'])) {
-                    $this->errors[] = 'php-ext.download-url-method : should be an array or a string, '.get_debug_type($phpExt['download-url-method']).' given';
-                    unset($phpExt['download-url-method']);
-                } else {
-                    $validDownloadUrlMethods = ['composer-default', 'pre-packaged-source', 'pre-packaged-binary'];
-                    $definedDownloadUrlMethods = is_array($phpExt['download-url-method']) ? $phpExt['download-url-method'] : [$phpExt['download-url-method']];
-
-                    if ([] === $definedDownloadUrlMethods) {
-                        $this->errors[] = 'php-ext.download-url-method : must contain at least one element';
-                        unset($phpExt['download-url-method']);
-                    } else {
-                        foreach ($definedDownloadUrlMethods as $key => $downloadUrlMethod) {
-                            if (!is_string($downloadUrlMethod)) {
-                                $this->errors[] = 'php-ext.download-url-method.'.$key.' : should be a string, '.get_debug_type($downloadUrlMethod).' given';
-                                unset($phpExt['download-url-method']);
-                            } elseif (!in_array($downloadUrlMethod, $validDownloadUrlMethods, true)) {
-                                $this->errors[] = 'php-ext.download-url-method.'.$key.' : invalid value ('.$downloadUrlMethod.'), must be one of ' . implode(', ', $validDownloadUrlMethods);
-                                unset($phpExt['download-url-method']);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (isset($phpExt['os-families']) && isset($phpExt['os-families-exclude'])) {
-                $this->errors[] = 'php-ext : os-families and os-families-exclude cannot both be specified';
-                unset($phpExt['os-families'], $phpExt['os-families-exclude']);
-            } else {
-                $validOsFamilies = ['windows', 'bsd', 'darwin', 'solaris', 'linux', 'unknown'];
-
-                foreach (['os-families', 'os-families-exclude'] as $fieldName) {
-                    if (isset($phpExt[$fieldName])) {
-                        if (!is_array($phpExt[$fieldName])) {
-                            $this->errors[] = 'php-ext.'.$fieldName.' : should be an array, '.get_debug_type($phpExt[$fieldName]).' given';
-                            unset($phpExt[$fieldName]);
-                        } elseif ([] === $phpExt[$fieldName]) {
-                            $this->errors[] = 'php-ext.'.$fieldName.' : must contain at least one element';
-                            unset($phpExt[$fieldName]);
-                        } else {
-                            foreach ($phpExt[$fieldName] as $key => $osFamily) {
-                                if (!is_string($osFamily)) {
-                                    $this->errors[] = 'php-ext.'.$fieldName.'.'.$key.' : should be a string, '.get_debug_type($osFamily).' given';
-                                    unset($phpExt[$fieldName][$key]);
-                                } elseif (!in_array($osFamily, $validOsFamilies, true)) {
-                                    $this->errors[] = 'php-ext.'.$fieldName.'.'.$key.' : invalid value ('.$osFamily.'), must be one of '.implode(', ', $validOsFamilies);
-                                    unset($phpExt[$fieldName][$key]);
-                                }
-                            }
-                            if ([] === $phpExt[$fieldName]) {
-                                unset($phpExt[$fieldName]);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (isset($phpExt['configure-options'])) {
-                if (!is_array($phpExt['configure-options'])) {
-                    $this->errors[] = 'php-ext.configure-options : should be an array, '.get_debug_type($phpExt['configure-options']).' given';
-                    unset($phpExt['configure-options']);
-                } else {
-                    foreach ($phpExt['configure-options'] as $key => $option) {
-                        if (!is_array($option)) {
-                            $this->errors[] = 'php-ext.configure-options.'.$key.' : should be an array, '.get_debug_type($option).' given';
-                            unset($phpExt['configure-options'][$key]);
-                            continue;
-                        }
-
-                        if (!isset($option['name'])) {
-                            $this->errors[] = 'php-ext.configure-options.'.$key.'.name : must be present';
-                            unset($phpExt['configure-options'][$key]);
-                            continue;
-                        }
-
-                        if (!is_string($option['name'])) {
-                            $this->errors[] = 'php-ext.configure-options.'.$key.'.name : should be a string, '.get_debug_type($option['name']).' given';
-                            unset($phpExt['configure-options'][$key]);
-                            continue;
-                        }
-
-                        if (isset($option['needs-value']) && !is_bool($option['needs-value'])) {
-                            $this->errors[] = 'php-ext.configure-options.'.$key.'.needs-value : should be a boolean, '.get_debug_type($option['needs-value']).' given';
-                            unset($phpExt['configure-options'][$key]['needs-value']);
-                        }
-
-                        if (isset($option['description']) && !is_string($option['description'])) {
-                            $this->errors[] = 'php-ext.configure-options.'.$key.'.description : should be a string, '.get_debug_type($option['description']).' given';
-                            unset($phpExt['configure-options'][$key]['description']);
-                        }
-                    }
-
-                    if ([] === $phpExt['configure-options']) {
-                        unset($phpExt['configure-options']);
-                    }
-                }
-            }
-
-            // If php-ext is now empty, unset it
-            if ([] === $phpExt) {
-                unset($this->config['php-ext']);
-            }
-
-            unset($phpExt);
+        $this->validateArray('php-ext');
+        if (isset($this->config['php-ext']) && !in_array($this->config['type'] ?? '', ['php-ext', 'php-ext-zend'], true)) {
+            $this->errors[] = 'php-ext can only be set by packages of type "php-ext" or "php-ext-zend" which must be C extensions';
+            unset($this->config['php-ext']);
         }
 
         $unboundConstraint = new Constraint('=', '10000000-dev');
@@ -538,27 +386,19 @@ class ValidatingArrayLoader implements LoaderInterface
                     $this->errors[] = $srcType . '.reference : must be present';
                 }
                 if (isset($this->config[$srcType]['type']) && !is_string($this->config[$srcType]['type'])) {
-                    $this->errors[] = $srcType . '.type : should be a string, '.get_debug_type($this->config[$srcType]['type']).' given';
+                    $this->errors[] = $srcType . '.type : should be a string, '.gettype($this->config[$srcType]['type']).' given';
                 }
                 if (isset($this->config[$srcType]['url']) && !is_string($this->config[$srcType]['url'])) {
-                    $this->errors[] = $srcType . '.url : should be a string, '.get_debug_type($this->config[$srcType]['url']).' given';
+                    $this->errors[] = $srcType . '.url : should be a string, '.gettype($this->config[$srcType]['url']).' given';
                 }
                 if (isset($this->config[$srcType]['reference']) && !is_string($this->config[$srcType]['reference']) && !is_int($this->config[$srcType]['reference'])) {
-                    $this->errors[] = $srcType . '.reference : should be a string or int, '.get_debug_type($this->config[$srcType]['reference']).' given';
+                    $this->errors[] = $srcType . '.reference : should be a string or int, '.gettype($this->config[$srcType]['reference']).' given';
                 }
                 if (isset($this->config[$srcType]['reference']) && Preg::isMatch('{^\s*-}', (string) $this->config[$srcType]['reference'])) {
                     $this->errors[] = $srcType . '.reference : must not start with a "-", "'.$this->config[$srcType]['reference'].'" given';
                 }
                 if (isset($this->config[$srcType]['url']) && Preg::isMatch('{^\s*-}', (string) $this->config[$srcType]['url'])) {
                     $this->errors[] = $srcType . '.url : must not start with a "-", "'.$this->config[$srcType]['url'].'" given';
-                }
-                // a perforce url is passed to the p4 client as P4PORT, where rsh:/jsh: endpoints
-                // mean "run this command locally" (GHSA-rvx4-ffvw-m9q3)
-                if ($srcType === 'source' && ($this->config[$srcType]['type'] ?? null) === 'perforce'
-                    && isset($this->config[$srcType]['url']) && is_string($this->config[$srcType]['url'])
-                    && !Perforce::isValidPort($this->config[$srcType]['url'])
-                ) {
-                    $this->errors[] = $srcType . '.url : invalid Perforce port ("'.$this->config[$srcType]['url'].'"), it must be of the form [tcp|ssl:][host:]port';
                 }
             }
         }
@@ -576,7 +416,7 @@ class ValidatingArrayLoader implements LoaderInterface
             } else {
                 foreach ($this->config['extra']['branch-alias'] as $sourceBranch => $targetBranch) {
                     if (!is_string($targetBranch)) {
-                        $this->warnings[] = 'extra.branch-alias.'.$sourceBranch.' : the target branch ('.json_encode($targetBranch).') must be a string, "'.get_debug_type($targetBranch).'" received.';
+                        $this->warnings[] = 'extra.branch-alias.'.$sourceBranch.' : the target branch ('.json_encode($targetBranch).') must be a string, "'.gettype($targetBranch).'" received.';
                         unset($this->config['extra']['branch-alias'][$sourceBranch]);
 
                         continue;
@@ -672,62 +512,6 @@ class ValidatingArrayLoader implements LoaderInterface
     }
 
     /**
-     * Re-applies the security-sensitive subset of the load() validation to a resolved package
-     * which may have been loaded via the non-validating ArrayLoader, before it is written to or
-     * installed from the lock file. This guards against malicious package names and source/dist
-     * URLs or references that could be interpreted as command-line options (argument injection)
-     * by the VCS/download tooling.
-     *
-     * @throws SecurityException
-     */
-    public static function validatePackage(PackageInterface $package): void
-    {
-        // The root package's name/metadata is locally controlled and already validated by
-        // RootPackageLoader (and its "__root__" placeholder name would be a false positive here).
-        // RootPackageInterface covers both RootPackage and RootAliasPackage.
-        if ($package instanceof RootPackageInterface) {
-            return;
-        }
-
-        // getName() is already lowercased, so the uppercase style branch never fires and only
-        // structural/security failures throw. Platform packages return null here.
-        if (null !== ($err = self::hasPackageNamingError($package->getName()))) {
-            throw new SecurityException('Invalid package found during dependency resolution, aborting: '.$err);
-        }
-
-        // A url or reference starting with a "-" may be misinterpreted as a command-line option
-        // by the VCS/download tooling, same protection as the source/dist checks done in load().
-        $sourceDist = [
-            'source.url' => $package->getSourceUrl(),
-            'source.reference' => $package->getSourceReference(),
-            'dist.url' => $package->getDistUrl(),
-            'dist.reference' => $package->getDistReference(),
-        ];
-        foreach ($sourceDist as $field => $value) {
-            if ($value !== null && Preg::isMatch('{^\s*-}', $value)) {
-                throw new SecurityException($package->getName().' has an invalid '.$field.', it must not start with a "-": '.$value);
-            }
-        }
-
-        // A perforce source.url ends up as the p4 client's P4PORT, and a "rsh:"/"jsh:" endpoint
-        // there makes the client execute the rest of the value as a local command instead of
-        // connecting to a server (GHSA-rvx4-ffvw-m9q3), so only accept network endpoints.
-        $sourceUrl = $package->getSourceUrl();
-        if ($package->getSourceType() === 'perforce' && $sourceUrl !== null && !Perforce::isValidPort($sourceUrl)) {
-            throw new SecurityException($package->getName().' has an invalid source.url, it must be a Perforce port of the form [tcp|ssl:][host:]port: '.$sourceUrl);
-        }
-
-        // Bin paths are resolved relative to the package install dir and then chmod'd (and
-        // proxied) by BinaryInstaller. A ".." segment escapes that directory and lets a
-        // dependency chmod/point at an arbitrary host file (GHSA-gjfg-22fp-rrxx), so reject it.
-        foreach ($package->getBinaries() as $bin) {
-            if (Preg::isMatch('{(?:^|[\\\\/])\.\.(?:[\\\\/]|$)}', $bin)) {
-                throw new SecurityException($package->getName().' has an invalid bin '.$bin.', it must not contain ".." path segments');
-            }
-        }
-    }
-
-    /**
      * @phpstan-param non-empty-string $property
      * @phpstan-param non-empty-string $regex
      */
@@ -758,7 +542,7 @@ class ValidatingArrayLoader implements LoaderInterface
     private function validateString(string $property, bool $mandatory = false): bool
     {
         if (isset($this->config[$property]) && !is_string($this->config[$property])) {
-            $this->errors[] = $property.' : should be a string, '.get_debug_type($this->config[$property]).' given';
+            $this->errors[] = $property.' : should be a string, '.gettype($this->config[$property]).' given';
             unset($this->config[$property]);
 
             return false;
@@ -782,7 +566,7 @@ class ValidatingArrayLoader implements LoaderInterface
     private function validateArray(string $property, bool $mandatory = false): bool
     {
         if (isset($this->config[$property]) && !is_array($this->config[$property])) {
-            $this->errors[] = $property.' : should be an array, '.get_debug_type($this->config[$property]).' given';
+            $this->errors[] = $property.' : should be an array, '.gettype($this->config[$property]).' given';
             unset($this->config[$property]);
 
             return false;
@@ -813,7 +597,7 @@ class ValidatingArrayLoader implements LoaderInterface
         $pass = true;
         foreach ($this->config[$property] as $key => $value) {
             if (!is_string($value) && !is_numeric($value)) {
-                $this->errors[] = $property.'.'.$key.' : must be a string or int, '.get_debug_type($value).' given';
+                $this->errors[] = $property.'.'.$key.' : must be a string or int, '.gettype($value).' given';
                 unset($this->config[$property][$key]);
                 $pass = false;
 

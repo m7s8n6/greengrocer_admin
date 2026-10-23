@@ -672,6 +672,17 @@ class Controller extends BaseController
         $invoice = view('unauthorized', $data)->render();
         return $invoice;
     }
+    /**
+     * Public (no token) settings for the partner apps (seller / delivery boy) to read
+     * before login. Keep this to non-sensitive flags only.
+     */
+    public function getPublicSettings()
+    {
+        return CommonHelper::responseWithData([
+            'is_demo_mode_on' => isDemoModeOn(),
+        ]);
+    }
+
     public function getAdminSettings()
     {
         $logo = "";

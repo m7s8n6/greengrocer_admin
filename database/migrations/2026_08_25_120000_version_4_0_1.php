@@ -242,6 +242,13 @@ return new class extends Migration
             }
         }
 
+        // Blog categories were global across modules; existing rows stay in module 1.
+        if (Schema::hasTable('blog_categories') && !Schema::hasColumn('blog_categories', 'module_id')) {
+            Schema::table('blog_categories', function (Blueprint $table) {
+                $table->unsignedBigInteger('module_id')->default(1)->index()->after('id');
+            });
+        }
+
         if (Schema::hasTable('social_media')) {
             Schema::table('social_media', function (Blueprint $table) {
                 if (!Schema::hasColumn('social_media', 'name')) {
@@ -496,13 +503,14 @@ return new class extends Migration
 
         // Register the "addons" permission (product category) and grant it to the same default
         // roles "brands"/"attributes" already have, so it shows in Role management immediately.
-        // Fresh install: permission_categories is still empty here (PermissionSeeder, which already
-        // lists "addons", runs after migrations) - so skip when the category row doesn't exist yet.
         if (Schema::hasTable('permissions') && Schema::hasTable('permission_categories')) {
             $exists = DB::table('permissions')->where('name', 'addons')->exists();
             $categoryId = DB::table('permission_categories')->where('name', 'product')->value('id');
+            // On a fresh install this migration runs before PermissionCategoriesSeeder, so the
+            // "product" category doesn't exist yet - category_id is NOT NULL, so inserting here
+            // would fail. Skip; the seeder path (run after migrations during install) creates
+            // permissions with their categories together instead.
             if (!$exists && $categoryId) {
-
                 $permissionId = DB::table('permissions')->insertGetId([
                     'name' => 'addons',
                     'guard_name' => 'web',

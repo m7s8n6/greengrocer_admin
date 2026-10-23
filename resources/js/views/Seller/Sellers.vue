@@ -26,13 +26,7 @@
                                         :placeholder="__('search')" @input="getRecords()">
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
-                                <router-link to="/sellers/create"
-                                    class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                    v-if="$can('seller_create')">
-                                    <i class="fa fa-plus"></i>
-                                    <span>{{ __('add_seller') }}</span>
-                                </router-link>
+                            <div class="d-flex gap-2 flex-wrap">
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
                                     <base-icon name="Funnel" width="24" height="24" useCurrentColor />
@@ -40,11 +34,21 @@
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
 
+                                <div class="view-toggle" role="group" :aria-label="__('view')">
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                </div>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
                                 </button>
+                                <router-link to="/sellers/create"
+                                    class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    v-if="$can('seller_create')">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{{ __('add_seller') }}</span>
+                                </router-link>
                             </div>
                         </div>
                         <b-collapse v-model="showFilters">
@@ -67,12 +71,80 @@
                             </div>
                         </b-collapse>
 
-                        <div class="table-responsive">
+                        <!-- Grid view -->
+                        <div v-if="viewMode === 'grid'">
+                            <div v-if="isLoading" class="item-grid-state">
+                                <i class="bi bi-hourglass-split"></i>{{ __('loading') }}...
+                            </div>
+                            <div v-else-if="!gridRecords.length" class="item-grid-state">
+                                <i class="bi bi-inbox"></i>{{ __('no_records_to_show') }}
+                            </div>
+                            <div v-else class="item-grid item-grid--single-xs">
+                                <div v-for="item in pagedItems(gridRecords)" :key="item.id" class="item-card">
+                                    <div class="item-card-media item-card-media--avatar">
+                                        <img v-if="item.logo" :src="$storageUrl + item.logo" :alt="item.store_name || item.name" />
+                                        <span v-else class="item-card-avatar">{{ initial(item.name) }}</span>
+                                    </div>
+                                    <div class="item-card-body">
+                                        <div class="item-card-title">{{ item.name }}</div>
+                                        <div class="item-card-meta" v-if="item.store_name"><i class="bi bi-shop me-1"></i>{{ item.store_name }}</div>
+                                        <div class="item-card-meta"><i class="bi bi-envelope me-1"></i>{{ item.email | emailMask }}</div>
+                                        <div class="item-card-meta"><i class="bi bi-telephone me-1"></i>{{ item.mobile | mobileMask }}</div>
+                                        <div class="item-card-stats justify-content-center">
+                                            <span class="item-card-chip">#{{ item.id }}</span>
+                                            <span class="item-card-chip">{{ __('balance') }}: {{ item.balance }}</span>
+                                            <span class="item-card-chip">{{ __('commission') }}: {{ item.commission }}</span>
+                                            <span class="item-card-chip" style="cursor: pointer;" v-b-tooltip.hover
+                                                :title="item.categories_array"><i class="fa fa-info-circle"></i>{{ __('categories') }}</span>
+                                            <span class="item-card-chip" v-if="item.require_products_approval == 1 || item.require_products_approval == 0">
+                                                {{ __('require_products_approval') }}:
+                                                {{ item.require_products_approval == 1 ? __('yes') : __('no') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-footer">
+                                        <div class="d-flex align-items-center gap-1 flex-wrap">
+                                            <span v-if="item.status == 1" class='figma-status-pill status-delivered'>{{ __('approved') }}</span>
+                                            <span v-else-if="item.status == 2" class='figma-status-pill status-pending'>{{ __('not_approved') }}</span>
+                                            <span v-else-if="item.status == 3" class='figma-status-pill status-cancelled'>{{ __('deactive') }}</span>
+                                            <span v-else-if="item.status == 4" class='figma-status-pill badge bg-dark'>{{ __('blocked') }}</span>
+                                            <span v-if="$can('seller_update') && (item.status == 1 || item.status == 3)"
+                                                @click="updateStatusSeller(fullIndex(item), item.id, item.status)"
+                                                class="figma-hover-light" v-b-tooltip.hover :title="__('availability')">
+                                                <a class="btn btn-sm px-1" :class="item.status == 1 ? 'text-success' : 'text-danger'">
+                                                    <i class="fa fs-5" :class="item.status == 1 ? 'fa-toggle-on' : 'fa-toggle-off'"></i></a>
+                                            </span>
+                                        </div>
+                                        <div class="item-card-actions">
+                                            <router-link
+                                                :to="{ name: 'EditSeller', params: { id: item.id, record: item } }"
+                                                class="figma-action-btn" v-if="$can('seller_update')" v-b-tooltip.hover
+                                                :title="__('edit')">
+                                                <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                            </router-link>
+                                            <button class="figma-action-btn figma-delete-btn"
+                                                @click="deleteSeller(fullIndex(item), item.id)" v-if="$can('seller_delete')"
+                                                v-b-tooltip.hover :title="__('delete')">
+                                                <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else class="table-responsive">
                             <b-table :items="translatedRecords" :fields="fields" :current-page="currentPage"
                                 :per-page="perPage" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
                                 :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                                 :busy="isLoading" stacked="md" show-empty
                                 :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
 
                                 <template #table-busy>
                                     <div class="text-center py-4">
@@ -88,20 +160,19 @@
                                 </template>
 
                                 <template #cell(logo)="row">
-                                    <span v-if="!row.item.logo" class="figma-text-muted">{{ __('no_image') }}</span>
-                                    <img v-else :src="$storageUrl + row.item.logo" class="rounded-3 shadow-sm"
-                                        height="42" />
+                                    <img :src="row.item.logo ? ($storageUrl + row.item.logo) : $placeholderImage" class="rounded-3 border"
+                                        height="40" width="40" />
                                 </template>
 
                                 <template #cell(status)="row">
                                     <span v-if="row.item.status == 1" class='figma-status-pill status-delivered'>{{
                                         __('approved') }}</span>
-                                    <span v-else-if="row.item.status == 2" class='figma-status-pill status-received'>{{
+                                    <span v-else-if="row.item.status == 2" class='figma-status-pill status-pending'>{{
                                         __('not_approved') }}</span>
                                     <span v-else-if="row.item.status == 3" class='figma-status-pill status-cancelled'>{{
                                         __('deactive') }}</span>
                                     <span v-else-if="row.item.status == 4"
-                                        class='figma-status-pill bg-dark text-white'>{{ __('blocked') }}</span>
+                                        class='figma-status-pill badge bg-dark'>{{ __('blocked') }}</span>
                                 </template>
 
                                 <template #cell(require_products_approval)="row">
@@ -113,7 +184,7 @@
 
                                 <template #cell(availability)="row">
                                     <span v-if="$can('seller_update')"
-                                        @click="updateStatusSeller(row.index, row.item.id, row.item.status)"
+                                        @click="updateStatusSeller(fullIndex(row.item), row.item.id, row.item.status)"
                                         class="figma-hover-light">
                                         <span class="text-success" v-if="row.item.status == 1">
                                             <a class="btn btn-sm"><i class="fa fa-toggle-on fs-5"></i></a>
@@ -144,7 +215,7 @@
                                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </router-link>
                                         <button class="figma-action-btn figma-delete-btn"
-                                            @click="deleteSeller(row.index, row.item.id)" v-if="$can('seller_delete')"
+                                            @click="deleteSeller(fullIndex(row.item), row.item.id)" v-if="$can('seller_delete')"
                                             v-b-tooltip.hover :title="__('delete')">
                                             <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
                                                 height="24" />
@@ -155,14 +226,16 @@
                             </b-table>
                         </div>
 
-                        <div class="figma-table-footer">
-                            <div class="showing-results-text">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd
-                                }}</span> {{ __('of') ||
-                                        'of' }} <span class="showing-bold">{{ translatedRecords.length }}</span>
+                        <div class="figma-table-footer flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                                    class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="translatedRecords.length"></table-count>
                             </div>
                             <b-pagination v-model="currentPage" :total-rows="translatedRecords.length" :per-page="perPage"
-                                align="right" class="figma-pagination mb-0"></b-pagination>
+                                align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
+                                prev-text="<" next-text=">"></b-pagination>
                         </div>
                     </div>
                 </div>
@@ -171,20 +244,23 @@
     </div>
 </template>
 <script>
+import ViewModeMixin from '../../mixins/ViewModeMixin';
+
 export default {
+    mixins: [ViewModeMixin],
     data: function () {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'name', label: __('name'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'store_name', label: __('store_name'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'email', label: __('email'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'mobile', label: __('mobile'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'balance', label: __('balance'), class: 'text-center', sortable: true, sortDirection: 'desc' },
+                { key: 'name', label: __('name'), sortable: true, sortDirection: 'desc' },
+                { key: 'store_name', label: __('store_name'), sortable: true, sortDirection: 'desc' },
+                { key: 'email', label: __('email'), sortable: true, sortDirection: 'desc' },
+                { key: 'mobile', label: __('mobile'), sortable: true, sortDirection: 'desc' },
+                { key: 'balance', label: __('balance'), sortable: true, sortDirection: 'desc' },
                 { key: 'logo', label: __('logo'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'commission', label: __('commission'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'categories_array', label: __('categories'), class: 'text-center', sortable: true, sortDirection: 'desc' },
-                { key: 'status', label: __('status'), class: 'text-center', sortable: true, sortDirection: 'desc' },
+                { key: 'commission', label: __('commission'), sortable: true, sortDirection: 'desc' },
+                { key: 'categories_array', label: __('categories'), sortable: true, sortDirection: 'desc' },
+                { key: 'status', label: __('status'), sortable: true, sortDirection: 'desc' },
                 { key: 'availability', label: __('availability'), class: 'text-center', sortable: true, sortDirection: 'desc' },
                 { key: 'require_products_approval', label: __('require_products_approval'), class: 'text-center', sortable: true, sortDirection: 'desc' },
                 { key: 'actions', label: __('actions') }
@@ -238,6 +314,10 @@ export default {
                 return translatedSeller;
             });
         },
+        // Grid view: same records and order as the table (search / status filter are server side).
+        gridRecords() {
+            return this.gridSort(this.translatedRecords);
+        },
         pageEnd() {
             return Math.min(this.currentPage * this.perPage, this.translatedRecords.length);
         }
@@ -253,7 +333,17 @@ export default {
             this.getRecords();
         });
     },
+    watch: {
+        perPage() {
+            this.currentPage = 1;
+        }
+    },
     methods: {
+        // Grid view: same order as the b-table (its sortBy / sortDesc are synced from the list view headers).
+        // Position of a card's record in this.records (the delete handler splices that array).
+        fullIndex(item) {
+            return this.records.findIndex(r => r.id === item.id);
+        },
         async fetchActiveLanguages() {
             try {
                 const res = await axios.get(this.$apiUrl + '/active_languages');
@@ -296,8 +386,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -324,8 +414,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true

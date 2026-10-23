@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="approve-page">
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <h3 class="modern-page-title mb-0">{{ __('approve_requests') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -23,7 +23,7 @@
 
                         <!-- Modern Filter Action Bar -->
                         <div
-                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row p-3">
                             <div class="flex-grow-1">
                                 <div class="figma-search-container">
                                     <i class="fa fa-search text-muted"></i>
@@ -31,10 +31,10 @@
                                         :placeholder="__('search') || 'Search...'" @input="getRecords()">
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex gap-2 align-items-center flex-wrap">
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                     <span>{{ __('filters') || 'Filters' }}</span>
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
@@ -57,6 +57,11 @@
                                         </div>
                                     </b-dropdown-form>
                                 </b-dropdown>
+
+<div class="view-toggle" role="group" :aria-label="__('view')">
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                </div>
 
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
@@ -96,15 +101,112 @@
                                 </div>
                             </div>
                         </b-collapse>
-                        <div class="table-responsive">
+                        <div v-if="viewMode === 'grid'">
+                            <div v-if="isLoading" class="item-grid-state">
+                                <i class="fa fa-spinner fa-spin"></i>{{ __('loading') }}...
+                            </div>
+                            <div v-else-if="gridProducts.length === 0" class="item-grid-state">
+                                <i class="fa" :class="filter ? 'fa-search' : 'fa-inbox'"></i>
+                                {{ filter ? __('no_records_matching_your_request') : __('no_records_to_show') }}
+                            </div>
+                            <div v-else class="item-grid">
+                                <div v-for="item in gridProducts" :key="item.product_variant_id" class="item-card">
+                                    <div class="item-card-media">
+                                        <img :src="item.image ? ($storageUrl + item.image) : $placeholderImage" :alt="item.name"
+                                            class="approve-card-img" @click="openLightbox(item.image ? ($storageUrl + item.image) : $placeholderImage)" />
+                                        <div class="item-card-badges">
+                                            <span class="badge bg-success" v-if="item.status == 1">{{ __('available') }}</span>
+                                            <span class="badge bg-danger" v-if="item.status == 0">{{ __('sold_out') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-body">
+                                        <div class="item-card-title" :title="item.name">{{ item.name }}</div>
+                                        <div class="item-card-meta" v-if="$roleSeller != login_user.role.name && item.seller_name"
+                                            :title="item.seller_name">
+                                            <i class="bi bi-shop"></i> {{ item.seller_name }}
+                                        </div>
+                                        <div class="item-card-meta">
+                                            {{ __('id') }}: #{{ item.product_variant_id }} &middot; {{ __('product_id') }}: #{{ item.product_id }}
+                                        </div>
+                                        <div class="item-card-price">
+                                            <template v-if="hasDiscount(item)">
+                                                <span>{{ $currency }}{{ item.discounted_price }}</span>
+                                                <del>{{ $currency }}{{ item.price }}</del>
+                                            </template>
+                                            <span v-else>{{ $currency }}{{ item.price }}</span>
+                                        </div>
+                                        <div class="item-card-stats">
+                                            <span class="item-card-chip" v-if="item.measurement" :title="__('measurement')">
+                                                <i class="bi bi-rulers"></i>{{ item.measurement }} <span v-if="item.short_code">{{ item.short_code }}</span>
+                                            </span>
+                                            <span class="item-card-chip" :title="__('stock')">
+                                                <i class="bi bi-box-seam"></i>
+                                                <span v-if="item.is_unlimited_stock">{{ __('unlimited') }}</span>
+                                                <template v-else>{{ item.stock }}</template>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-footer">
+                                        <a class="btn btn-sm approve-toggle" @click="updateStatusProduct(productIndex(item), item.id)"
+                                            v-if="$can('product_update')" v-b-tooltip.hover :title="__('availability')">
+                                            <span class="primary-toggal" v-if="item.status == 1"><i
+                                                    class="fa fa-toggle-on fa-2x"></i></span>
+                                            <span class="text-danger" v-else><i class="fa fa-toggle-off fa-2x"></i></span>
+                                        </a>
+                                        <div class="item-card-actions">
+
+                                                <template v-if="$roleSeller == login_user.role.name">
+                                                    <router-link
+                                                        :to="{ name: 'SellerViewProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'SellerEditProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('edit')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </router-link>
+                                                </template>
+                                                <template v-else>
+                                                    <router-link
+                                                        :to="{ name: 'ViewProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </router-link>
+                                                    <router-link
+                                                        :to="{ name: 'EditProduct', params: { id: item.id, record: item } }"
+                                                        class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
+                                                        :title="__('edit')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </router-link>
+                                                </template>
+
+                                                <button class="figma-action-btn figma-delete-btn"
+                                                    @click="deleteRecord(productIndex(item), item.product_variant_id)"
+                                                    v-if="$can('product_delete')" v-b-tooltip.hover :title="__('delete')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="table-responsive">
 
                             <b-table :items="translatedProducts" :fields="visibleFields" :filter="filter" :filter-included-fields="filterOn"
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                 :bordered="false" :busy="isLoading" stacked="md" show-empty
-                                :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+                                :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table approve-table mb-0">
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
 
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
@@ -114,8 +216,9 @@
                                     {{ row.item.seller_name }}
                                 </template>
                                 <template #cell(image)="row">
-                                    <img :src="$storageUrl + row.item.image"
-                                        @click="openLightbox($storageUrl + row.item.image)" alt="Image" height="50" style="cursor: pointer;" />
+                                    <img :src="row.item.image ? ($storageUrl + row.item.image) : $placeholderImage"
+                                        @click="openLightbox(row.item.image ? ($storageUrl + row.item.image) : $placeholderImage)" alt="Image"
+                                        class="approve-thumb" />
                                 </template>
                                 <template #cell(measurement)="row">
 
@@ -133,7 +236,7 @@
                                 </template>
 
                                 <template #cell(availability)="row">
-                                    <a class="btn btn-sm" @click="updateStatusProduct(row.index, row.item.id)"
+                                    <a class="btn btn-sm approve-toggle" @click="updateStatusProduct(productIndex(row.item), row.item.id)"
                                         v-if="$can('product_update')">
                                         <span class="primary-toggal" v-if="row.item.status == 1"><i
                                                 class="fa fa-toggle-on fa-2x"></i></span>
@@ -188,44 +291,39 @@
                                 </template>
 
                                 <template #cell(actions)="row">
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex gap-1 approve-row-actions">
 
                                         <template v-if="$roleSeller == login_user.role.name">
                                             <router-link
                                                 :to="{ name: 'SellerViewProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
-                                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-eye"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'SellerEditProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-pencil"></i>
                                             </router-link>
                                         </template>
                                         <template v-else>
                                             <router-link
                                                 :to="{ name: 'ViewProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-b-tooltip.hover :title="__('view')">
-                                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-eye"></i>
                                             </router-link>
                                             <router-link
                                                 :to="{ name: 'EditProduct', params: { id: row.item.id, record: row.item } }"
                                                 class="figma-action-btn" v-if="$can('product_update')" v-b-tooltip.hover
                                                 :title="__('edit')">
-                                                <base-icon name="edit icon" hoverName="edit Hover" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-pencil"></i>
                                             </router-link>
                                         </template>
 
-                                        <button class="figma-action-btn"
-                                            @click="deleteRecord(row.index, row.item.product_variant_id)"
+                                        <button class="figma-action-btn figma-delete-btn"
+                                            @click="deleteRecord(productIndex(row.item), row.item.product_variant_id)"
                                             v-if="$can('product_delete')" v-b-tooltip.hover :title="__('delete')">
-                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
-                                                height="24" />
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </template>
@@ -237,6 +335,7 @@
                             <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                             <b-form-select v-model="perPage" :options="pageOptions" size="sm"
                                 style="width: auto;"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         </div>
                         <div class="d-flex align-items-center gap-3">
                             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
@@ -257,7 +356,9 @@ import axios from "axios";
 import Auth from '../../Auth.js';
 import Vue from "vue";
 import FsLightbox from "fslightbox-vue";
+import ViewModeMixin from '../../mixins/ViewModeMixin';
 export default {
+    mixins: [ViewModeMixin],
     components: {
         VuejsDatatableFactory,
         FsLightbox,
@@ -317,6 +418,8 @@ export default {
             currentLanguageId: null,
             activeLanguages: [],
             showFilters: false,
+            // The API returns one page at a time (grid view shows the array as is)
+            serverPagination: true,
         }
     },
     watch: {
@@ -334,6 +437,10 @@ export default {
     computed: {
         visibleFields() {
             return this.fields.filter(field => field.visible)
+        },
+        // Grid view cards: same records, search and order as the b-table
+        gridProducts() {
+            return this.pagedItems(this.gridFilterSort(this.translatedProducts));
         },
         isSellerRoute() {
             // Use this.$route to access the current route
@@ -471,6 +578,15 @@ export default {
         });
     },
     methods: {
+        // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
+        productIndex(item) {
+            return this.products.findIndex(product => product.product_variant_id === item.product_variant_id);
+        },
+        hasDiscount(item) {
+            const price = parseFloat(item.price);
+            const discounted = parseFloat(item.discounted_price);
+            return !isNaN(discounted) && discounted > 0 && (isNaN(price) || discounted < price);
+        },
         // Fetch active languages and set current language ID
         fetchActiveLanguages() {
             return axios.get(this.$apiUrl + '/active_languages')
@@ -539,8 +655,8 @@ export default {
                 cancelButtonText: "Cancel",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -566,8 +682,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -589,3 +705,64 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.approve-page ::v-deep .approve-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    cursor: pointer;
+}
+
+/* !important: legacy global .figma-action-btn forces 40px with !important */
+.approve-page ::v-deep .approve-row-actions .figma-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+.approve-page ::v-deep .approve-row-actions {
+    flex-wrap: nowrap;
+}
+
+.approve-page ::v-deep .approve-table td:last-child {
+    white-space: nowrap;
+}
+
+.approve-page .item-card-actions {
+    margin-left: auto;
+}
+
+.approve-page .approve-card-img {
+    cursor: zoom-in;
+}
+
+.approve-page ::v-deep .approve-toggle {
+    padding: 0;
+    border: 0;
+    line-height: 1;
+}
+
+.approve-page ::v-deep .approve-toggle .fa-2x {
+    font-size: 24px;
+}
+
+.approve-page ::v-deep .approve-toggle .primary-toggal {
+    color: var(--theme-primary-500);
+}
+
+@media (max-width: 767.98px) {
+    .approve-page ::v-deep .approve-row-actions {
+        flex-wrap: wrap;
+    }
+
+    .approve-page ::v-deep .approve-table td:last-child {
+        white-space: normal;
+    }
+}
+</style>

@@ -14,25 +14,19 @@ class NotificationPanelApiController extends Controller
     $page = $request->input('page', 1);
     $offset = ($page - 1) * $limit;
 
-    $notifications = PanelNotification::orderBy('id', 'DESC');
+    // Newest first. The id is a UUID, so ordering by it is effectively random - use the time.
+    $notifications = PanelNotification::orderBy('created_at', 'DESC')->orderBy('id', 'DESC');
 
-    if (
-        isset(auth()->user()->seller->id) &&
-        auth()->user()->seller->id !== null &&
-        auth()->user()->role_id == 3
-    ) {
-        // Get admin IDs with role_id 3
-        $adminIds = \App\Models\Admin::where('role_id', 3)->pluck('id');
+    // Each user sees their own notifications, the same list the header bell shows. (Every order
+    // creates one notification per admin / seller / delivery boy, so listing everyone's showed
+    // the same order several times and let a seller read other sellers' notifications.)
+    $notifications->where('notifiable_type', \App\Models\Admin::class)
+                  ->where('notifiable_id', auth()->user()->id);
 
-        // Filter notifications for matching admin IDs and notifiable_type
-        $notifications->where('notifiable_type', \App\Models\Admin::class)
-                      ->whereIn('notifiable_id', $adminIds);
-    } elseif (auth()->user()->role_id == 4) {
-        // Filter notifications for the authenticated delivery boy
-        $notifications->where('notifiable_type', \App\Models\Admin::class)
-                      ->where('notifiable_id', auth()->user()->id);
-    } else {
-        // You can handle other role conditions here, e.g. for admins or delivery boys
+    // Search runs on the server so it covers every page, not just the 10 rows on screen.
+    $search = trim((string) $request->input('search', ''));
+    if ($search !== '') {
+        $notifications->where('data', 'like', '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search) . '%');
     }
 
     $total = $notifications->count();

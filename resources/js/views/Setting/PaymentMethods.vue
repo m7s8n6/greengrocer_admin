@@ -10,6 +10,7 @@
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                            <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('payment_gateways_methods_settings') }}</li>
                         </ol>
                     </nav>
@@ -18,21 +19,22 @@
         </div>
             <section class="section">
                 <form id="payment_method_settings_form" method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
-                    <div class="row">
-                        <div class="col-6 mb-4">
+                    <div class="row payment-methods-grid">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('cod_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('cod_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('cod_payments_desc', 'Let customers pay in cash when the order is delivered.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('cod_payments')" id="cod_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.cod_payment_method" :checked="payment_method.cod_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <input type="hidden" id="payment_method_settings" v-model="payment_method.payment_method_settings" name="payment_method_settings" required="" value="1" aria-required="true">
                                     <div class="">
-                                        <div class="form-group">
-                                            <label for="cod_payment_method">{{ __('cod_payments') }} <small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                            <div class='form-check form-switch'>
-                                                <input class='form-check-input' id="cod_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.cod_payment_method" :checked="payment_method.cod_payment_method">
-                                            </div>
-                                        </div>
+                                        <p v-if="payment_method.cod_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                         <div v-if="payment_method.cod_payment_method == 1" class="form-group">
                                             <label for="cod_mode">{{ __('cod_mode') }}</label><br>
                                             <p><small><b>{{ __('global') }} :</b> {{ __('will_be_considered_for_all_the_products') }}.</small></p>
@@ -48,18 +50,19 @@
                         </div>
 
 
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('paypal_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('paypal_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('paypal_payments_desc', 'Accept PayPal payments using your business account.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('paypal_payments')" id="paypal_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paypal_payment_method" :checked="payment_method.paypal_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="paypal_payment_method"> {{ __('paypal_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="paypal_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paypal_payment_method" :checked="payment_method.paypal_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.paypal_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.paypal_payment_method == 1" class="form-group">
                                         <label for="paypal_mode"> {{ __('payment_mode') }}<small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
                                         <select name="paypal_mode" id="paypal_mode" required v-model="payment_method.paypal_mode" class="form-control form-select">
@@ -112,18 +115,19 @@
                             </div>
                         </div>
 
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('razorpay_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('razorpay_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('razorpay_payments_desc', 'Accept cards, UPI and wallets through Razorpay.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('razorpay_payments')" id="razorpay_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.razorpay_payment_method" :checked="payment_method.razorpay_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="razorpay_payment_method">{{ __('razorpay_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="razorpay_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.razorpay_payment_method" :checked="payment_method.razorpay_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.razorpay_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.razorpay_payment_method == 1" class="form-group">
                                         <label for="razorpay_key">{{ __('razorpay_key_id') }}</label>
                                         <input type="text" class="form-control" name="razorpay_key" id="razorpay_key" v-model="payment_method.razorpay_key" placeholder="Razor Key ID">
@@ -135,18 +139,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('paystack_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('paystack_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('paystack_payments_desc', 'Accept card and mobile money payments through Paystack.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('paystack_payments')" id="paystack_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paystack_payment_method" :checked="payment_method.paystack_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="paystack_payment_method">{{ __('paystack_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="paystack_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paystack_payment_method" :checked="payment_method.paystack_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.paystack_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.paystack_payment_method == 1" class="form-group">
                                         <label for="paystack_public_key">{{ __('paystack_public_key') }}</label>
                                         <input type="text" class="form-control" name="paystack_public_key" id="paystack_public_key" v-model="payment_method.paystack_public_key" placeholder="Paystack Public key" required>
@@ -170,18 +175,19 @@
                             </div>
                         </div>
 
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('stripe_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('stripe_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('stripe_payments_desc', 'Accept card payments worldwide through Stripe.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('stripe_payments')" id="stripe_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.stripe_payment_method" :checked="payment_method.stripe_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="stripe_payment_method">{{ __('stripe_payments') }} <small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="stripe_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.stripe_payment_method" :checked="payment_method.stripe_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.stripe_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.stripe_payment_method == 1" class="form-group">
                                         <label for="stripe_publishable_key">{{ __('stripe_publishable_key') }}</label>
                                         <input type="text" class="form-control" name="stripe_publishable_key" id="stripe_publishable_key" v-model="payment_method.stripe_publishable_key" placeholder="Stripe Publishable Key">
@@ -351,19 +357,20 @@
                             </div>
                         </div>
 
-                        <!-- <div class="col-6 mb-4">
+                        <!-- <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('paytm_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('paytm_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('paytm_payments_desc', 'Accept payments through Paytm.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('paytm_payments')" id="paytm_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paytm_payment_method" :checked="payment_method.paytm_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
 
-                                    <div class="form-group">
-                                        <label for="paytm_payment_method">{{ __('paytm_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="paytm_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paytm_payment_method" :checked="payment_method.paytm_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.paytm_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
 
                                     <div v-if="payment_method.paytm_payment_method == 1" class="form-group">
                                         <label for="paytm_mode">{{ __('paytm_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
@@ -388,19 +395,20 @@
                             </div>
                         </div> -->
 
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('midtrans_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('midtrans_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('midtrans_payments_desc', 'Accept payments in Indonesia through Midtrans.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('midtrans_payments')" id="midtrans_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.midtrans_payment_method" :checked="payment_method.midtrans_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
 
-                                    <div class="form-group">
-                                        <label for="midtrans_payment_method">{{ __('midtrans_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="midtrans_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.midtrans_payment_method" :checked="payment_method.midtrans_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.midtrans_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
 
                                     <div v-if="payment_method.midtrans_payment_method == 1" class="form-group">
                                         <label for="midtrans_mode">{{ __('midtrans_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
@@ -429,19 +437,20 @@
                             </div>
                         </div>
 
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('phonepay_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('phonepay_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('phonepay_payments_desc', 'Accept UPI and card payments through PhonePe.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('phonepay_payments')" id="phonepay_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.phonepay_payment_method" :checked="payment_method.phonepay_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
 
-                                    <div class="form-group">
-                                        <label for="phonepay_payment_method">{{ __('phonepay_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="phonepay_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.phonepay_payment_method" :checked="payment_method.phonepay_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.phonepay_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
 
                                     <div v-if="payment_method.phonepay_payment_method == 1" class="form-group">
                                         <label for="phonepay_mode">{{ __('phonepay_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
@@ -490,18 +499,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('cashfree_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('cashfree_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('cashfree_payments_desc', 'Accept cards, UPI and net banking through Cashfree.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('cashfree_payments')" id="cashfree_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.cashfree_payment_method" :checked="payment_method.cashfree_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="phonepay_payment_method">{{ __('cashfree_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="cashfree_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.cashfree_payment_method" :checked="payment_method.cashfree_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.cashfree_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.cashfree_payment_method == 1" class="form-group">
                                         <label for="cashfree_mode">{{ __('cashfree_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
                                         <select name="cashfree_mode" id="cashfree_mode" :required="payment_method.cashfree_payment_method == 1" v-model="payment_method.cashfree_mode" class="form-control form-select">
@@ -527,18 +537,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('paytabs_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('paytabs_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('paytabs_payments_desc', 'Accept card payments through PayTabs.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('paytabs_payments')" id="paytabs_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paytabs_payment_method" :checked="payment_method.paytabs_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="paytabs_payment_method">{{ __('paytabs_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="paytabs_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.paytabs_payment_method" :checked="payment_method.paytabs_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.paytabs_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.paytabs_payment_method == 1" class="form-group">
                                         <label for="paytabs_mode">{{ __('paytabs_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
                                         <select name="paytabs_mode" id="paytabs_mode" :required="payment_method.paytabs_payment_method == 1" v-model="payment_method.paytabs_mode" class="form-control form-select">
@@ -566,18 +577,19 @@
                         </div>
 
                         <!-- DPO (Direct Pay Online) -->
-                        <div class="col-6 mb-4">
+                        <div class="col-12 col-lg-6 mb-4">
                             <div class="card h-100">
-                                <div class="card-header">
-                                    <h4 class="card-title">{{ __('dpo_payments') }}</h4>
+                                <div class="card-header d-flex align-items-start justify-content-between">
+                                    <div class="pm-header-text">
+                                        <h4 class="card-title float-none">{{ __('dpo_payments') }}</h4>
+                                        <p class="text-muted small mb-0 mt-1">{{ tr('dpo_payments_desc', 'Accept card and mobile money payments through DPO Pay.') }}</p>
+                                    </div>
+                                    <div class='form-check form-switch pm-header-switch'>
+                                        <input class='form-check-input' :aria-label="__('dpo_payments')" id="dpo_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.dpo_payment_method" :checked="payment_method.dpo_payment_method">
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="dpo_payment_method">{{ __('dpo_payments') }}<small>[ {{ __('enable') }} / {{ __('disable') }} ] </small></label><br>
-                                        <div class='form-check form-switch'>
-                                            <input class='form-check-input' id="dpo_payment_method" type='checkbox' true-value="1" false-value="0" v-model="payment_method.dpo_payment_method" :checked="payment_method.dpo_payment_method">
-                                        </div>
-                                    </div>
+                                    <p v-if="payment_method.dpo_payment_method != 1" class="text-muted small mb-0">{{ tr('payment_gateway_disabled_hint', 'Turn this gateway on to configure its settings.') }}</p>
                                     <div v-if="payment_method.dpo_payment_method == 1" class="form-group">
                                         <label for="dpo_mode">{{ __('dpo_payment_mode') }} <small>[ {{ __('sandbox') }} / {{ __('live') }} ]</small></label>
                                         <select name="dpo_mode" id="dpo_mode" :required="payment_method.dpo_payment_method == 1" v-model="payment_method.dpo_mode" class="form-control form-select">
@@ -620,7 +632,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group col-12 d-flex justify-content-end payment-methods-actions">
                             <b-button type="submit" id="btn_update" variant="primary" :disabled="isLoading" v-if="$can('manage_payment_methods')"> {{ __('update') }}
                                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                             </b-button>
@@ -733,6 +745,7 @@ export default {
         this.getPaymentMethods()
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         getPaymentMethods() {
             axios.get(this.$apiUrl + '/payment_methods').then((response) => {
                 if(response.data.data) {
@@ -890,3 +903,28 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+/* Gateway card header: title + description left, enable switch right */
+.pm-header-text {
+    min-width: 0;
+}
+.pm-header-switch {
+    flex: 0 0 auto;
+    margin: 2px 0 0 12px;
+    min-height: 0;
+}
+.payment-methods-grid .card-body small {
+    color: var(--ui-text-muted);
+}
+.payment-methods-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 0;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-bg);
+}
+</style>

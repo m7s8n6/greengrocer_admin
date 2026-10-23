@@ -1,11 +1,14 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="xl" scrollable no-close-on-backdrop
         no-fade static>
-        <div slot="modal-footer">
-            <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
-                <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-            </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+        <div slot="modal-footer" class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100">
+            <span class="text-muted small">{{ user_permissions.length }} {{ __('selected') }}</span>
+            <div class="d-flex gap-2 ms-auto">
+                <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
+                <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
+                    <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                </b-button>
+            </div>
         </div>
 
         <template #modal-header="{ close }">
@@ -16,45 +19,48 @@
             <button type="button" aria-label="Close" class="close" @click="close()">×</button>
         </template>
 
-        <form ref="my-form" @submit.prevent="saveRecord" class="p-2">
-            <div class="row g-3">
-                <div class="col-md-12">
+        <form ref="my-form" @submit.prevent="saveRecord" class="role-form">
+            <div class="row">
+                <div class="col-12 col-md-6">
                     <div class="form-group">
-                        <label class="form-label fw-bold">{{ __('title') }} <span class="text-danger">*</span></label>
+                        <label class="form-label">{{ __('title') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" required v-model="name" :placeholder="__('title')">
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-12">
-                    <div class="table-responsive border-0">
-                        <table class="table table-bordered permission-table">
-                            <tbody>
-                                <tr v-for="(category, index) in categories" :key="index">
-                                    <th class="bg-light-custom text-nowrap" style="width: 200px;"> {{
-                                        formattedName(category.name) }} </th>
-                                    <td>
-                                        <div class="row g-2">
-                                            <div v-for="permission in category.permissions" :key="permission.id"
-                                                class="col-12 col-md-6 col-lg-4">
-                                                <div class='form-check form-switch d-flex align-items-center gap-2 flex-nowrap'>
-                                                    <input class='form-check-input flex-shrink-0 m-0' type='checkbox'
-                                                        :id="'checkbox_' + permission.id" :value="permission.id"
-                                                        v-model="user_permissions"
-                                                        :checked="user_permissions.includes(permission.id)">
-                                                    <label class="permission-label"
-                                                        :for="'checkbox_' + permission.id"> {{
-                                                            formattedName(permission.name) }} </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <div class="perm-section-head">
+                <h6 class="mb-0">{{ __('permission_access') }}</h6>
+                <span class="figma-status-pill bg-primary">{{ user_permissions.length }} {{ __('selected') }}</span>
+            </div>
+
+            <div class="row g-3">
+                <div v-for="(category, index) in categories" :key="index" class="col-12 col-lg-6">
+                    <div class="perm-card h-100">
+                        <div class="perm-card__head">
+                            <span class="perm-card__title">{{ formattedName(category.name) }}</span>
+                            <span class="perm-card__count">{{ category.permissions.filter(p => user_permissions.includes(p.id)).length }}/{{ category.permissions.length }}</span>
+                        </div>
+                        <div class="perm-card__body">
+                            <div class="row g-2">
+                                <div v-for="permission in category.permissions" :key="permission.id"
+                                    class="col-12 col-sm-6">
+                                    <div class='form-check perm-check'>
+                                        <input class='form-check-input' type='checkbox'
+                                            :id="'checkbox_' + permission.id" :value="permission.id"
+                                            v-model="user_permissions"
+                                            :checked="user_permissions.includes(permission.id)">
+                                        <label class="permission-label"
+                                            :for="'checkbox_' + permission.id"> {{
+                                                formattedName(permission.name) }} </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -194,7 +200,7 @@ export default {
 }
 
 .slider {
-    background-color: #ccc;
+    background-color: var(--theme-neutral-300);
     bottom: 0;
     cursor: pointer;
     left: 0;
@@ -205,7 +211,7 @@ export default {
 }
 
 .slider:before {
-    background-color: #fff;
+    background-color: var(--ui-surface);
     bottom: 4px;
     content: "";
     height: 26px;
@@ -216,7 +222,7 @@ export default {
 }
 
 input:checked+.slider {
-    background-color: #66bb6a;
+    background-color: var(--theme-success-500);
 }
 
 input:checked+.slider:before {
@@ -231,27 +237,74 @@ input:checked+.slider:before {
     border-radius: 50%;
 }
 
-.permission-table {
-    margin-bottom: 0;
-    border: 1px solid #dee2e6;
+.role-form {
+    padding: 4px;
 }
 
-.bg-light-custom {
-    background-color: #f8f9fa;
+.perm-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 4px 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--ui-border);
 }
 
-body.theme-dark .permission-table {
-    border-color: #334155 !important;
+.perm-section-head h6 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
 }
 
-body.theme-dark .permission-table th,
-body.theme-dark .permission-table td {
-    border-color: #334155 !important;
+.perm-card {
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    overflow: hidden;
 }
 
-body.theme-dark .bg-light-custom {
-    background-color: #1e293b !important;
-    color: #f8fafc !important;
+.perm-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--ui-surface-muted);
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.perm-card__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.perm-card__count {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+}
+
+.perm-card__body {
+    padding: 12px 14px;
+}
+
+.form-check.perm-check {
+    margin: 0;
+    padding: 6px 8px !important;
+    border-radius: var(--ui-radius-sm);
+}
+
+.perm-check:hover {
+    background: var(--ui-primary-soft);
+}
+
+.perm-check .permission-label {
+    font-size: 13px;
+    color: var(--ui-text);
+    cursor: pointer;
 }
 
 .form-check {
@@ -268,7 +321,6 @@ body.theme-dark .bg-light-custom {
     margin-top: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    min-width: 2em;
 }
 
 .permission-label {

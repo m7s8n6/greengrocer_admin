@@ -43,7 +43,7 @@ class UserProductRequest extends Model
         if ($this->image) {
             return asset('storage/' . $this->image);
         }
-        return null;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
     public function scopeByCustomer($query, $customerId)
     {

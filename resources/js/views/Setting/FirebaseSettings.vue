@@ -10,6 +10,7 @@
                         <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('firebase_settings') }}</li>
                             </ol>
                         </nav>
@@ -19,12 +20,13 @@
             <section class="section">
                 <form id="api_key_form" method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
                     <div class="card">
-                     
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('firebase_setup_keys') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('firebase_settings_desc', 'Firebase project keys and service-account file used for push notifications and phone login.') }} <span class="text-danger">*</span> {{ __('required_fields') }}.</p>
+                        </div>
                         <div class="card-body">
                             <div class="row">
-                                <h4 class="card-title">{{ __('firebase_setup_keys') }}</h4>
-                                <label><span class="text-danger text-xs">*</span> {{ __('required_fields') }}.</label>
-                                <div class="divider"><div class="divider-text">{{ __('firebase_setup_keys_form') }}</div></div>
+                                <div class="col-12"><h5 class="settings-subsection-title mt-0">{{ __('firebase_setup_keys_form') }}</h5></div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="firebase_apiKey">{{ __('apikey') }}<span class="text-danger text-xs">*</span></label>
@@ -76,8 +78,8 @@
 
 
 
-                                <div class="divider">
-                                    <div class="divider-text">{{ __('firebase_json_file_upload') }}</div>
+                                <div class="col-12">
+                                    <h5 class="settings-subsection-title settings-subsection-title--divided">{{ __('firebase_json_file_upload') }}</h5>
                                 </div>
 
                                 <div class="col-md-6">
@@ -90,7 +92,7 @@
                                                 <i class="fa fa-times-circle"></i> {{ __('file_not_exists') }}
                                             </span>
                                         </label>
-                                        <p class="text-muted mb-1">
+                                        <p class="text-muted small mb-1">
                                             {{ __('supported_formats') }}: JSON
                                         </p>
                                         <span v-if="jsonFileError" class="error">{{ jsonFileError }}</span>
@@ -121,11 +123,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-footer">
-                            <b-button type="submit" variant="primary" :disabled="isLoading">{{ __('update') }}
-                                <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                            </b-button>
+                            <div class="d-flex justify-content-end border-top pt-3 mt-2">
+                                <b-button type="submit" variant="primary" :disabled="isLoading">{{ __('update') }}
+                                    <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                </b-button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -166,6 +168,7 @@ export default {
         }
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         getFirebaseData() {
             axios.get(this.$apiUrl + '/firebase').then((response) => {
                 if(response.data.data) {
@@ -276,3 +279,17 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.settings-subsection-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin: 0 0 12px;
+}
+.settings-subsection-title--divided {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+</style>

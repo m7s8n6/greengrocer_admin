@@ -105,6 +105,7 @@ class StoreSettingsApiController extends Controller
             "google_map_api_key" => "",
             "apiKey" => "",
             "googleMapApiKey" => "",
+            "map_provider" => "google",
             "text_gen_key" => "",
             "fssai_lic_img" => "",
             "allow_all_category_level" => 1,
@@ -121,7 +122,6 @@ class StoreSettingsApiController extends Controller
             "door_step_mode" => "",
             "playstore_url" => "",
             "appstore_url" => "",
-            "guest_cart" => "",
             "phone_login" => "",
             "google_login" => "",
             "apple_login" => "",
@@ -147,6 +147,8 @@ class StoreSettingsApiController extends Controller
         );
         $login_variables = array_keys($login_settingsArray);
         $login_settings = Setting::whereIn('variable', $login_variables)->get();
+        // Demo mode lives in .env (DEMO_MODE), not in the settings table.
+        $login_settings->push((object) ['variable' => 'is_demo_mode_on', 'value' => (string) isDemoModeOn()]);
 
         $refer_earn_settingsArray = array(
             "referral_min_order_amount" => "",
@@ -192,7 +194,20 @@ class StoreSettingsApiController extends Controller
             return CommonHelper::responseError($validator->errors()->first());
         }
 
+        // Only the primary admin (id 1) may switch Demo Mode on or off, whatever the current
+        // state. Other admins can still save the rest of the login settings as long as they
+        // leave the Demo Mode value unchanged.
+        if ($request->has('is_demo_mode_on')
+            && (int) (auth()->user()->id ?? 0) !== 1
+            && ((int) $request->is_demo_mode_on === 1 ? 1 : 0) !== isDemoModeOn()) {
+            return CommonHelper::responseError('Only the main admin can change Demo Mode.');
+        }
+
         foreach ($request->all() as $key => $value) {
+            // Demo mode is written to .env below, never stored in the settings table.
+            if ($key === 'is_demo_mode_on') {
+                continue;
+            }
             $value = $value ?? " ";
             $setting = Setting::where('variable', $key)->first();
             if ($setting) {
@@ -208,8 +223,33 @@ class StoreSettingsApiController extends Controller
                 $setting->save();
             }
         }
+
+        if ($request->has('is_demo_mode_on') && !$this->saveDemoModeToEnv((int) $request->is_demo_mode_on === 1 ? 1 : 0)) {
+            return CommonHelper::responseError('Login settings saved, but the .env file is not writable so Demo Mode could not be changed.');
+        }
         return CommonHelper::responseSuccess(__('login_settings_saved_successfully'));
     }
+
+    /**
+     * Mirror the Demo Mode toggle into .env (DEMO_MODE) so the rest of the app, which reads
+     * the env value, follows it. Returns false when .env cannot be written.
+     */
+    private function saveDemoModeToEnv(int $value): bool
+    {
+        try {
+            $env = new \Brotzka\DotenvEditor\DotenvEditor();
+            if ($env->keyExists('DEMO_MODE')) {
+                $env->changeEnv(['DEMO_MODE' => $value]);
+            } else {
+                $env->addData(['DEMO_MODE' => $value]);
+            }
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Could not write DEMO_MODE to .env: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function save_refer_earn_setting(Request $request)
     {
         foreach ($request->all() as $key => $value) {
@@ -647,7 +687,7 @@ class StoreSettingsApiController extends Controller
      */
     public function save_third_party_api_setting(Request $request)
     {
-        $api_variables = ['google_place_api_key', 'google_map_api_key', 'apiKey', 'googleMapApiKey', 'text_gen_key'];
+        $api_variables = ['google_place_api_key', 'google_map_api_key', 'apiKey', 'googleMapApiKey', 'text_gen_key', 'map_provider'];
 
         foreach ($request->all() as $key => $value) {
             if (in_array($key, $api_variables)) {
@@ -680,6 +720,12 @@ class StoreSettingsApiController extends Controller
     public function save_seller_setting(Request $request)
     {
         $seller_variables = ['one_seller_cart', 'seller_commission', 'self_pickup_mode'];
+
+        // Quick Delivery requires One Seller Cart - turning it off drops every module back to
+        // Fixed Time Window so no module is left on a slot type it can no longer use.
+        if ($request->has('one_seller_cart') && (int) trim((string) $request->one_seller_cart) !== 1) {
+            Setting::where('variable', 'like', 'time_slot_type_%')->where('value', 'express')->update(['value' => 'fixed']);
+        }
 
         foreach ($request->all() as $key => $value) {
             if (in_array($key, $seller_variables)) {
@@ -924,7 +970,7 @@ class StoreSettingsApiController extends Controller
             'host' => $request->host,
             'username' => $request->username,
             'password' => $request->password,
-            'port' => $request->port,
+            'port' => $request->filled('port') ? (int) $request->port : null,
             'encryption' => $request->encryption,
             'from'       => [
                 'address' => $request->username,
@@ -942,12 +988,11 @@ class StoreSettingsApiController extends Controller
             Mail::send([], [], function ($message) use ($request) {
                 $message->to($request->email)
                     ->subject('Testing Mail')
-                    ->setBody('Email Test Successfully!', 'text/html');
+                    ->html('Email Test Successfully!');
                 $message->from($request->username, $request->app_name);
             });
             return CommonHelper::responseSuccess('test_mail_sent_successfully');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return CommonHelper::responseError($e->getMessage());
         }
     }
@@ -982,116 +1027,17 @@ class StoreSettingsApiController extends Controller
                 return CommonHelper::responseError('Google Places API key not configured');
             }
 
-            // Build the API URL
-            $baseUrl = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
-            $params = [
-                'input' => $request->input,
-                'key' => $apiKey,
-                'language' => $request->language ?? 'en',
-            ];
-
-            // Add optional parameters
-            if ($request->types) {
-                $params['types'] = $request->types;
+            $newSuggestions = $this->googlePlacesNewAutocomplete($request, $apiKey);
+            if ($newSuggestions !== null) {
+                return CommonHelper::responseWithData([
+                    'suggestions' => $newSuggestions,
+                    'status' => count($newSuggestions) ? 'OK' : 'ZERO_RESULTS',
+                ]);
             }
 
-            if ($request->components) {
-                $params['components'] = $request->components;
-            }
-
-            if ($request->sessiontoken) {
-                $params['sessiontoken'] = $request->sessiontoken;
-            }
-
-            // Make the request to Google Places API
-            $url = $baseUrl . '?' . http_build_query($params);
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode !== 200) {
-                return CommonHelper::responseError('Failed to fetch location suggestions');
-            }
-
-            $data = json_decode($response, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return CommonHelper::responseError('Invalid response from Google Places API');
-            }
-
-            // Check if Google API returned an error
-            if (isset($data['status']) && $data['status'] !== 'OK' && $data['status'] !== 'ZERO_RESULTS') {
-                $errorMessage = $data['error_message'] ?? 'Google Places API error: ' . $data['status'];
-                return CommonHelper::responseError($errorMessage);
-            }
-
-            // Format the response for frontend consumption
-            $suggestions = [];
-            if (isset($data['predictions']) && is_array($data['predictions'])) {
-                foreach ($data['predictions'] as $prediction) {
-                    // Extract main text and secondary text from structured_formatting
-                    $mainText = '';
-                    $secondaryText = '';
-                    $mainTextMatches = [];
-
-                    if (isset($prediction['structured_formatting'])) {
-                        $mainText = $prediction['structured_formatting']['main_text'] ?? '';
-                        $secondaryText = $prediction['structured_formatting']['secondary_text'] ?? '';
-
-                        // Extract matches for main text
-                        if (isset($prediction['structured_formatting']['main_text_matched_substrings'])) {
-                            foreach ($prediction['structured_formatting']['main_text_matched_substrings'] as $match) {
-                                $mainTextMatches[] = [
-                                    'endOffset' => $match['offset'] + $match['length']
-                                ];
-                            }
-                        }
-                    }
-
-                    // Extract matches for full text
-                    $textMatches = [];
-                    if (isset($prediction['matched_substrings'])) {
-                        foreach ($prediction['matched_substrings'] as $match) {
-                            $textMatches[] = [
-                                'endOffset' => $match['offset'] + $match['length']
-                            ];
-                        }
-                    }
-
-                    $suggestions[] = [
-                        'placePrediction' => [
-                            'place' => 'places/' . ($prediction['place_id'] ?? ''),
-                            'placeId' => $prediction['place_id'] ?? '',
-                            'text' => [
-                                'text' => $prediction['description'] ?? '',
-                                'matches' => $textMatches
-                            ],
-                            'structuredFormat' => [
-                                'mainText' => [
-                                    'text' => $mainText,
-                                    'matches' => $mainTextMatches
-                                ],
-                                'secondaryText' => [
-                                    'text' => $secondaryText
-                                ]
-                            ],
-                            'types' => $prediction['types'] ?? []
-                        ]
-                    ];
-                }
-            }
-
-            return CommonHelper::responseWithData([
-                'suggestions' => $suggestions,
-                'status' => $data['status'] ?? 'OK'
-            ]);
+            // Places API (New) is the only Places API used (the legacy one can't be enabled on new
+            // Google projects; existing installs enable Places API (New) instead).
+            return CommonHelper::responseError($this->googlePlacesError ?: 'Google Places API (New) is not available. Enable it for the Google key saved in settings.');
         } catch (\Exception $e) {
             Log::error('Google Places Autocomplete Error: ' . $e->getMessage());
             return CommonHelper::responseError('An error occurred while fetching location suggestions');
@@ -1127,129 +1073,201 @@ class StoreSettingsApiController extends Controller
                 return CommonHelper::responseError('Google Places API key not configured');
             }
 
-            // Build the API URL with comprehensive fields
-            $baseUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
-            $params = [
-                'place_id' => $request->place_id,
-                'key' => $apiKey,
-                'language' => $request->language ?? 'en',
-                'fields' => $request->fields ?? 'name,place_id,types,formatted_address,address_components,geometry,photos,website,url,utc_offset,icon,icon_background_color,icon_mask_base_uri,price_level,rating,user_ratings_total,reviews,opening_hours,business_status,formatted_phone_number,international_phone_number,editorial_summary'
-            ];
-
-            // Add optional parameters
-            if ($request->sessiontoken) {
-                $params['sessiontoken'] = $request->sessiontoken;
+            $newDetails = $this->googlePlacesNewDetails($request, $apiKey);
+            if ($newDetails !== null) {
+                return CommonHelper::responseWithData($newDetails);
             }
 
-            // Make the request to Google Places API
-            $url = $baseUrl . '?' . http_build_query($params);
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode !== 200) {
-                return CommonHelper::responseError('Failed to fetch place details');
-            }
-
-            $data = json_decode($response, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return CommonHelper::responseError('Invalid response from Google Places API');
-            }
-
-            // Check if Google API returned an error
-            if (isset($data['status']) && $data['status'] !== 'OK') {
-                $errorMessage = $data['error_message'] ?? 'Google Places API error: ' . $data['status'];
-                return CommonHelper::responseError($errorMessage);
-            }
-
-            // Transform the response to match the desired format
-            $result = $data['result'] ?? [];
-
-            $formattedResponse = [
-                'name' => 'places/' . ($result['place_id'] ?? ''),
-                'id' => $result['place_id'] ?? '',
-                'types' => $result['types'] ?? [],
-                'formattedAddress' => $result['formatted_address'] ?? '',
-                'addressComponents' => [],
-                'location' => [
-                    'latitude' => $result['geometry']['location']['lat'] ?? 0,
-                    'longitude' => $result['geometry']['location']['lng'] ?? 0
-                ],
-                'viewport' => [
-                    'low' => [
-                        'latitude' => $result['geometry']['viewport']['southwest']['lat'] ?? 0,
-                        'longitude' => $result['geometry']['viewport']['southwest']['lng'] ?? 0
-                    ],
-                    'high' => [
-                        'latitude' => $result['geometry']['viewport']['northeast']['lat'] ?? 0,
-                        'longitude' => $result['geometry']['viewport']['northeast']['lng'] ?? 0
-                    ]
-                ],
-                'googleMapsUri' => $result['url'] ?? '',
-                'websiteUri' => $result['website'] ?? '',
-                'utcOffsetMinutes' => $result['utc_offset'] ?? 0,
-                'adrFormatAddress' => $this->generateAdrFormatAddress($result['address_components'] ?? []),
-                'iconMaskBaseUri' => $result['icon_mask_base_uri'] ?? '',
-                'iconBackgroundColor' => $result['icon_background_color'] ?? '',
-                'displayName' => [
-                    'text' => $result['name'] ?? '',
-                    'languageCode' => $request->language ?? 'en'
-                ],
-                'shortFormattedAddress' => $this->getShortFormattedAddress($result['address_components'] ?? []),
-                'photos' => [],
-                'pureServiceAreaBusiness' => false,
-                'googleMapsLinks' => [
-                    'directionsUri' => $result['url'] ?? '',
-                    'placeUri' => $result['url'] ?? '',
-                    'photosUri' => $result['url'] ?? ''
-                ],
-            ];
-
-            // Process address components
-            if (isset($result['address_components']) && is_array($result['address_components'])) {
-                foreach ($result['address_components'] as $component) {
-                    $formattedResponse['addressComponents'][] = [
-                        'longText' => $component['long_name'] ?? '',
-                        'shortText' => $component['short_name'] ?? '',
-                        'types' => $component['types'] ?? [],
-                        'languageCode' => $request->language ?? 'en'
-                    ];
-                }
-            }
-
-            // Process photos
-            if (isset($result['photos']) && is_array($result['photos'])) {
-                foreach ($result['photos'] as $photo) {
-                    $formattedResponse['photos'][] = [
-                        'name' => 'places/' . ($result['place_id'] ?? '') . '/photos/' . ($photo['photo_reference'] ?? ''),
-                        'widthPx' => $photo['width'] ?? 0,
-                        'heightPx' => $photo['height'] ?? 0,
-                        'authorAttributions' => [
-                            [
-                                'displayName' => $photo['html_attributions'][0] ?? 'Unknown',
-                                'uri' => '',
-                                'photoUri' => ''
-                            ]
-                        ],
-                        'flagContentUri' => '',
-                        'googleMapsUri' => ''
-                    ];
-                }
-            }
-
-            return CommonHelper::responseWithData($formattedResponse);
+            return CommonHelper::responseError($this->googlePlacesError ?: 'Google Places API (New) is not available. Enable it for the Google key saved in settings.');
         } catch (\Exception $e) {
             Log::error('Google Places Details Error: ' . $e->getMessage());
             return CommonHelper::responseError('An error occurred while fetching place details');
         }
+    }
+
+    /** Last error text from googlePlacesNewRequest(), so the reply can show the real reason. */
+    protected $googlePlacesError = '';
+
+    /**
+     * Places API (New) call. Returns the decoded JSON, or null when Google refuses it (not enabled
+     * for the key's project, key restrictions, any other error); the reason is kept in
+     * $this->googlePlacesError.
+     */
+    protected function googlePlacesNewRequest(string $method, string $url, string $apiKey, string $fieldMask, ?array $body = null): ?array
+    {
+        $this->googlePlacesError = '';
+
+        try {
+            $headers = ['X-Goog-Api-Key: ' . $apiKey, 'X-Goog-FieldMask: ' . $fieldMask];
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            if ($method === 'POST') {
+                $headers[] = 'Content-Type: application/json';
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body ?? []));
+            }
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            $response = curl_exec($ch);
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $data = json_decode((string) $response, true);
+            if ($httpCode !== 200 || !is_array($data)) {
+                $this->googlePlacesError = $data['error']['message'] ?? 'Google Places API (New) request failed.';
+                return null;
+            }
+            return $data;
+        } catch (\Throwable $e) {
+            $this->googlePlacesError = $e->getMessage();
+            Log::error('Google Places (New) request failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Autocomplete (New) -> the `placePrediction` list the apps already read, or null on failure. The request keeps the legacy inputs: `components` ("country:in|country:us")
+     * becomes includedRegionCodes, and the legacy "(cities)" / "(regions)" types become primary types;
+     * other legacy type words (geocode, address, establishment) have no equivalent and are left out.
+     */
+    private function googlePlacesNewAutocomplete(Request $request, string $apiKey): ?array
+    {
+        $body = [
+            'input' => $request->input,
+            'languageCode' => $request->language ?? 'en',
+        ];
+        if ($request->sessiontoken) {
+            $body['sessionToken'] = $request->sessiontoken;
+        }
+        if ($request->components) {
+            $codes = [];
+            foreach (explode('|', $request->components) as $component) {
+                if (stripos($component, 'country:') === 0) {
+                    $codes[] = strtolower(substr($component, 8));
+                }
+            }
+            if ($codes) {
+                $body['includedRegionCodes'] = array_slice(array_values(array_unique($codes)), 0, 15);
+            }
+        }
+        if ($request->types === '(cities)') {
+            $body['includedPrimaryTypes'] = ['locality', 'administrative_area_level_3'];
+        } elseif ($request->types === '(regions)') {
+            $body['includedPrimaryTypes'] = ['locality', 'sublocality', 'postal_code', 'country', 'administrative_area_level_1'];
+        }
+
+        $data = $this->googlePlacesNewRequest(
+            'POST',
+            'https://places.googleapis.com/v1/places:autocomplete',
+            $apiKey,
+            'suggestions.placePrediction.place,suggestions.placePrediction.placeId,suggestions.placePrediction.text,suggestions.placePrediction.structuredFormat,suggestions.placePrediction.types',
+            $body
+        );
+        if ($data === null) {
+            return null;
+        }
+
+        $suggestions = [];
+        foreach ((array) ($data['suggestions'] ?? []) as $suggestion) {
+            if (empty($suggestion['placePrediction'])) {
+                continue; // query predictions have no place
+            }
+            $prediction = $suggestion['placePrediction'];
+            $suggestions[] = ['placePrediction' => [
+                'place' => $prediction['place'] ?? ('places/' . ($prediction['placeId'] ?? '')),
+                'placeId' => $prediction['placeId'] ?? '',
+                'text' => [
+                    'text' => $prediction['text']['text'] ?? '',
+                    'matches' => $prediction['text']['matches'] ?? [],
+                ],
+                'structuredFormat' => [
+                    'mainText' => [
+                        'text' => $prediction['structuredFormat']['mainText']['text'] ?? '',
+                        'matches' => $prediction['structuredFormat']['mainText']['matches'] ?? [],
+                    ],
+                    'secondaryText' => [
+                        'text' => $prediction['structuredFormat']['secondaryText']['text'] ?? '',
+                    ],
+                ],
+                'types' => $prediction['types'] ?? [],
+            ]];
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * Place Details (New) -> the field set the apps already read, or null on failure. Fields that cost extra on Google's side and that the address pickers don't use (photos,
+     * website) are not requested and keep their empty defaults.
+     */
+    private function googlePlacesNewDetails(Request $request, string $apiKey): ?array
+    {
+        $language = $request->language ?? 'en';
+        $query = ['languageCode' => $language];
+        if ($request->sessiontoken) {
+            $query['sessionToken'] = $request->sessiontoken;
+        }
+
+        $data = $this->googlePlacesNewRequest(
+            'GET',
+            'https://places.googleapis.com/v1/places/' . rawurlencode($request->place_id) . '?' . http_build_query($query),
+            $apiKey,
+            'id,displayName,formattedAddress,addressComponents,location,viewport,types,googleMapsUri,utcOffsetMinutes,adrFormatAddress,shortFormattedAddress'
+        );
+        if ($data === null || empty($data['id'])) {
+            return null;
+        }
+
+        $components = [];
+        foreach ((array) ($data['addressComponents'] ?? []) as $component) {
+            $components[] = [
+                'longText' => $component['longText'] ?? '',
+                'shortText' => $component['shortText'] ?? '',
+                'types' => $component['types'] ?? [],
+                'languageCode' => $component['languageCode'] ?? $language,
+            ];
+        }
+        $uri = $data['googleMapsUri'] ?? '';
+
+        return [
+            'name' => $data['name'] ?? ('places/' . $data['id']),
+            'id' => $data['id'],
+            'types' => $data['types'] ?? [],
+            'formattedAddress' => $data['formattedAddress'] ?? '',
+            'addressComponents' => $components,
+            'location' => [
+                'latitude' => $data['location']['latitude'] ?? 0,
+                'longitude' => $data['location']['longitude'] ?? 0,
+            ],
+            'viewport' => [
+                'low' => [
+                    'latitude' => $data['viewport']['low']['latitude'] ?? 0,
+                    'longitude' => $data['viewport']['low']['longitude'] ?? 0,
+                ],
+                'high' => [
+                    'latitude' => $data['viewport']['high']['latitude'] ?? 0,
+                    'longitude' => $data['viewport']['high']['longitude'] ?? 0,
+                ],
+            ],
+            'googleMapsUri' => $uri,
+            'websiteUri' => '',
+            'utcOffsetMinutes' => $data['utcOffsetMinutes'] ?? 0,
+            'adrFormatAddress' => $data['adrFormatAddress'] ?? '',
+            'iconMaskBaseUri' => '',
+            'iconBackgroundColor' => '',
+            'displayName' => [
+                'text' => $data['displayName']['text'] ?? '',
+                'languageCode' => $data['displayName']['languageCode'] ?? $language,
+            ],
+            'shortFormattedAddress' => $data['shortFormattedAddress'] ?? '',
+            'photos' => [],
+            'pureServiceAreaBusiness' => false,
+            'googleMapsLinks' => [
+                'directionsUri' => $uri,
+                'placeUri' => $uri,
+                'photosUri' => $uri,
+            ],
+        ];
     }
 
     /**
@@ -1389,6 +1407,324 @@ class StoreSettingsApiController extends Controller
             Log::error('Google Maps Geocoding Error: ' . $e->getMessage());
             return CommonHelper::responseError('An error occurred while processing geocoding request: ' . $e->getMessage());
         }
+    }
+
+    // ============================================================
+    // Map provider dispatchers (Google paid vs OpenStreetMap free).
+    // Callers (admin panel map pickers, customer app/web) hit these
+    // instead of the google*/osm* methods directly — each one routes
+    // to whichever provider is configured and returns a normalized
+    // response shape so the frontend does not need to branch on it.
+    // ============================================================
+
+    protected function activeMapProvider(): string
+    {
+        $provider = Setting::get_value('map_provider');
+        return $provider === 'osm' ? 'osm' : 'google';
+    }
+
+    public function placesAutocomplete(Request $request)
+    {
+        return $this->activeMapProvider() === 'osm'
+            ? $this->osmPlacesAutocomplete($request)
+            : $this->googlePlacesAutocomplete($request);
+    }
+
+    public function placesDetails(Request $request)
+    {
+        return $this->activeMapProvider() === 'osm'
+            ? $this->osmPlacesDetails($request)
+            : $this->googlePlacesDetails($request);
+    }
+
+    public function mapsGeocoding(Request $request)
+    {
+        return $this->activeMapProvider() === 'osm'
+            ? $this->osmReverseGeocoding($request)
+            : $this->googleMapsGeocoding($request);
+    }
+
+    /**
+     * Nominatim search -> normalized to the Google-Places-Autocomplete shape so
+     * frontend code (EditCity.vue, EditSeller.vue, SellerDetails.vue, the OsmMapPicker
+     * component) can stay provider-agnostic. Nominatim's public server is free but
+     * rate-limited - fine for admin-panel usage (a handful of lookups per day), not
+     * meant for high-volume customer-facing traffic. Self-host Nominatim later if that
+     * becomes a problem, swapping only the URL in nominatimRequest() below.
+     */
+    public function osmPlacesAutocomplete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'input' => 'required|string|min:2',
+            'language' => 'nullable|string|size:2',
+            'source' => 'required|string|in:app,web',
+        ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        ApiCallTracking::incrementCallCount('osm_places_autocomplete', $request->source);
+
+        try {
+            $params = [
+                'q' => $request->input,
+                'format' => 'json',
+                'addressdetails' => 1,
+                'limit' => 5,
+                'accept-language' => $request->language ?? 'en',
+            ];
+            $data = $this->nominatimRequest('search', $params);
+            if (isset($data['__error'])) {
+                return CommonHelper::responseError($data['__error']);
+            }
+
+            $suggestions = [];
+            foreach ((array) $data as $row) {
+                $osmType = $row['osm_type'] ?? '';
+                $osmId = $row['osm_id'] ?? '';
+                // Encode a placeId callers can pass back to placesDetails.
+                $placeId = $osmType && $osmId ? (strtoupper(substr($osmType, 0, 1)) . $osmId) : '';
+                $display = $row['display_name'] ?? '';
+                $address = $row['address'] ?? [];
+                $mainText = $address['city'] ?? $address['town'] ?? $address['village']
+                    ?? $address['suburb'] ?? $address['road'] ?? $display;
+                $secondary = trim(str_replace($mainText, '', $display), " ,");
+
+                $suggestions[] = [
+                    'placePrediction' => [
+                        'place' => 'osm/' . $placeId,
+                        'placeId' => $placeId,
+                        'text' => ['text' => $display, 'matches' => []],
+                        'structuredFormat' => [
+                            'mainText' => ['text' => $mainText, 'matches' => []],
+                            'secondaryText' => ['text' => $secondary],
+                        ],
+                        'types' => [$row['type'] ?? $row['class'] ?? 'place'],
+                        // Provider-specific extras - the OSM map picker can use these
+                        // as a fast path and skip the details round-trip if it wants.
+                        '_osm' => [
+                            'lat' => isset($row['lat']) ? (float) $row['lat'] : null,
+                            'lon' => isset($row['lon']) ? (float) $row['lon'] : null,
+                            'address' => $address,
+                        ],
+                    ],
+                ];
+            }
+
+            return CommonHelper::responseWithData([
+                'suggestions' => $suggestions,
+                'status' => 'OK',
+                'provider' => 'osm',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('OSM Places Autocomplete Error: ' . $e->getMessage());
+            return CommonHelper::responseError('An error occurred while fetching location suggestions');
+        }
+    }
+
+    /**
+     * Nominatim lookup by encoded place_id (e.g. "N12345", "W67890", "R11").
+     * Normalized to the Google-Places-Details shape.
+     */
+    public function osmPlacesDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'place_id' => 'required|string',
+            'language' => 'nullable|string|size:2',
+            'source' => 'required|string|in:app,web',
+        ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        ApiCallTracking::incrementCallCount('osm_places_details', $request->source);
+
+        try {
+            $placeId = (string) $request->place_id;
+            // Expected forms: "N123", "W123", "R123" (node/way/relation prefix).
+            if (!preg_match('/^[NWR]\d+$/i', $placeId)) {
+                return CommonHelper::responseError('Invalid OSM place id');
+            }
+            $params = [
+                'osm_ids' => strtoupper($placeId),
+                'format' => 'json',
+                'addressdetails' => 1,
+                'accept-language' => $request->language ?? 'en',
+            ];
+            $data = $this->nominatimRequest('lookup', $params);
+            if (isset($data['__error'])) {
+                return CommonHelper::responseError($data['__error']);
+            }
+            $row = is_array($data) && !empty($data) ? $data[0] : null;
+            if (!$row) {
+                return CommonHelper::responseError('Place not found');
+            }
+            return CommonHelper::responseWithData($this->normalizeOsmPlace($row, $request->language ?? 'en'));
+        } catch (\Exception $e) {
+            Log::error('OSM Places Details Error: ' . $e->getMessage());
+            return CommonHelper::responseError('An error occurred while fetching place details');
+        }
+    }
+
+    /**
+     * Nominatim reverse geocoding -> shape matching googleMapsGeocoding().
+     */
+    public function osmReverseGeocoding(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'source' => 'required|string|in:app,web',
+        ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        ApiCallTracking::incrementCallCount('osm_maps_geocoding', $request->source);
+
+        try {
+            $params = [
+                'lat' => $request->latitude,
+                'lon' => $request->longitude,
+                'format' => 'json',
+                'addressdetails' => 1,
+                'zoom' => 18,
+            ];
+            $data = $this->nominatimRequest('reverse', $params);
+            if (isset($data['__error'])) {
+                return CommonHelper::responseError($data['__error']);
+            }
+            if (!is_array($data) || empty($data)) {
+                return CommonHelper::responseWithData(['results' => [], 'status' => 'ZERO_RESULTS']);
+            }
+
+            $components = $this->osmAddressToComponents($data['address'] ?? []);
+            $result = [
+                'formatted_address' => $data['display_name'] ?? '',
+                'geometry' => [
+                    'location' => [
+                        'lat' => isset($data['lat']) ? (float) $data['lat'] : 0,
+                        'lng' => isset($data['lon']) ? (float) $data['lon'] : 0,
+                    ],
+                ],
+                'place_id' => ($data['osm_type'] ?? '') && ($data['osm_id'] ?? '')
+                    ? strtoupper(substr($data['osm_type'], 0, 1)) . $data['osm_id']
+                    : '',
+                'types' => [$data['type'] ?? 'place'],
+                'address_components' => array_map(function ($c) {
+                    return [
+                        'long_name' => $c['longText'],
+                        'short_name' => $c['shortText'],
+                        'types' => $c['types'],
+                    ];
+                }, $components),
+                'partial_match' => false,
+            ];
+
+            return CommonHelper::responseWithData([
+                'results' => [$result],
+                'status' => 'OK',
+                'provider' => 'osm',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('OSM Reverse Geocoding Error: ' . $e->getMessage());
+            return CommonHelper::responseError('An error occurred while processing geocoding request');
+        }
+    }
+
+    protected function nominatimRequest(string $endpoint, array $params): array
+    {
+        $url = 'https://nominatim.openstreetmap.org/' . $endpoint . '?' . http_build_query($params);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        // Nominatim ToS requires a real User-Agent identifying the app.
+        curl_setopt($ch, CURLOPT_USERAGENT, 'eGrocer/1.0 (' . parse_url(env('APP_URL', 'localhost'), PHP_URL_HOST) . ')');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            return ['__error' => 'Network error: ' . $err];
+        }
+        if ($httpCode !== 200) {
+            return ['__error' => 'OSM request failed. HTTP ' . $httpCode];
+        }
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ['__error' => 'Invalid response from OSM Nominatim'];
+        }
+        return $data;
+    }
+
+    protected function normalizeOsmPlace(array $row, string $language = 'en'): array
+    {
+        $addr = $row['address'] ?? [];
+        $components = $this->osmAddressToComponents($addr);
+        $lat = isset($row['lat']) ? (float) $row['lat'] : 0;
+        $lon = isset($row['lon']) ? (float) $row['lon'] : 0;
+        $placeId = ($row['osm_type'] ?? '') && ($row['osm_id'] ?? '')
+            ? strtoupper(substr($row['osm_type'], 0, 1)) . $row['osm_id']
+            : '';
+
+        return [
+            'name' => 'osm/' . $placeId,
+            'id' => $placeId,
+            'types' => [$row['type'] ?? $row['class'] ?? 'place'],
+            'formattedAddress' => $row['display_name'] ?? '',
+            'addressComponents' => array_map(function ($c) use ($language) {
+                return $c + ['languageCode' => $language];
+            }, $components),
+            'location' => ['latitude' => $lat, 'longitude' => $lon],
+            'viewport' => [
+                'low' => ['latitude' => $lat, 'longitude' => $lon],
+                'high' => ['latitude' => $lat, 'longitude' => $lon],
+            ],
+            'displayName' => [
+                'text' => $addr['city'] ?? $addr['town'] ?? $addr['village'] ?? ($row['name'] ?? $row['display_name'] ?? ''),
+                'languageCode' => $language,
+            ],
+            'shortFormattedAddress' => $addr['city'] ?? $addr['town'] ?? $addr['village'] ?? '',
+            'provider' => 'osm',
+        ];
+    }
+
+    /**
+     * Map Nominatim address keys -> Google address_components-style rows.
+     */
+    protected function osmAddressToComponents(array $addr): array
+    {
+        $map = [
+            'house_number' => ['street_number'],
+            'road' => ['route'],
+            'suburb' => ['sublocality', 'sublocality_level_1'],
+            'neighbourhood' => ['neighborhood'],
+            'village' => ['locality'],
+            'town' => ['locality'],
+            'city' => ['locality'],
+            'county' => ['administrative_area_level_2'],
+            'state' => ['administrative_area_level_1'],
+            'state_district' => ['administrative_area_level_2'],
+            'postcode' => ['postal_code'],
+            'country' => ['country'],
+            'country_code' => ['country'],
+        ];
+        $out = [];
+        foreach ($map as $key => $types) {
+            if (!empty($addr[$key])) {
+                $val = $addr[$key];
+                $shortVal = ($key === 'country_code') ? strtoupper((string) $val) : (string) $val;
+                $longVal = ($key === 'country_code') ? ($addr['country'] ?? strtoupper((string) $val)) : (string) $val;
+                $out[] = ['longText' => $longVal, 'shortText' => $shortVal, 'types' => $types];
+            }
+        }
+        return $out;
     }
 
     /**

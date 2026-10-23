@@ -32,7 +32,9 @@ class ThemeService
     ];
 
     public const DEFAULT_LIGHT_SEED_PRIMARY = '#FF9900';
-    public const DEFAULT_LIGHT_SEED_NEUTRAL = '#6f6f6f';
+    // Neutral drives text, borders and surfaces; white produced an all-white palette (invisible
+    // borders). #9E9E9E is the lightest seed the Theme Settings save check accepts.
+    public const DEFAULT_LIGHT_SEED_NEUTRAL = '#9E9E9E';
 
     /**
      * Generate an 11-stop (50-950) color palette from a single hex seed.
@@ -266,6 +268,15 @@ class ThemeService
         return $map;
     }
 
+    /**
+     * Whether the module has saved its own primary / neutral colors (Theme Settings > Save).
+     */
+    public function hasOwnColors(int $moduleId): bool
+    {
+        $map = $this->getSettingsMap($moduleId);
+        return !empty($map['light_seed_primary']) || !empty($map['light_primary_palette']);
+    }
+
     private function decodedPalette(array $map, string $key): ?array
     {
         if (empty($map[$key])) {
@@ -322,5 +333,44 @@ class ThemeService
     public function touchThemeUpdatedAt(int $moduleId = 1): void
     {
         $this->putSetting('theme_updated_at', now()->toIso8601String(), $moduleId);
+    }
+
+    /*
+     * Admin panel colours (one global setting, the same for every module):
+     *   admin_use_module_theme = 1 -> the admin panel follows each module's theme colours (default)
+     *   admin_use_module_theme = 0 -> the admin panel uses its own primary / neutral palette below
+     * Stored as plain (unsuffixed) keys; module 1's keys are unsuffixed, so module id 1 = global.
+     */
+    private const ADMIN_KEYS = ['admin_use_module_theme', 'admin_seed_primary', 'admin_seed_neutral', 'admin_primary_palette', 'admin_neutral_palette'];
+
+    public function getAdminPanelTheme(): array
+    {
+        $map = Setting::whereIn('variable', self::ADMIN_KEYS)->pluck('value', 'variable')->toArray();
+
+        $usesModuleTheme = !isset($map['admin_use_module_theme']) || (string) $map['admin_use_module_theme'] !== '0';
+        $seedPrimary = $map['admin_seed_primary'] ?? self::DEFAULT_LIGHT_SEED_PRIMARY;
+        $seedNeutral = $map['admin_seed_neutral'] ?? self::DEFAULT_LIGHT_SEED_NEUTRAL;
+
+        return [
+            'use_module_theme' => $usesModuleTheme,
+            'seed_primary' => $seedPrimary,
+            'seed_neutral' => $seedNeutral,
+            'primary' => $this->decodedPalette($map, 'admin_primary_palette') ?? $this->generatePalette($seedPrimary),
+            'neutral' => $this->decodedPalette($map, 'admin_neutral_palette') ?? $this->generateNeutralPalette($seedNeutral),
+        ];
+    }
+
+    public function saveAdminPanelTheme(bool $useModuleTheme, ?string $seedPrimary = null, ?string $seedNeutral = null): array
+    {
+        $this->putSetting('admin_use_module_theme', $useModuleTheme ? '1' : '0', 1);
+
+        if (!$useModuleTheme && $seedPrimary && $seedNeutral) {
+            $this->putSetting('admin_seed_primary', $seedPrimary, 1);
+            $this->putSetting('admin_seed_neutral', $seedNeutral, 1);
+            $this->putSetting('admin_primary_palette', json_encode($this->generatePalette($seedPrimary)), 1);
+            $this->putSetting('admin_neutral_palette', json_encode($this->generateNeutralPalette($seedNeutral)), 1);
+        }
+
+        return $this->getAdminPanelTheme();
     }
 }

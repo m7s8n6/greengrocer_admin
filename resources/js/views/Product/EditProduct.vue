@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+    <div class="product-form-page">
+        <div class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
             <h3 class="mb-0">
                 <template v-if="clone">
                     {{ __('clone') }}
@@ -50,25 +50,25 @@
                 <div class="col-12 col-md-12 order-md-1 order-last" id="mymodal">
                     <form ref="my-form" @submit.prevent="saveRecord" @keydown.enter="$event.preventDefault()">
                         <div class="card">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <h4><template v-if="clone">{{ __('clone') }}</template><template v-else-if="id">{{
                                     __('edit') }}</template><template v-else>{{ __('add') }}</template> {{
                                             __('product') }}</h4>
-                                <span class="pull-right">
+                                <span class="product-form-header-action">
                                     <template v-if="isSellerRole">
-                                        <router-link to="/seller/manage_products" class="btn btn-primary"
+                                        <router-link to="/seller/manage_products" class="btn btn-sm btn-outline-secondary"
                                             v-b-tooltip.hover title="Manage Product">{{ __('manage_products')
                                             }}</router-link>
                                     </template>
                                     <template v-else>
-                                        <router-link to="/manage_products" class="btn btn-primary" v-b-tooltip.hover
+                                        <router-link to="/manage_products" class="btn btn-sm btn-outline-secondary" v-b-tooltip.hover
                                             title="Manage Product">{{ __('manage_products') }}</router-link>
                                     </template>
                                 </span>
                             </div>
                             <div class="card-body">
                                 <!-- Language Tabs -->
-                                <div class="col-md-12 mb-3" v-if="languages.length > 0">
+                                <div class="mb-3 product-lang-tabs" v-if="languages.length > 0">
                                     <b-tabs v-model="activeLanguageTab" content-class="mt-3">
                                         <b-tab v-for="language in languages" :key="language.id" :title="language.name"
                                             lazy>
@@ -79,8 +79,8 @@
                                             </template>
 
                                             <!-- Translate buttons -->
-                                            <div class="mb-3" v-if="language.is_default && languages.length > 1">
-                                                <b-button size="sm" variant="outline-primary" class="mr-2"
+                                            <div class="mb-3 d-flex flex-wrap align-items-center gap-2 product-translate-actions" v-if="language.is_default && languages.length > 1">
+                                                <b-button size="sm" variant="outline-primary"
                                                     @click="translateEmpty(language)" v-b-tooltip.hover
                                                     :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                                                     :disabled="loadingEmpty">
@@ -98,7 +98,7 @@
                                                 </b-button>
 
                                                 <div v-if="translateSuccessMessage"
-                                                    class="text-success mt-2 font-weight-bold">
+                                                    class="text-success small w-100 font-weight-bold">
                                                     {{ translateSuccessMessage }}
                                                 </div>
                                             </div>
@@ -199,7 +199,7 @@
                                                             <div
                                                                 class="form-group mb-3 d-flex flex-wrap align-items-center">
                                                                 <button type="button"
-                                                                    class="btn btn-outline-primary me-3 my-2 ai-generate-btn"
+                                                                    class="btn btn-sm btn-outline-primary me-3 my-2 ai-generate-btn"
                                                                     @click="generateDescription"
                                                                     :disabled="isGeneratingAI">
                                                                     <!-- AI Processing State -->
@@ -298,7 +298,7 @@
                             </div>
                             <div class="card-body">
                                 <!-- Language Tabs for SEO -->
-                                <div class="col-md-12 mb-3" v-if="languages.length > 0">
+                                <div class="mb-3 product-lang-tabs" v-if="languages.length > 0">
                                     <b-tabs v-model="activeLanguageTab" content-class="mt-3">
                                         <b-tab v-for="language in languages" :key="language.id" :title="language.name"
                                             lazy>
@@ -349,14 +349,14 @@
                                 </div>
                             </div>
                             <!-- Save and Clear buttons for non-default language tabs -->
-                            <div class="card-footer"
+                            <div class="card-footer product-form-actions"
                                 v-if="languages.length > 0 && languages[activeLanguageTab] && !languages[activeLanguageTab].is_default">
+                                <button type="button" class="btn btn-outline-secondary" @click="clearForm">{{ __('clear')
+                                    }}</button>
                                 <b-button type="submit" @keydown.enter="saveRecord" variant="primary"
                                     :disabled="isLoading"> {{ __('save') }}
                                     <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                 </b-button>
-                                <button type="button" class="btn btn-danger" @click="clearForm">{{ __('clear')
-                                    }}</button>
                             </div>
                         </div>
 
@@ -369,7 +369,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <!-- Row: Category, Product type, Product status -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label>{{ __('category') }} <i class="text-danger">*</i></label>
                                             <!-- Select2 instead of a native <select>: the native dropdown popup is
@@ -381,20 +381,20 @@
                                                 :settings="{ width: '100%', dropdownParent: '#mymodal' }" />
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                                         <template v-if="isSellerRole">
                                             <input type="hidden" v-model="is_approved">
                                         </template>
                                         <template v-else>
                                             <div class="form-group mb-3">
                                                 <label>{{ __('product_status') }}</label><br>
-                                                <div id="status" class="btn-group">
-                                                    <label class="btn btn-primary" data-toggle-class="btn-primary"
+                                                <div id="status" class="btn-group btn-group-toggle segmented-toggle product-status-toggle">
+                                                    <label class="btn" :class="is_approved == 1 ? 'btn-success' : 'btn-outline-secondary'" data-toggle-class="btn-primary"
                                                         data-toggle-passive-class="btn-default">
                                                         <input type="radio" v-model="is_approved" value="1"> {{
                                                             __('approved') }}
                                                     </label>
-                                                    <label class="btn btn-danger" data-toggle-class="btn-danger"
+                                                    <label class="btn" :class="is_approved == 0 ? 'btn-danger' : 'btn-outline-secondary'" data-toggle-class="btn-danger"
                                                         data-toggle-passive-class="btn-default">
                                                         <input type="radio" v-model="is_approved" value="0">
                                                         {{ __('not_approved') }}
@@ -437,18 +437,18 @@
 
 
                                     <!-- Row: Barcode, Total allowed quantity -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label for="barcode">{{ __('barcode') }}</label>
                                             <input type="text" id="barcode" class="form-control" :placeholder="__('barcode')"
                                                 v-model="barcode" @input="validateBarcode">
-                                            <p style="color:red !important" v-if="validationBarcodeMessage">{{
+                                            <p class="small text-danger mt-1 mb-0" v-if="validationBarcodeMessage">{{
                                                 validationBarcodeMessage }}</p>
-                                            <p style="color:green !important" v-else-if="isBarcodeValid">Barcode is valid!
+                                            <p class="small text-success mt-1 mb-0" v-else-if="isBarcodeValid">Barcode is valid!
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label for="max_allowed_quantity">{{ __('total_allowed_quantity') }} ({{ __('keep_blank_if_no_such_limit')
                                                 }}) </label>
@@ -458,7 +458,7 @@
                                     </div>
 
                                     <!-- Row: Is returnable, Is cancelable, Is COD allowed -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-6 col-xl-4">
                                         <div class="form-group mb-3 d-flex flex-wrap align-items-start gap-2">
                                             <div>
                                                 <label>{{ __('is_returnable') }}</label><br>
@@ -476,7 +476,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6 col-xl-4">
                                         <div class="form-group mb-3 d-flex flex-wrap align-items-start gap-2">
                                             <div>
                                                 <label>{{ __('is_cancelable') }}</label><br>
@@ -499,7 +499,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6 col-xl-4">
                                         <div class="form-group mb-3">
                                             <label>{{ __('is_cod_allowed') }}</label><br>
                                             <b-form-radio-group v-model="cod_allowed_status" :options="[
@@ -508,7 +508,7 @@
                                             ]" buttons button-variant="outline-primary"></b-form-radio-group>
                                         </div>
                                     </div>
-                                    <div class="col-md-4" v-if="isPharmacyModule">
+                                    <div class="col-md-6 col-xl-4" v-if="isPharmacyModule">
                                         <div class="form-group mb-3">
                                             <label>{{ __('require_prescription') }}</label><br>
                                             <b-form-radio-group v-model="require_prescription" :options="[
@@ -531,7 +531,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group col-md-4" v-for="field in translatedCustomFields"
+                                    <div class="form-group mb-3 col-md-6" v-for="field in translatedCustomFields"
                                         :key="field.id">
                                         <label>{{ field.name }}
                                             <i v-if="field.is_required" class="text-danger">*</i></label>
@@ -556,6 +556,8 @@
                                                 class="badge bg-success mt-1"><i class="fa fa-eye"></i> {{ __('view') || 'View' }}</a>
                                         </template>
 
+                                        <custom-field-date v-else-if="field.type === 'date'" v-model="customFieldValues[field.id]"
+                                            :placeholder="field.name"></custom-field-date>
                                         <input v-else :type="field.type === 'number' ? 'number' : 'text'"
                                             class="form-control" v-model="customFieldValues[field.id]"
                                             :placeholder="field.name">
@@ -570,10 +572,10 @@
                             <div class="card-header">
                                 <h4>{{ __('product_variants') }}</h4>
                             </div>
-                            <div class="card-body">
-                                <div class="col-md-6">
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
+                            <div class="card-body product-variants-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
                                             <label class="control-label">{{ __('stock_limit') }} <i
                                                     class="text-danger">*</i></label><br>
                                             <b-form-radio-group v-model="is_unlimited_stock" :options="[
@@ -582,15 +584,15 @@
                                             ]" buttons button-variant="outline-primary"></b-form-radio-group>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-md-12">
+                                    <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('images') }}</label><br>
                                         <b-form-radio-group v-model="image_mode" :options="[
                                             { text: __('global_images'), 'value': 'global' },
                                             { text: __('variant_wise_images'), 'value': 'variant' },
                                         ]" buttons button-variant="outline-primary"></b-form-radio-group>
+                                    </div>
                                     </div>
                                 </div>
 
@@ -709,14 +711,14 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-12" v-if="attributeOptions.length === 0 && !isLoadingAttributes">
+                                <div v-if="attributeOptions.length === 0 && !isLoadingAttributes">
                                     <p class="text-danger mb-2">
                                         {{ category_id ? __('no_attributes_for_this_category') : __('please_select_category_first') }}
                                     </p>
                                 </div>
 
                                 <!-- Variant matrix: pick attribute values, generate every combination -->
-                                <div class="col-md-12" v-if="attributeOptions.length">
+                                <div class="product-form-subsection" v-if="attributeOptions.length">
                                     <h5 class="mb-1">{{ __('variant_matrix') }}</h5>
                                     <p class="text-muted mb-3">{{ __('select_one_or_more_values_for_each_attribute_every_combination_becomes_a_variant') }}</p>
 
@@ -730,9 +732,9 @@
                                                 v-b-tooltip.hover :title="value.value"
                                                 class="d-inline-block rounded-circle me-2 mb-1"
                                                 :style="{
-                                                    background: value.color_code || '#ccc',
+                                                    background: value.color_code || 'var(--theme-neutral-300)',
                                                     width: '32px', height: '32px', cursor: 'pointer',
-                                                    border: isAttributeValueChecked(attribute.id, value.id) ? '3px solid #37a279' : '1px solid #ccc'
+                                                    border: isAttributeValueChecked(attribute.id, value.id) ? '3px solid var(--theme-primary-500)' : '1px solid var(--theme-neutral-300)'
                                                 }"></span>
                                         </template>
 
@@ -742,7 +744,7 @@
                                                 @click="toggleAttributeValueChecked(attribute.id, value.id)"
                                                 v-b-tooltip.hover :title="value.value"
                                                 class="d-inline-block me-2 mb-1"
-                                                :style="{ cursor: 'pointer', border: isAttributeValueChecked(attribute.id, value.id) ? '3px solid #37a279' : '1px solid #ccc' }">
+                                                :style="{ cursor: 'pointer', border: isAttributeValueChecked(attribute.id, value.id) ? '3px solid var(--theme-primary-500)' : '1px solid var(--theme-neutral-300)' }">
                                                 <img v-if="value.image_url" :src="value.image_url" style="width: 40px; height: 40px; object-fit: cover; display: block;">
                                                 <span v-else style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 10px;">{{ value.value }}</span>
                                             </span>
@@ -779,8 +781,7 @@
                                 <!-- Chip list: one chip per generated variant, click to edit its fields below.
                                      Legacy variants saved before the attribute system (no attribute_value_id)
                                      still get a chip - "unmapped" - so they stay editable/recoverable. -->
-                                <div class="col-md-12 mb-3" v-if="hasEditableVariants">
-                                    <hr>
+                                <div class="mb-3 product-form-subsection" v-if="hasEditableVariants">
                                     <h5 class="mb-2">{{ __('product_variants') }}</h5>
                                     <button type="button" v-for="(input, k) in inputs" :key="k"
                                         class="btn btn-sm me-1 mb-1"
@@ -793,7 +794,7 @@
                                     </button>
                                 </div>
 
-                                <div id="packate_div" class="list-group-item" v-for="(input, k) in inputs" :key="k"
+                                <div id="packate_div" class="list-group-item product-variant-panel" v-for="(input, k) in inputs" :key="k"
                                     v-show="k === activeVariantIndex && (input.attribute_value_id || input.id)">
                                     <div class="row">
                                         <div class="col-md-12 mb-2" v-if="input.label">
@@ -817,7 +818,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-6 col-xl-4">
                                             <div class="form-group mb-3">
                                                 <label>{{ __('price') }} ( {{ $currency }} ) <i
                                                         class="text-danger">*</i></label>
@@ -825,7 +826,7 @@
                                                     placeholder="0.00" v-model="input.packet_price" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6 col-xl-4">
                                             <div class="form-group mb-3">
                                                 <label>{{ __('purchase_price') }} ( {{ $currency }} )
                                                     <i class="fa fa-info-circle text-muted" v-b-tooltip.hover
@@ -835,7 +836,7 @@
                                                     placeholder="0.00" v-model="input.packet_purchase_price">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6 col-xl-4">
                                             <div class="form-group mb-3">
                                                 <label>{{ __('discounted_price') }} ( {{ $currency }} )</label>
                                                 <input type="number" min="0" step="any" class="form-control"
@@ -845,14 +846,14 @@
                                                     input.validationErrorDiscountedPrice }}</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-4" v-if="is_unlimited_stock != 1">
+                                        <div class="col-md-6 col-xl-4" v-if="is_unlimited_stock != 1">
                                             <div class="form-group mb-3">
                                                 <label>{{ __('stock') }} <i class="text-danger">*</i></label>
                                                 <input type="number" step="any" min="0" class="form-control"
                                                     placeholder="0" name="packate_stock[]" v-model="input.packet_stock">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6 col-xl-4">
                                             <div class="form-group mb-3">
                                                 <label>{{ __('status') }} <i class="text-danger">*</i></label>
                                                 <select class="form-control" v-model="input.packet_status"
@@ -918,14 +919,14 @@
 
                             </div>
                             <!-- Save and Clear buttons for default language tab only -->
-                            <div class="card-footer"
+                            <div class="card-footer product-form-actions"
                                 v-if="languages.length === 0 || (languages[activeLanguageTab] && languages[activeLanguageTab].is_default)">
+                                <button type="button" class="btn btn-outline-secondary" @click="clearForm">{{ __('clear')
+                                    }}</button>
                                 <b-button type="submit" @keydown.enter="saveRecord" variant="primary"
                                     :disabled="isLoading"> {{ __('save') }}
                                     <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                 </b-button>
-                                <button type="button" class="btn btn-danger" @click="clearForm">{{ __('clear')
-                                    }}</button>
                             </div>
                         </div>
                     </form>
@@ -1790,8 +1791,8 @@ export default {
                         cancelButtonText: __('cancel'),
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: '#37a279',
-                        cancelButtonColor: '#d33',
+                        confirmButtonColor: 'var(--theme-primary-500)',
+                        cancelButtonColor: 'var(--theme-error-500)',
                     }).then(result => {
                         if (result.value) {
                             this.applyAttributeValueToggle(attributeId, valueId, current, idx);
@@ -1927,8 +1928,8 @@ export default {
                     cancelButtonText: __('cancel'),
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#37a279',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: 'var(--theme-primary-500)',
+                    cancelButtonColor: 'var(--theme-error-500)',
                 }).then(result => {
                     if (result.value) {
                         let postData = {
@@ -1951,7 +1952,7 @@ export default {
                                         text: __('this_was_the_last_variant_the_product_has_been_deleted_please_add_it_as_a_new_product'),
                                         icon: 'warning',
                                         confirmButtonText: __('ok'),
-                                        confirmButtonColor: '#37a279',
+                                        confirmButtonColor: 'var(--theme-primary-500)',
                                     }).then(() => {
                                         this.$router.push({ path: this.loggedUser?.role?.name === "Seller" ? '/seller/manage_products' : '/manage_products' });
                                     });
@@ -2882,7 +2883,7 @@ export default {
                             title: __('some_variants_were_kept') || 'Some variants were kept',
                             text: (__('these_variants_have_order_history_and_were_not_removed') || 'These variants are tied to past orders and were not removed') + ': ' + keptVariants.join(', '),
                             icon: 'info',
-                            confirmButtonColor: '#37a279',
+                            confirmButtonColor: 'var(--theme-primary-500)',
                         }).then(() => {
                             redirectAfterSave();
                         });
@@ -2911,8 +2912,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.deleteImageIds.push(id);
@@ -3026,8 +3027,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     if (this.$refs['my-form']) this.$refs['my-form'].reset();
@@ -3168,16 +3169,18 @@ export default {
 /* AI Generate Button Styles */
 .ai-generate-btn {
     position: relative;
-    min-width: 200px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     transition: all 0.3s ease;
 }
 
 .ai-generate-btn:disabled {
     opacity: 0.9;
     cursor: not-allowed;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
-    color: white;
+    background: linear-gradient(90deg, var(--theme-primary-500) 0%, var(--theme-primary-600) 100%);
+    border-color: var(--theme-primary-500);
+    color: var(--theme-neutral-50);
 }
 
 /* AI Spinner Animation */
@@ -3185,9 +3188,9 @@ export default {
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid color-mix(in srgb, var(--theme-neutral-50) 30%, transparent);
     border-radius: 50%;
-    border-top-color: #fff;
+    border-top-color: var(--theme-neutral-50);
     animation: ai-spin 0.8s ease-in-out infinite;
 }
 
@@ -3245,7 +3248,117 @@ export default {
     line-height: 1;
     border: none;
     background: transparent;
-    color: #dc3545;
+    color: var(--theme-error-500);
     font-size: 16px;
+}
+
+/* ===== Redesign: sectioned form (cards with header, 2-col grid, sticky actions) ===== */
+.product-form-page .card {
+    margin-bottom: 20px;
+}
+
+.product-form-page .card > .card-header h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin-bottom: 0;
+}
+
+.product-form-page .form-group > label,
+.product-form-page .form-group > div > label,
+.product-form-page .form-group label.control-label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-text);
+    margin-bottom: 6px;
+}
+
+/* Language tabs: underline style */
+.product-form-page ::v-deep .product-lang-tabs .nav-tabs {
+    border-bottom: 1px solid var(--ui-border);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.product-form-page ::v-deep .product-lang-tabs .nav-tabs .nav-link {
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 14px;
+    margin-bottom: -1px;
+}
+
+.product-form-page ::v-deep .product-lang-tabs .nav-tabs .nav-link .text-primary {
+    color: inherit !important;
+}
+
+.product-form-page ::v-deep .product-lang-tabs .nav-tabs .nav-link.active .text-primary,
+.product-form-page ::v-deep .product-lang-tabs .nav-tabs .nav-link.active {
+    color: var(--theme-primary-600) !important;
+}
+
+/* Approved / not approved toggle: shared .segmented-toggle (custom-egrocer.scss) */
+
+/* Variants card: sub-sections and the active variant panel */
+.product-form-subsection {
+    padding-top: 16px;
+    margin-top: 8px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.product-form-subsection h5 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.product-variant-panel {
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius-lg) !important;
+    background: var(--ui-surface-muted);
+    padding: 16px;
+}
+
+.product-variants-body ::v-deep .btn-group-toggle .btn,
+.product-form-page ::v-deep .btn-group-toggle .btn {
+    font-size: 13px;
+    padding: 8px 14px;
+}
+
+/* Form actions: bottom-right, kept in view while scrolling a long card */
+.product-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    background: var(--ui-surface) !important;
+    border-radius: 0 0 var(--ui-radius-lg) var(--ui-radius-lg) !important;
+    box-shadow: 0 -6px 16px color-mix(in srgb, var(--theme-neutral-900) 6%, transparent);
+}
+
+.product-form-actions .btn {
+    min-width: 96px;
+}
+
+@media (max-width: 575.98px) {
+    .product-form-actions .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .product-form-header-action .btn {
+        white-space: nowrap;
+    }
+
+    .ai-generate-btn {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0 !important;
+    }
 }
 </style>

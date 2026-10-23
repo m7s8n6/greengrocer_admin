@@ -311,17 +311,15 @@ body.theme-dark tr {
 body.theme-dark label {
     display: inline-block;
 }
-body.theme-dark button {
+/* reset rules use :where() so they keep the same (lowest) priority as Bootstrap's own reboot;
+   otherwise they outrank component classes in dark mode only (buttons lost their radius/font size) */
+:where(body.theme-dark) button {
     border-radius: 0;
 }
 body.theme-dark button:focus:not(:focus-visible) {
     outline: 0;
 }
-body.theme-dark button,
-body.theme-dark input,
-body.theme-dark optgroup,
-body.theme-dark select,
-body.theme-dark textarea {
+:where(body.theme-dark) :is(button, input, optgroup, select, textarea) {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
@@ -1914,7 +1912,7 @@ body.theme-dark .form-control:disabled {
     background-color: #40404d;
     opacity: 1;
 }
-body.theme-dark .form-control::file-selector-button {
+:where(body.theme-dark) .form-control::file-selector-button {
     -webkit-margin-end: 0.75rem;
     background-color: #e6eef5;
     border: 0 solid;
@@ -1930,12 +1928,11 @@ body.theme-dark .form-control::file-selector-button {
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
-    body.theme-dark .form-control::file-selector-button {
+    :where(body.theme-dark) .form-control::file-selector-button {
         transition: none;
     }
 }
-body.theme-dark
-.form-control:hover:not(:disabled):not([readonly])::file-selector-button {
+:where(body.theme-dark) .form-control:hover:not(:disabled):not([readonly])::file-selector-button {
     background-color: #dbe2e9;
 }
 body.theme-dark .form-control-plaintext {
@@ -1963,7 +1960,7 @@ body.theme-dark .form-control-sm {
     min-height: calc(1.5em + 0.5rem + 2px);
     padding: 0.25rem 0.5rem;
 }
-body.theme-dark .form-control-sm::file-selector-button {
+:where(body.theme-dark) .form-control-sm::file-selector-button {
     -webkit-margin-end: 0.5rem;
     margin: -0.25rem -0.5rem;
     margin-inline-end: 0.5rem;
@@ -1975,7 +1972,7 @@ body.theme-dark .form-control-lg {
     min-height: calc(1.5em + 1rem + 2px);
     padding: 0.5rem 1rem;
 }
-body.theme-dark .form-control-lg::file-selector-button {
+:where(body.theme-dark) .form-control-lg::file-selector-button {
     -webkit-margin-end: 1rem;
     margin: -0.5rem -1rem;
     margin-inline-end: 1rem;

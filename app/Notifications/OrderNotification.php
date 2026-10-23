@@ -32,6 +32,16 @@ class OrderNotification extends Notification
      */
     public function toArray($notifiable)
     {
+        // Auto-assign gave up (no driver accepted / none available): say so plainly instead of
+        // falling through to the generic "Order #N <status>" text, which looks like a normal update.
+        if ($this->type == 'auto_assign_failed') {
+            return [
+                'type' => 'auto_assign_failed',
+                'order_id' => $this->order_id,
+                'text' => "No delivery boy accepted order #" . $this->order_id . ". Please assign a delivery boy manually.",
+            ];
+        }
+
         if ($this->type == 'order_assign') {
             if ($notifiable->role_id == 4) {
                 $text = "You have been assigned order #" . $this->order_id;

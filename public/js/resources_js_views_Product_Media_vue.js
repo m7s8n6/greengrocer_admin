@@ -16,6 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Auth_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Auth.js */ "./resources/js/Auth.js");
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -159,11 +160,95 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_3__["default"]],
   components: {
     vueDropzone: (vue2_dropzone__WEBPACK_IMPORTED_MODULE_0___default())
   },
@@ -255,7 +340,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       copyIcon: true,
       copies: [],
       selectedItems: [],
-      all_select: false
+      all_select: false,
+      failedImages: {},
+      // The API returns one page at a time (grid view shows the array as is)
+      serverPagination: true
     };
   },
   computed: {
@@ -269,6 +357,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           value: f.key
         };
       });
+    },
+    // Grid view cards: same records, search and order as the b-table
+    gridMedia: function gridMedia() {
+      return this.pagedItems(this.gridFilterSort(this.media));
     },
     isSellerRoute: function isSellerRoute() {
       // Use this.$route to access the current route
@@ -296,6 +388,26 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
   },
   methods: {
+    // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
+    fileExtension: function fileExtension(item) {
+      var ext = item.extension || (item.name && item.name.indexOf('.') !== -1 ? item.name.split('.').pop() : '');
+      return String(ext || '').toLowerCase().replace(/^\./, '');
+    },
+    isImageFile: function isImageFile(item) {
+      var type = String(item.type || '').toLowerCase();
+      if (type.indexOf('image') !== -1) return true;
+      return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'avif', 'ico'].includes(this.fileExtension(item));
+    },
+    fileIcon: function fileIcon(item) {
+      var ext = this.fileExtension(item);
+      if (ext === 'pdf') return 'bi-file-earmark-pdf';
+      if (['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(ext)) return 'bi-file-earmark-play';
+      if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) return 'bi-file-earmark-music';
+      if (['zip', 'rar', '7z', 'gz', 'tar'].includes(ext)) return 'bi-file-earmark-zip';
+      if (['doc', 'docx', 'txt', 'rtf'].includes(ext)) return 'bi-file-earmark-text';
+      if (['xls', 'xlsx', 'csv'].includes(ext)) return 'bi-file-earmark-spreadsheet';
+      return 'bi-file-earmark';
+    },
     getMedia: function getMedia() {
       var _this = this;
       this.isLoading = true;
@@ -309,6 +421,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         _this.media = response.data.data;
         _this.totalRows = response.data.total;
         _this.isLoading = false;
+        // Page changed: re-derive "Select All" from the new page's rows
+        _this.selectCheckBox();
       });
     },
     uploadImage: function uploadImage() {
@@ -348,8 +462,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         cancelButtonText: "Cancel",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this3.isLoading = true;
@@ -378,20 +492,26 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       if (this.all_select == false) {
         this.all_select = true;
         this.media.forEach(function (media) {
-          _this5.selectedItems.push(media.id);
+          if (!_this5.selectedItems.includes(media.id)) {
+            _this5.selectedItems.push(media.id);
+          }
         });
       } else {
         this.all_select = false;
-        this.selectedItems = [];
+        // Unselect only the current page's items
+        var currentPageIds = this.media.map(function (media) {
+          return media.id;
+        });
+        this.selectedItems = this.selectedItems.filter(function (id) {
+          return !currentPageIds.includes(id);
+        });
       }
     },
     selectCheckBox: function selectCheckBox() {
-      var uniqueSelectedItems = _toConsumableArray(new Set(this.selectedItems));
-      if (this.media.length === uniqueSelectedItems.length) {
-        this.all_select = true;
-      } else {
-        this.all_select = false;
-      }
+      var selected = new Set(this.selectedItems);
+      this.all_select = this.media.length > 0 && this.media.every(function (media) {
+        return selected.has(media.id);
+      });
     },
     multipleDelete: function multipleDelete() {
       var _this6 = this;
@@ -404,8 +524,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           cancelButtonText: "Cancel",
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33'
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)'
         }).then(function (result) {
           if (result.value) {
             var ids = uniqueSelectedItems.toString();
@@ -432,6 +552,125 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Media.vue?vue&type=style&index=0&id=d1daa3d6&scoped=true&lang=css":
 /*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/Media.vue?vue&type=style&index=0&id=d1daa3d6&scoped=true&lang=css ***!
@@ -452,7 +691,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue2_dropzone_dist_vue2Dropzone_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.media-page .figma-main-section-card > .card-header[data-v-d1daa3d6] {\n    padding: 14px 20px !important;\n    border-bottom: 1px solid var(--ui-border);\n    background: transparent;\n}\n.media-page .figma-main-section-card > .card-header .card-title[data-v-d1daa3d6] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n\n/* Dropzone: dashed tinted drop area in the theme font */\n.media-page[data-v-d1daa3d6]  .vue-dropzone {\n    font-family: var(--ui-font);\n    border: 2px dashed var(--ui-border-strong);\n    border-radius: var(--ui-radius-lg);\n    background: var(--ui-surface-muted);\n    color: var(--ui-text-muted);\n    min-height: 160px;\n    transition: border-color 0.15s ease, background-color 0.15s ease;\n}\n.media-page[data-v-d1daa3d6]  .vue-dropzone:hover {\n    border-color: var(--theme-primary-400);\n    background: var(--ui-primary-soft);\n}\n.media-page[data-v-d1daa3d6]  .dropzone-custom-title {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n    margin-bottom: 4px;\n}\n.media-page[data-v-d1daa3d6]  .dropzone-custom-title i {\n    color: var(--theme-primary-500);\n    margin-right: 6px;\n}\n.media-page[data-v-d1daa3d6]  .dropzone-custom-content .subtitle {\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n\n/* Table: 40px thumbs, long file names wrap, compact actions never overflow */\n.media-page[data-v-d1daa3d6]  .media-thumb {\n    width: 40px;\n    height: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n}\n.media-page[data-v-d1daa3d6]  .media-table thead th:first-child,\n.media-page[data-v-d1daa3d6]  .media-table tbody td:first-child {\n    width: 44px;\n}\n.media-page[data-v-d1daa3d6]  .media-table td {\n    overflow-wrap: anywhere;\n}\n\n/* !important: legacy global .figma-action-btn forces 40px with !important */\n.media-page[data-v-d1daa3d6]  .media-row-actions .figma-action-btn {\n    width: 32px !important;\n    height: 32px !important;\n    min-width: 32px;\n    padding: 0 !important;\n    font-size: 14px;\n}\n.media-page[data-v-d1daa3d6]  .media-row-actions {\n    flex-wrap: nowrap;\n}\n.media-page .item-card-actions[data-v-d1daa3d6] {\n    margin-left: auto;\n}\n.media-page .media-card-name[data-v-d1daa3d6] {\n    font-size: 13px;\n    word-break: break-all;\n}\n.media-page .media-select-all[data-v-d1daa3d6] {\n    cursor: pointer;\n}\n.media-page .media-select-all .form-check-input[data-v-d1daa3d6] {\n    position: static;\n    width: 16px;\n    height: 16px;\n}\n.media-page .media-bulk-delete[data-v-d1daa3d6]:not(:disabled),\n.media-page .media-bulk-delete:not(:disabled) i[data-v-d1daa3d6] {\n    color: var(--theme-error-600) !important;\n}\n\n/* Phones: \"Delete Selected Media\" is too long for a half-width cell (it wrapped to 3 lines and\n   spilled out of the button), so it takes its own full row; the label stays on one line. */\n@media (max-width: 575.98px) {\n.media-page .media-bulk-delete[data-v-d1daa3d6],\n    .media-page .media-select-all[data-v-d1daa3d6] {\n        grid-column: 1 / -1;\n        justify-content: center;\n}\n.media-page .media-bulk-delete span[data-v-d1daa3d6] {\n        white-space: nowrap;\n}\n}\n.media-page .media-select-all[data-v-d1daa3d6] {\n    cursor: pointer;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n}\n.media-page .media-select-all .form-check-input[data-v-d1daa3d6] {\n    position: static !important;\n    opacity: 1 !important;\n    clip: auto !important;\n    pointer-events: auto !important;\n    width: 16px !important;\n    height: 16px !important;\n    margin: 0 !important;\n    cursor: pointer !important;\n    flex-shrink: 0 !important;\n}\n.media-page[data-v-d1daa3d6]  .media-thumb-fallback {\n    font-size: 20px;\n    color: var(--ui-text-subtle);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 40px;\n    height: 40px;\n    border-radius: var(--ui-radius);\n    background: var(--ui-surface-muted);\n}\n@media (min-width: 768px) {\n.media-page[data-v-d1daa3d6]  .media-table td:nth-child(4) {\n        min-width: 180px;\n        max-width: 280px;\n}\n.media-page[data-v-d1daa3d6]  .media-table td:nth-child(8),\n    .media-page[data-v-d1daa3d6]  .media-table td:last-child {\n        white-space: nowrap;\n        overflow-wrap: normal;\n}\n}\n@media (max-width: 767.98px) {\n.media-page[data-v-d1daa3d6]  .media-table tbody td:first-child {\n        width: auto;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -685,7 +924,7 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
+  return _c("div", { staticClass: "media-page" }, [
     _c("div", { staticClass: "page-heading" }, [
       _c("div", { staticClass: "page-title mb-2" }, [
         _c(
@@ -746,11 +985,13 @@ var render = function () {
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
         _c("div", { staticClass: "figma-main-section-card mb-4" }, [
-          _c("div", { staticClass: "card-body p-4" }, [
-            _c("h4", { staticClass: "card-title mb-3" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h4", { staticClass: "card-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("media_upload_form"))),
             ]),
-            _vm._v(" "),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body p-3 p-md-4" }, [
             _c(
               "form",
               { attrs: { method: "POST", enctype: "multipart/form-data" } },
@@ -788,34 +1029,39 @@ var render = function () {
                   ]
                 ),
                 _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary mt-3",
-                    attrs: { type: "button", disabled: _vm.submitBtn === true },
-                    on: {
-                      click: function ($event) {
-                        return _vm.uploadImage()
+                _c("div", { staticClass: "d-flex justify-content-end mt-3" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: {
+                        type: "button",
+                        disabled: _vm.submitBtn === true,
+                      },
+                      on: {
+                        click: function ($event) {
+                          return _vm.uploadImage()
+                        },
                       },
                     },
-                  },
-                  [
-                    !_vm.isLoading
-                      ? _c("i", { staticClass: "fa fa-upload" })
-                      : _vm._e(),
-                    _vm._v(
-                      " " +
-                        _vm._s(_vm.__("upload")) +
-                        "\n                            "
-                    ),
-                    _vm.isLoading
-                      ? _c("b-spinner", {
-                          attrs: { small: "", label: "Spinning" },
-                        })
-                      : _vm._e(),
-                  ],
-                  1
-                ),
+                    [
+                      !_vm.isLoading
+                        ? _c("i", { staticClass: "fa fa-upload" })
+                        : _vm._e(),
+                      _vm._v(
+                        " " +
+                          _vm._s(_vm.__("upload")) +
+                          "\n                            "
+                      ),
+                      _vm.isLoading
+                        ? _c("b-spinner", {
+                            attrs: { small: "", label: "Spinning" },
+                          })
+                        : _vm._e(),
+                    ],
+                    1
+                  ),
+                ]),
               ],
               1
             ),
@@ -823,11 +1069,13 @@ var render = function () {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "figma-main-section-card" }, [
-          _c("div", { staticClass: "card-body p-0" }, [
-            _c("h4", { staticClass: "card-title p-3 mb-0" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h4", { staticClass: "card-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("media_list"))),
             ]),
-            _vm._v(" "),
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body p-0" }, [
             _c(
               "div",
               {
@@ -872,32 +1120,137 @@ var render = function () {
                   "div",
                   {
                     staticClass:
-                      "d-flex gap-2 align-items-center flex-shrink-0",
+                      "d-flex gap-2 align-items-center flex-wrap flex-shrink-0",
                   },
                   [
                     _c(
                       "button",
                       {
                         staticClass:
-                          "btn btn-figma-filter d-flex align-items-center gap-2 text-danger",
+                          "btn btn-figma-filter d-flex align-items-center gap-2 media-bulk-delete",
                         attrs: { disabled: _vm.selectedItems.length === 0 },
                         on: { click: _vm.multipleDelete },
                       },
                       [
-                        _c("base-icon", {
-                          attrs: {
-                            name: "Type=Default",
-                            hoverName: "Type=Hover",
-                            width: "20",
-                            height: "20",
-                          },
-                        }),
+                        _c("i", { staticClass: "bi bi-trash" }),
                         _vm._v(" "),
                         _c("span", [
                           _vm._v(_vm._s(_vm.__("delete_selected_media"))),
                         ]),
-                      ],
-                      1
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _vm.viewMode === "grid"
+                      ? _c(
+                          "label",
+                          {
+                            staticClass:
+                              "btn btn-figma-filter d-flex align-items-center gap-2 mb-0 media-select-all",
+                          },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.all_select,
+                                  expression: "all_select",
+                                },
+                              ],
+                              staticClass: "form-check-input m-0",
+                              attrs: { type: "checkbox" },
+                              domProps: {
+                                checked: Array.isArray(_vm.all_select)
+                                  ? _vm._i(_vm.all_select, null) > -1
+                                  : _vm.all_select,
+                              },
+                              on: {
+                                click: _vm.allSelectCheckBox,
+                                change: function ($event) {
+                                  var $$a = _vm.all_select,
+                                    $$el = $event.target,
+                                    $$c = $$el.checked ? true : false
+                                  if (Array.isArray($$a)) {
+                                    var $$v = null,
+                                      $$i = _vm._i($$a, $$v)
+                                    if ($$el.checked) {
+                                      $$i < 0 &&
+                                        (_vm.all_select = $$a.concat([$$v]))
+                                    } else {
+                                      $$i > -1 &&
+                                        (_vm.all_select = $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1)))
+                                    }
+                                  } else {
+                                    _vm.all_select = $$c
+                                  }
+                                },
+                              },
+                            }),
+                            _vm._v(" "),
+                            _c("span", [_vm._v(_vm._s(_vm.__("select_all")))]),
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass: "view-toggle",
+                        attrs: { role: "group", "aria-label": _vm.__("view") },
+                      },
+                      [
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass: "view-toggle-btn",
+                            class: { active: _vm.viewMode === "grid" },
+                            attrs: {
+                              type: "button",
+                              title: _vm.__("grid_view"),
+                            },
+                            on: {
+                              click: function ($event) {
+                                return _vm.setViewMode("grid")
+                              },
+                            },
+                          },
+                          [_c("i", { staticClass: "bi bi-grid-3x3-gap-fill" })]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass: "view-toggle-btn",
+                            class: { active: _vm.viewMode === "list" },
+                            attrs: {
+                              type: "button",
+                              title: _vm.__("list_view"),
+                            },
+                            on: {
+                              click: function ($event) {
+                                return _vm.setViewMode("list")
+                              },
+                            },
+                          },
+                          [_c("i", { staticClass: "bi bi-list-ul" })]
+                        ),
+                      ]
                     ),
                     _vm._v(" "),
                     _c(
@@ -930,293 +1283,654 @@ var render = function () {
               ]
             ),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "table-responsive mb-0" },
-              [
-                _c("b-table", {
-                  staticClass: "mb-0",
-                  attrs: {
-                    items: _vm.media,
-                    fields: _vm.fields,
-                    filter: _vm.filter,
-                    "filter-included-fields": _vm.filterOn,
-                    "sort-by": _vm.sortBy,
-                    "sort-desc": _vm.sortDesc,
-                    "sort-direction": _vm.sortDirection,
-                    bordered: false,
-                    busy: _vm.isLoading,
-                    stacked: "md",
-                    "show-empty": "",
-                    small: "",
-                  },
-                  on: {
-                    "update:sortBy": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sort-by": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sortDesc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                    "update:sort-desc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "table-busy",
-                      fn: function () {
-                        return [
-                          _c(
+            _vm.viewMode === "grid"
+              ? _c("div", [
+                  _vm.isLoading
+                    ? _c("div", { staticClass: "item-grid-state" }, [
+                        _c("i", { staticClass: "fa fa-spinner fa-spin" }),
+                        _vm._v(
+                          _vm._s(_vm.__("loading")) +
+                            "...\n                        "
+                        ),
+                      ])
+                    : _vm.gridMedia.length === 0
+                    ? _c("div", { staticClass: "item-grid-state" }, [
+                        _c("i", {
+                          staticClass: "fa",
+                          class: _vm.filter ? "fa-search" : "fa-inbox",
+                        }),
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(
+                              _vm.filter
+                                ? _vm.__("no_records_matching_your_request")
+                                : _vm.__("no_records_to_show")
+                            ) +
+                            "\n                        "
+                        ),
+                      ])
+                    : _c(
+                        "div",
+                        { staticClass: "item-grid" },
+                        _vm._l(_vm.gridMedia, function (item) {
+                          return _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            {
+                              key: item.id,
+                              staticClass: "item-card",
+                              class: {
+                                "is-selected": _vm.selectedItems.includes(
+                                  item.id
+                                ),
+                              },
+                            },
                             [
-                              _c("b-spinner", { staticClass: "align-middle" }),
-                              _vm._v(" "),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                              ]),
-                            ],
-                            1
-                          ),
-                        ]
-                      },
-                      proxy: true,
-                    },
-                    {
-                      key: "head(select)",
-                      fn: function (row) {
-                        return [
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.all_select,
-                                expression: "all_select",
-                              },
-                            ],
-                            staticClass: "form-check-input",
-                            attrs: { type: "checkbox" },
-                            domProps: {
-                              checked: Array.isArray(_vm.all_select)
-                                ? _vm._i(_vm.all_select, null) > -1
-                                : _vm.all_select,
-                            },
-                            on: {
-                              click: _vm.allSelectCheckBox,
-                              change: function ($event) {
-                                var $$a = _vm.all_select,
-                                  $$el = $event.target,
-                                  $$c = $$el.checked ? true : false
-                                if (Array.isArray($$a)) {
-                                  var $$v = null,
-                                    $$i = _vm._i($$a, $$v)
-                                  if ($$el.checked) {
-                                    $$i < 0 &&
-                                      (_vm.all_select = $$a.concat([$$v]))
-                                  } else {
-                                    $$i > -1 &&
-                                      (_vm.all_select = $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1)))
-                                  }
-                                } else {
-                                  _vm.all_select = $$c
-                                }
-                              },
-                            },
-                          }),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(select)",
-                      fn: function (row) {
-                        return [
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.selectedItems,
-                                expression: "selectedItems",
-                              },
-                            ],
-                            staticClass: "form-check-input",
-                            attrs: { type: "checkbox" },
-                            domProps: {
-                              value: row.item.id,
-                              checked: Array.isArray(_vm.selectedItems)
-                                ? _vm._i(_vm.selectedItems, row.item.id) > -1
-                                : _vm.selectedItems,
-                            },
-                            on: {
-                              change: [
-                                function ($event) {
-                                  var $$a = _vm.selectedItems,
-                                    $$el = $event.target,
-                                    $$c = $$el.checked ? true : false
-                                  if (Array.isArray($$a)) {
-                                    var $$v = row.item.id,
-                                      $$i = _vm._i($$a, $$v)
-                                    if ($$el.checked) {
-                                      $$i < 0 &&
-                                        (_vm.selectedItems = $$a.concat([$$v]))
-                                    } else {
-                                      $$i > -1 &&
-                                        (_vm.selectedItems = $$a
-                                          .slice(0, $$i)
-                                          .concat($$a.slice($$i + 1)))
-                                    }
-                                  } else {
-                                    _vm.selectedItems = $$c
-                                  }
-                                },
-                                _vm.selectCheckBox,
-                              ],
-                            },
-                          }),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(image)",
-                      fn: function (row) {
-                        return [
-                          row.item.name
-                            ? _c("img", {
-                                attrs: {
-                                  src:
-                                    _vm.$storageUrl +
-                                    row.item.sub_directory +
-                                    row.item.name,
-                                  height: "50",
-                                },
-                              })
-                            : _vm._e(),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(actions)",
-                      fn: function (row) {
-                        return [
-                          _c("div", { staticClass: "d-flex gap-2" }, [
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "clipboard",
-                                    rawName: "v-clipboard",
-                                    value: function () {
-                                      return (
-                                        row.item.sub_directory + row.item.name
-                                      )
+                              _c(
+                                "label",
+                                { staticClass: "item-card-select mb-0" },
+                                [
+                                  _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.selectedItems,
+                                        expression: "selectedItems",
+                                      },
+                                    ],
+                                    attrs: {
+                                      type: "checkbox",
+                                      "aria-label": item.name,
                                     },
-                                    expression:
-                                      "() => row.item.sub_directory + row.item.name",
-                                  },
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
-                                ],
-                                staticClass: "figma-action-btn",
-                                style: _vm.copies.includes(row.item.id)
-                                  ? "width: auto !important; min-width: 65px !important; padding: 0 8px !important;"
-                                  : "",
-                                attrs: {
-                                  type: "button",
-                                  title: _vm.__("copy"),
-                                },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.copyPath(row.item.id)
-                                  },
-                                },
-                              },
-                              [
-                                !_vm.copies.includes(row.item.id)
-                                  ? _c(
-                                      "span",
-                                      [
-                                        _c("base-icon", {
-                                          attrs: {
-                                            name: "copy",
-                                            width: "24",
-                                            height: "24",
-                                          },
-                                        }),
+                                    domProps: {
+                                      value: item.id,
+                                      checked: Array.isArray(_vm.selectedItems)
+                                        ? _vm._i(_vm.selectedItems, item.id) >
+                                          -1
+                                        : _vm.selectedItems,
+                                    },
+                                    on: {
+                                      change: [
+                                        function ($event) {
+                                          var $$a = _vm.selectedItems,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = item.id,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (_vm.selectedItems = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (_vm.selectedItems = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.selectedItems = $$c
+                                          }
+                                        },
+                                        _vm.selectCheckBox,
                                       ],
-                                      1
+                                    },
+                                  }),
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                {
+                                  staticClass:
+                                    "item-card-media item-card-media--cover",
+                                },
+                                [
+                                  item.name &&
+                                  _vm.isImageFile(item) &&
+                                  !_vm.failedImages[item.id]
+                                    ? _c("img", {
+                                        attrs: {
+                                          src:
+                                            _vm.$storageUrl +
+                                            item.sub_directory +
+                                            item.name,
+                                          alt: "",
+                                          loading: "lazy",
+                                        },
+                                        on: {
+                                          error: function ($event) {
+                                            return _vm.$set(
+                                              _vm.failedImages,
+                                              item.id,
+                                              true
+                                            )
+                                          },
+                                        },
+                                      })
+                                    : _c("i", {
+                                        staticClass: "bi item-card-noimg",
+                                        class: _vm.fileIcon(item),
+                                      }),
+                                  _vm._v(" "),
+                                  item.extension
+                                    ? _c(
+                                        "div",
+                                        { staticClass: "item-card-badges" },
+                                        [
+                                          _c(
+                                            "span",
+                                            {
+                                              staticClass:
+                                                "badge bg-info text-uppercase",
+                                            },
+                                            [_vm._v(_vm._s(item.extension))]
+                                          ),
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "item-card-body" }, [
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass:
+                                      "item-card-title media-card-name",
+                                    attrs: { title: item.name },
+                                  },
+                                  [_vm._v(_vm._s(item.name))]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "item-card-meta" },
+                                  [
+                                    _vm._v(
+                                      "\n                                        #" +
+                                        _vm._s(item.id)
+                                    ),
+                                    item.type
+                                      ? [_vm._v(" · " + _vm._s(item.type))]
+                                      : _vm._e(),
+                                  ],
+                                  2
+                                ),
+                                _vm._v(" "),
+                                item.size
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "item-card-meta",
+                                        attrs: { title: _vm.__("size") },
+                                      },
+                                      [
+                                        _c("i", { staticClass: "bi bi-hdd" }),
+                                        _vm._v(
+                                          " " +
+                                            _vm._s(item.size) +
+                                            "\n                                    "
+                                        ),
+                                      ]
                                     )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _vm.copies.includes(row.item.id)
+                                item.sub_directory
                                   ? _c(
-                                      "span",
+                                      "div",
                                       {
-                                        staticStyle: {
-                                          "font-size": "12px",
-                                          "font-weight": "600",
-                                        },
+                                        staticClass: "item-card-meta",
+                                        attrs: { title: item.sub_directory },
                                       },
-                                      [_vm._v("Copied!")]
+                                      [
+                                        _c("i", {
+                                          staticClass: "bi bi-folder2",
+                                        }),
+                                        _vm._v(
+                                          " " +
+                                            _vm._s(item.sub_directory) +
+                                            "\n                                    "
+                                        ),
+                                      ]
                                     )
                                   : _vm._e(),
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "item-card-footer" }, [
+                                _c(
+                                  "div",
+                                  { staticClass: "item-card-actions" },
+                                  [
+                                    _c(
+                                      "button",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "clipboard",
+                                            rawName: "v-clipboard",
+                                            value: function () {
+                                              return (
+                                                item.sub_directory + item.name
+                                              )
+                                            },
+                                            expression:
+                                              "() => item.sub_directory + item.name",
+                                          },
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass: "figma-action-btn",
+                                        style: _vm.copies.includes(item.id)
+                                          ? "width: auto !important; min-width: 65px !important; padding: 0 8px !important;"
+                                          : "",
+                                        attrs: {
+                                          type: "button",
+                                          title: _vm.__("copy"),
+                                        },
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.copyPath(item.id)
+                                          },
+                                        },
+                                      },
+                                      [
+                                        !_vm.copies.includes(item.id)
+                                          ? _c("span", [
+                                              _c("i", {
+                                                staticClass: "bi bi-files",
+                                              }),
+                                            ])
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _vm.copies.includes(item.id)
+                                          ? _c(
+                                              "span",
+                                              {
+                                                staticStyle: {
+                                                  "font-size": "12px",
+                                                  "font-weight": "600",
+                                                },
+                                              },
+                                              [_vm._v("Copied!")]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        directives: [
+                                          {
+                                            name: "b-tooltip",
+                                            rawName: "v-b-tooltip.hover",
+                                            modifiers: { hover: true },
+                                          },
+                                        ],
+                                        staticClass:
+                                          "figma-action-btn figma-delete-btn",
+                                        attrs: {
+                                          type: "button",
+                                          title: _vm.__("delete"),
+                                        },
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.deleteMedia(
+                                              _vm.media.indexOf(item),
+                                              item.id
+                                            )
+                                          },
+                                        },
+                                      },
+                                      [_c("i", { staticClass: "bi bi-trash" })]
+                                    ),
+                                  ]
+                                ),
+                              ]),
+                            ]
+                          )
+                        }),
+                        0
+                      ),
+                ])
+              : _c(
+                  "div",
+                  { staticClass: "table-responsive mb-0" },
+                  [
+                    _c("b-table", {
+                      staticClass: "media-table mb-0",
+                      attrs: {
+                        items: _vm.media,
+                        fields: _vm.fields,
+                        filter: _vm.filter,
+                        "filter-included-fields": _vm.filterOn,
+                        "sort-by": _vm.sortBy,
+                        "sort-desc": _vm.sortDesc,
+                        "sort-direction": _vm.sortDirection,
+                        bordered: false,
+                        busy: _vm.isLoading,
+                        stacked: "md",
+                        "show-empty": "",
+                        small: "",
+                      },
+                      on: {
+                        "update:sortBy": function ($event) {
+                          _vm.sortBy = $event
+                        },
+                        "update:sort-by": function ($event) {
+                          _vm.sortBy = $event
+                        },
+                        "update:sortDesc": function ($event) {
+                          _vm.sortDesc = $event
+                        },
+                        "update:sort-desc": function ($event) {
+                          _vm.sortDesc = $event
+                        },
+                      },
+                      scopedSlots: _vm._u([
+                        {
+                          key: "empty",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-inbox fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyText)),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "emptyfiltered",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-search fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyFilteredText)),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "table-busy",
+                          fn: function () {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted my-3" },
+                                [
+                                  _c("b-spinner", {
+                                    staticClass: "align-middle",
+                                  }),
+                                  _vm._v(" "),
+                                  _c("strong", [
+                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                  ]),
+                                ],
+                                1
+                              ),
+                            ]
+                          },
+                          proxy: true,
+                        },
+                        {
+                          key: "head(select)",
+                          fn: function (row) {
+                            return [
+                              _c("input", {
                                 directives: [
                                   {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.all_select,
+                                    expression: "all_select",
                                   },
                                 ],
-                                staticClass: "figma-action-btn",
-                                attrs: {
-                                  type: "button",
-                                  title: _vm.__("delete"),
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  checked: Array.isArray(_vm.all_select)
+                                    ? _vm._i(_vm.all_select, null) > -1
+                                    : _vm.all_select,
                                 },
                                 on: {
-                                  click: function ($event) {
-                                    return _vm.deleteMedia(
-                                      row.index,
-                                      row.item.id
-                                    )
+                                  click: _vm.allSelectCheckBox,
+                                  change: function ($event) {
+                                    var $$a = _vm.all_select,
+                                      $$el = $event.target,
+                                      $$c = $$el.checked ? true : false
+                                    if (Array.isArray($$a)) {
+                                      var $$v = null,
+                                        $$i = _vm._i($$a, $$v)
+                                      if ($$el.checked) {
+                                        $$i < 0 &&
+                                          (_vm.all_select = $$a.concat([$$v]))
+                                      } else {
+                                        $$i > -1 &&
+                                          (_vm.all_select = $$a
+                                            .slice(0, $$i)
+                                            .concat($$a.slice($$i + 1)))
+                                      }
+                                    } else {
+                                      _vm.all_select = $$c
+                                    }
                                   },
                                 },
-                              },
-                              [
-                                _c("base-icon", {
-                                  attrs: {
-                                    name: "Type=Default",
-                                    hoverName: "Type=Hover",
-                                    width: "24",
-                                    height: "24",
+                              }),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(select)",
+                          fn: function (row) {
+                            return [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.selectedItems,
+                                    expression: "selectedItems",
                                   },
-                                }),
-                              ],
-                              1
-                            ),
-                          ]),
-                        ]
-                      },
-                    },
-                  ]),
-                }),
-              ],
-              1
-            ),
+                                ],
+                                staticClass: "form-check-input",
+                                attrs: { type: "checkbox" },
+                                domProps: {
+                                  value: row.item.id,
+                                  checked: Array.isArray(_vm.selectedItems)
+                                    ? _vm._i(_vm.selectedItems, row.item.id) >
+                                      -1
+                                    : _vm.selectedItems,
+                                },
+                                on: {
+                                  change: [
+                                    function ($event) {
+                                      var $$a = _vm.selectedItems,
+                                        $$el = $event.target,
+                                        $$c = $$el.checked ? true : false
+                                      if (Array.isArray($$a)) {
+                                        var $$v = row.item.id,
+                                          $$i = _vm._i($$a, $$v)
+                                        if ($$el.checked) {
+                                          $$i < 0 &&
+                                            (_vm.selectedItems = $$a.concat([
+                                              $$v,
+                                            ]))
+                                        } else {
+                                          $$i > -1 &&
+                                            (_vm.selectedItems = $$a
+                                              .slice(0, $$i)
+                                              .concat($$a.slice($$i + 1)))
+                                        }
+                                      } else {
+                                        _vm.selectedItems = $$c
+                                      }
+                                    },
+                                    _vm.selectCheckBox,
+                                  ],
+                                },
+                              }),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(image)",
+                          fn: function (row) {
+                            return [
+                              row.item.name &&
+                              _vm.isImageFile(row.item) &&
+                              !_vm.failedImages[row.item.id]
+                                ? _c("img", {
+                                    staticClass: "media-thumb",
+                                    attrs: {
+                                      src:
+                                        _vm.$storageUrl +
+                                        row.item.sub_directory +
+                                        row.item.name,
+                                      alt: "",
+                                    },
+                                    on: {
+                                      error: function ($event) {
+                                        return _vm.$set(
+                                          _vm.failedImages,
+                                          row.item.id,
+                                          true
+                                        )
+                                      },
+                                    },
+                                  })
+                                : _c("i", {
+                                    staticClass: "bi media-thumb-fallback",
+                                    class: _vm.fileIcon(row.item),
+                                  }),
+                            ]
+                          },
+                        },
+                        {
+                          key: "cell(actions)",
+                          fn: function (row) {
+                            return [
+                              _c(
+                                "div",
+                                {
+                                  staticClass: "d-flex gap-1 media-row-actions",
+                                },
+                                [
+                                  _c(
+                                    "button",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "clipboard",
+                                          rawName: "v-clipboard",
+                                          value: function () {
+                                            return (
+                                              row.item.sub_directory +
+                                              row.item.name
+                                            )
+                                          },
+                                          expression:
+                                            "() => row.item.sub_directory + row.item.name",
+                                        },
+                                        {
+                                          name: "b-tooltip",
+                                          rawName: "v-b-tooltip.hover",
+                                          modifiers: { hover: true },
+                                        },
+                                      ],
+                                      staticClass: "figma-action-btn",
+                                      style: _vm.copies.includes(row.item.id)
+                                        ? "width: auto !important; min-width: 65px !important; padding: 0 8px !important;"
+                                        : "",
+                                      attrs: {
+                                        type: "button",
+                                        title: _vm.__("copy"),
+                                      },
+                                      on: {
+                                        click: function ($event) {
+                                          return _vm.copyPath(row.item.id)
+                                        },
+                                      },
+                                    },
+                                    [
+                                      !_vm.copies.includes(row.item.id)
+                                        ? _c("span", [
+                                            _c("i", {
+                                              staticClass: "bi bi-files",
+                                            }),
+                                          ])
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm.copies.includes(row.item.id)
+                                        ? _c(
+                                            "span",
+                                            {
+                                              staticStyle: {
+                                                "font-size": "12px",
+                                                "font-weight": "600",
+                                              },
+                                            },
+                                            [_vm._v("Copied!")]
+                                          )
+                                        : _vm._e(),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "button",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "b-tooltip",
+                                          rawName: "v-b-tooltip.hover",
+                                          modifiers: { hover: true },
+                                        },
+                                      ],
+                                      staticClass:
+                                        "figma-action-btn figma-delete-btn",
+                                      attrs: {
+                                        type: "button",
+                                        title: _vm.__("delete"),
+                                      },
+                                      on: {
+                                        click: function ($event) {
+                                          _vm.deleteMedia(
+                                            _vm.media.indexOf(row.item),
+                                            row.item.id
+                                          )
+                                        },
+                                      },
+                                    },
+                                    [_c("i", { staticClass: "bi bi-trash" })]
+                                  ),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                      ]),
+                    }),
+                  ],
+                  1
+                ),
             _vm._v(" "),
             _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
               _c(
@@ -1236,6 +1950,14 @@ var render = function () {
                         _vm.perPage = $$v
                       },
                       expression: "perPage",
+                    },
+                  }),
+                  _vm._v(" "),
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
                     },
                   }),
                 ],

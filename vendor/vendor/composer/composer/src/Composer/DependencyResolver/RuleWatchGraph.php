@@ -109,12 +109,15 @@ class RuleWatchGraph
                 if (!$node->getRule()->isDisabled() && !$decisions->satisfy($otherWatch)) {
                     $ruleLiterals = $node->getRule()->getLiterals();
 
-                    $alternativeLiteral = array_find($ruleLiterals, static function ($ruleLiteral) use ($literal, $otherWatch, $decisions): bool {
-                        return $ruleLiteral !== $literal && $ruleLiteral !== $otherWatch && !$decisions->conflict($ruleLiteral);
+                    $alternativeLiterals = array_filter($ruleLiterals, static function ($ruleLiteral) use ($literal, $otherWatch, $decisions): bool {
+                        return $literal !== $ruleLiteral &&
+                            $otherWatch !== $ruleLiteral &&
+                            !$decisions->conflict($ruleLiteral);
                     });
 
-                    if ($alternativeLiteral !== null) {
-                        $this->moveWatch($literal, $alternativeLiteral, $node);
+                    if (\count($alternativeLiterals) > 0) {
+                        reset($alternativeLiterals);
+                        $this->moveWatch($literal, current($alternativeLiterals), $node);
                         continue;
                     }
 

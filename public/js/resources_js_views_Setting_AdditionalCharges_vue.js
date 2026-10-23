@@ -208,6 +208,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 //
 //
 //
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -224,6 +228,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     };
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     fetchActiveLanguages: function fetchActiveLanguages() {
       var _this = this;
       if (this.languages.length) {
@@ -304,8 +312,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         text: __('you_wont_be_able_to_revert_this'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: 'var(--theme-error-500)',
+        cancelButtonColor: 'var(--theme-primary-500)',
         confirmButtonText: __('yes_delete_it'),
         cancelButtonText: __('cancel')
       }).then(function (result) {
@@ -500,7 +508,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.charge-card[data-v-f6e0b92c] {\n    background: var(--bs-card-bg, #fafbfc);\n    border: 1px solid var(--bs-border-color, #dee2e6) !important;\n    transition: background-color 0.3s ease;\n}\nbody.theme-dark .charge-card[data-v-f6e0b92c] {\n    background: #1e293b !important;\n    border-color: #334155 !important;\n}\n.charge-card[data-v-f6e0b92c]:hover {\n    background: #f0f4f8;\n}\nbody.theme-dark .charge-card[data-v-f6e0b92c]:hover {\n    background: #232f42 !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.charge-card[data-v-f6e0b92c] {\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    transition: border-color 0.15s ease;\n}\n.charge-card[data-v-f6e0b92c]:hover {\n    border-color: var(--ui-border-strong);\n}\n.charge-card label[data-v-f6e0b92c] {\n    font-size: 13px;\n}\n\n/* Refundable / Status switches: same height as the inputs so the row lines up */\n.charge-switch[data-v-f6e0b92c] {\n    display: flex;\n    align-items: center;\n    min-height: 40px;\n    margin-bottom: 0;\n}\n.charge-switch .form-check-label[data-v-f6e0b92c] {\n    margin-left: 6px;\n    color: var(--ui-text-muted);\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -664,6 +672,17 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
                     {
                       staticClass: "breadcrumb-item active",
                       attrs: { "aria-current": "page" },
@@ -685,8 +704,19 @@ var render = function () {
       _c("section", { staticClass: "section" }, [
         _c("div", { staticClass: "card" }, [
           _c("div", { staticClass: "card-header" }, [
-            _c("h4", { staticClass: "card-title" }, [
+            _c("h4", { staticClass: "card-title float-none" }, [
               _vm._v(_vm._s(_vm.__("additional_charge"))),
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+              _vm._v(
+                _vm._s(
+                  _vm.tr(
+                    "additional_charge_desc",
+                    "Extra charges (packaging, handling, etc.) added to orders at checkout."
+                  )
+                )
+              ),
             ]),
           ]),
           _vm._v(" "),
@@ -867,485 +897,551 @@ var render = function () {
                         _vm._l(_vm.additionalCharges, function (charge, index) {
                           return _c(
                             "div",
-                            {
-                              key: index,
-                              staticClass:
-                                "charge-card mb-3 p-3 border rounded",
-                            },
+                            { key: index, staticClass: "charge-card mb-3 p-3" },
                             [
                               _c(
                                 "div",
                                 { staticClass: "row align-items-end" },
                                 [
-                                  _c("div", { staticClass: "col-md-4" }, [
-                                    _c(
-                                      "div",
-                                      { staticClass: "form-group mb-2" },
-                                      [
-                                        _c("label", [
-                                          _vm._v(
-                                            _vm._s(_vm.__("charge_title")) + " "
-                                          ),
-                                          language.is_default
-                                            ? _c(
-                                                "span",
-                                                { staticClass: "text-danger" },
-                                                [_vm._v("*")]
-                                              )
-                                            : _vm._e(),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("input", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
+                                  _c(
+                                    "div",
+                                    { staticClass: "col-12 col-md-6 col-xl-4" },
+                                    [
+                                      _c(
+                                        "div",
+                                        { staticClass: "form-group mb-2" },
+                                        [
+                                          _c("label", [
+                                            _vm._v(
+                                              _vm._s(_vm.__("charge_title")) +
+                                                " "
+                                            ),
+                                            language.is_default
+                                              ? _c(
+                                                  "span",
+                                                  {
+                                                    staticClass: "text-danger",
+                                                  },
+                                                  [_vm._v("*")]
+                                                )
+                                              : _vm._e(),
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value:
+                                                  charge.title[language.code],
+                                                expression:
+                                                  "charge.title[language.code]",
+                                              },
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: {
+                                              type: "text",
+                                              placeholder:
+                                                _vm.__("charge_title"),
+                                              required: language.is_default
+                                                ? true
+                                                : undefined,
+                                            },
+                                            domProps: {
                                               value:
                                                 charge.title[language.code],
-                                              expression:
-                                                "charge.title[language.code]",
                                             },
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: {
-                                            type: "text",
-                                            placeholder: _vm.__("charge_title"),
-                                            required: language.is_default
-                                              ? true
-                                              : undefined,
-                                          },
-                                          domProps: {
-                                            value: charge.title[language.code],
-                                          },
-                                          on: {
-                                            input: function ($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                charge.title,
-                                                language.code,
-                                                $event.target.value
-                                              )
+                                            on: {
+                                              input: function ($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.$set(
+                                                  charge.title,
+                                                  language.code,
+                                                  $event.target.value
+                                                )
+                                              },
                                             },
-                                          },
-                                        }),
-                                      ]
-                                    ),
-                                  ]),
+                                          }),
+                                        ]
+                                      ),
+                                    ]
+                                  ),
                                   _vm._v(" "),
                                   language.is_default
                                     ? [
-                                        _c("div", { staticClass: "col-md-2" }, [
-                                          _c(
-                                            "div",
-                                            { staticClass: "form-group mb-2" },
-                                            [
-                                              _c("label", [
-                                                _vm._v(
-                                                  _vm._s(_vm.__("charge_type"))
-                                                ),
-                                              ]),
-                                              _vm._v(" "),
-                                              _c(
-                                                "select",
-                                                {
-                                                  directives: [
-                                                    {
-                                                      name: "model",
-                                                      rawName: "v-model",
-                                                      value: charge.charge_type,
-                                                      expression:
-                                                        "charge.charge_type",
-                                                    },
-                                                  ],
-                                                  staticClass:
-                                                    "form-control form-select",
-                                                  on: {
-                                                    change: function ($event) {
-                                                      var $$selectedVal =
-                                                        Array.prototype.filter
-                                                          .call(
-                                                            $event.target
-                                                              .options,
-                                                            function (o) {
-                                                              return o.selected
-                                                            }
-                                                          )
-                                                          .map(function (o) {
-                                                            var val =
-                                                              "_value" in o
-                                                                ? o._value
-                                                                : o.value
-                                                            return val
-                                                          })
-                                                      _vm.$set(
-                                                        charge,
-                                                        "charge_type",
-                                                        $event.target.multiple
-                                                          ? $$selectedVal
-                                                          : $$selectedVal[0]
-                                                      )
-                                                    },
-                                                  },
-                                                },
-                                                [
-                                                  _c(
-                                                    "option",
-                                                    {
-                                                      attrs: {
-                                                        value: "amount",
-                                                      },
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        _vm._s(_vm.__("amount"))
-                                                      ),
-                                                    ]
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "col-6 col-md-3 col-xl-2",
+                                          },
+                                          [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass: "form-group mb-2",
+                                              },
+                                              [
+                                                _c("label", [
+                                                  _vm._v(
+                                                    _vm._s(
+                                                      _vm.__("charge_type")
+                                                    )
                                                   ),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "option",
-                                                    {
-                                                      attrs: {
-                                                        value: "percentage",
-                                                      },
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        _vm._s(
-                                                          _vm.__("percentage")
-                                                        )
-                                                      ),
-                                                    ]
-                                                  ),
-                                                ]
-                                              ),
-                                            ]
-                                          ),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("div", { staticClass: "col-md-2" }, [
-                                          _c(
-                                            "div",
-                                            { staticClass: "form-group mb-2" },
-                                            [
-                                              _c("label", [
-                                                _vm._v(
-                                                  _vm._s(
-                                                    charge.charge_type ===
-                                                      "percentage"
-                                                      ? _vm.__("percentage")
-                                                      : _vm.__("charge_amount")
-                                                  )
-                                                ),
-                                              ]),
-                                              _vm._v(" "),
-                                              _c(
-                                                "div",
-                                                { staticClass: "input-group" },
-                                                [
-                                                  _c(
-                                                    "span",
-                                                    {
-                                                      staticClass:
-                                                        "input-group-text",
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                                                            " +
-                                                          _vm._s(
-                                                            charge.charge_type ===
-                                                              "percentage"
-                                                              ? "%"
-                                                              : _vm.$currency
-                                                          ) +
-                                                          "\n                                                        "
-                                                      ),
-                                                    ]
-                                                  ),
-                                                  _vm._v(" "),
-                                                  _c("input", {
-                                                    directives: [
-                                                      {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value: charge.amount,
-                                                        expression:
-                                                          "charge.amount",
-                                                      },
-                                                    ],
-                                                    staticClass: "form-control",
-                                                    attrs: {
-                                                      type: "number",
-                                                      id:
-                                                        "charge_amount_" +
-                                                        index,
-                                                      min: "0",
-                                                      max:
-                                                        charge.charge_type ===
-                                                        "percentage"
-                                                          ? 100
-                                                          : undefined,
-                                                      step: "0.01",
-                                                      required: "",
-                                                    },
-                                                    domProps: {
-                                                      value: charge.amount,
-                                                    },
-                                                    on: {
-                                                      input: function ($event) {
-                                                        if (
-                                                          $event.target
-                                                            .composing
-                                                        ) {
-                                                          return
-                                                        }
-                                                        _vm.$set(
-                                                          charge,
-                                                          "amount",
-                                                          $event.target.value
-                                                        )
-                                                      },
-                                                    },
-                                                  }),
-                                                ]
-                                              ),
-                                            ]
-                                          ),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("div", { staticClass: "col-md-2" }, [
-                                          _c(
-                                            "div",
-                                            { staticClass: "form-group mb-2" },
-                                            [
-                                              _c("label", [
-                                                _vm._v(
-                                                  _vm._s(_vm.__("refundable"))
-                                                ),
-                                              ]),
-                                              _vm._v(" "),
-                                              _c(
-                                                "div",
-                                                {
-                                                  staticClass:
-                                                    "form-check form-switch mt-1",
-                                                },
-                                                [
-                                                  _c("input", {
+                                                ]),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "select",
+                                                  {
                                                     directives: [
                                                       {
                                                         name: "model",
                                                         rawName: "v-model",
                                                         value:
-                                                          charge.is_refundable,
+                                                          charge.charge_type,
                                                         expression:
-                                                          "charge.is_refundable",
+                                                          "charge.charge_type",
                                                       },
                                                     ],
                                                     staticClass:
-                                                      "form-check-input",
-                                                    attrs: {
-                                                      type: "checkbox",
-                                                      id: "refundable_" + index,
-                                                    },
-                                                    domProps: {
-                                                      checked: Array.isArray(
-                                                        charge.is_refundable
-                                                      )
-                                                        ? _vm._i(
-                                                            charge.is_refundable,
-                                                            null
-                                                          ) > -1
-                                                        : charge.is_refundable,
-                                                    },
+                                                      "form-control form-select",
                                                     on: {
                                                       change: function (
                                                         $event
                                                       ) {
-                                                        var $$a =
-                                                            charge.is_refundable,
-                                                          $$el = $event.target,
-                                                          $$c = $$el.checked
-                                                            ? true
-                                                            : false
-                                                        if (
-                                                          Array.isArray($$a)
-                                                        ) {
-                                                          var $$v = null,
-                                                            $$i = _vm._i(
-                                                              $$a,
-                                                              $$v
+                                                        var $$selectedVal =
+                                                          Array.prototype.filter
+                                                            .call(
+                                                              $event.target
+                                                                .options,
+                                                              function (o) {
+                                                                return o.selected
+                                                              }
                                                             )
-                                                          if ($$el.checked) {
-                                                            $$i < 0 &&
-                                                              _vm.$set(
-                                                                charge,
-                                                                "is_refundable",
-                                                                $$a.concat([
-                                                                  $$v,
-                                                                ])
-                                                              )
-                                                          } else {
-                                                            $$i > -1 &&
-                                                              _vm.$set(
-                                                                charge,
-                                                                "is_refundable",
-                                                                $$a
-                                                                  .slice(0, $$i)
-                                                                  .concat(
-                                                                    $$a.slice(
-                                                                      $$i + 1
-                                                                    )
-                                                                  )
-                                                              )
-                                                          }
-                                                        } else {
-                                                          _vm.$set(
-                                                            charge,
-                                                            "is_refundable",
-                                                            $$c
-                                                          )
-                                                        }
+                                                            .map(function (o) {
+                                                              var val =
+                                                                "_value" in o
+                                                                  ? o._value
+                                                                  : o.value
+                                                              return val
+                                                            })
+                                                        _vm.$set(
+                                                          charge,
+                                                          "charge_type",
+                                                          $event.target.multiple
+                                                            ? $$selectedVal
+                                                            : $$selectedVal[0]
+                                                        )
                                                       },
                                                     },
-                                                  }),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "label",
-                                                    {
-                                                      staticClass:
-                                                        "form-check-label",
-                                                      attrs: {
-                                                        for:
-                                                          "refundable_" + index,
-                                                      },
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                                                            " +
-                                                          _vm._s(
-                                                            charge.is_refundable
-                                                              ? _vm.__("yes")
-                                                              : _vm.__("no")
-                                                          ) +
-                                                          "\n                                                        "
-                                                      ),
-                                                    ]
-                                                  ),
-                                                ]
-                                              ),
-                                            ]
-                                          ),
-                                        ]),
-                                        _vm._v(" "),
-                                        _c("div", { staticClass: "col-md-1" }, [
-                                          _c(
-                                            "div",
-                                            { staticClass: "form-group mb-2" },
-                                            [
-                                              _c("label", [
-                                                _vm._v(
-                                                  _vm._s(_vm.__("status"))
-                                                ),
-                                              ]),
-                                              _vm._v(" "),
-                                              _c(
-                                                "div",
-                                                {
-                                                  staticClass:
-                                                    "form-check form-switch mt-1",
-                                                },
-                                                [
-                                                  _c("input", {
-                                                    directives: [
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "option",
                                                       {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value: charge.is_active,
-                                                        expression:
-                                                          "charge.is_active",
+                                                        attrs: {
+                                                          value: "amount",
+                                                        },
                                                       },
-                                                    ],
-                                                    staticClass:
-                                                      "form-check-input",
-                                                    attrs: {
-                                                      type: "checkbox",
-                                                      id: "status_" + index,
-                                                    },
-                                                    domProps: {
-                                                      checked: Array.isArray(
-                                                        charge.is_active
-                                                      )
-                                                        ? _vm._i(
-                                                            charge.is_active,
-                                                            null
-                                                          ) > -1
-                                                        : charge.is_active,
-                                                    },
-                                                    on: {
-                                                      change: function (
-                                                        $event
-                                                      ) {
-                                                        var $$a =
-                                                            charge.is_active,
-                                                          $$el = $event.target,
-                                                          $$c = $$el.checked
-                                                            ? true
-                                                            : false
-                                                        if (
-                                                          Array.isArray($$a)
-                                                        ) {
-                                                          var $$v = null,
-                                                            $$i = _vm._i(
-                                                              $$a,
-                                                              $$v
-                                                            )
-                                                          if ($$el.checked) {
-                                                            $$i < 0 &&
-                                                              _vm.$set(
-                                                                charge,
-                                                                "is_active",
-                                                                $$a.concat([
-                                                                  $$v,
-                                                                ])
-                                                              )
-                                                          } else {
-                                                            $$i > -1 &&
-                                                              _vm.$set(
-                                                                charge,
-                                                                "is_active",
-                                                                $$a
-                                                                  .slice(0, $$i)
-                                                                  .concat(
-                                                                    $$a.slice(
-                                                                      $$i + 1
-                                                                    )
-                                                                  )
-                                                              )
-                                                          }
-                                                        } else {
-                                                          _vm.$set(
-                                                            charge,
-                                                            "is_active",
-                                                            $$c
+                                                      [
+                                                        _vm._v(
+                                                          _vm._s(
+                                                            _vm.__("amount")
                                                           )
-                                                        }
+                                                        ),
+                                                      ]
+                                                    ),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "option",
+                                                      {
+                                                        attrs: {
+                                                          value: "percentage",
+                                                        },
                                                       },
-                                                    },
-                                                  }),
-                                                ]
-                                              ),
-                                            ]
-                                          ),
-                                        ]),
+                                                      [
+                                                        _vm._v(
+                                                          _vm._s(
+                                                            _vm.__("percentage")
+                                                          )
+                                                        ),
+                                                      ]
+                                                    ),
+                                                  ]
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
                                         _vm._v(" "),
                                         _c(
                                           "div",
                                           {
                                             staticClass:
-                                              "col-md-1 d-flex align-items-end mb-2",
+                                              "col-6 col-md-3 col-xl-2",
+                                          },
+                                          [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass: "form-group mb-2",
+                                              },
+                                              [
+                                                _c("label", [
+                                                  _vm._v(
+                                                    _vm._s(
+                                                      charge.charge_type ===
+                                                        "percentage"
+                                                        ? _vm.__("percentage")
+                                                        : _vm.__(
+                                                            "charge_amount"
+                                                          )
+                                                    )
+                                                  ),
+                                                ]),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    staticClass: "input-group",
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "span",
+                                                      {
+                                                        staticClass:
+                                                          "input-group-text",
+                                                      },
+                                                      [
+                                                        _vm._v(
+                                                          "\n                                                            " +
+                                                            _vm._s(
+                                                              charge.charge_type ===
+                                                                "percentage"
+                                                                ? "%"
+                                                                : _vm.$currency
+                                                            ) +
+                                                            "\n                                                        "
+                                                        ),
+                                                      ]
+                                                    ),
+                                                    _vm._v(" "),
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value: charge.amount,
+                                                          expression:
+                                                            "charge.amount",
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "form-control",
+                                                      attrs: {
+                                                        type: "number",
+                                                        id:
+                                                          "charge_amount_" +
+                                                          index,
+                                                        min: "0",
+                                                        max:
+                                                          charge.charge_type ===
+                                                          "percentage"
+                                                            ? 100
+                                                            : undefined,
+                                                        step: "0.01",
+                                                        required: "",
+                                                      },
+                                                      domProps: {
+                                                        value: charge.amount,
+                                                      },
+                                                      on: {
+                                                        input: function (
+                                                          $event
+                                                        ) {
+                                                          if (
+                                                            $event.target
+                                                              .composing
+                                                          ) {
+                                                            return
+                                                          }
+                                                          _vm.$set(
+                                                            charge,
+                                                            "amount",
+                                                            $event.target.value
+                                                          )
+                                                        },
+                                                      },
+                                                    }),
+                                                  ]
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "col-5 col-md-4 col-xl-2",
+                                          },
+                                          [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass: "form-group mb-2",
+                                              },
+                                              [
+                                                _c("label", [
+                                                  _vm._v(
+                                                    _vm._s(_vm.__("refundable"))
+                                                  ),
+                                                ]),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    staticClass:
+                                                      "form-check form-switch charge-switch",
+                                                  },
+                                                  [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value:
+                                                            charge.is_refundable,
+                                                          expression:
+                                                            "charge.is_refundable",
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "form-check-input",
+                                                      attrs: {
+                                                        type: "checkbox",
+                                                        id:
+                                                          "refundable_" + index,
+                                                      },
+                                                      domProps: {
+                                                        checked: Array.isArray(
+                                                          charge.is_refundable
+                                                        )
+                                                          ? _vm._i(
+                                                              charge.is_refundable,
+                                                              null
+                                                            ) > -1
+                                                          : charge.is_refundable,
+                                                      },
+                                                      on: {
+                                                        change: function (
+                                                          $event
+                                                        ) {
+                                                          var $$a =
+                                                              charge.is_refundable,
+                                                            $$el =
+                                                              $event.target,
+                                                            $$c = $$el.checked
+                                                              ? true
+                                                              : false
+                                                          if (
+                                                            Array.isArray($$a)
+                                                          ) {
+                                                            var $$v = null,
+                                                              $$i = _vm._i(
+                                                                $$a,
+                                                                $$v
+                                                              )
+                                                            if ($$el.checked) {
+                                                              $$i < 0 &&
+                                                                _vm.$set(
+                                                                  charge,
+                                                                  "is_refundable",
+                                                                  $$a.concat([
+                                                                    $$v,
+                                                                  ])
+                                                                )
+                                                            } else {
+                                                              $$i > -1 &&
+                                                                _vm.$set(
+                                                                  charge,
+                                                                  "is_refundable",
+                                                                  $$a
+                                                                    .slice(
+                                                                      0,
+                                                                      $$i
+                                                                    )
+                                                                    .concat(
+                                                                      $$a.slice(
+                                                                        $$i + 1
+                                                                      )
+                                                                    )
+                                                                )
+                                                            }
+                                                          } else {
+                                                            _vm.$set(
+                                                              charge,
+                                                              "is_refundable",
+                                                              $$c
+                                                            )
+                                                          }
+                                                        },
+                                                      },
+                                                    }),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "label",
+                                                      {
+                                                        staticClass:
+                                                          "form-check-label",
+                                                        attrs: {
+                                                          for:
+                                                            "refundable_" +
+                                                            index,
+                                                        },
+                                                      },
+                                                      [
+                                                        _vm._v(
+                                                          "\n                                                            " +
+                                                            _vm._s(
+                                                              charge.is_refundable
+                                                                ? _vm.__("yes")
+                                                                : _vm.__("no")
+                                                            ) +
+                                                            "\n                                                        "
+                                                        ),
+                                                      ]
+                                                    ),
+                                                  ]
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "col-4 col-md-4 col-xl-1",
+                                          },
+                                          [
+                                            _c(
+                                              "div",
+                                              {
+                                                staticClass: "form-group mb-2",
+                                              },
+                                              [
+                                                _c("label", [
+                                                  _vm._v(
+                                                    _vm._s(_vm.__("status"))
+                                                  ),
+                                                ]),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    staticClass:
+                                                      "form-check form-switch charge-switch",
+                                                  },
+                                                  [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value:
+                                                            charge.is_active,
+                                                          expression:
+                                                            "charge.is_active",
+                                                        },
+                                                      ],
+                                                      staticClass:
+                                                        "form-check-input",
+                                                      attrs: {
+                                                        type: "checkbox",
+                                                        id: "status_" + index,
+                                                      },
+                                                      domProps: {
+                                                        checked: Array.isArray(
+                                                          charge.is_active
+                                                        )
+                                                          ? _vm._i(
+                                                              charge.is_active,
+                                                              null
+                                                            ) > -1
+                                                          : charge.is_active,
+                                                      },
+                                                      on: {
+                                                        change: function (
+                                                          $event
+                                                        ) {
+                                                          var $$a =
+                                                              charge.is_active,
+                                                            $$el =
+                                                              $event.target,
+                                                            $$c = $$el.checked
+                                                              ? true
+                                                              : false
+                                                          if (
+                                                            Array.isArray($$a)
+                                                          ) {
+                                                            var $$v = null,
+                                                              $$i = _vm._i(
+                                                                $$a,
+                                                                $$v
+                                                              )
+                                                            if ($$el.checked) {
+                                                              $$i < 0 &&
+                                                                _vm.$set(
+                                                                  charge,
+                                                                  "is_active",
+                                                                  $$a.concat([
+                                                                    $$v,
+                                                                  ])
+                                                                )
+                                                            } else {
+                                                              $$i > -1 &&
+                                                                _vm.$set(
+                                                                  charge,
+                                                                  "is_active",
+                                                                  $$a
+                                                                    .slice(
+                                                                      0,
+                                                                      $$i
+                                                                    )
+                                                                    .concat(
+                                                                      $$a.slice(
+                                                                        $$i + 1
+                                                                      )
+                                                                    )
+                                                                )
+                                                            }
+                                                          } else {
+                                                            _vm.$set(
+                                                              charge,
+                                                              "is_active",
+                                                              $$c
+                                                            )
+                                                          }
+                                                        },
+                                                      },
+                                                    }),
+                                                  ]
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "div",
+                                          {
+                                            staticClass:
+                                              "col-3 col-md-4 col-xl-1 d-flex align-items-end justify-content-end mb-2",
                                           },
                                           [
                                             _vm.$can(
@@ -1402,11 +1498,16 @@ var render = function () {
                               language.is_default
                                 ? _c("div", { staticClass: "row mt-1" }, [
                                     _c("div", { staticClass: "col-12" }, [
-                                      _c("label", { staticClass: "me-3" }, [
-                                        _vm._v(
-                                          _vm._s(_vm.__("applicable_on")) + ":"
-                                        ),
-                                      ]),
+                                      _c(
+                                        "label",
+                                        { staticClass: "mr-3 mb-1" },
+                                        [
+                                          _vm._v(
+                                            _vm._s(_vm.__("applicable_on")) +
+                                              ":"
+                                          ),
+                                        ]
+                                      ),
                                       _vm._v(" "),
                                       _c(
                                         "div",
@@ -1597,44 +1698,59 @@ var render = function () {
                   1
                 ),
                 _vm._v(" "),
-                _c("div", { staticClass: "mt-3 d-flex justify-content-end" }, [
+                _c("div", { staticClass: "d-flex justify-content-start" }, [
                   _vm.$can("additional_charges_create")
                     ? _c(
                         "button",
                         {
-                          staticClass: "btn btn-success",
+                          staticClass: "btn btn-sm btn-outline-primary",
                           attrs: { type: "button" },
                           on: { click: _vm.addCharge },
                         },
-                        [_vm._v(_vm._s(_vm.__("add_charge")))]
+                        [
+                          _c("i", {
+                            staticClass: "fas fa-plus mr-1",
+                            attrs: { "aria-hidden": "true" },
+                          }),
+                          _vm._v(_vm._s(_vm.__("add_charge"))),
+                        ]
                       )
                     : _vm._e(),
                 ]),
                 _vm._v(" "),
-                _vm.$can("additional_charges_update")
-                  ? _c(
-                      "b-button",
-                      {
-                        staticClass: "mt-3",
-                        attrs: {
-                          type: "submit",
-                          variant: "primary",
-                          disabled: _vm.isLoading,
-                        },
-                      },
-                      [
-                        _vm._v(
-                          "\n                            " +
-                            _vm._s(_vm.__("update")) +
-                            "\n                            "
-                        ),
-                        _vm.isLoading
-                          ? _c("b-spinner", { attrs: { small: "" } })
-                          : _vm._e(),
-                      ],
-                      1
-                    )
-                  : _vm._e(),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "d-flex justify-content-end border-top pt-3 mt-3",
+                  },
+                  [
+                    _vm.$can("additional_charges_update")
+                      ? _c(
+                          "b-button",
+                          {
+                            attrs: {
+                              type: "submit",
+                              variant: "primary",
+                              disabled: _vm.isLoading,
+                            },
+                          },
+                          [
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(_vm.__("update")) +
+                                "\n                                "
+                            ),
+                            _vm.isLoading
+                              ? _c("b-spinner", { attrs: { small: "" } })
+                              : _vm._e(),
+                          ],
+                          1
+                        )
+                      : _vm._e(),
+                  ],
+                  1
+                ),
               ],
               1
             ),

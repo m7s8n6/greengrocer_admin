@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+        <div class="page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
             <h3 class="modern-page-title mb-0">{{ __('return_requests') }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -35,6 +35,12 @@
                             :per-page="perPage" :sort-direction="sortDirection" :bordered="false" :busy="isLoading"
                             stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small
                             class="figma-order-table mb-0">
+                            <template #empty="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                            </template>
+                            <template #emptyfiltered="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                            </template>
 
                             <template #table-busy>
                                 <div class="text-center text-black my-2">
@@ -89,12 +95,12 @@
                                 <div class="d-flex gap-2">
                                     <button class="figma-action-btn" @click="edit_record = row.item"
                                         v-if="$can('return_request_update')" v-b-tooltip.hover :title="__('edit')">
-                                        <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="figma-action-btn figma-delete-btn"
                                         @click="deleteReturnRequests(row.index, row.item.id)"
                                         v-if="$can('return_request_delete')" v-b-tooltip.hover :title="__('delete')">
-                                        <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </template>
@@ -102,11 +108,12 @@
                         </b-table>
                     </div>
 
-                    <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                        <div class="showing-results-text small">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') || 'of' }} <span
-                                class="showing-bold">{{ totalRows
-                                }}</span>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                            <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                                style="width: auto;"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         </div>
                         <div class="d-flex align-items-center gap-3">
                             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
@@ -152,6 +159,7 @@ export default {
             totalRows: 1,
             currentPage: 1,
             perPage: this.$perPage,
+            pageOptions: this.$pageOptions,
             sortDesc: false,
             sortDirection: 'asc',
             filter: null,
@@ -267,8 +275,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -303,6 +311,37 @@ export default {
     white-space: normal;
     word-break: break-word;
     max-width: 320px;
-    text-align: left;
+    text-align: start;
+    font-size: 13px;
+}
+
+/* Neutral statuses (received from customer / return to seller) as soft pills */
+.badge.bg-secondary,
+.badge.bg-dark {
+    background: var(--ui-surface-muted) !important;
+    color: var(--ui-text) !important;
+    border-color: var(--ui-border) !important;
+}
+
+.figma-table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px !important;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+}
+
+@media (max-width: 767.98px) {
+    .figma-table-footer {
+        justify-content: center;
+        padding: 12px 16px !important;
+    }
+
+    .reason-cell-text {
+        max-width: none;
+    }
 }
 </style>

@@ -30,6 +30,7 @@ class BlogsApiController extends Controller
     {
         try {
             $query = BlogCategory::with('translations')
+                ->where('module_id', $request->header('X-Module-Id') ?: 1)
                 ->withCount(['activeBlogs'])
                 ->orderByDesc('id');
 
@@ -109,6 +110,7 @@ class BlogsApiController extends Controller
 
             // Create base category
             $category = BlogCategory::create([
+                'module_id' => $request->header('X-Module-Id') ?: 1,
                 'slug' => $request->slug,
                 'status' => $request->status,
                 'name' => $categoryName,

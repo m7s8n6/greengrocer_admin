@@ -46,7 +46,7 @@ class Cart extends Model
             ->orderBy('id')
             ->value('image');
 
-        return $image ? asset('storage/'.$image) : '';
+        return $image ? asset('storage/'.$image) : \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
 
 }

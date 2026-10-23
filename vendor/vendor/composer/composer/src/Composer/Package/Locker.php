@@ -225,7 +225,7 @@ class Locker
      * Returns the platform requirements stored in the lock file
      *
      * @param  bool                     $withDevReqs if true, the platform requirements from the require-dev block are also returned
-     * @return Link[]
+     * @return \Composer\Package\Link[]
      */
     public function getPlatformRequirements(bool $withDevReqs = false): array
     {
@@ -552,14 +552,11 @@ class Locker
             $sourceRef = $package->getSourceReference() ?: $package->getDistReference();
             switch ($sourceType) {
                 case 'git':
-                    GitUtil::cleanEnv($this->process);
+                    GitUtil::cleanEnv();
 
-                    $command = GitUtil::buildRevListCommand($this->process, array_merge(['-n1', '--format=%ct', (string) $sourceRef], GitUtil::getNoShowSignatureFlags($this->process)));
-                    if (0 === $this->process->execute($command, $output, $path)) {
-                        $output = trim(GitUtil::parseRevListOutput($output, $this->process));
-                        if (Preg::isMatch('{^\s*\d+\s*$}', $output)) {
-                            $datetime = new \DateTime('@'.trim($output), new \DateTimeZone('UTC'));
-                        }
+                    $command = array_merge(['git', 'log', '-n1', '--pretty=%ct', (string) $sourceRef], GitUtil::getNoShowSignatureFlags($this->process));
+                    if (0 === $this->process->execute($command, $output, $path) && Preg::isMatch('{^\s*\d+\s*$}', $output)) {
+                        $datetime = new \DateTime('@'.trim($output), new \DateTimeZone('UTC'));
                     }
                     break;
 

@@ -3,49 +3,40 @@
         <div class="login-wrapper">
             <div class="detail-card">
                 <div class="auth-logo">
-                    <a href="javascript:void(0)"
-                       style="display: flex; align-items: center; justify-content: flex-start;">
-                        <img v-if="$appLogo != ''" :src="$storageUrl+$appLogo" style="height: 70px; width: 70px;"
+                    <a href="javascript:void(0)" class="d-flex align-items-center justify-content-start gap-2">
+                        <img v-if="$appLogo != ''" :src="$storageUrl+$appLogo" class="details-logo"
                              alt='Logo'/>
-                        <img v-else :src="$baseUrl + '/images/logo.png'" style="height: 70px; width: 70px;"
+                        <img v-else :src="$baseUrl + '/images/logo.png'" class="details-logo"
                              alt='Logo'/>
-                        <h2 style="margin: 10px;">{{ $appName }}</h2>
+                        <h2 class="details-app-name mb-0">{{ $appName }}</h2>
                     </a>
                 </div>
                 <h4>Seller Complete Profile</h4>
-                <p class="auth-subtitle text-primary">Please Complete the form to complete your registration</p>
+                <p class="auth-subtitle">Please Complete the form to complete your registration</p>
                 <form ref="my-form" @submit.prevent="saveSellerDetails">
                     <div class="row">
                         <div class="content">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Store Information</h4>
+                                    <h4 class="card-title mb-0">Store Information</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Name</label>
                                                 <input type="text" class="form-control" v-model="name" required
                                                        placeholder="Enter name.">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Store Name</label>
                                                 <input type="text" class="form-control" v-model="store_name" required
                                                        placeholder="Enter store name.">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <div class="form-group">
-                                                <label>Store URL</label>
-                                                <input type="text" class="form-control" v-model="store_url"
-                                                       placeholder="Enter store URL.">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Categories</label>
                                                 <Select2 v-model="categories_ids"
@@ -57,7 +48,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Tax Name</label>
                                                 <input type="text" class="form-control" v-model="tax_name"
@@ -65,7 +56,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Tax Number</label>
                                                 <input type="text" class="form-control" v-model="tax_number"
@@ -73,7 +64,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>PAN Number</label>
                                                 <input type="text" class="form-control" v-model="pan_number"
@@ -81,7 +72,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4"> 
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>National Identity Card</label>
 
@@ -111,7 +102,7 @@
 
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Address Proof</label>
                                                 <input type="file" class="file-input" ref="file_address_proof"
@@ -177,11 +168,11 @@
                             </div>
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Store Location Information</h4>
+                                    <h4 class="card-title mb-0">Store Location Information</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <label for="city_name">Select or Search City</label>
                                             <multiselect v-model="city"
                                                          :options="cities"
@@ -203,52 +194,68 @@
                                                 </template>
                                             </multiselect>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>State</label>
                                                 <input type="text" class="form-control" v-model="state" readonly placeholder="Enter state">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Street</label>
                                                 <input type="text" class="form-control" v-model="street"
                                                        readonly placeholder="Enter street.">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Latitude</label>
                                                 <input type="text" class="form-control" v-model="latitude" readonly placeholder="Enter latitude.">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Longitude</label>
                                                 <input type="text" class="form-control" v-model="longitude" readonly placeholder="Enter longitude.">
                                             </div>
                                         </div>
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <label for="location">Search Location</label>
-                                            <div class="input-group">
-                                                <GmapAutocomplete type="search" class="form-control" placeholder="Search you location on map."
-                                                                  @place_changed="setPlace"
-                                                                  :options="{ fields: ['formatted_address', 'geometry', 'name', 'address_components'], strictBounds: false}"
-                                                                  id="location">
-                                                </GmapAutocomplete>
-                                                <b-button type="button" variant="primary" v-b-tooltip.hover  title="Add current location" @click="getCurrentLocation">
+                                            <div class="input-group" v-if="mapProvider === 'google'">
+                                                <google-place-search placeholder="Search you location on map."
+                                                                     @place_changed="setPlace" input-id="location">
+                                                </google-place-search>
+                                                <b-button type="button" variant="primary" class="search_location_btn" v-b-tooltip.hover  title="Add current location" @click="getCurrentLocation">
                                                     <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF">
                                                         <title>current-location</title>
                                                         <path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
                                                     </svg>
                                                 </b-button>
                                             </div>
+                                            <div class="input-group position-relative" v-else>
+                                                <input type="search" class="form-control" id="osm_location"
+                                                    placeholder="Search you location on map." :value="osmSellerQuery"
+                                                    @input="onOsmSellerQueryInput($event.target.value)" autocomplete="off">
+                                                <b-button type="button" variant="primary" class="search_location_btn" v-b-tooltip.hover title="Add current location" @click="getOsmCurrentLocation">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF">
+                                                        <title>current-location</title>
+                                                        <path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                                                    </svg>
+                                                </b-button>
+                                                <ul v-if="osmSellerSuggestions.length" class="list-group osm-suggestions">
+                                                    <li v-for="s in osmSellerSuggestions" :key="s.placePrediction.placeId"
+                                                        class="list-group-item list-group-item-action" style="cursor:pointer"
+                                                        @mousedown.prevent="selectOsmSellerSuggestion(s)">
+                                                        {{ s.placePrediction.text.text }}
+                                                    </li>
+                                                </ul>
+                                            </div>
                                             <span class="text-danger d-block font-size-13">*Only Search Location, When Update is necessary</span>
                                             <span class="text text-primary font-size-13">Search your seller name and you will get the location points(Latitude & Longitude) below.</span>
                                         </div>
                                         <div class="col-md-12 mb-3">
                                             <div v-if="formatted_address" class="text-danger">*Drag and click marker to your shop proper location (This will affect into delivery charge calculation)</div>
-                                            <div id="map" style="position: relative; overflow: hidden;">
+                                            <div id="map" style="position: relative; overflow: hidden;" v-if="mapProvider === 'google'">
                                                 <GmapMap
                                                     :center="center"
                                                     :zoom="13"
@@ -266,7 +273,7 @@
                                                         @drag="updateCoordinates"
                                                         @click="updateCoordinates"
                                                     />
-                                                  
+
                                                     <gmap-info-window
                                                         :options="{
                                                                   maxWidth: 300,
@@ -279,6 +286,15 @@
                                                     </gmap-info-window>
                                                 </GmapMap>
                                             </div>
+                                            <div id="osm_map" v-else>
+                                                <osm-map-picker ref="osmSellerDetailsMap"
+                                                    :lat="latitude" :lng="longitude"
+                                                    height="400px"
+                                                    :show-search-box="false"
+                                                    @location-selected="onOsmLocationSelected"
+                                                    @suggestions-updated="osmSellerSuggestions = $event">
+                                                </osm-map-picker>
+                                            </div>
                                             <div v-if="formatted_address">
                                             <span class="title font-weight-bolder"><b>{{
                                                     place_name
@@ -290,11 +306,11 @@
                             </div>
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Seller Bank Information</h4>
+                                    <h4 class="card-title mb-0">Seller Bank Information</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Bank Name</label>
                                                 <input type="text" class="form-control" v-model="bank_name"
@@ -302,7 +318,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Account Number</label>
                                                 <input type="number" class="form-control" v-model="account_number"
@@ -310,7 +326,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Bank's IFSC Code</label>
                                                 <input type="text" class="form-control" v-model="ifsc_code"
@@ -318,7 +334,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group col-md-4">
+                                        <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Bank Account Name</label>
                                                 <input type="text" class="form-control valid" v-model="account_name"
@@ -331,10 +347,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-primary btn-block btn-lg shadow-lg mt-5">
-                            Complete
-                            <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                        </button>
+                        <div class="col-12 d-flex justify-content-end mt-3">
+                            <button class="btn btn-primary btn-lg px-5 complete-btn">
+                                Complete
+                                <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                            </button>
+                        </div>
                     </div>
                 </form>
                 <div class="auth-copyright">
@@ -374,6 +392,8 @@ export default {
             markers: [],
             place_name: "",
             formatted_address: "",
+            osmSellerQuery: "",
+            osmSellerSuggestions: [],
             infoWindow: {
                 position: {lat: 0, lng: 0},
                 open: false,
@@ -385,7 +405,6 @@ export default {
             name: Auth.user.username,
             email: Auth.user.email,
             mobile: "",
-            store_url: "",
             password: "",
             confirm_password: "",
             store_name: "",
@@ -448,7 +467,10 @@ export default {
             });
             return temp;
         },
-        google: gmapApi
+        google: gmapApi,
+        mapProvider() {
+            return window.mapProvider === 'osm' ? 'osm' : 'google';
+        }
     },
     methods: {
         getStoreDescriptionEditorInit() {
@@ -578,6 +600,51 @@ export default {
         updateCoordinates(location) {
             this.handleMapClick(location);
         },
+        onOsmLocationSelected(payload) {
+            this.latitude = payload.lat;
+            this.longitude = payload.lng;
+
+            let addressArr = (payload.formatted_address || '').split(",");
+            this.street = addressArr[0] + " " + (addressArr[1] || "");
+            this.place_name = payload.name || addressArr[1] || payload.formatted_address;
+            this.formatted_address = payload.formatted_address;
+        },
+        onOsmSellerQueryInput(text) {
+            this.osmSellerQuery = text;
+            if (this.$refs.osmSellerDetailsMap) {
+                this.$refs.osmSellerDetailsMap.setQueryAndSearch(text);
+            }
+        },
+        selectOsmSellerSuggestion(suggestion) {
+            this.osmSellerQuery = suggestion.placePrediction.text.text;
+            this.osmSellerSuggestions = [];
+            if (this.$refs.osmSellerDetailsMap) {
+                this.$refs.osmSellerDetailsMap.selectSuggestion(suggestion);
+            }
+        },
+        getOsmCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    this.$refs.osmSellerDetailsMap && this.$refs.osmSellerDetailsMap.setView(position.coords.latitude, position.coords.longitude);
+                    axios.post(this.$apiUrl + '/map/geocode', {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        source: 'web',
+                    }).then((response) => {
+                        const data = response.data && response.data.data ? response.data.data : response.data;
+                        const result = data && data.results && data.results[0];
+                        this.onOsmLocationSelected({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            formatted_address: result ? result.formatted_address : '',
+                            name: result ? result.formatted_address : '',
+                        });
+                    });
+                });
+            } else {
+                this.showError("Geolocation is not supported by this browser.");
+            }
+        },
         setCityId() {
             this.state = this.city.state;
             this.city_id = this.city.id;
@@ -633,7 +700,6 @@ export default {
             formData.append('name', this.name);
             formData.append('email', this.email);
             formData.append('mobile', this.mobile);
-            formData.append('store_url', this.store_url);
             formData.append('password', this.password);
             formData.append('confirm_password', this.confirm_password);
             formData.append('store_name', this.store_name);
@@ -702,6 +768,18 @@ export default {
 
 <style scoped>
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+.osm-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border-strong);
+    border-top: none;
+}
 #auth{
     overflow: auto!important;
 }
@@ -710,6 +788,50 @@ export default {
 }
 .auth-logo {
     padding-bottom: 10px;
+}
+
+.details-logo {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.details-app-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+/* Section cards inside the profile form: SnapBuy card header + spacing */
+.detail-card .card {
+    margin-bottom: 20px;
+}
+
+.detail-card .card > .card-header .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.detail-card .file-input-div label {
+    display: block;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.detail-card .custom-image {
+    width: 64px;
+    height: 64px;
+    margin-top: 8px;
+    object-fit: cover;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+}
+
+@media (max-width: 575.98px) {
+    .complete-btn {
+        width: 100%;
+    }
 }
 
 </style>

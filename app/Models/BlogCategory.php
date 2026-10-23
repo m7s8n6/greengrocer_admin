@@ -11,6 +11,7 @@ class BlogCategory extends Model
     protected $table = 'blog_categories';
 
     protected $fillable = [
+        'module_id',
         'slug',
         'name',
         'meta_title',

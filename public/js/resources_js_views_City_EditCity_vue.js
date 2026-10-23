@@ -323,6 +323,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -337,6 +363,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       },
       currentPlace: null,
       markers: [],
+      osmCityQuery: '',
+      osmCitySuggestions: [],
       city: {
         id: "",
         latitude: "",
@@ -444,6 +472,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   computed: {
     google: function google() {
       return (0,vue2_google_maps__WEBPACK_IMPORTED_MODULE_2__.gmapApi)(); // This will return the google object once the API is loaded
+    },
+    mapProvider: function mapProvider() {
+      return window.mapProvider === 'osm' ? 'osm' : 'google';
     }
   },
   created: function created() {
@@ -460,6 +491,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     });
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     fetchActiveLanguages: function fetchActiveLanguages() {
       var _this3 = this;
       return axios__WEBPACK_IMPORTED_MODULE_1___default().get(this.$apiUrl + '/active_languages').then(function (response) {
@@ -584,6 +619,36 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.currentPlace = null;
       }
     },
+    onOsmLocationSelected: function onOsmLocationSelected(payload) {
+      this.city.latitude = payload.lat;
+      this.city.longitude = payload.lng;
+      this.city.name = payload.name || this.city.name;
+      var addressArr = (payload.formatted_address || '').split(",");
+      this.city.state = addressArr[addressArr.length - 2] || this.city.state;
+      this.city.formatted_address = payload.formatted_address;
+    },
+    onOsmCityQueryInput: function onOsmCityQueryInput(text) {
+      this.osmCityQuery = text;
+      if (this.$refs.osmCityMap) {
+        this.$refs.osmCityMap.setQueryAndSearch(text);
+      }
+    },
+    selectOsmCitySuggestion: function selectOsmCitySuggestion(suggestion) {
+      this.osmCityQuery = suggestion.placePrediction.text.text;
+      this.osmCitySuggestions = [];
+      if (this.$refs.osmCityMap) {
+        this.$refs.osmCityMap.selectSuggestion(suggestion);
+      }
+    },
+    onOsmBoundaryChanged: function onOsmBoundaryChanged(payload) {
+      this.geolocation_type = payload.geolocation_type || 'polygon';
+      this.radius = payload.radius;
+      if (payload.geolocation_type === 'circle') {
+        this.vertices = JSON.stringify(payload.vertices);
+      } else {
+        this.vertices = payload.vertices;
+      }
+    },
     loadCityWithTranslations: function loadCityWithTranslations() {
       var _this4 = this;
       return axios__WEBPACK_IMPORTED_MODULE_1___default().get(this.$apiUrl + '/cities/edit/' + this.city.id).then(function (response) {
@@ -680,6 +745,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }, 100); // Check every 100ms
     },
     setMap: function setMap() {
+      var _this6 = this;
       if (!this.city.latitude || !this.city.longitude) {
         return;
       }
@@ -701,6 +767,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.infoWindow.position = marker;
       this.infoWindow.template = "<b>".concat(this.city.name, "</b><br>").concat(this.city.formatted_address);
       this.infoWindow.open = true;
+      if (this.mapProvider === 'osm') {
+        if (!this.city.boundary_points || !this.city.id) {
+          return;
+        }
+        var osmBoundaryPoints = this.city.boundary_points;
+        if (typeof osmBoundaryPoints === 'string') {
+          try {
+            osmBoundaryPoints = JSON.parse(osmBoundaryPoints);
+          } catch (e) {
+            return;
+          }
+        }
+        if (!osmBoundaryPoints || _typeof(osmBoundaryPoints) !== 'object') {
+          return;
+        }
+        var osmPoints = Array.isArray(osmBoundaryPoints) ? osmBoundaryPoints : [osmBoundaryPoints];
+        if (osmPoints.length === 0) return;
+        this.geolocation_type = this.city.geolocation_type || 'polygon';
+        this.radius = this.city.radius;
+        this.vertices = this.city.geolocation_type === 'circle' ? this.city.boundary_points : osmPoints;
+        this.$nextTick(function () {
+          if (_this6.$refs.osmCityMap) {
+            _this6.$refs.osmCityMap.restoreBoundary({
+              geolocation_type: _this6.city.geolocation_type || 'polygon',
+              vertices: osmPoints,
+              radius: _this6.city.radius
+            });
+          }
+        });
+        return;
+      }
       if (!this.map || !this.city.boundary_points || !this.city.id) {
         return;
       }
@@ -749,10 +846,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     switchToDefaultLanguageTab: function switchToDefaultLanguageTab() {
-      var _this6 = this;
+      var _this7 = this;
       var skipError = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var defaultLangIndex = this.languages.findIndex(function (language) {
-        return language.id === _this6.defaultLanguageId;
+        return language.id === _this7.defaultLanguageId;
       });
       if (defaultLangIndex !== -1) {
         if (!skipError) {
@@ -762,38 +859,38 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     saveRecord: function saveRecord() {
-      var _this7 = this;
+      var _this8 = this;
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var cityId, languagesToSave, defaultLang, _i, _languagesToSave, _response$data$data, language, formData, key, _this7$city$key, response, _error$response, _error$response$data;
+        var cityId, languagesToSave, defaultLang, _i, _languagesToSave, _response$data$data, language, formData, key, _this8$city$key, response, _error$response, _error$response$data;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (_this7.validateDefaultLanguage()) {
+                if (_this8.validateDefaultLanguage()) {
                   _context.next = 2;
                   break;
                 }
                 return _context.abrupt("return");
               case 2:
-                if (_this7.vertices) {
+                if (_this8.vertices) {
                   _context.next = 5;
                   break;
                 }
-                _this7.showError("Draw Deliverable area on Map");
+                _this8.showError("Draw Deliverable area on Map");
                 return _context.abrupt("return");
               case 5:
-                _this7.isLoading = true;
-                cityId = _this7.city.id;
+                _this8.isLoading = true;
+                cityId = _this8.city.id;
                 languagesToSave = [];
-                defaultLang = _this7.languages.find(function (l) {
+                defaultLang = _this8.languages.find(function (l) {
                   return l.is_default;
                 });
                 if (defaultLang) {
                   languagesToSave.push(defaultLang);
                 }
-                _this7.languages.forEach(function (language) {
+                _this8.languages.forEach(function (language) {
                   if (language.is_default) return;
-                  var trans = _this7.translations[language.id];
+                  var trans = _this8.translations[language.id];
                   if (trans.zone && trans.zone.trim() !== '') {
                     languagesToSave.push(language);
                   }
@@ -813,27 +910,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
                 // ALWAYS send base fields for default language
                 if (language.is_default) {
-                  for (key in _this7.city) {
+                  for (key in _this8.city) {
                     if (key === 'range_wise_charges') {
-                      formData.append(key, JSON.stringify(_this7.city[key]));
+                      formData.append(key, JSON.stringify(_this8.city[key]));
                     } else {
-                      formData.append(key, (_this7$city$key = _this7.city[key]) !== null && _this7$city$key !== void 0 ? _this7$city$key : '');
+                      formData.append(key, (_this8$city$key = _this8.city[key]) !== null && _this8$city$key !== void 0 ? _this8$city$key : '');
                     }
                   }
-                  formData.append("geolocation_type", _this7.geolocation_type);
-                  formData.append("radius", _this7.radius);
-                  if (_this7.geolocation_type === 'circle') {
-                    formData.append("boundary_points", _this7.vertices);
+                  formData.append("geolocation_type", _this8.geolocation_type);
+                  formData.append("radius", _this8.radius);
+                  if (_this8.geolocation_type === 'circle') {
+                    formData.append("boundary_points", _this8.vertices);
                   } else {
-                    formData.append("boundary_points", JSON.stringify(_this7.vertices));
+                    formData.append("boundary_points", JSON.stringify(_this8.vertices));
                   }
                 }
 
                 // Always send translation fields
                 formData.append("language_id", language.id);
-                formData.append("zone", _this7.translations[language.id].zone || '');
+                formData.append("zone", _this8.translations[language.id].zone || '');
                 _context.next = 22;
-                return axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this7.$apiUrl + '/cities/save', formData);
+                return axios__WEBPACK_IMPORTED_MODULE_1___default().post(_this8.$apiUrl + '/cities/save', formData);
               case 22:
                 response = _context.sent;
                 if (!cityId && (_response$data$data = response.data.data) !== null && _response$data$data !== void 0 && _response$data$data.id) {
@@ -844,9 +941,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _context.next = 13;
                 break;
               case 27:
-                _this7.showMessage("success", __('city_saved_successfully'));
+                _this8.showMessage("success", __('city_saved_successfully'));
                 setTimeout(function () {
-                  _this7.$router.push({
+                  _this8.$router.push({
                     path: '/cities'
                   });
                 }, 1500);
@@ -856,13 +953,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 _context.prev = 31;
                 _context.t0 = _context["catch"](11);
                 if ((_error$response = _context.t0.response) !== null && _error$response !== void 0 && (_error$response$data = _error$response.data) !== null && _error$response$data !== void 0 && _error$response$data.message) {
-                  _this7.showError(_context.t0.response.data.message);
+                  _this8.showError(_context.t0.response.data.message);
                 } else {
-                  _this7.showError("Something went wrong!");
+                  _this8.showError("Something went wrong!");
                 }
               case 34:
                 _context.prev = 34;
-                _this7.isLoading = false;
+                _this8.isLoading = false;
                 return _context.finish(34);
               case 37:
               case "end":
@@ -1176,6 +1273,58 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.osm-suggestions[data-v-a8c9b86c] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    z-index: 1000;\n    max-height: 220px;\n    overflow-y: auto;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border-strong);\n    border-top: none;\n    border-radius: 0 0 var(--ui-radius) var(--ui-radius);\n    box-shadow: var(--ui-shadow-lg);\n}\n.osm-suggestion-item[data-v-a8c9b86c] {\n    cursor: pointer;\n}\n.city-map--google[data-v-a8c9b86c] {\n    position: relative;\n    overflow: hidden;\n}\n.city-gmap[data-v-a8c9b86c] {\n    width: 100%;\n    height: 700px;\n    margin-top: 5px;\n}\n.osm-suggestions .list-group-item[data-v-a8c9b86c] {\n    font-size: 13px;\n    color: var(--ui-text);\n    background: var(--ui-surface);\n    border-color: var(--ui-border);\n}\n.form-actions[data-v-a8c9b86c] {\n    margin-top: 8px;\n    padding-top: 16px;\n    border-top: 1px solid var(--ui-border);\n}\n.range-row[data-v-a8c9b86c] {\n    margin-bottom: 10px;\n}\n.range-row .col[data-v-a8c9b86c] {\n    min-width: 0;\n}\n.range-index[data-v-a8c9b86c],\n.range-to[data-v-a8c9b86c] {\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n.range-btn[data-v-a8c9b86c] {\n    width: 32px;\n    height: 32px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n}\n.city-map[data-v-a8c9b86c] {\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n}\n.city-address[data-v-a8c9b86c] {\n    display: flex;\n    align-items: flex-start;\n    gap: 8px;\n    padding: 10px 12px;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-heading);\n    background: var(--ui-surface-muted);\n    border-radius: var(--ui-radius);\n}\n.city-address i[data-v-a8c9b86c] {\n    color: var(--theme-primary-600);\n    margin-top: 2px;\n}\n@media (max-width: 767.98px) {\n    /* shorter map on phones */\n.city-gmap[data-v-a8c9b86c],\n    #map[data-v-a8c9b86c]  .vue-map-container {\n        height: 420px;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_style_index_0_id_a8c9b86c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_style_index_0_id_a8c9b86c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_style_index_0_id_a8c9b86c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/City/EditCity.vue":
 /*!**********************************************!*\
   !*** ./resources/js/views/City/EditCity.vue ***!
@@ -1186,23 +1335,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditCity.vue?vue&type=template&id=a8c9b86c */ "./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c");
+/* harmony import */ var _EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true */ "./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true");
 /* harmony import */ var _EditCity_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EditCity.vue?vue&type=script&lang=js */ "./resources/js/views/City/EditCity.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _EditCity_vue_vue_type_style_index_0_id_a8c9b86c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css */ "./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _EditCity_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__.render,
-  _EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "a8c9b86c",
   null
   
 )
@@ -1229,26 +1380,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c":
-/*!****************************************************************************!*\
-  !*** ./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c ***!
-  \****************************************************************************/
+/***/ "./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css ***!
+  \******************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./EditCity.vue?vue&type=template&id=a8c9b86c */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_style_index_0_id_a8c9b86c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=style&index=0&id=a8c9b86c&scoped=true&lang=css");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c":
-/*!*******************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c ***!
-  \*******************************************************************************************************************************************************************************************************************/
+/***/ "./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditCity_vue_vue_type_template_id_a8c9b86c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true");
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/City/EditCity.vue?vue&type=template&id=a8c9b86c&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1262,20 +1425,20 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-          _c("h3", [_vm._v(_vm._s(_vm.__("manage_city")))]),
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-          _c(
-            "nav",
-            {
-              staticClass: "breadcrumb-header float-start float-lg-end",
-              attrs: { "aria-label": "breadcrumb" },
-            },
-            [
-              _c("ol", { staticClass: "breadcrumb" }, [
+      _c("div", { staticClass: "page-title mb-3" }, [
+        _c(
+          "div",
+          {
+            staticClass:
+              "d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2",
+          },
+          [
+            _c("h3", { staticClass: "mb-0" }, [
+              _vm._v(_vm._s(_vm.__("manage_city"))),
+            ]),
+            _vm._v(" "),
+            _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
                 _c(
                   "li",
                   { staticClass: "breadcrumb-item" },
@@ -1318,17 +1481,18 @@ var render = function () {
                   2
                 ),
               ]),
-            ]
-          ),
-        ]),
+            ]),
+          ]
+        ),
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-md-6 col-sm-12 order-md-1 order-last" }, [
-          _c("div", { staticClass: "card h-100" }, [
+        _c("div", { staticClass: "col-12 col-xl-6 mb-3" }, [
+          _c("div", { staticClass: "card h-100 mb-0" }, [
             _c("div", { staticClass: "card-header" }, [
               _c(
                 "h4",
+                { staticClass: "card-title mb-0 float-none" },
                 [
                   _vm.city.id
                     ? [_vm._v(_vm._s(_vm.__("edit")))]
@@ -1341,6 +1505,17 @@ var render = function () {
                 ],
                 2
               ),
+              _vm._v(" "),
+              _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                _vm._v(
+                  _vm._s(
+                    _vm.tr(
+                      "city_details_desc",
+                      "Search the city, then set its zone, travel time and delivery charges."
+                    )
+                  )
+                ),
+              ]),
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body" }, [
@@ -1415,7 +1590,10 @@ var render = function () {
                               language.name
                                 ? _c(
                                     "div",
-                                    { staticClass: "mb-3" },
+                                    {
+                                      staticClass:
+                                        "mb-3 d-flex flex-wrap gap-2",
+                                    },
                                     [
                                       _c(
                                         "b-button",
@@ -1427,7 +1605,6 @@ var render = function () {
                                               modifiers: { hover: true },
                                             },
                                           ],
-                                          staticClass: "mr-2",
                                           attrs: {
                                             size: "sm",
                                             variant: "outline-primary",
@@ -1511,7 +1688,7 @@ var render = function () {
                                             "div",
                                             {
                                               staticClass:
-                                                "text-success mt-2 font-weight-bold",
+                                                "text-success w-100 font-weight-bold",
                                             },
                                             [
                                               _vm._v(
@@ -1529,7 +1706,8 @@ var render = function () {
                                   )
                                 : _vm._e(),
                               _vm._v(" "),
-                              language.is_default
+                              language.is_default &&
+                              _vm.mapProvider === "google"
                                 ? _c(
                                     "div",
                                     { staticClass: "form-group" },
@@ -1544,25 +1722,11 @@ var render = function () {
                                         ]
                                       ),
                                       _vm._v(" "),
-                                      _c("GmapAutocomplete", {
-                                        staticClass: "form-control",
+                                      _c("google-place-search", {
                                         attrs: {
-                                          type: "search",
                                           placeholder:
                                             _vm.__("search_city_on_map"),
-                                          options: {
-                                            fields: [
-                                              "address_components",
-                                              "formatted_address",
-                                              "geometry",
-                                              "name",
-                                              "place_id",
-                                              "plus_code",
-                                              "types",
-                                            ],
-                                            strictBounds: false,
-                                          },
-                                          id: "city_name",
+                                          "input-id": "city_name",
                                         },
                                         on: { place_changed: _vm.setPlace },
                                       }),
@@ -1596,8 +1760,8 @@ var render = function () {
                                       }),
                                       _vm._v(" "),
                                       _c(
-                                        "span",
-                                        { staticClass: "text text-primary" },
+                                        "small",
+                                        { staticClass: "form-text text-muted" },
                                         [
                                           _vm._v(
                                             _vm._s(
@@ -1613,471 +1777,101 @@ var render = function () {
                                   )
                                 : _vm._e(),
                               _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "latitude" } },
-                                      [
-                                        _vm._v(
-                                          _vm._s(_vm.__("latitude")) + " "
-                                        ),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-sm",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.city.latitude,
-                                          expression: "city.latitude",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "text",
-                                        name: "latitude",
-                                        id: "latitude",
-                                        placeholder: _vm.__("latitude"),
-                                        required: "",
-                                        readonly: "",
-                                      },
-                                      domProps: { value: _vm.city.latitude },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "latitude",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "longitude" } },
-                                      [
-                                        _vm._v(
-                                          " " + _vm._s(_vm.__("longitude"))
-                                        ),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-sm",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.city.longitude,
-                                          expression: "city.longitude",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "text",
-                                        name: "longitude",
-                                        id: "longitude",
-                                        placeholder: _vm.__("longitude"),
-                                        required: "",
-                                        readonly: "",
-                                      },
-                                      domProps: { value: _vm.city.longitude },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "longitude",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c("label", { attrs: { for: "name" } }, [
-                                      _vm._v(" " + _vm._s(_vm.__("city_name"))),
-                                      _c(
-                                        "span",
-                                        { staticClass: "text-danger text-sm" },
-                                        [_vm._v("*")]
-                                      ),
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.city.name,
-                                          expression: "city.name",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "text",
-                                        name: "name",
-                                        id: "name",
-                                        placeholder: _vm.__("city_name"),
-                                        required: "",
-                                        readonly: "",
-                                      },
-                                      domProps: { value: _vm.city.name },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "name",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c("label", { attrs: { for: "state" } }, [
-                                      _vm._v(
-                                        " " + _vm._s(_vm.__("state_name"))
-                                      ),
-                                      _c(
-                                        "span",
-                                        { staticClass: "text-danger text-sm" },
-                                        [_vm._v("*")]
-                                      ),
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.city.state,
-                                          expression: "city.state",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "text",
-                                        name: "state",
-                                        id: "state",
-                                        placeholder: _vm.__("state_name"),
-                                        required: "",
-                                        readonly: "",
-                                      },
-                                      domProps: { value: _vm.city.state },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "state",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _c("div", { staticClass: "form-group" }, [
-                                _c(
-                                  "label",
-                                  { attrs: { for: "zone_" + language.id } },
-                                  [
-                                    _vm._v(" " + _vm._s(_vm.__("zone_name"))),
-                                    language.is_default
-                                      ? _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-sm",
-                                          },
-                                          [_vm._v("*")]
-                                        )
-                                      : _vm._e(),
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.translations[language.id].zone,
-                                      expression:
-                                        "translations[language.id].zone",
-                                    },
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    type: "text",
-                                    name: "zone",
-                                    id: "zone_" + language.id,
-                                    required:
-                                      language.is_default == 1
-                                        ? true
-                                        : undefined,
-                                    placeholder: _vm.__("zone_name"),
-                                  },
-                                  domProps: {
-                                    value: _vm.translations[language.id].zone,
-                                  },
-                                  on: {
-                                    input: function ($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.$set(
-                                        _vm.translations[language.id],
-                                        "zone",
-                                        $event.target.value
-                                      )
-                                    },
-                                  },
-                                }),
-                              ]),
-                              _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "time_to_travel" } },
-                                      [
-                                        _vm._v(
-                                          _vm._s(_vm.__("time_to_travel_1km")) +
-                                            " "
-                                        ),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-sm",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                        _vm._v(" "),
-                                        _c("small", [
-                                          _vm._v(
-                                            "(\n                                                " +
-                                              _vm._s(
-                                                _vm.__("enter_in_minutes")
-                                              ) +
-                                              ")"
-                                          ),
-                                        ]),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.city.time_to_travel,
-                                          expression: "city.time_to_travel",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "number",
-                                        name: "time_to_travel",
-                                        id: "time_to_travel",
-                                        min: "0",
-                                        max: "999999999",
-                                        placeholder: _vm.__(
-                                          "enter_time_to_travel_1km_in_minutes"
-                                        ),
-                                        required: "",
-                                      },
-                                      domProps: {
-                                        value: _vm.city.time_to_travel,
-                                      },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "time_to_travel",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              language.is_default
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      {
-                                        attrs: {
-                                          for: "min_amount_for_free_delivery",
-                                        },
-                                      },
-                                      [
-                                        _vm._v(
-                                          _vm._s(
-                                            _vm.__(
-                                              "minimum_amount_for_free_delivery"
-                                            )
-                                          )
-                                        ),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-xs",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                        _vm._v(" "),
-                                        _c("small", [
-                                          _vm._v(
-                                            "[ " +
-                                              _vm._s(_vm.$currency) +
-                                              "\n                                                ]"
-                                          ),
-                                        ]),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value:
-                                            _vm.city
-                                              .min_amount_for_free_delivery,
-                                          expression:
-                                            "city.min_amount_for_free_delivery",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "number",
-                                        name: "min_amount_for_free_delivery",
-                                        id: "min_amount_for_free_delivery",
-                                        placeholder: _vm.__(
-                                          "minimum_amount_for_free_delivery"
-                                        ),
-                                        min: "0",
-                                        max: "999999999",
-                                        required: "",
-                                      },
-                                      domProps: {
-                                        value:
-                                          _vm.city.min_amount_for_free_delivery,
-                                      },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.city,
-                                            "min_amount_for_free_delivery",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    }),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              language.is_default
+                              language.is_default && _vm.mapProvider === "osm"
                                 ? _c(
                                     "div",
-                                    { staticClass: "form-group d-none" },
+                                    {
+                                      staticClass:
+                                        "form-group position-relative",
+                                    },
                                     [
                                       _c(
                                         "label",
-                                        {
-                                          attrs: {
-                                            for: "max_deliverable_distance",
-                                          },
-                                        },
+                                        { attrs: { for: "osm_city_name" } },
                                         [
                                           _vm._v(
-                                            " " +
-                                              _vm._s(
-                                                _vm.__(
-                                                  "maximum_delivarable_distance"
-                                                )
-                                              )
+                                            " " + _vm._s(_vm.__("search_city"))
                                           ),
-                                          _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "text-danger text-xs",
-                                            },
-                                            [_vm._v("*")]
-                                          ),
-                                          _vm._v(" "),
-                                          _c("small", [_vm._v("[Kilometre]")]),
                                         ]
                                       ),
+                                      _vm._v(" "),
+                                      _c("input", {
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          type: "search",
+                                          id: "osm_city_name",
+                                          placeholder:
+                                            _vm.__("search_city_on_map"),
+                                          autocomplete: "off",
+                                        },
+                                        domProps: { value: _vm.osmCityQuery },
+                                        on: {
+                                          input: function ($event) {
+                                            return _vm.onOsmCityQueryInput(
+                                              $event.target.value
+                                            )
+                                          },
+                                        },
+                                      }),
+                                      _vm._v(" "),
+                                      _vm.osmCitySuggestions.length
+                                        ? _c(
+                                            "ul",
+                                            {
+                                              staticClass:
+                                                "list-group osm-suggestions",
+                                            },
+                                            _vm._l(
+                                              _vm.osmCitySuggestions,
+                                              function (s) {
+                                                return _c(
+                                                  "li",
+                                                  {
+                                                    key: s.placePrediction
+                                                      .placeId,
+                                                    staticClass:
+                                                      "list-group-item list-group-item-action osm-suggestion-item",
+                                                    on: {
+                                                      mousedown: function (
+                                                        $event
+                                                      ) {
+                                                        $event.preventDefault()
+                                                        return _vm.selectOsmCitySuggestion(
+                                                          s
+                                                        )
+                                                      },
+                                                    },
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      "\n                                                " +
+                                                        _vm._s(
+                                                          s.placePrediction.text
+                                                            .text
+                                                        ) +
+                                                        "\n                                            "
+                                                    ),
+                                                  ]
+                                                )
+                                              }
+                                            ),
+                                            0
+                                          )
+                                        : _vm._e(),
                                       _vm._v(" "),
                                       _c("input", {
                                         directives: [
                                           {
                                             name: "model",
                                             rawName: "v-model",
-                                            value:
-                                              _vm.city.max_deliverable_distance,
+                                            value: _vm.city.formatted_address,
                                             expression:
-                                              "city.max_deliverable_distance",
+                                              "city.formatted_address",
                                           },
                                         ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          name: "max_deliverable_distance",
-                                          placeholder:
-                                            "Enter Delivarable Maximum Distance in km",
-                                          min: "0",
-                                          max: "999999999",
-                                        },
+                                        attrs: { type: "hidden" },
                                         domProps: {
-                                          value:
-                                            _vm.city.max_deliverable_distance,
+                                          value: _vm.city.formatted_address,
                                         },
                                         on: {
                                           input: function ($event) {
@@ -2086,22 +1880,603 @@ var render = function () {
                                             }
                                             _vm.$set(
                                               _vm.city,
-                                              "max_deliverable_distance",
+                                              "formatted_address",
                                               $event.target.value
                                             )
                                           },
                                         },
                                       }),
+                                      _vm._v(" "),
+                                      _c(
+                                        "small",
+                                        { staticClass: "form-text text-muted" },
+                                        [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm.__(
+                                                "search_your_city_where_you_will_deliver_the_food_and_to_find_co_ordinates"
+                                              )
+                                            )
+                                          ),
+                                        ]
+                                      ),
                                     ]
                                   )
                                 : _vm._e(),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "row" }, [
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "latitude" } },
+                                          [
+                                            _vm._v(
+                                              _vm._s(_vm.__("latitude")) + " "
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.city.latitude,
+                                              expression: "city.latitude",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "text",
+                                            name: "latitude",
+                                            id: "latitude",
+                                            placeholder: _vm.__("latitude"),
+                                            required: "",
+                                            readonly: "",
+                                          },
+                                          domProps: {
+                                            value: _vm.city.latitude,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "latitude",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "longitude" } },
+                                          [
+                                            _vm._v(
+                                              " " + _vm._s(_vm.__("longitude"))
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.city.longitude,
+                                              expression: "city.longitude",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "text",
+                                            name: "longitude",
+                                            id: "longitude",
+                                            placeholder: _vm.__("longitude"),
+                                            required: "",
+                                            readonly: "",
+                                          },
+                                          domProps: {
+                                            value: _vm.city.longitude,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "longitude",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "name" } },
+                                          [
+                                            _vm._v(
+                                              " " + _vm._s(_vm.__("city_name"))
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.city.name,
+                                              expression: "city.name",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "text",
+                                            name: "name",
+                                            id: "name",
+                                            placeholder: _vm.__("city_name"),
+                                            required: "",
+                                            readonly: "",
+                                          },
+                                          domProps: { value: _vm.city.name },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "name",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "state" } },
+                                          [
+                                            _vm._v(
+                                              " " + _vm._s(_vm.__("state_name"))
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.city.state,
+                                              expression: "city.state",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "text",
+                                            name: "state",
+                                            id: "state",
+                                            placeholder: _vm.__("state_name"),
+                                            required: "",
+                                            readonly: "",
+                                          },
+                                          domProps: { value: _vm.city.state },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "state",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  {
+                                    staticClass: "form-group col-12",
+                                    class: { "col-md-6": language.is_default },
+                                  },
+                                  [
+                                    _c(
+                                      "label",
+                                      { attrs: { for: "zone_" + language.id } },
+                                      [
+                                        _vm._v(
+                                          " " + _vm._s(_vm.__("zone_name"))
+                                        ),
+                                        language.is_default
+                                          ? _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value:
+                                            _vm.translations[language.id].zone,
+                                          expression:
+                                            "translations[language.id].zone",
+                                        },
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        type: "text",
+                                        name: "zone",
+                                        id: "zone_" + language.id,
+                                        required:
+                                          language.is_default == 1
+                                            ? true
+                                            : undefined,
+                                        placeholder: _vm.__("zone_name"),
+                                      },
+                                      domProps: {
+                                        value:
+                                          _vm.translations[language.id].zone,
+                                      },
+                                      on: {
+                                        input: function ($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            _vm.translations[language.id],
+                                            "zone",
+                                            $event.target.value
+                                          )
+                                        },
+                                      },
+                                    }),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          { attrs: { for: "time_to_travel" } },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                _vm.__("time_to_travel_1km")
+                                              ) + " "
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-sm",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("small", [
+                                              _vm._v(
+                                                "(\n                                                " +
+                                                  _vm._s(
+                                                    _vm.__("enter_in_minutes")
+                                                  ) +
+                                                  ")"
+                                              ),
+                                            ]),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.city.time_to_travel,
+                                              expression: "city.time_to_travel",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            name: "time_to_travel",
+                                            id: "time_to_travel",
+                                            min: "0",
+                                            max: "999999999",
+                                            placeholder: _vm.__(
+                                              "enter_time_to_travel_1km_in_minutes"
+                                            ),
+                                            required: "",
+                                          },
+                                          domProps: {
+                                            value: _vm.city.time_to_travel,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "time_to_travel",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "form-group col-12 col-md-6",
+                                      },
+                                      [
+                                        _c(
+                                          "label",
+                                          {
+                                            attrs: {
+                                              for: "min_amount_for_free_delivery",
+                                            },
+                                          },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                _vm.__(
+                                                  "minimum_amount_for_free_delivery"
+                                                )
+                                              )
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-xs",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("small", [
+                                              _vm._v(
+                                                "[ " +
+                                                  _vm._s(_vm.$currency) +
+                                                  "\n                                                ]"
+                                              ),
+                                            ]),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                _vm.city
+                                                  .min_amount_for_free_delivery,
+                                              expression:
+                                                "city.min_amount_for_free_delivery",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            name: "min_amount_for_free_delivery",
+                                            id: "min_amount_for_free_delivery",
+                                            placeholder: _vm.__(
+                                              "minimum_amount_for_free_delivery"
+                                            ),
+                                            min: "0",
+                                            max: "999999999",
+                                            required: "",
+                                          },
+                                          domProps: {
+                                            value:
+                                              _vm.city
+                                                .min_amount_for_free_delivery,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "min_amount_for_free_delivery",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group d-none" },
+                                      [
+                                        _c(
+                                          "label",
+                                          {
+                                            attrs: {
+                                              for: "max_deliverable_distance",
+                                            },
+                                          },
+                                          [
+                                            _vm._v(
+                                              " " +
+                                                _vm._s(
+                                                  _vm.__(
+                                                    "maximum_delivarable_distance"
+                                                  )
+                                                )
+                                            ),
+                                            _c(
+                                              "span",
+                                              {
+                                                staticClass:
+                                                  "text-danger text-xs",
+                                              },
+                                              [_vm._v("*")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("small", [
+                                              _vm._v("[Kilometre]"),
+                                            ]),
+                                          ]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                _vm.city
+                                                  .max_deliverable_distance,
+                                              expression:
+                                                "city.max_deliverable_distance",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            name: "max_deliverable_distance",
+                                            placeholder:
+                                              "Enter Delivarable Maximum Distance in km",
+                                            min: "0",
+                                            max: "999999999",
+                                          },
+                                          domProps: {
+                                            value:
+                                              _vm.city.max_deliverable_distance,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.city,
+                                                "max_deliverable_distance",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                              ]),
                               _vm._v(" "),
                               language.is_default
                                 ? _c("div", { staticClass: "form-group" }, [
                                     _c(
                                       "label",
                                       {
-                                        staticClass: " col-12 col-form-label",
                                         attrs: {
                                           for: "delivery_charge_method",
                                         },
@@ -2412,9 +2787,7 @@ var render = function () {
                                     "range_wise_charges"
                                       ? _c(
                                           "div",
-                                          {
-                                            staticClass: "form-group col-sm-12",
-                                          },
+                                          { staticClass: "form-group" },
                                           [
                                             _c("label", [
                                               _vm._v(
@@ -2438,10 +2811,10 @@ var render = function () {
                                               ),
                                               _vm._v(" "),
                                               _c(
-                                                "span",
+                                                "small",
                                                 {
                                                   staticClass:
-                                                    "text-secondary text-sm",
+                                                    "d-block text-muted",
                                                 },
                                                 [
                                                   _vm._v(
@@ -2463,13 +2836,14 @@ var render = function () {
                                                   {
                                                     key: (_vm.key = index + 1),
                                                     staticClass:
-                                                      "form-group row",
+                                                      "row g-2 align-items-center range-row",
                                                   },
                                                   [
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-sm-1",
+                                                        staticClass:
+                                                          "col-auto range-index",
                                                       },
                                                       [
                                                         _vm._v(
@@ -2480,9 +2854,7 @@ var render = function () {
                                                     _vm._v(" "),
                                                     _c(
                                                       "div",
-                                                      {
-                                                        staticClass: "col-sm-3",
-                                                      },
+                                                      { staticClass: "col" },
                                                       [
                                                         _c("input", {
                                                           directives: [
@@ -2539,7 +2911,7 @@ var render = function () {
                                                       "div",
                                                       {
                                                         staticClass:
-                                                          "col-sm-1 btn btn-secondary",
+                                                          "col-auto range-to",
                                                       },
                                                       [
                                                         _vm._v(
@@ -2550,9 +2922,7 @@ var render = function () {
                                                     _vm._v(" "),
                                                     _c(
                                                       "div",
-                                                      {
-                                                        staticClass: "col-sm-3",
-                                                      },
+                                                      { staticClass: "col" },
                                                       [
                                                         _c("input", {
                                                           directives: [
@@ -2607,9 +2977,7 @@ var render = function () {
                                                     _vm._v(" "),
                                                     _c(
                                                       "div",
-                                                      {
-                                                        staticClass: "col-sm-3",
-                                                      },
+                                                      { staticClass: "col" },
                                                       [
                                                         _c("input", {
                                                           directives: [
@@ -2665,7 +3033,7 @@ var render = function () {
                                                           "div",
                                                           {
                                                             staticClass:
-                                                              "col-sm-1",
+                                                              "col-auto",
                                                           },
                                                           [
                                                             _c(
@@ -2681,15 +3049,14 @@ var render = function () {
                                                                     },
                                                                   },
                                                                 ],
-                                                                staticStyle: {
-                                                                  cursor:
-                                                                    "pointer",
-                                                                },
+                                                                staticClass:
+                                                                  "figma-action-btn range-btn",
                                                                 attrs: {
                                                                   title:
                                                                     _vm.__(
                                                                       "add_row"
                                                                     ),
+                                                                  role: "button",
                                                                 },
                                                                 on: {
                                                                   click:
@@ -2699,7 +3066,7 @@ var render = function () {
                                                               [
                                                                 _c("i", {
                                                                   staticClass:
-                                                                    "fa fa-plus-square fa-2x",
+                                                                    "fa fa-plus",
                                                                 }),
                                                               ]
                                                             ),
@@ -2712,7 +3079,7 @@ var render = function () {
                                                           "div",
                                                           {
                                                             staticClass:
-                                                              "col-sm-1",
+                                                              "col-auto",
                                                           },
                                                           [
                                                             _c(
@@ -2728,15 +3095,14 @@ var render = function () {
                                                                     },
                                                                   },
                                                                 ],
-                                                                staticStyle: {
-                                                                  cursor:
-                                                                    "pointer",
-                                                                },
+                                                                staticClass:
+                                                                  "figma-action-btn figma-delete-btn range-btn",
                                                                 attrs: {
                                                                   title:
                                                                     _vm.__(
                                                                       "remove_row"
                                                                     ),
+                                                                  role: "button",
                                                                 },
                                                                 on: {
                                                                   click:
@@ -2752,7 +3118,7 @@ var render = function () {
                                                               [
                                                                 _c("i", {
                                                                   staticClass:
-                                                                    "fa fa-times fa-2x",
+                                                                    "fa fa-times",
                                                                 }),
                                                               ]
                                                             ),
@@ -2776,25 +3142,32 @@ var render = function () {
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "submit" },
-                      },
-                      [_vm._v(" " + _vm._s(_vm.__("save")))]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-secondary",
-                        attrs: { type: "reset" },
-                      },
-                      [_vm._v(_vm._s(_vm.__("clear")))]
-                    ),
-                  ]),
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "form-actions d-flex justify-content-end gap-2",
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-secondary",
+                          attrs: { type: "reset" },
+                        },
+                        [_vm._v(_vm._s(_vm.__("clear")))]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit" },
+                        },
+                        [_vm._v(" " + _vm._s(_vm.__("save")))]
+                      ),
+                    ]
+                  ),
                 ],
                 1
               ),
@@ -2802,117 +3175,157 @@ var render = function () {
           ]),
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-          _c("div", { staticClass: "card h-100" }, [
+        _c("div", { staticClass: "col-12 col-xl-6 mb-3" }, [
+          _c("div", { staticClass: "card h-100 mb-0" }, [
             _c("div", { staticClass: "card-header" }, [
-              _c("h4", [_vm._v(_vm._s(_vm.__("map_view")))]),
+              _c("h4", { staticClass: "card-title mb-0 float-none" }, [
+                _vm._v(_vm._s(_vm.__("map_view"))),
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                _vm._v(
+                  _vm._s(
+                    _vm.tr(
+                      "city_map_view_desc",
+                      "Draw the delivery boundary of the city on the map."
+                    )
+                  )
+                ),
+              ]),
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "offset-3 mt-1" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "badge bg-primary",
-                    attrs: { type: "button", id: "remove-line" },
-                  },
-                  [_vm._v(_vm._s(_vm.__("remove_newly_added_line")))]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "badge bg-danger",
-                    attrs: { type: "button", id: "clear-line" },
-                  },
-                  [_vm._v(_vm._s(_vm.__("clear_map")))]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "badge bg-success",
-                    attrs: { type: "button", id: "add-line" },
-                  },
-                  [_vm._v(_vm._s(_vm.__("restore_old_map")))]
-                ),
-              ]),
+              _vm.mapProvider === "google"
+                ? _c("div", { staticClass: "d-flex flex-wrap gap-2 mb-3" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-sm btn-outline-primary",
+                        attrs: { type: "button", id: "remove-line" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("remove_newly_added_line")))]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-sm btn-outline-danger",
+                        attrs: { type: "button", id: "clear-line" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("clear_map")))]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-sm btn-outline-success",
+                        attrs: { type: "button", id: "add-line" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("restore_old_map")))]
+                    ),
+                  ])
+                : _vm._e(),
               _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticStyle: { position: "relative", overflow: "hidden" },
-                  attrs: { id: "map" },
-                },
-                [
-                  _c(
-                    "GmapMap",
+              _vm.mapProvider === "google"
+                ? _c(
+                    "div",
                     {
-                      ref: "mapRef",
-                      staticStyle: {
-                        width: "100%",
-                        height: "700px",
-                        "margin-top": "5px",
-                      },
-                      attrs: {
-                        zoom: 13,
-                        center: _vm.center,
-                        mapTypeControl: true,
-                        drawingControl: true,
-                      },
+                      staticClass: "city-map city-map--google",
+                      attrs: { id: "map" },
                     },
                     [
-                      _vm._l(_vm.markers, function (m, index) {
-                        return _c("GmapMarker", {
-                          key: index,
-                          attrs: {
-                            position: _vm.google && m.position,
-                            clickable: true,
-                            draggable: true,
-                          },
-                          on: {
-                            click: function ($event) {
-                              _vm.center = m.position
-                            },
-                          },
-                        })
-                      }),
-                      _vm._v(" "),
                       _c(
-                        "gmap-info-window",
+                        "GmapMap",
                         {
+                          ref: "mapRef",
+                          staticClass: "city-gmap",
                           attrs: {
-                            options: {
-                              maxWidth: 300,
-                              pixelOffset: { width: 0, height: -35 },
-                            },
-                            position: _vm.infoWindow.position,
-                            opened: _vm.infoWindow.open,
-                          },
-                          on: {
-                            closeclick: function ($event) {
-                              _vm.infoWindow.open = false
-                            },
+                            zoom: 13,
+                            center: _vm.center,
+                            mapTypeControl: true,
+                            drawingControl: true,
                           },
                         },
                         [
-                          _c("div", {
-                            domProps: {
-                              innerHTML: _vm._s(_vm.infoWindow.template),
-                            },
+                          _vm._l(_vm.markers, function (m, index) {
+                            return _c("GmapMarker", {
+                              key: index,
+                              attrs: {
+                                position: _vm.google && m.position,
+                                clickable: true,
+                                draggable: true,
+                              },
+                              on: {
+                                click: function ($event) {
+                                  _vm.center = m.position
+                                },
+                              },
+                            })
                           }),
-                        ]
+                          _vm._v(" "),
+                          _c(
+                            "gmap-info-window",
+                            {
+                              attrs: {
+                                options: {
+                                  maxWidth: 300,
+                                  pixelOffset: { width: 0, height: -35 },
+                                },
+                                position: _vm.infoWindow.position,
+                                opened: _vm.infoWindow.open,
+                              },
+                              on: {
+                                closeclick: function ($event) {
+                                  _vm.infoWindow.open = false
+                                },
+                              },
+                            },
+                            [
+                              _c("div", {
+                                domProps: {
+                                  innerHTML: _vm._s(_vm.infoWindow.template),
+                                },
+                              }),
+                            ]
+                          ),
+                        ],
+                        2
                       ),
                     ],
-                    2
+                    1
+                  )
+                : _c(
+                    "div",
+                    { staticClass: "city-map", attrs: { id: "osm_map" } },
+                    [
+                      _c("osm-map-picker", {
+                        ref: "osmCityMap",
+                        attrs: {
+                          lat: _vm.city.latitude,
+                          lng: _vm.city.longitude,
+                          height: "700px",
+                          "show-search-box": false,
+                          "click-to-place": false,
+                          "draggable-marker": false,
+                          "enable-drawing": true,
+                        },
+                        on: {
+                          "location-selected": _vm.onOsmLocationSelected,
+                          "suggestions-updated": function ($event) {
+                            _vm.osmCitySuggestions = $event
+                          },
+                          "boundary-changed": _vm.onOsmBoundaryChanged,
+                        },
+                      }),
+                    ],
+                    1
                   ),
-                ],
-                1
-              ),
               _vm._v(" "),
               _vm.city.formatted_address
-                ? _c("div", [
-                    _c("span", { staticClass: "title font-weight-bolder" }, [
+                ? _c("div", { staticClass: "city-address mt-3" }, [
+                    _c("i", { staticClass: "fa fa-map-marker" }),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "title" }, [
                       _vm._v(_vm._s(_vm.city.formatted_address)),
                     ]),
                   ])

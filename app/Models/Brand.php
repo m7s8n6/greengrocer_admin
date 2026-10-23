@@ -27,11 +27,10 @@ class Brand extends Model
     protected $appends = ['image_url', 'translations'];
 
     public function getImageUrlAttribute(){
-        $image_url = '';
         if($this->image){
-            $image_url = asset('storage/'.$this->image);
+            return asset('storage/'.$this->image);
         }
-        return $image_url;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
      public function translations()
     {

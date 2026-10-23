@@ -35,7 +35,7 @@
                             <div class="d-flex gap-2">
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                     <span>{{ __('filters') || 'Filters' }}</span>
                                     <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                                 </button>
@@ -74,11 +74,7 @@
                                                     :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
                                                     :append-to-body="true" opens="right"
                                                     class="w-100"></date-range-picker>
-                                                <button v-if="dateRange.startDate" type="button"
-                                                    class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                    style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                    @click.stop="clearDate()"
-                                                    v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                                <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                     <i class="fa fa-times-circle text-muted"></i>
                                                 </button>
                                                 <base-icon name="CalendarDots" width="24" height="24"
@@ -123,6 +119,12 @@
                                 :details-td-class="'p-0 bg-light'"
                                 :tbody-tr-class="() => 'figma-tr align-middle cursor-pointer'" small
                                 class="figma-order-table mb-0">
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
 
                                 <template #cell(id)="row">
                                     <div class="figma-link-blue" @click.stop="toggleOrder(row)" style="cursor:pointer;">
@@ -154,7 +156,7 @@
                                 </template>
 
                                 <template #cell(active_status)="row">
-                                    <span class="figma-badge" :class="getStatusBadgeClass(row.item.active_status)">{{
+                                    <span class="figma-status-pill figma-badge" :class="getStatusBadgeClass(row.item.active_status)">{{
                                         getStatusName(row.item.active_status) }}</span>
                                 </template>
 
@@ -163,13 +165,12 @@
                                         <router-link
                                             :to="{ name: 'ViewSelfPickupOrder', params: { id: row.item.id, record: row.item } }"
                                             v-b-tooltip.hover :title="__('view')" class="figma-action-btn">
-                                            <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
+                                            <i class="bi bi-eye"></i>
                                         </router-link>
-                                        <button class="figma-action-btn" v-b-tooltip.hover :title="__('delete')"
+                                        <button class="figma-action-btn figma-delete-btn" v-b-tooltip.hover :title="__('delete')"
                                             @click="deleteOrder(row.index, row.item.id)"
                                             v-if="$can('self_pickup_order_delete') && !isSeller">
-                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
-                                                height="24" />
+                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
                                 </template>
@@ -208,7 +209,7 @@
                                                     {{ $currency }} {{ item.sub_total }}
                                                 </div>
                                                 <div class="col-md-2">
-                                                    {{ item.status_name }}
+                                                    <span class="figma-status-pill figma-badge-default">{{ item.status_name }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -242,6 +243,7 @@
                                 <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                                 <b-form-select v-model="perPage" :options="pageOptions" size="sm"
                                     style="width: auto;"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalOrderRows"></table-count>
                             </div>
                             <b-pagination v-model="currentPage" :total-rows="totalOrderRows" :per-page="perPage"
                                 align="right" class="figma-pagination mb-0"></b-pagination>
@@ -521,8 +523,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -620,6 +622,70 @@ export default {
 @media only screen and (min-width: 600px) {
     .vue-daterange-picker[data-v-1ebd09d2] {
         min-width: 90%;
+    }
+}
+
+/* Status pills (figma-badge-* come from getStatusBadgeClass) */
+.figma-badge-default {
+    background: var(--ui-surface-muted);
+    color: var(--ui-text);
+    border-color: var(--ui-border) !important;
+}
+
+.figma-badge-received,
+.figma-badge-shipped {
+    background: var(--theme-info-50);
+    color: var(--theme-info-700);
+    border-color: color-mix(in srgb, var(--theme-info-500) 30%, transparent) !important;
+}
+
+.figma-badge-processed,
+.figma-badge-paymentpending {
+    background: var(--theme-warn-50);
+    color: var(--theme-warn-700);
+    border-color: color-mix(in srgb, var(--theme-warn-500) 30%, transparent) !important;
+}
+
+.figma-badge-delivered {
+    background: var(--theme-success-50);
+    color: var(--theme-success-700);
+    border-color: color-mix(in srgb, var(--theme-success-500) 30%, transparent) !important;
+}
+
+.figma-badge-cancelled {
+    background: var(--theme-error-50);
+    color: var(--theme-error-700);
+    border-color: color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
+}
+
+/* Expanded order items */
+.bg-light-soft {
+    background: var(--ui-surface-muted) !important;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius-lg);
+    font-size: 13px;
+}
+
+.bg-light-soft .bg-white {
+    background: var(--ui-surface) !important;
+}
+
+/* Footer */
+.figma-table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px !important;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+}
+
+@media (max-width: 767.98px) {
+    .figma-table-footer {
+        justify-content: center;
+        padding: 12px 16px !important;
     }
 }
 </style>

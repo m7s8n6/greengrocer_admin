@@ -46,7 +46,7 @@ class ProcessExecutor
         ['show'],
         ['log'],
         ['branch'],
-        ['remote', 'set-url'],
+        ['remote', 'set-url']
     ];
 
     /** @var int */
@@ -139,7 +139,7 @@ class ProcessExecutor
             $process = new Process($command, $cwd, $env, null, static::getTimeout());
         }
 
-        if (!Platform::isWindows() && $tty) {
+        if (! Platform::isWindows() && $tty) {
             try {
                 $process->setTty(true);
             } catch (RuntimeException $e) {
@@ -482,7 +482,17 @@ class ProcessExecutor
         }
 
         $commandString = is_string($command) ? $command : implode(' ', array_map(self::class.'::escape', $command));
-        $safeCommand = Url::sanitize($commandString);
+        $safeCommand = Preg::replaceCallback('{://(?P<user>[^:/\s]+):(?P<password>[^@\s/]+)@}i', static function ($m): string {
+            // if the username looks like a long (12char+) hex string, or a modern github token (e.g. ghp_xxx, github_pat_xxx) we obfuscate that
+            if (Preg::isMatch(GitHub::GITHUB_TOKEN_REGEX, $m['user'])) {
+                return '://***:***@';
+            }
+            if (Preg::isMatch('{^[a-f0-9]{12,}$}', $m['user'])) {
+                return '://***:***@';
+            }
+
+            return '://'.$m['user'].':***@';
+        }, $commandString);
         $safeCommand = Preg::replace("{--password (.*[^\\\\]\') }", '--password \'***\' ', $safeCommand);
         $this->io->writeError('Executing'.($async ? ' async' : '').' command ('.($cwd ?: 'CWD').'): '.$safeCommand);
     }

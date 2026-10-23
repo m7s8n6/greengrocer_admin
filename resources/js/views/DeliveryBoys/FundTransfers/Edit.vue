@@ -1,14 +1,14 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex flex-wrap justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading || (graterAmount === true) ">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
-                <div class="form-group">
+                <div class="form-group col-12">
                     <label>{{ __('delivery_boy') }}</label>
                     <multiselect v-model="fundTransfers.deliveryBoy"
                                  :options="deliveryBoys"
@@ -21,29 +21,25 @@
                                  label="name"
                                  track-by="name" required>
                     </multiselect>
-                    <div class="border border-grey rounded p-2 mt-2" v-if="fundTransfers.deliveryBoy">
-                        <div class="d-flex justify-content-between align-items-center text-left">
-                            <span>{{ __('name') }}:-</span><span> {{ fundTransfers.deliveryBoy.name }}</span>
-                            <span>{{ __('mobile') }}:-</span><span> {{ fundTransfers.deliveryBoy.mobile }}</span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center text-left">
-                            <span>{{ __('id') }}:-</span><span> {{ fundTransfers.deliveryBoy.id }}</span>
-                            <span>{{ __('balance') }}:-</span><span> {{ fundTransfers.deliveryBoy.balance }}</span>
-                        </div>
+                    <div class="db-selected-card mt-2" v-if="fundTransfers.deliveryBoy">
+                        <div class="db-selected-item"><span class="db-selected-label">{{ __('name') }}</span><span class="db-selected-value">{{ fundTransfers.deliveryBoy.name }}</span></div>
+                        <div class="db-selected-item"><span class="db-selected-label">{{ __('mobile') }}</span><span class="db-selected-value">{{ fundTransfers.deliveryBoy.mobile }}</span></div>
+                        <div class="db-selected-item"><span class="db-selected-label">{{ __('id') }}</span><span class="db-selected-value">{{ fundTransfers.deliveryBoy.id }}</span></div>
+                        <div class="db-selected-item"><span class="db-selected-label">{{ __('balance') }}</span><span class="db-selected-value">{{ fundTransfers.deliveryBoy.balance }}</span></div>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12">
                     <label for="amount">{{ __('transfer_amount') }}</label>
                     <input type="number" name="amount" id="amount" v-model="fundTransfers.amount" v-on:keyup="checkAmount" required class="form-control" :placeholder="__('transfer_amount')" @input="validateFundTransfer">
                     <span class="text-danger" v-if="graterAmount === true">{{ __('you_can_not_enter_amount_greater_than_balance') }}</span>
                     <span v-if="validationErrorFundTransfer" class="error">{{ validationErrorFundTransfer }}</span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12">
                     <label for="message">{{ __('message') }}</label>
                     <textarea name="message" id="message" v-model="fundTransfers.message" class="form-control" rows="3" :placeholder="__('message')" ></textarea>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -151,4 +147,35 @@ export default {
 
 <style scoped>
 @import "../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+/* Selected delivery boy summary */
+.db-selected-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    padding: 12px 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface-muted);
+}
+
+.db-selected-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.db-selected-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--ui-text-muted);
+}
+
+.db-selected-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+    overflow-wrap: anywhere;
+}
 </style>

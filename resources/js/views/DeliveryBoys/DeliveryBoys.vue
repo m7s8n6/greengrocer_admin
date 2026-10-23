@@ -12,9 +12,6 @@
         </div>
         <section class="section">
             <div class="figma-main-section-card">
-                <div class="card-header border-0 bg-transparent py-3">
-                    <h4 class="card-title mb-0 figma-card-title">{{ __('delivery_boys') }}</h4>
-                </div>
                 <div class="card-body p-0">
                     <!-- Modern Filter Action Bar -->
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -25,11 +22,20 @@
                                     :placeholder="__('search') || 'Search...'" @input="getDeliveryBoys()">
                             </div>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 flex-wrap">
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
-                                <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                 <span>{{ __('filters') || 'Filters' }}</span>
+                            </button>
+                            <div class="view-toggle" role="group" :aria-label="__('view')">
+                                <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                            </div>
+                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                @click="getDeliveryBoys()" v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') }}</span>
                             </button>
                             <router-link to="/delivery_boys/create"
                                 class="btn btn-figma-filter d-flex align-items-center gap-2"
@@ -37,11 +43,6 @@
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('add_delivery_boy') }}</span>
                             </router-link>
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                @click="getDeliveryBoys()" v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
-                                <span>{{ __('refresh') }}</span>
-                            </button>
                         </div>
                     </div>
 
@@ -64,15 +65,82 @@
                             </div>
                         </div>
                     </b-collapse>
-                    <div class="table-responsive">
+                    <!-- Grid view -->
+                    <div v-if="viewMode === 'grid'">
+                        <div v-if="isLoading" class="item-grid-state">
+                            <i class="bi bi-hourglass-split"></i>{{ __('loading') }}...
+                        </div>
+                        <div v-else-if="!gridDeliveryBoys.length" class="item-grid-state">
+                            <template v-if="filter && translatedDeliveryBoys.length">
+                                <i class="bi bi-search"></i>{{ __('no_records_matching_your_request') }}
+                            </template>
+                            <template v-else>
+                                <i class="bi bi-inbox"></i>{{ __('no_records_to_show') }}
+                            </template>
+                        </div>
+                        <div v-else class="item-grid item-grid--single-xs">
+                            <div v-for="item in pagedItems(gridDeliveryBoys)" :key="item.id" class="item-card">
+                                <div class="item-card-media item-card-media--avatar">
+                                    <span class="item-card-avatar">{{ initial(item.name) }}</span>
+                                </div>
+                                <div class="item-card-body">
+                                    <div class="item-card-title">{{ item.name }}</div>
+                                    <div class="item-card-meta"><i class="bi bi-telephone me-1"></i>{{ item.mobile | mobileMask }}</div>
+                                    <div class="item-card-meta" v-if="item.email"><i class="bi bi-envelope me-1"></i>{{ item.email }}</div>
+                                    <div class="item-card-meta" v-if="item.address"><i class="bi bi-geo-alt me-1"></i>{{ item.address }}</div>
+                                    <div class="item-card-stats justify-content-center">
+                                        <span class="item-card-chip">#{{ item.id }}</span>
+                                        <span class="item-card-chip">{{ __('balance') }}: {{ $currency }}{{ item.balance }}</span>
+                                        <span class="item-card-chip">{{ __('cash_received') }}: {{ $currency }}{{ item.cash_received }}</span>
+                                        <span class="item-card-chip" style="cursor: pointer;"
+                                            v-b-tooltip.hover="{ html: true, title: bonusDetailsHtml(item), boundary: 'window' }"><i class="fa fa-info-circle"></i>{{ __('bonus') }}</span>
+                                        <span class="item-card-chip">{{ __('available') }}:
+                                            <span :class="item.status == 1 ? 'text-success' : 'text-danger'">{{ item.status == 1 ? __('yes') : __('no') }}</span></span>
+                                    </div>
+                                </div>
+                                <div class="item-card-footer">
+                                    <div>
+                                        <label v-if="item.status == 0" class='badge bg-primary mb-0'>{{ __('registered') }}</label>
+                                        <label v-else-if="item.status == 1" class='badge bg-success mb-0'>{{ __('active') }}</label>
+                                        <label v-else-if="item.status == 2" class='badge bg-warning mb-0'>{{ __('not_approved') }}</label>
+                                        <label v-else-if="item.status == 3" class='badge bg-danger mb-0'>{{ __('deactive') }}</label>
+                                        <label v-else-if="item.status == 4" class='badge bg-dark mb-0'>{{ __('blocked') }}</label>
+                                        <label v-else-if="item.status == 7" class='badge bg-danger mb-0'>{{ __('removed') }}</label>
+                                    </div>
+                                    <div class="item-card-actions">
+                                        <router-link
+                                            :to="{ name: 'EditDeliveryBoy', params: { id: item.id, record: item } }"
+                                            class="figma-action-btn" v-if="$can('seller_update')" v-b-tooltip.hover
+                                            :title="__('edit')">
+                                            <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        </router-link>
+                                        <button class="figma-action-btn figma-delete-btn"
+                                            @click="deleteDeliveryBoys(fullIndex(item), item.id)"
+                                            v-if="$can('delivery_boy_delete')" v-b-tooltip.hover :title="__('delete')">
+                                            <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else class="table-responsive">
                         <b-table :items="translatedDeliveryBoys" :fields="fields" :current-page="currentPage"
                             :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                             :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                             :bordered="false" :busy="isLoading" stacked="md" show-empty
                             :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-2">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -90,7 +158,7 @@
 
                             <template #cell(bonus_percentage)="row">
                                 <div>
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
+                                    <small class="db-info-chip"
                                         v-b-tooltip.hover="{ html: true, title: bonusDetailsHtml(row.item), boundary: 'window' }">
                                         <i class="fa fa-info-circle"></i>
                                     </small>
@@ -106,7 +174,7 @@
                                     __('not_approved') }}</label>
                                 <label v-else-if="row.item.status == 3" class='badge bg-danger'>{{ __('deactive')
                                     }}</label>
-                                <label v-else-if="row.item.status == 4" class='badge bg-black'>{{ __('blocked')
+                                <label v-else-if="row.item.status == 4" class='badge bg-dark'>{{ __('blocked')
                                     }}</label>
                                 <label v-else-if="row.item.status == 7" class='badge bg-danger'>{{ __('removed')
                                     }}</label>
@@ -127,7 +195,7 @@
                                     </router-link>
 
                                     <button class="figma-action-btn figma-delete-btn"
-                                        @click="deleteDeliveryBoys(row.index, row.item.id)"
+                                        @click="deleteDeliveryBoys(fullIndex(row.item), row.item.id)"
                                         v-if="$can('delivery_boy_delete')" v-b-tooltip.hover :title="__('delete')">
                                         <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                                     </button>
@@ -138,10 +206,13 @@
                     </div>
 
                     <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                                'of' }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -157,7 +228,10 @@
 
 <script>
 import EditRecord from './Edit';
+import ViewModeMixin from '../../mixins/ViewModeMixin';
+
 export default {
+    mixins: [ViewModeMixin],
     components: {
         'app-edit-record': EditRecord,
     },
@@ -165,14 +239,14 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'name', label: __('name'), sortable: true, class: 'text-center' },
-                { key: 'mobile', label: __('mobile'), sortable: true, class: 'text-center' },
-                { key: 'email', label: __('email'), sortable: true, class: 'text-center' },
-                { key: 'address', label: __('address'), sortable: true, class: 'text-center' },
-                { key: 'bonus_percentage', label: __('bonus'), sortable: true, class: 'text-center' },
-                { key: 'balance', label: __('balance'), sortable: true, class: 'text-center' },
-                { key: 'cash_received', label: __('cash_received'), sortable: true, class: 'text-center' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center' },
+                { key: 'name', label: __('name'), sortable: true },
+                { key: 'mobile', label: __('mobile'), sortable: true },
+                { key: 'email', label: __('email'), sortable: true },
+                { key: 'address', label: __('address'), sortable: true },
+                { key: 'bonus_percentage', label: __('bonus'), sortable: true },
+                { key: 'balance', label: __('balance'), sortable: true },
+                { key: 'cash_received', label: __('cash_received'), sortable: true },
+                { key: 'status', label: __('status'), sortable: true },
                 { key: 'is_available', label: __('available'), class: 'text-center' },
                 { key: 'actions', label: __('actions') }
             ],
@@ -245,6 +319,10 @@ export default {
                     return { text: f.label, value: f.key }
                 })
         },
+        // Grid view: same records, client-side search and order as the table.
+        gridDeliveryBoys() {
+            return this.gridSort(this.gridFilter(this.translatedDeliveryBoys));
+        },
         pageEnd() {
             return Math.min(this.currentPage * this.perPage, this.totalRows);
         }
@@ -265,6 +343,12 @@ export default {
         });
     },
     methods: {
+        // Grid view: same client-side search the b-table :filter applies (any field contains the text).
+        // Grid view: same order as the b-table (its sortBy / sortDesc are synced from the list view headers).
+        // Position of a card's record in this.deliveryBoys (the delete handler splices that array).
+        fullIndex(item) {
+            return this.deliveryBoys.findIndex(b => b.id === item.id);
+        },
         escapeHtml(value) {
             const div = document.createElement('div');
             div.textContent = value ?? '';
@@ -338,8 +422,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -365,3 +449,18 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.db-info-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    cursor: pointer;
+}
+</style>

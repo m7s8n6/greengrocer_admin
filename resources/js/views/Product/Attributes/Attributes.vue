@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <h3 class="modern-page-title mb-0">{{ __('attributes') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -15,7 +15,7 @@
         </div>
 
         <section class="section">
-            <div class="figma-main-section-card">
+            <div class="card figma-main-section-card">
                 <div class="card-body p-0">
                     <!-- Modern Filter Action Bar -->
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -26,17 +26,16 @@
                                     :placeholder="__('search') || 'Search...'" @input="getRecords()">
                             </div>
                         </div>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getRecords()"
+                                v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') || 'Refresh' }}</span>
+                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="edit_record = true">
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('add_attribute') }}</span>
-                            </button>
-
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getRecords()"
-                                v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
-                                <span>{{ __('refresh') || 'Refresh' }}</span>
                             </button>
                         </div>
                     </div>
@@ -67,11 +66,11 @@
                         <template #cell(values)="row">
                             <div class="d-flex flex-wrap gap-1 justify-content-center align-items-center">
                                 <span v-for="value in row.item.values" :key="value.id"
-                                    class="badge bg-light text-dark border d-inline-flex align-items-center gap-1">
+                                    class="attr-chip">
                                     <span v-if="row.item.type === 'color' && value.color_code"
-                                        class="rounded-circle border" :style="{ background: value.color_code, width: '12px', height: '12px', display: 'inline-block' }"></span>
+                                        class="attr-chip-dot" :style="{ background: value.color_code }"></span>
                                     <img v-else-if="row.item.type === 'image' && value.image_url" :src="value.image_url"
-                                        class="rounded" style="width: 16px; height: 16px; object-fit: cover;">
+                                        class="attr-value-img">
                                     {{ value.value }}
                                     <small v-if="value.short_code" class="text-muted">({{ value.short_code }})</small>
                                 </span>
@@ -86,7 +85,7 @@
                                 <div>{{ row.item.seller ? row.item.seller.name : __('seller') || 'Seller' }}</div>
                                 <small class="text-muted">ID - {{ row.item.seller_id }}</small>
                             </div>
-                            <span v-else class="badge bg-success">{{ __('global') || 'Global' }}</span>
+                            <span v-else class="badge bg-primary">{{ __('global') || 'Global' }}</span>
                         </template>
 
                         <template #cell(status)="row">
@@ -105,7 +104,6 @@
                                      assigned to a category, rather than hidden outright. -->
                                 <button v-if="!isSeller || row.item.is_mine" class="figma-action-btn"
                                     :disabled="isSeller && isInUse(row.item)"
-                                    :style="isSeller && isInUse(row.item) ? 'opacity: 0.5; cursor: not-allowed;' : ''"
                                     @click="!(isSeller && isInUse(row.item)) && deleteRecord(row.index, row.item.id)"
                                     v-b-tooltip.hover
                                     :title="isSeller && isInUse(row.item) ? (__('attribute_in_use_cannot_be_deleted') || 'Assigned to a category, cannot be deleted') : __('delete')">
@@ -119,8 +117,8 @@
                 <div class="figma-table-footer flex-wrap gap-3">
                     <div class="d-flex align-items-center gap-2">
                         <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
-                        <b-form-select v-model="perPage" :options="pageOptions" size="sm"
-                            style="width: auto;"></b-form-select>
+                        <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
@@ -302,8 +300,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: inUse ? '#d33' : '#37a279',
-                cancelButtonColor: inUse ? '#37a279' : '#d33',
+                confirmButtonColor: inUse ? 'var(--theme-error-500)' : 'var(--theme-primary-500)',
+                cancelButtonColor: inUse ? 'var(--theme-primary-500)' : 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true;
@@ -328,6 +326,36 @@ export default {
 </script>
 
 <style scoped>
+.attr-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+.attr-chip-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--ui-border-strong);
+}
+
+.attr-value-img {
+    width: 16px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
 .figma-action-btn.is-disabled,
 .figma-action-btn:disabled {
     opacity: 0.35;

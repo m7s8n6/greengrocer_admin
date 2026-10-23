@@ -13,7 +13,6 @@
                                     srcset="" />
                                 <img class="container-logo logo-dark" v-if="$appDarkLogo" :src="$storageUrl + $appDarkLogo"
                                     alt='Logo' srcset="" />
-                                {{ $appName }}
                             </router-link>
                         </div>
                     </div>
@@ -38,7 +37,7 @@
                                         <template v-for="sub in item.submenu">
                                             <li class="submenu-item" :class="{ 'active': isActive(sub.url) }"
                                                 :key="sub.key">
-                                                <router-link :to="sub.url">
+                                                <router-link :to="sub.url" @click.native="closeSideBarMenu()">
                                                     {{ sub.name }}
                                                 </router-link>
                                             </li>
@@ -46,7 +45,7 @@
                                     </ul>
                                 </template>
                                 <template v-else>
-                                    <router-link class="sidebar-link" :to="item.url">
+                                    <router-link class="sidebar-link" :to="item.url" @click.native="closeSideBarMenu()">
                                         <i :class="`fa fa-${item.icon}`"></i>
                                         <span>{{ item.name }}</span>
                                     </router-link>
@@ -137,12 +136,9 @@ export default {
                 slideToggle(submenu, 300)
             })
         }
-        window.addEventListener('DOMContentLoaded', (event) => {
-            var w = window.innerWidth;
-            if (w < 1200) {
-                document.getElementById('sidebar')?.classList?.remove('active');
-            }
-        });
+        if (window.innerWidth < 1200) {
+            document.getElementById('sidebar')?.classList?.remove('active');
+        }
         // Update backdrop when sidebar opens/closes on small screens - click outside to close
         const updateSidebarBackdrop = () => {
             const sidebar = document.getElementById('sidebar');
@@ -186,7 +182,7 @@ export default {
             });
         }
         // Scroll into active sidebar
-        document.querySelector('.sidebar-item.active').scrollIntoView(false)
+        this.scrollSidebarToActive()
 
 
     },
@@ -220,6 +216,13 @@ export default {
                     url: '/delivery_boy/orders',
                     permission: 'order_list'
                 },
+                // Auto-assign delivery boy feature disabled
+                // {
+                //     name: 'Requested Orders',
+                //     icon: 'clipboard-list',
+                //     url: '/delivery_boy/requested_orders',
+                //     permission: 'order_list'
+                // },
                 {
                     name: __('return_requests'),
                     icon: 'retweet',
@@ -246,7 +249,7 @@ export default {
                 },
                 {
                     name: __('delivery_boy_salary'),
-                    icon: 'money-bill',
+                    icon: 'file-invoice-dollar',
                     url: '/delivery_boy/salary',
                     permission: 'salary_list'
                 }
@@ -256,6 +259,23 @@ export default {
         }
     },
     methods: {
+        // Phones / tablets: tapping a final menu item closes the slide-in sidebar.
+        closeSideBarMenu() {
+            if (window.innerWidth < 1200) {
+                document.getElementById('sidebar')?.classList?.remove('active');
+                const backdrop = document.querySelector('.sidebar-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        },
+        // Bring the active menu item into view by scrolling only the sidebar list. scrollIntoView()
+        // also scrolled the page itself, which on phones (off-canvas sidebar) hid the top bar.
+        scrollSidebarToActive() {
+            const item = document.querySelector('#sidebar .sidebar-item.active');
+            const wrapper = document.querySelector('#sidebar .sidebar-wrapper');
+            if (!item || !wrapper) return;
+            const offset = item.getBoundingClientRect().top - wrapper.getBoundingClientRect().top;
+            wrapper.scrollTop += offset - wrapper.clientHeight / 2;
+        },
         subIsActive(item) {
             const paths = Array.isArray(item.submenu) ? item.submenu : [];
             return paths.some(path => {
@@ -263,7 +283,8 @@ export default {
             });
         },
         isActive(url) {
-            if (this.$route.path == url) {
+            // The dashboard menu item links to the panel root, which redirects to its dashboard route.
+            if (this.$route.path == url || (url === '/delivery_boy' && this.$route.path === '/delivery_boy/dashboard')) {
                 return true;
             }
             return false;
@@ -379,7 +400,7 @@ body.theme-dark .logo-dark {
 }
 .stats-panel {
     background-color: #fff;
-    border: 1px solid rgba(67, 94, 190, 0.1);
+    border: 1px solid color-mix(in srgb, var(--theme-primary-500) 10%, transparent);
     box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     transition: all 0.3s ease;
 }
@@ -390,7 +411,7 @@ body.theme-dark .logo-dark {
 }
 
 .bg-light-primary {
-    background-color: #ebf3ff !important;
+    background-color: var(--theme-info-50) !important;
 }
 
 .fade-enter-active,

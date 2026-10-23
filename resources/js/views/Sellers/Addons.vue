@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('addons') || 'Addons' }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -14,7 +14,7 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="card figma-main-section-card">
                     <div class="card-body p-0">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                             <div class="flex-grow-1">
@@ -24,15 +24,15 @@
                                         :placeholder="__('search')">
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>{{ __('refresh') }}</span>
+                                </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="edit_record = true">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_addon_group') || 'Add Addon Group' }}</span>
-                                </button>
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
-                                    <i class="fa fa-refresh"></i>
-                                    <span>{{ __('refresh') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -61,12 +61,12 @@
                                         <div>{{ row.item.seller ? row.item.seller.name : __('seller') || 'Seller' }}</div>
                                         <small class="text-muted">ID - {{ row.item.seller_id }}</small>
                                     </div>
-                                    <span v-else class="badge bg-success">{{ __('global') || 'Global' }}</span>
+                                    <span v-else class="badge bg-primary">{{ __('global') || 'Global' }}</span>
                                 </template>
 
                                 <template #cell(status)="row">
-                                    <span v-if="row.item.status == 1" class="badge bg-success">{{__('activate')}}</span>
-                                    <span v-else class="badge bg-danger">{{__('deactivate')}}</span>
+                                    <span v-if="row.item.status == 1" class="badge bg-success">{{ __('active') }}</span>
+                                    <span v-else class="badge bg-danger">{{ __('deactive') }}</span>
                                 </template>
 
                                 <template #cell(actions)="row">
@@ -81,18 +81,18 @@
                                     <span v-else class="text-muted small">{{ __('managed_by_admin') || 'Managed by admin' }}</span>
                                 </template>
                             </b-table>
-                            <div class="figma-table-footer flex-wrap gap-3">
+                        </div>
+                        <div class="figma-table-footer flex-wrap gap-3">
                                 <div class="d-flex align-items-center gap-2">
                                     <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
-                                    <b-form-select v-model="perPage" :options="pageOptions" size="sm"
-                                        style="width: auto;"></b-form-select>
+                                    <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                                        align="right" class="figma-pagination mb-0"></b-pagination>
+                                        align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -181,8 +181,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true;

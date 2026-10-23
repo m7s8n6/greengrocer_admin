@@ -13,7 +13,6 @@
 namespace Composer\DependencyResolver;
 
 use Composer\Package\AliasPackage;
-use Composer\Package\CompletePackageInterface;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Repository\PlatformRepository;
@@ -38,7 +37,7 @@ class Transaction
 
     /**
      * Package set resulting from this transaction
-     * @var array<int, PackageInterface>
+     * @var array<string, PackageInterface>
      */
     protected $resultPackageMap;
 
@@ -77,7 +76,6 @@ class Transaction
                 if ($a instanceof AliasPackage !== $b instanceof AliasPackage) {
                     return $a instanceof AliasPackage ? -1 : 1;
                 }
-
                 // if names are the same, compare version, e.g. to sort aliases reliably, actual order does not matter
                 return strcmp($b->getVersion(), $a->getVersion());
             }
@@ -87,7 +85,7 @@ class Transaction
 
         $this->resultPackageMap = [];
         foreach ($resultPackages as $package) {
-            $this->resultPackageMap[spl_object_id($package)] = $package;
+            $this->resultPackageMap[spl_object_hash($package)] = $package;
             foreach ($package->getNames() as $name) {
                 $this->resultPackagesByName[$name][] = $package;
             }
@@ -128,12 +126,12 @@ class Transaction
         while (\count($stack) > 0) {
             $package = array_pop($stack);
 
-            if (isset($processed[spl_object_id($package)])) {
+            if (isset($processed[spl_object_hash($package)])) {
                 continue;
             }
 
-            if (!isset($visited[spl_object_id($package)])) {
-                $visited[spl_object_id($package)] = true;
+            if (!isset($visited[spl_object_hash($package)])) {
+                $visited[spl_object_hash($package)] = true;
 
                 $stack[] = $package;
                 if ($package instanceof AliasPackage) {
@@ -147,8 +145,8 @@ class Transaction
                         }
                     }
                 }
-            } elseif (!isset($processed[spl_object_id($package)])) {
-                $processed[spl_object_id($package)] = true;
+            } elseif (!isset($processed[spl_object_hash($package)])) {
+                $processed[spl_object_hash($package)] = true;
 
                 if ($package instanceof AliasPackage) {
                     $aliasKey = $package->getName().'::'.$package->getVersion();
@@ -165,15 +163,7 @@ class Transaction
                         // TODO different for lock?
                         if ($package->getVersion() !== $presentPackageMap[$package->getName()]->getVersion() ||
                             $package->getDistReference() !== $presentPackageMap[$package->getName()]->getDistReference() ||
-                            $package->getSourceReference() !== $presentPackageMap[$package->getName()]->getSourceReference() ||
-                            (
-                                $package instanceof CompletePackageInterface
-                                && $presentPackageMap[$package->getName()] instanceof CompletePackageInterface
-                                && (
-                                    $package->isAbandoned() !== $presentPackageMap[$package->getName()]->isAbandoned()
-                                    || $package->getReplacementPackage() !== $presentPackageMap[$package->getName()]->getReplacementPackage()
-                                )
-                            )
+                            $package->getSourceReference() !== $presentPackageMap[$package->getName()]->getSourceReference()
                         ) {
                             $operations[] = new Operation\UpdateOperation($source, $package);
                         }
@@ -225,7 +215,7 @@ class Transaction
      * These serve as a starting point to enumerate packages in a topological order despite potential cycles.
      * If there are packages with a cycle on the top level the package with the lowest name gets picked
      *
-     * @return array<int, PackageInterface>
+     * @return array<string, PackageInterface>
      */
     protected function getRootPackages(): array
     {
@@ -241,7 +231,7 @@ class Transaction
 
                 foreach ($possibleRequires as $require) {
                     if ($require !== $package) {
-                        unset($roots[spl_object_id($require)]);
+                        unset($roots[spl_object_hash($require)]);
                     }
                 }
             }

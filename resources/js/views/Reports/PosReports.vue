@@ -18,83 +18,119 @@
                 </div>
             </div>
             <section class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">POS Orders Report</h4>
+                <div class="row g-3 mb-3 report-kpis justify-content-start">
+                    <div class="col-6 col-md-4 col-xl-3">
+                        <div class="figma-kpi-card-v2 w-100">
+                            <div class="figma-kpi-icon-v2 bg-stat-blue"><i class="bi bi-receipt"></i></div>
+                            <div class="figma-kpi-content-v2">
+                                <span class="figma-kpi-label-v2">{{ __('total_amount') }}</span>
+                                <span class="figma-kpi-value-v2">{{ $currency }} {{ totalAmount }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <b-row class="mb-2">
-                            <b-col md="3">
-                                <h6 class="box-title">From & To Date</h6>
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <date-range-picker :append-to-body="true" :single-date-picker="'range'"
-                                        :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
-                                        :autoApply=false :showDropdowns=true v-model="dateRange" :maxDate="maxDate"
-                                        @update="getPosOrders"></date-range-picker>
-                                    <button class="btn btn-sm btn-danger ml-1"
-                                        @click="dateRange.startDate = null, dateRange.endDate = null, getPosOrders()">
-                                        {{ __('clear') }}
-                                    </button>
+                </div>
+                <div class="figma-main-section-card">
+                    <div class="card-body p-0">
+                        <!-- Toolbar: search + refresh -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
+                            <div class="flex-grow-1">
+                                <div class="figma-search-container">
+                                    <i class="fa fa-search text-muted"></i>
+                                    <input id="filter-input" v-model="filter" type="search" class="figma-search-input"
+                                        :placeholder="__('search')" @input="onFilterChanged">
                                 </div>
-                            </b-col>
-                            <b-col md="3">
-                                <h6 class="box-title">Store</h6>
-                                <b-form-select class="form-select" v-model="selectedStore" :options="storeOptions"
-                                    @change="getPosOrders"></b-form-select>
-                            </b-col>
-                            <b-col md="3">
-                                <h6 class="box-title">Payment Method</h6>
-                                <b-form-select class="form-select" v-model="selectedPaymentMethod"
-                                    :options="paymentMethodOptions" @change="getPosOrders"></b-form-select>
-                            </b-col>
-                            <b-col md="2">
-                                <h6 class="box-title">{{ __('search') }}</h6>
-                                <b-form-input id="filter-input" v-model="filter" type="search"
-                                    :placeholder="__('search')" @input="onFilterChanged"></b-form-input>
-                            </b-col>
-                            <b-col md="1">
-                                <button class="btn btn-primary btn_refresh" v-b-tooltip.hover :title="__('refresh')"
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    :class="{ 'active': showFilters }" @click="showFilters = !showFilters">
+                                    <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                    <span>{{ __('filters') }}</span>
+                                    <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                </button>
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2 btn_refresh"
                                     @click="getPosOrders()">
                                     <i class="fa fa-refresh" aria-hidden="true"></i>
+                                    <span>{{ __('refresh') }}</span>
                                 </button>
-                            </b-col>
-                        </b-row>
+                            </div>
+                        </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
+                        <!-- Filters -->
+                        <b-collapse v-model="showFilters">
+                        <div class="figma-filter-section">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="figma-filter-group">
+                                        <label class="figma-filter-label">From & To Date</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <date-range-picker :append-to-body="true" :single-date-picker="'range'"
+                                                :locale-data="dateRangePickerLocale" :ranges="dateRangePickerRanges"
+                                                :autoApply=false :showDropdowns=true v-model="dateRange" :maxDate="maxDate"
+                                                @update="getPosOrders" class="flex-grow-1"></date-range-picker>
+                                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                                @click="dateRange.startDate = null, dateRange.endDate = null, getPosOrders()">
+                                                <i class="fa fa-eraser"></i>
+                                                <span>{{ __('clear') }}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="figma-filter-group">
+                                        <label class="figma-filter-label">Store</label>
+                                        <b-form-select class="form-select modern-select" v-model="selectedStore" :options="storeOptions"
+                                            @change="getPosOrders"></b-form-select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="figma-filter-group">
+                                        <label class="figma-filter-label">Payment Method</label>
+                                        <b-form-select class="form-select modern-select" v-model="selectedPaymentMethod"
+                                            :options="paymentMethodOptions" @change="getPosOrders"></b-form-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        </b-collapse>
+
+                        <div class="table-responsive mb-0">
+                            <table class="table figma-table mb-0">
                                 <thead>
-                                    <tr class="bg-light">
-                                        <th class="text-center">Order ID</th>
-                                        <th class="text-center">Store</th>
-                                        <th class="text-center">Customer</th>
-                                        <th class="text-center">Mobile Number</th>
-                                        <th class="text-center">Date</th>
-                                        <th class="text-center">Total Amount</th>
-                                        <th class="text-center">Payment Method</th>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Store</th>
+                                        <th>Customer</th>
+                                        <th>Mobile Number</th>
+                                        <th>Date</th>
+                                        <th class="text-end">Total Amount</th>
+                                        <th>Payment Method</th>
                                         <th class="text-center">Invoice</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-if="isLoading">
-                                        <td colspan="8" class="text-center text-black my-2">
+                                        <td colspan="8" class="text-center my-2">
                                             <b-spinner class="align-middle"></b-spinner>
                                             <strong>{{ __('loading') }}...</strong>
                                         </td>
                                     </tr>
                                     <tr v-else-if="filteredItems.length === 0">
-                                        <td colspan="8" class="text-center">No records found</td>
+                                        <td colspan="8" class="text-center report-empty">
+                                            <i class="fa fa-inbox d-block mb-2 report-empty-icon" aria-hidden="true"></i>
+                                            No records found
+                                        </td>
                                     </tr>
                                     <template v-else>
                                         <tr v-for="item in paginatedItems" :key="item.id">
-                                            <td class="text-center">{{ item.id }}</td>
-                                            <td class="text-center">{{ item.store_name || '-' }}</td>
-                                            <td class="text-center">{{ item.customer_name }}</td>
-                                            <td class="text-center">{{ item.customer_mobile || '-' }}</td>
-                                            <td class="text-center">{{ formatDate(item.created_at) }}</td>
-                                            <td class="text-center">{{ $currency }} {{ item.total_amount }}</td>
-                                            <td class="text-center">{{ item.payment_method }}</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-primary" @click="viewInvoice(item.id)">
+                                            <td class="fw-semibold">#{{ item.id }}</td>
+                                            <td>{{ item.store_name || '-' }}</td>
+                                            <td>{{ item.customer_name }}</td>
+                                            <td>{{ item.customer_mobile || '-' }}</td>
+                                            <td>{{ formatDate(item.created_at) }}</td>
+                                            <td class="text-end">{{ $currency }} {{ item.total_amount }}</td>
+                                            <td><span class="figma-status-pill bg-info">{{ item.payment_method }}</span></td>
+                                            <td>
+                                                <button class="figma-action-btn mx-auto" v-b-tooltip.hover title="Invoice" @click="viewInvoice(item.id)">
                                                     <i class="fa fa-receipt" aria-hidden="true"></i>
                                                 </button>
                                             </td>
@@ -102,38 +138,30 @@
                                     </template>
                                 </tbody>
                                 <tfoot>
-                                    <tr class="bg-light font-weight-bold">
-                                        <td class="text-center">Total</td>
+                                    <tr class="report-total-row">
+                                        <td>Total</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td class="text-center">{{ $currency }} {{ footerTotal }}</td>
+                                        <td class="text-end">{{ $currency }} {{ footerTotal }}</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
-                        <b-row>
-                            <b-col md="2" class="my-1">
-                                <b-form-group :label="__('per_page')" label-for="per-page-select" label-align-sm="right"
-                                    label-size="sm" class="mb-0">
-                                    <b-form-select id="per-page-select" v-model="perPage" :options="pageOptions"
-                                        size="sm" class="form-control form-select"
-                                        @change="onPerPageChange"></b-form-select>
-                                </b-form-group>
-                            </b-col>
-                            <b-col md="4" class="my-1 d-flex align-items-center justify-content-center">
-                                <div class="total-amount-display">
-                                    <strong>{{ __('total_amount') }}:</strong> {{ $currency }} {{ totalAmount }}
-                                </div>
-                            </b-col>
-                            <b-col md="6" class="my-1">
-                                <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                                    align="right" class="figma-pagination mb-0" @change="onPageChange"></b-pagination>
-                            </b-col>
-                        </b-row>
+                        <div class="figma-table-footer">
+                            <div class="d-flex align-items-center gap-2">
+                                <label for="per-page-select" class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                <b-form-select id="per-page-select" v-model="perPage" :options="pageOptions"
+                                    size="sm" class="form-control form-select report-per-page"
+                                    @change="onPerPageChange"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+                            </div>
+                            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+                                align="right" class="figma-pagination mb-0" @change="onPageChange"></b-pagination>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -144,9 +172,9 @@
             <div class="invoice-container">
                 <iframe :src="invoiceUrl" frameborder="0" style="width: 100%; height: 80vh;"></iframe>
             </div>
-            <div class="text-center mt-3">
-                <button class="btn btn-secondary" @click="$bvModal.hide('invoice-modal')">Close</button>
-                <button class="btn btn-primary ml-2" @click="printInvoice">Print</button>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-outline-secondary" @click="$bvModal.hide('invoice-modal')">Close</button>
+                <button class="btn btn-primary" @click="printInvoice"><i class="fa fa-print me-1"></i>Print</button>
             </div>
         </b-modal>
     </div>
@@ -161,6 +189,7 @@ export default {
     components: { DateRangePicker },
     data: function () {
         return {
+            showFilters: false,
             dateRange: { startDate: null, endDate: null },
             maxDate: new Date(),
             invoiceUrl: '',
@@ -350,7 +379,7 @@ export default {
 }
 
 .order-details-header {
-    background-color: #f8f9fa;
+    background-color: var(--theme-neutral-100, #f8f9fa);
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 20px;
@@ -359,10 +388,46 @@ export default {
 .total-amount-display {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #435ebe;
+    color: var(--theme-primary-500, #435ebe);
 }
 
 .invoice-action-cell {
     min-width: 100px;
 }
+
+.report-total-row td {
+    font-weight: 700;
+    color: var(--ui-heading);
+    background: var(--ui-surface-muted);
+    border-top: 1px solid var(--ui-border);
+}
+
+.report-empty {
+    color: var(--ui-text-muted) !important;
+    padding: 32px 16px !important;
+}
+
+.report-empty-icon {
+    font-size: 28px;
+    color: var(--ui-text-subtle);
+}
+
+.report-per-page {
+    width: auto;
+    min-width: 72px;
+}
+
+.figma-filter-section .vue-daterange-picker {
+    min-width: 0;
+}
+
+@media (max-width: 575.98px) {
+    .figma-table-footer {
+        height: auto;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px !important;
+    }
+}
+
 </style>

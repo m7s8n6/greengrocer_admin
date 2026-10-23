@@ -10,6 +10,7 @@
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                            <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('sms_gateways_methods_settings') }}</li>
                         </ol>
                     </nav>
@@ -18,11 +19,12 @@
         </div>
             <section class="section">
                 <form id="sms_method_settings_form" method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
-                    <div class="row">
-                        <div class="col-6 mb-4">
-                            <div class="card h-100">
+                    <div class="row sms-methods-grid">
+                        <div class="col-12">
+                            <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">{{ __('twilio') }}</h4>
+                                    <h4 class="card-title float-none">{{ __('twilio') }}</h4>
+                                    <p class="text-muted small mb-0 mt-1">{{ tr('sms_settings_desc', 'Twilio credentials used to send OTP and order SMS messages.') }}</p>
                                 </div>
                                 <div class="card-body">
                                     <input type="hidden" id="sms_method_settings" v-model="sms_settings.sms_method_settings" name="sms_method_settings" required="" value="1" aria-required="true">
@@ -58,14 +60,13 @@
 
                             </div>
                                     </div>
+                                    <div class="d-flex justify-content-end border-top pt-3 mt-2" v-if="$can('manage_payment_methods')">
+                                        <b-button v-if="$can('sms_settings')" type="submit" id="btn_update" variant="primary" :disabled="isLoading"> {{ __('update') }}
+                                            <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                        </b-button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <b-button type="submit" id="btn_update" variant="primary" :disabled="isLoading" v-if="$can('manage_payment_methods')"> {{ __('update') }}
-                                <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                            </b-button>
                         </div>
 
                     </div>
@@ -96,6 +97,7 @@ export default {
         this.getSmsMethods()
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         getSmsMethods() {
             axios.get(this.$apiUrl + '/sms_settings').then((response) => {
                 if(response.data.data) {
@@ -164,3 +166,27 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+/* Enable/disable switch row at the top of the gateway card: label left, switch right */
+.sms-methods-grid .card-body .form-group:has(> .form-switch) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--ui-border);
+}
+.sms-methods-grid .card-body .form-group:has(> .form-switch) > br {
+    display: none;
+}
+.sms-methods-grid .card-body .form-group:has(> .form-switch) > label {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+.sms-methods-grid .card-body .form-group:has(> .form-switch) > .form-switch {
+    margin: 0;
+}
+</style>

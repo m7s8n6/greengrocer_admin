@@ -187,6 +187,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -338,7 +339,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.auth[data-v-7c515ec0] {\n    overflow-x: hidden!important;\n}\n.auth-logo[data-v-7c515ec0] {\n    padding-bottom: 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Registration card: wide auth card with grouped form sections (SnapBuy look) */\n.auth[data-v-7c515ec0] {\n    overflow-y: auto !important;\n}\n.auth .login-wrapper[data-v-7c515ec0] {\n    justify-content: center;\n    align-items: flex-start;\n    padding: 32px 20px;\n    height: auto !important;\n    min-height: 100% !important;\n    overflow: visible !important;\n}\n.auth .register-breadcrumb .breadcrumb[data-v-7c515ec0] {\n    justify-content: center;\n    font-size: 13px;\n    padding: 0;\n    margin-bottom: 12px;\n    background: transparent;\n}\n\n/* Sections flow with the page; no nested scroll box (overrides common.css + dark-mode .content) */\n.auth .content[data-v-7c515ec0] {\n    max-height: none !important;\n    overflow: visible !important;\n    padding: 0 !important;\n    margin: 0 !important; /* common.css gives .content a 10px margin; keeps sections aligned with the actions row */\n    border: 0 !important;\n    background: transparent !important;\n}\n.auth .content > .card-body[data-v-7c515ec0] {\n    padding: 0;\n}\n@media (max-width: 575.98px) {\n.auth .login-wrapper[data-v-7c515ec0] {\n        padding: 16px;\n}\n.auth .detail-card[data-v-7c515ec0] {\n        padding: 24px 16px 16px;\n        border-radius: 16px;\n        min-width: 0;\n}\n.register-section[data-v-7c515ec0] {\n        padding: 16px;\n}\n.register-actions .btn[data-v-7c515ec0] {\n        width: 100%;\n}\n}\n.login-logo-dark[data-v-7c515ec0] {\n    display: none;\n}\nbody.theme-dark .login-logo-light[data-v-7c515ec0] {\n    display: none;\n}\nbody.theme-dark .login-logo-dark[data-v-7c515ec0] {\n    display: block;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -515,33 +516,35 @@ var render = function () {
             _c(
               "a",
               {
-                staticStyle: {
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "flex-start",
-                },
+                staticClass: "d-flex align-items-center justify-content-center",
                 attrs: { href: "javascript:void(0)" },
               },
               [
                 _vm.$appLogo != ""
                   ? _c("img", {
-                      staticStyle: { height: "70px", width: "70px" },
+                      staticClass: "auth-logo-img login-logo-light",
                       attrs: {
                         src: _vm.$storageUrl + _vm.$appLogo,
                         alt: "Logo",
                       },
                     })
                   : _c("img", {
-                      staticStyle: { height: "70px", width: "70px" },
+                      staticClass: "auth-logo-img login-logo-light",
                       attrs: {
                         src: _vm.$baseUrl + "/images/logo.png",
                         alt: "Logo",
                       },
                     }),
                 _vm._v(" "),
-                _c("h2", { staticStyle: { margin: "10px" } }, [
-                  _vm._v(_vm._s(_vm.$appName)),
-                ]),
+                _vm.$appDarkLogo
+                  ? _c("img", {
+                      staticClass: "auth-logo-img login-logo-dark",
+                      attrs: {
+                        src: _vm.$storageUrl + _vm.$appDarkLogo,
+                        alt: "Logo",
+                      },
+                    })
+                  : _vm._e(),
               ]
             ),
           ]),
@@ -565,644 +568,656 @@ var render = function () {
             },
             [
               _c("div", { staticClass: "content" }, [
-                _c("h6", [_vm._v("Delivery Boy Information")]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "name" } }, [_vm._v("Name")]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.name,
-                            expression: "deliveryBoys.name",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "name",
-                          id: "name",
-                          placeholder: "Enter name.",
-                        },
-                        domProps: { value: _vm.deliveryBoys.name },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "name",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
+                _c("div", { staticClass: "register-section" }, [
+                  _c("h6", { staticClass: "register-section-title" }, [
+                    _vm._v("Delivery Boy Information"),
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "mobile" } }, [
-                        _vm._v("Mobile No."),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.mobile,
-                            expression: "deliveryBoys.mobile",
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "name" } }, [
+                          _vm._v("Name"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.name,
+                              expression: "deliveryBoys.name",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            name: "name",
+                            id: "name",
+                            placeholder: "Enter name.",
                           },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "number",
-                          name: "mobile",
-                          id: "mobile",
-                          placeholder: "Enter mobile no.",
-                        },
-                        domProps: { value: _vm.deliveryBoys.mobile },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "mobile",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "driving_license" } }, [
-                        _vm._v("Driving License"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        ref: "file_license",
-                        staticClass: "file-input",
-                        attrs: {
-                          type: "file",
-                          name: "driving_license",
-                          id: "driving_license",
-                          required: !_vm.deliveryBoys.id,
-                        },
-                        on: { change: _vm.handleFileUploadLicense },
-                      }),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        {
-                          staticClass: "file-input-div bg-gray-100",
+                          domProps: { value: _vm.deliveryBoys.name },
                           on: {
-                            click: function ($event) {
-                              return _vm.$refs.file_license.click()
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "name",
+                                $event.target.value
+                              )
                             },
-                            drop: _vm.dropFileUploadLicense,
-                            dragover: _vm.$dragoverFile,
-                            dragleave: _vm.$dragleaveFile,
                           },
-                        },
-                        [
-                          _vm.deliveryBoys.driving_license &&
-                          _vm.deliveryBoys.driving_license.name !== ""
-                            ? [
-                                _c("label", [
-                                  _vm._v(
-                                    "Selected file name:- " +
-                                      _vm._s(
-                                        _vm.deliveryBoys.driving_license.name
-                                      )
-                                  ),
-                                ]),
-                              ]
-                            : [
-                                _vm._m(0),
-                                _vm._v(" "),
-                                _c("label", [
-                                  _vm._v(
-                                    _vm._s(
-                                      _vm.__(
-                                        "drop_files_here_or_click_to_upload"
-                                      )
-                                    )
-                                  ),
-                                ]),
-                              ],
-                        ],
-                        2
-                      ),
-                      _vm._v(" "),
-                      _vm.deliveryBoys.driving_license_url
-                        ? _c("div", { staticClass: "row" }, [
-                            _vm.isImage(_vm.deliveryBoys.driving_license_url)
-                              ? _c("div", { staticClass: "col-md-2" }, [
-                                  _c("img", {
-                                    staticClass: "custom-image",
-                                    attrs: {
-                                      src: _vm.deliveryBoys.driving_license_url,
-                                      title: "Driving License",
-                                      alt: "Driving License",
-                                    },
-                                  }),
-                                ])
-                              : _c("div", { staticClass: "col-md-2 mt-2" }, [
-                                  _c(
-                                    "a",
-                                    {
-                                      staticClass: "badge bg-success",
-                                      attrs: {
-                                        target: "_blank",
-                                        href: _vm.deliveryBoys
-                                          .driving_license_url,
-                                      },
-                                    },
-                                    [
-                                      _c("i", { staticClass: "fa fa-eye" }),
-                                      _vm._v(" Identity Card"),
-                                    ]
-                                  ),
-                                ]),
-                          ])
-                        : _vm._e(),
+                        }),
+                      ]),
                     ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "national_identity_card" } },
-                        [_vm._v("National Identity Card")]
-                      ),
-                      _vm._v(" "),
-                      _c("input", {
-                        ref: "file_card",
-                        staticClass: "file-input",
-                        attrs: {
-                          type: "file",
-                          name: "national_identity_card",
-                          id: "national_identity_card",
-                          required: !_vm.deliveryBoys.id,
-                        },
-                        on: { change: _vm.handleFileUploadCard },
-                      }),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        {
-                          staticClass: "file-input-div bg-gray-100",
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "mobile" } }, [
+                          _vm._v("Mobile No."),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.mobile,
+                              expression: "deliveryBoys.mobile",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "number",
+                            name: "mobile",
+                            id: "mobile",
+                            placeholder: "Enter mobile no.",
+                          },
+                          domProps: { value: _vm.deliveryBoys.mobile },
                           on: {
-                            click: function ($event) {
-                              return _vm.$refs.file_card.click()
-                            },
-                            drop: _vm.dropFileUploadCard,
-                            dragover: _vm.$dragoverFile,
-                            dragleave: _vm.$dragleaveFile,
-                          },
-                        },
-                        [
-                          _vm.deliveryBoys.national_identity_card &&
-                          _vm.deliveryBoys.national_identity_card.name !== ""
-                            ? [
-                                _c("label", [
-                                  _vm._v(
-                                    "Selected file name:- " +
-                                      _vm._s(
-                                        _vm.deliveryBoys.national_identity_card
-                                          .name
-                                      )
-                                  ),
-                                ]),
-                              ]
-                            : [
-                                _vm._m(1),
-                                _vm._v(" "),
-                                _c("label", [
-                                  _vm._v(
-                                    _vm._s(
-                                      _vm.__(
-                                        "drop_files_here_or_click_to_upload"
-                                      )
-                                    )
-                                  ),
-                                ]),
-                              ],
-                        ],
-                        2
-                      ),
-                      _vm._v(" "),
-                      _vm.deliveryBoys.national_identity_card_url
-                        ? _c("div", { staticClass: "row" }, [
-                            _vm.isImage(
-                              _vm.deliveryBoys.national_identity_card_url
-                            )
-                              ? _c("div", { staticClass: "col-md-2" }, [
-                                  _c("img", {
-                                    staticClass: "custom-image",
-                                    attrs: {
-                                      src: _vm.deliveryBoys
-                                        .national_identity_card_url,
-                                      title: "National Identity Card",
-                                      alt: "National Identity Card",
-                                    },
-                                  }),
-                                ])
-                              : _c("div", { staticClass: "col-md-2 mt-2" }, [
-                                  _c(
-                                    "a",
-                                    {
-                                      staticClass: "badge bg-success",
-                                      attrs: {
-                                        target: "_blank",
-                                        href: _vm.deliveryBoys
-                                          .national_identity_card_url,
-                                      },
-                                    },
-                                    [
-                                      _c("i", { staticClass: "fa fa-eye" }),
-                                      _vm._v(" Identity Card"),
-                                    ]
-                                  ),
-                                ]),
-                          ])
-                        : _vm._e(),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "dob" } }, [
-                        _vm._v("Date Of Birth"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.dob,
-                            expression: "deliveryBoys.dob",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "date",
-                          name: "dob",
-                          id: "dob",
-                          required: "",
-                          placeholder: "Enter date of birth",
-                        },
-                        domProps: { value: _vm.deliveryBoys.dob },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "dob",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "ifsc_code" } }, [
-                        _vm._v("Bank's IFSC Code"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.ifsc_code,
-                            expression: "deliveryBoys.ifsc_code",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "ifsc_code",
-                          id: "ifsc_code",
-                          required: "",
-                          placeholder: "Enter bank's IFSC code.",
-                        },
-                        domProps: { value: _vm.deliveryBoys.ifsc_code },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "ifsc_code",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "bank_name" } }, [
-                        _vm._v("Bank Name"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.bank_name,
-                            expression: "deliveryBoys.bank_name",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "bank_name",
-                          id: "bank_name",
-                          required: "",
-                          placeholder: "Enter bank name",
-                        },
-                        domProps: { value: _vm.deliveryBoys.bank_name },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "bank_name",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "account_number" } }, [
-                        _vm._v("Account Number"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.bank_account_number,
-                            expression: "deliveryBoys.bank_account_number",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "account_number",
-                          id: "account_number",
-                          required: "",
-                          placeholder: "Enter account number",
-                        },
-                        domProps: {
-                          value: _vm.deliveryBoys.bank_account_number,
-                        },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "bank_account_number",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "account_name" } }, [
-                        _vm._v("Bank Account Name"),
-                      ]),
-                      _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.account_name,
-                            expression: "deliveryBoys.account_name",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          name: "account_name",
-                          id: "account_name",
-                          required: "",
-                          placeholder: "Enter bank account name",
-                        },
-                        domProps: { value: _vm.deliveryBoys.account_name },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "account_name",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "col-md-6" },
-                    [
-                      _c("label", { attrs: { for: "city_name" } }, [
-                        _vm._v("Select or Search City"),
-                      ]),
-                      _vm._v(" "),
-                      _c("multiselect", {
-                        attrs: {
-                          options: _vm.cities,
-                          placeholder: "Select & Search City",
-                          label: "name",
-                          "track-by": "name",
-                          id: "city_name",
-                          required: "",
-                        },
-                        on: { close: _vm.setCityId },
-                        scopedSlots: _vm._u([
-                          {
-                            key: "singleLabel",
-                            fn: function (props) {
-                              return [
-                                _c("span", { staticClass: "option__desc" }, [
-                                  _c("span", { staticClass: "option__title" }, [
-                                    _vm._v(_vm._s(props.option.name)),
-                                  ]),
-                                ]),
-                              ]
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "mobile",
+                                $event.target.value
+                              )
                             },
                           },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "driving_license" } }, [
+                          _vm._v("Driving License"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          ref: "file_license",
+                          staticClass: "file-input",
+                          attrs: {
+                            type: "file",
+                            name: "driving_license",
+                            id: "driving_license",
+                            required: !_vm.deliveryBoys.id,
+                          },
+                          on: { change: _vm.handleFileUploadLicense },
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "div",
                           {
-                            key: "option",
-                            fn: function (props) {
-                              return [
-                                _c("div", { staticClass: "option__desc" }, [
-                                  _c("span", { staticClass: "option__title" }, [
+                            staticClass: "file-input-div bg-gray-100",
+                            on: {
+                              click: function ($event) {
+                                return _vm.$refs.file_license.click()
+                              },
+                              drop: _vm.dropFileUploadLicense,
+                              dragover: _vm.$dragoverFile,
+                              dragleave: _vm.$dragleaveFile,
+                            },
+                          },
+                          [
+                            _vm.deliveryBoys.driving_license &&
+                            _vm.deliveryBoys.driving_license.name !== ""
+                              ? [
+                                  _c("label", [
                                     _vm._v(
-                                      _vm._s(props.option.formatted_address)
+                                      "Selected file name:- " +
+                                        _vm._s(
+                                          _vm.deliveryBoys.driving_license.name
+                                        )
                                     ),
                                   ]),
-                                ]),
-                              ]
+                                ]
+                              : [
+                                  _vm._m(0),
+                                  _vm._v(" "),
+                                  _c("label", [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm.__(
+                                          "drop_files_here_or_click_to_upload"
+                                        )
+                                      )
+                                    ),
+                                  ]),
+                                ],
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _vm.deliveryBoys.driving_license_url
+                          ? _c("div", { staticClass: "row" }, [
+                              _vm.isImage(_vm.deliveryBoys.driving_license_url)
+                                ? _c("div", { staticClass: "col-md-2" }, [
+                                    _c("img", {
+                                      staticClass: "custom-image",
+                                      attrs: {
+                                        src: _vm.deliveryBoys
+                                          .driving_license_url,
+                                        title: "Driving License",
+                                        alt: "Driving License",
+                                      },
+                                    }),
+                                  ])
+                                : _c("div", { staticClass: "col-md-2 mt-2" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "badge bg-success",
+                                        attrs: {
+                                          target: "_blank",
+                                          href: _vm.deliveryBoys
+                                            .driving_license_url,
+                                        },
+                                      },
+                                      [
+                                        _c("i", { staticClass: "fa fa-eye" }),
+                                        _vm._v(" Identity Card"),
+                                      ]
+                                    ),
+                                  ]),
+                            ])
+                          : _vm._e(),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { attrs: { for: "national_identity_card" } },
+                          [_vm._v("National Identity Card")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          ref: "file_card",
+                          staticClass: "file-input",
+                          attrs: {
+                            type: "file",
+                            name: "national_identity_card",
+                            id: "national_identity_card",
+                            required: !_vm.deliveryBoys.id,
+                          },
+                          on: { change: _vm.handleFileUploadCard },
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            staticClass: "file-input-div bg-gray-100",
+                            on: {
+                              click: function ($event) {
+                                return _vm.$refs.file_card.click()
+                              },
+                              drop: _vm.dropFileUploadCard,
+                              dragover: _vm.$dragoverFile,
+                              dragleave: _vm.$dragleaveFile,
                             },
                           },
-                        ]),
-                        model: {
-                          value: _vm.city,
-                          callback: function ($$v) {
-                            _vm.city = $$v
-                          },
-                          expression: "city",
-                        },
-                      }),
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "address" } }, [
-                        _vm._v("Address"),
+                          [
+                            _vm.deliveryBoys.national_identity_card &&
+                            _vm.deliveryBoys.national_identity_card.name !== ""
+                              ? [
+                                  _c("label", [
+                                    _vm._v(
+                                      "Selected file name:- " +
+                                        _vm._s(
+                                          _vm.deliveryBoys
+                                            .national_identity_card.name
+                                        )
+                                    ),
+                                  ]),
+                                ]
+                              : [
+                                  _vm._m(1),
+                                  _vm._v(" "),
+                                  _c("label", [
+                                    _vm._v(
+                                      _vm._s(
+                                        _vm.__(
+                                          "drop_files_here_or_click_to_upload"
+                                        )
+                                      )
+                                    ),
+                                  ]),
+                                ],
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _vm.deliveryBoys.national_identity_card_url
+                          ? _c("div", { staticClass: "row" }, [
+                              _vm.isImage(
+                                _vm.deliveryBoys.national_identity_card_url
+                              )
+                                ? _c("div", { staticClass: "col-md-2" }, [
+                                    _c("img", {
+                                      staticClass: "custom-image",
+                                      attrs: {
+                                        src: _vm.deliveryBoys
+                                          .national_identity_card_url,
+                                        title: "National Identity Card",
+                                        alt: "National Identity Card",
+                                      },
+                                    }),
+                                  ])
+                                : _c("div", { staticClass: "col-md-2 mt-2" }, [
+                                    _c(
+                                      "a",
+                                      {
+                                        staticClass: "badge bg-success",
+                                        attrs: {
+                                          target: "_blank",
+                                          href: _vm.deliveryBoys
+                                            .national_identity_card_url,
+                                        },
+                                      },
+                                      [
+                                        _c("i", { staticClass: "fa fa-eye" }),
+                                        _vm._v(" Identity Card"),
+                                      ]
+                                    ),
+                                  ]),
+                            ])
+                          : _vm._e(),
                       ]),
-                      _vm._v(" "),
-                      _c("textarea", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.deliveryBoys.address,
-                            expression: "deliveryBoys.address",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          name: "address",
-                          id: "address",
-                          rows: "3",
-                          placeholder: "Enter address",
-                        },
-                        domProps: { value: _vm.deliveryBoys.address },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "address",
-                              $event.target.value
-                            )
-                          },
-                        },
-                      }),
                     ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-6" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "other_payment_info" } }, [
-                        _vm._v("Other Payment Information"),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "dob" } }, [
+                          _vm._v("Date Of Birth"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.dob,
+                              expression: "deliveryBoys.dob",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "date",
+                            name: "dob",
+                            id: "dob",
+                            required: "",
+                            placeholder: "Enter date of birth",
+                          },
+                          domProps: { value: _vm.deliveryBoys.dob },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "dob",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
                       ]),
-                      _vm._v(" "),
-                      _c("textarea", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "ifsc_code" } }, [
+                          _vm._v("Bank's IFSC Code"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.ifsc_code,
+                              expression: "deliveryBoys.ifsc_code",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            name: "ifsc_code",
+                            id: "ifsc_code",
+                            required: "",
+                            placeholder: "Enter bank's IFSC code.",
+                          },
+                          domProps: { value: _vm.deliveryBoys.ifsc_code },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "ifsc_code",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "bank_name" } }, [
+                          _vm._v("Bank Name"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.bank_name,
+                              expression: "deliveryBoys.bank_name",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            name: "bank_name",
+                            id: "bank_name",
+                            required: "",
+                            placeholder: "Enter bank name",
+                          },
+                          domProps: { value: _vm.deliveryBoys.bank_name },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "bank_name",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "account_number" } }, [
+                          _vm._v("Account Number"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.bank_account_number,
+                              expression: "deliveryBoys.bank_account_number",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            name: "account_number",
+                            id: "account_number",
+                            required: "",
+                            placeholder: "Enter account number",
+                          },
+                          domProps: {
+                            value: _vm.deliveryBoys.bank_account_number,
+                          },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "bank_account_number",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "account_name" } }, [
+                          _vm._v("Bank Account Name"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.account_name,
+                              expression: "deliveryBoys.account_name",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            name: "account_name",
+                            id: "account_name",
+                            required: "",
+                            placeholder: "Enter bank account name",
+                          },
+                          domProps: { value: _vm.deliveryBoys.account_name },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "account_name",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-md-6 form-group" },
+                      [
+                        _c("label", { attrs: { for: "city_name" } }, [
+                          _vm._v("Select or Search City"),
+                        ]),
+                        _vm._v(" "),
+                        _c("multiselect", {
+                          attrs: {
+                            options: _vm.cities,
+                            placeholder: "Select & Search City",
+                            label: "name",
+                            "track-by": "name",
+                            id: "city_name",
+                            required: "",
+                          },
+                          on: { close: _vm.setCityId },
+                          scopedSlots: _vm._u([
+                            {
+                              key: "singleLabel",
+                              fn: function (props) {
+                                return [
+                                  _c("span", { staticClass: "option__desc" }, [
+                                    _c(
+                                      "span",
+                                      { staticClass: "option__title" },
+                                      [_vm._v(_vm._s(props.option.name))]
+                                    ),
+                                  ]),
+                                ]
+                              },
+                            },
+                            {
+                              key: "option",
+                              fn: function (props) {
+                                return [
+                                  _c("div", { staticClass: "option__desc" }, [
+                                    _c(
+                                      "span",
+                                      { staticClass: "option__title" },
+                                      [
+                                        _vm._v(
+                                          _vm._s(props.option.formatted_address)
+                                        ),
+                                      ]
+                                    ),
+                                  ]),
+                                ]
+                              },
+                            },
+                          ]),
+                          model: {
+                            value: _vm.city,
+                            callback: function ($$v) {
+                              _vm.city = $$v
+                            },
+                            expression: "city",
+                          },
+                        }),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "address" } }, [
+                          _vm._v("Address"),
+                        ]),
+                        _vm._v(" "),
+                        _c("textarea", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.address,
+                              expression: "deliveryBoys.address",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            name: "address",
+                            id: "address",
+                            rows: "3",
+                            placeholder: "Enter address",
+                          },
+                          domProps: { value: _vm.deliveryBoys.address },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "address",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "other_payment_info" } }, [
+                          _vm._v("Other Payment Information"),
+                        ]),
+                        _vm._v(" "),
+                        _c("textarea", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deliveryBoys.other_payment_information,
+                              expression:
+                                "deliveryBoys.other_payment_information",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            name: "other_payment_info",
+                            id: "other_payment_info",
+                            rows: "3",
+                            placeholder: "Enter other payment information",
+                          },
+                          domProps: {
                             value: _vm.deliveryBoys.other_payment_information,
-                            expression:
-                              "deliveryBoys.other_payment_information",
                           },
-                        ],
-                        staticClass: "form-control",
-                        attrs: {
-                          name: "other_payment_info",
-                          id: "other_payment_info",
-                          rows: "3",
-                          placeholder: "Enter other payment information",
-                        },
-                        domProps: {
-                          value: _vm.deliveryBoys.other_payment_information,
-                        },
-                        on: {
-                          input: function ($event) {
-                            if ($event.target.composing) {
-                              return
-                            }
-                            _vm.$set(
-                              _vm.deliveryBoys,
-                              "other_payment_information",
-                              $event.target.value
-                            )
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.deliveryBoys,
+                                "other_payment_information",
+                                $event.target.value
+                              )
+                            },
                           },
-                        },
-                      }),
+                        }),
+                      ]),
                     ]),
                   ]),
                 ]),
               ]),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass:
-                    "btn btn-primary btn-block btn-lg shadow-lg mt-5",
-                },
-                [
-                  _vm._v(
-                    "\n                     Complete\n                     "
-                  ),
-                  _vm.isLoading
-                    ? _c("b-spinner", {
-                        attrs: { small: "", label: "Spinning" },
-                      })
-                    : _vm._e(),
-                ],
-                1
-              ),
+              _c("div", { staticClass: "register-actions" }, [
+                _c(
+                  "button",
+                  { staticClass: "btn btn-primary btn-lg" },
+                  [
+                    _vm._v(
+                      "\n                         Complete\n                         "
+                    ),
+                    _vm.isLoading
+                      ? _c("b-spinner", {
+                          attrs: { small: "", label: "Spinning" },
+                        })
+                      : _vm._e(),
+                  ],
+                  1
+                ),
+              ]),
             ]
           ),
           _vm._v(" "),

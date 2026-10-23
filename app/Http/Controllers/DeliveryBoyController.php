@@ -11,6 +11,7 @@ use App\Models\FundTransfer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\OrderStatusList;
 use App\Models\PanelNotification;
 use App\Models\Setting;
@@ -395,11 +396,19 @@ class DeliveryBoyController extends BaseController
             "app_mode_delivery_boy",
             "app_mode_delivery_boy_remark",
             "apiKey",
-            "enable_road_path_tracking"
+            "enable_road_path_tracking",
+            "broadcast_driver",
+            "pusher_app_key",
+            "pusher_app_cluster",
+            "reverb_app_key",
+            "reverb_host",
+            "reverb_port",
+            "reverb_scheme"
         );
         $settings = CommonHelper::getSettings($variables);
         $settings = CommonHelper::resolveTranslatedSettings($settings);
         $settings["allPermissions"] = auth()->user()->allPermissions;
+        $settings["map_provider"] = CommonHelper::activeMapProvider(); // 'google' or 'osm'
         $settings = json_encode($settings);
         $settings = base64_encode($settings);
         if(!empty($settings)){
@@ -431,60 +440,366 @@ class DeliveryBoyController extends BaseController
         echo "Done";
     }
 
-    public function manageLiveTracking(Request $request)
-{
-
-    // Define the validation rules
-    $validator = Validator::make($request->all(),[
-        'order_id' => 'required|numeric|exists:orders,id',
-        'order_status' => 'required|string|in:5,6,7',
-        'latitude' => 'required|string',
-        'longitude' => 'required|string',
-    ]);
-    if ($validator->fails()) {
+    /**
+     * Same reply as customer/live_tracking_route, for the rider app. Rider login only, and
+     * only for an order assigned to that rider.
+     */
+    public function getLiveTrackingRoute(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|numeric|exists:orders,id',
+        ]);
+        if ($validator->fails()) {
             return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+        $order = $deliveryBoy
+            ? Order::where('id', $request->order_id)->where('delivery_boy_id', $deliveryBoy->id)->first()
+            : null;
+        if (!$order) {
+            return CommonHelper::responseError('Order not found.');
+        }
+
+        $payload = LiveTracking::routePayload($order);
+        if (!$payload) {
+            return CommonHelper::responseError('Live Tracking Not available.');
+        }
+
+        return CommonHelper::responseSuccessWithData('Live Tracking Route fetched successfully.', $payload);
     }
 
-    // Retrieve the inputs
-    $orderId = $request->order_id;
-    $orderStatus = $request->input('order_status');
-    $latitude = $request->input('latitude');
-    $longitude = $request->input('longitude');
+    /**
+     * Road route from the driver's current position to the order's delivery address.
+     * latitude/longitude are the driver's live GPS (falls back to the last stored point).
+     */
+    public function getOrderRoute(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|numeric|exists:orders,id',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+        ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
 
-    // Check if the order exists and if it's valid for tracking
-    $order = Order::find($orderId);
-    if (!$order) {
-        return response()->json([
-            'error' => true,
-            'message' => 'Order does not exist.'
+        $order = Order::where('id', $request->order_id)
+            ->where('delivery_boy_id', auth()->user()->deliveryBoy->id)
+            ->first();
+        if (!$order) {
+            return CommonHelper::responseError('Order not found.');
+        }
+
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
+        if ($lat === null || $lng === null) {
+            $tracking = LiveTracking::where('order_id', $order->id)->orderBy('id', 'desc')->first();
+            if (!$tracking) {
+                return CommonHelper::responseError('Driver location not available.');
+            }
+            $lat = $tracking->latitude;
+            $lng = $tracking->longitude;
+        }
+
+        return CommonHelper::responseSuccessWithData('Route fetched successfully.', [
+            'driver' => ['latitude' => (float) $lat, 'longitude' => (float) $lng],
+            'destination' => ['latitude' => (float) $order->latitude, 'longitude' => (float) $order->longitude],
+            'route' => CommonHelper::getRoutePath($lat, $lng, $order->latitude, $order->longitude),
         ]);
     }
 
-    if (in_array($order->active_status, [
-        1,2,3,4,7,8
-    ])) {
-        return response()->json([
-            'error' => true,
-            'message' => "Order is {$order->active_status}. You cannot track this order."
+    // Auto-assign delivery boy feature disabled
+    // /**
+    //  * On Duty / Off Duty toggle (auto-assign delivery boy plan §1). Guarded against
+    //  * going off-duty mid-delivery - a driver holding an active undelivered order must
+    //  * finish it first.
+    //  */
+    // public function toggleDuty(\Illuminate\Http\Request $request)
+    // {
+    //     $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+    //     if (!$deliveryBoy) {
+    //         return CommonHelper::responseError('delivery_boy_not_found');
+    //     }
+
+    //     $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+    //         'is_online' => 'required|boolean',
+    //         'latitude' => 'nullable|string',
+    //         'longitude' => 'nullable|string',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return CommonHelper::responseError($validator->errors()->first());
+    //     }
+
+    //     if (!$request->boolean('is_online') && $deliveryBoy->pending_order_count > 0) {
+    //         return CommonHelper::responseError('cannot_go_off_duty_with_active_delivery');
+    //     }
+
+    //     $deliveryBoy->is_online = $request->boolean('is_online');
+    //     if ($request->boolean('is_online') && $request->filled('latitude') && $request->filled('longitude')) {
+    //         $deliveryBoy->current_latitude = $request->latitude;
+    //         $deliveryBoy->current_longitude = $request->longitude;
+    //         $deliveryBoy->location_updated_at = now();
+    //     }
+    //     if (!$request->boolean('is_online')) {
+    //         $deliveryBoy->current_latitude = null;
+    //         $deliveryBoy->current_longitude = null;
+    //     }
+    //     $deliveryBoy->save();
+
+    //     return CommonHelper::responseSuccess($deliveryBoy->is_online ? 'you_are_now_on_duty' : 'you_are_now_off_duty');
+    // }
+
+    /**
+     * Periodic location ping while On Duty (auto-assign delivery boy plan §1/§6). Needs no order
+     * id: it saves the rider's own position, and for every order the rider has Out For Delivery it
+     * records that position for live tracking and pushes it to the customer.
+     */
+    public function updateLocation(\Illuminate\Http\Request $request)
+    {
+        $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+        if (!$deliveryBoy) {
+            return CommonHelper::responseError('delivery_boy_not_found');
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'latitude' => 'required|string',
+            'longitude' => 'required|string',
         ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        $deliveryBoy->current_latitude = $request->latitude;
+        $deliveryBoy->current_longitude = $request->longitude;
+        $deliveryBoy->location_updated_at = now();
+        $deliveryBoy->save();
+
+        // Push the new position to the customer's live tracking map for every order this
+        // driver is currently out for delivery with (status 5). Best-effort: a broadcasting
+        // outage must never fail the location update.
+        try {
+            $orders = Order::where('delivery_boy_id', $deliveryBoy->id)->where('active_status', 5)->get();
+            foreach ($orders as $order) {
+                // Shared write path (see LiveTracking::record): live_tracking, the rider's own
+                // position and the driver_location push all carry this same value.
+                LiveTracking::record($order, $deliveryBoy, $request->latitude, $request->longitude);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Driver location tracking update failed: ' . $e->getMessage());
+        }
+
+        return CommonHelper::responseSuccess('location_updated_successfully');
     }
 
-    // Prepare the data for live tracking
-    $trackingData = [
-        'order_id' => $orderId,
-        'order_status' => $orderStatus,
-        'latitude' => $latitude,
-        'longitude' => $longitude,
-    ];
+    // Auto-assign delivery boy feature disabled
+    // /**
+    //  * Driver accepts/rejects an auto-assign order offer (plan §6/§7).
+    //  */
+    // public function respondAssignment(\Illuminate\Http\Request $request)
+    // {
+    //     $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+    //     if (!$deliveryBoy) {
+    //         return CommonHelper::responseError('delivery_boy_not_found');
+    //     }
 
-    // Update or insert live tracking data
-    $liveTracking = LiveTracking::updateOrCreate(
-        ['order_id' => $orderId],
-        $trackingData
-    );
+    //     $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+    //         'order_id' => 'required|integer',
+    //         'action' => 'required|in:accept,reject',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return CommonHelper::responseError($validator->errors()->first());
+    //     }
 
-    $message = $liveTracking->wasRecentlyCreated ? 'Live Tracking Details Inserted Successfully.' : 'Live Tracking Details Updated Successfully.' ;
-    return  CommonHelper::responseSuccess($message);
-}
+    //     $attempt = \App\Models\DeliveryAssignmentAttempt::where('order_id', $request->order_id)
+    //         ->where('delivery_boy_id', $deliveryBoy->id)
+    //         ->where('status', \App\Models\DeliveryAssignmentAttempt::$statusOffered)
+    //         ->first();
 
+    //     if (!$attempt) {
+    //         return CommonHelper::responseError('offer_no_longer_available');
+    //     }
+
+    //     $result = \App\Services\AutoAssignDeliveryBoyService::handleResponse($attempt->id, $request->action);
+
+    //     return $result['status'] === 1
+    //         ? CommonHelper::responseSuccess($result['message'])
+    //         : CommonHelper::responseError($result['message']);
+    // }
+
+    // Auto-assign delivery boy feature disabled
+    // /**
+    //  * Polled by the web delivery-boy panel (VerticalHeader.vue) every few seconds while
+    //  * On Duty, to show the incoming-offer popup. No websocket/push dependency - works
+    //  * the same on shared hosting as a VPS. Returns null when there's nothing open.
+    //  */
+    // public function currentOffer()
+    // {
+    //     $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+    //     if (!$deliveryBoy) {
+    //         return CommonHelper::responseError('delivery_boy_not_found');
+    //     }
+
+    //     // Expire timed-out offers and start the next round without waiting for the cron job.
+    //     \App\Services\AutoAssignDeliveryBoyService::sweepIfDue();
+
+    //     // Newest offer that is still open: skip offers past their time limit (the timeout sweep
+    //     // may not have marked them yet) and orders someone else already took.
+    //     $attempt = null;
+    //     $order = null;
+    //     $settings = null;
+    //     $openAttempts = \App\Models\DeliveryAssignmentAttempt::where('delivery_boy_id', $deliveryBoy->id)
+    //         ->where('status', \App\Models\DeliveryAssignmentAttempt::$statusOffered)
+    //         ->orderByDesc('offered_at')
+    //         ->get();
+    //     foreach ($openAttempts as $candidate) {
+    //         $candidateOrder = Order::find($candidate->order_id);
+    //         if (!$candidateOrder || !empty($candidateOrder->delivery_boy_id)) {
+    //             continue;
+    //         }
+    //         $candidateSettings = \App\Models\ModuleDeliverySetting::forModule($candidateOrder->module_id);
+    //         $timeout = (int) ($candidateSettings->response_timeout_seconds ?? 60);
+    //         if ($candidate->offered_at && $candidate->offered_at->copy()->addSeconds($timeout)->isPast()) {
+    //             continue;
+    //         }
+    //         $attempt = $candidate;
+    //         $order = $candidateOrder;
+    //         $settings = $candidateSettings;
+    //         break;
+    //     }
+
+    //     if (!$attempt) {
+    //         return CommonHelper::responseWithData(null);
+    //     }
+
+    //     $itemCount = OrderItem::where('order_id', $order->id)->count();
+    //     $address = $order->address_id ? \App\Models\UserAddress::find($order->address_id) : null;
+
+    //     return CommonHelper::responseWithData([
+    //         'attempt_id' => $attempt->id,
+    //         'order_id' => $order->id,
+    //         'final_total' => $order->final_total,
+    //         'item_count' => $itemCount,
+    //         'area' => $address->area ?? '',
+    //         'city' => $address->city ?? '',
+    //         'distance_km' => $attempt->distance_km,
+    //         'offered_at' => optional($attempt->offered_at)->toIso8601String(),
+    //         'response_timeout_seconds' => $settings->response_timeout_seconds ?? 60,
+    //     ]);
+    // }
+
+    // Auto-assign delivery boy feature disabled
+    // /**
+    //  * Requested Orders queue: every order currently offered to this delivery boy that has not
+    //  * expired, so an offer that was missed as a popup / push can still be accepted or rejected
+    //  * from here. Offers come from the existing delivery_assignment_attempts rows.
+    //  */
+    // public function requestedOrders()
+    // {
+    //     $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+    //     if (!$deliveryBoy) {
+    //         return CommonHelper::responseError('delivery_boy_not_found');
+    //     }
+
+    //     // The table only exists where the auto-assign tables were migrated.
+    //     if (!\Illuminate\Support\Facades\Schema::hasTable('delivery_assignment_attempts')) {
+    //         return CommonHelper::responseWithData([]);
+    //     }
+
+    //     // Expire timed-out offers and start the next round without waiting for the cron job.
+    //     \App\Services\AutoAssignDeliveryBoyService::sweepIfDue();
+
+    //     $attempts = \App\Models\DeliveryAssignmentAttempt::where('delivery_boy_id', $deliveryBoy->id)
+    //         ->where('status', \App\Models\DeliveryAssignmentAttempt::$statusOffered)
+    //         ->orderBy('offered_at')
+    //         ->get();
+    //     if ($attempts->isEmpty()) {
+    //         return CommonHelper::responseWithData([]);
+    //     }
+
+    //     $orders = Order::withoutGlobalScope('module')->whereIn('id', $attempts->pluck('order_id'))->get()->keyBy('id');
+    //     $itemCounts = OrderItem::whereIn('order_id', $orders->keys())
+    //         ->selectRaw('order_id, COUNT(*) as total')->groupBy('order_id')->pluck('total', 'order_id');
+    //     $addresses = \App\Models\UserAddress::whereIn('id', $orders->pluck('address_id')->filter()->unique())->get()->keyBy('id');
+
+    //     $timeouts = [];
+    //     $queue = [];
+    //     foreach ($attempts as $attempt) {
+    //         $order = $orders->get($attempt->order_id);
+    //         // Gone, cancelled out of the offer stage, or already taken by someone else.
+    //         if (!$order || !empty($order->delivery_boy_id)) {
+    //             continue;
+    //         }
+    //         if (!isset($timeouts[$order->module_id])) {
+    //             $settings = \App\Models\ModuleDeliverySetting::forModule($order->module_id);
+    //             $timeouts[$order->module_id] = (int) ($settings->response_timeout_seconds ?? 60);
+    //         }
+    //         $timeout = $timeouts[$order->module_id];
+    //         $expiresAt = $attempt->offered_at ? $attempt->offered_at->copy()->addSeconds($timeout) : null;
+    //         if ($expiresAt && $expiresAt->isPast()) {
+    //             continue;
+    //         }
+    //         $address = $addresses->get($order->address_id);
+    //         $queue[] = [
+    //             'attempt_id' => $attempt->id,
+    //             'order_id' => $order->id,
+    //             'final_total' => $order->final_total,
+    //             'item_count' => (int) ($itemCounts[$order->id] ?? 0),
+    //             'area' => $address->area ?? '',
+    //             'city' => $address->city ?? '',
+    //             'distance_km' => $attempt->distance_km,
+    //             'offered_at' => optional($attempt->offered_at)->toIso8601String(),
+    //             'expires_at' => optional($expiresAt)->toIso8601String(),
+    //             'seconds_left' => $expiresAt ? (int) max(0, now()->diffInSeconds($expiresAt, false)) : null,
+    //             'response_timeout_seconds' => $timeout,
+    //         ];
+    //     }
+
+    //     return CommonHelper::responseWithData($queue);
+    // }
+
+    // Auto-assign delivery boy feature disabled
+    // /**
+    //  * Accept / reject one order from the Requested Orders queue.
+    //  */
+    // public function respondRequestedOrder(\Illuminate\Http\Request $request)
+    // {
+    //     $deliveryBoy = auth()->user()->deliveryBoy ?? null;
+    //     if (!$deliveryBoy) {
+    //         return CommonHelper::responseError('delivery_boy_not_found');
+    //     }
+
+    //     $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+    //         'order_id' => 'required|integer',
+    //         'action' => 'required|in:accept,reject',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return CommonHelper::responseError($validator->errors()->first());
+    //     }
+
+    //     if (!\Illuminate\Support\Facades\Schema::hasTable('delivery_assignment_attempts')) {
+    //         return CommonHelper::responseError('offer_no_longer_available');
+    //     }
+
+    //     $attempt = \App\Models\DeliveryAssignmentAttempt::where('order_id', $request->order_id)
+    //         ->where('delivery_boy_id', $deliveryBoy->id)
+    //         ->where('status', \App\Models\DeliveryAssignmentAttempt::$statusOffered)
+    //         ->first();
+    //     if (!$attempt) {
+    //         return CommonHelper::responseError('offer_no_longer_available');
+    //     }
+
+    //     $order = Order::withoutGlobalScope('module')->find($attempt->order_id);
+    //     $settings = $order ? \App\Models\ModuleDeliverySetting::forModule($order->module_id) : null;
+    //     $timeout = (int) ($settings->response_timeout_seconds ?? 60);
+    //     if ($attempt->offered_at && $attempt->offered_at->copy()->addSeconds($timeout)->isPast()) {
+    //         return CommonHelper::responseError('offer_expired');
+    //     }
+
+    //     $result = \App\Services\AutoAssignDeliveryBoyService::handleResponse($attempt->id, $request->action);
+
+    //     return $result['status'] === 1
+    //         ? CommonHelper::responseSuccess($result['message'])
+    //         : CommonHelper::responseError($result['message']);
+    // }
 }

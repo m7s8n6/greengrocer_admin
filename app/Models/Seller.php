@@ -58,7 +58,13 @@ class Seller extends Model
      */
     private function customFieldValueByName(string $name)
     {
-        $fieldId = CustomField::where('module', 'seller')->where('name', $name)->value('id');
+        // Resolved once per request: this accessor runs for every seller row x 5 appended
+        // attributes, and the field ids never change within a request.
+        static $fieldIds = [];
+        if (!array_key_exists($name, $fieldIds)) {
+            $fieldIds[$name] = CustomField::where('module', 'seller')->where('name', $name)->value('id');
+        }
+        $fieldId = $fieldIds[$name];
         if (!$fieldId) {
             return null;
         }
@@ -98,10 +104,46 @@ class Seller extends Model
         return $this->belongsTo(Admin::class, 'admin_id', 'id');
     }
 
+    /**
+     * A seller uses their own drivers only when the admin's global switch is on AND the
+     * seller's own delivery_boy_source is 'own'.
+     */
+    public function usesOwnFleet(): bool
+    {
+        return $this->delivery_boy_source === 'own' && Setting::sellerOwnDriversAllowed();
+    }
+
     public function city()
     {
         return $this->belongsTo(City::class, 'city_id', 'id');
     }
+    /**
+     * Active sellers whose module is active too - the ones a delivery boy may register to.
+     * Ignores the request-module global scope so the list spans every active module.
+     * $cityId limits it to sellers serving that city.
+     */
+    public static function registrableForDeliveryBoy($cityId = null)
+    {
+        $query = static::withoutGlobalScope('module')
+            ->where('sellers.status', self::$statusActive)
+            ->whereIn('sellers.module_id', Module::where('status', 1)->select('id'))
+            // Only sellers who actually run their own drivers can take a registration, and
+            // only while the admin's global "Allow Sellers' Own Drivers" switch is on.
+            ->where('sellers.delivery_boy_source', 'own');
+
+        if (!Setting::sellerOwnDriversAllowed()) {
+            $query->whereRaw('1 = 0');
+        }
+
+        // sellers.city_id is a comma-separated list of the cities the seller serves.
+        // A list of cities means the seller must serve every one of them.
+        foreach (array_filter((array) $cityId) as $id) {
+            $query->whereRaw('FIND_IN_SET(?, sellers.city_id)', [(int) $id]);
+        }
+
+        return $query;
+    }
+
     public function module()
     {
         return $this->belongsTo(Module::class, 'module_id', 'id');
@@ -116,13 +158,18 @@ class Seller extends Model
     }
     public function getCategoriesArrayAttribute()
     {
+        // Memoized per request by category list + language: sellers commonly share the same
+        // categories and this accessor is appended to every serialized seller.
+        static $cache = [];
         $categoriesArray = is_string($this->categories) ? explode(',', $this->categories) : [];
-        $categoriesCollection = collect($categoriesArray);
-        $categoryNames = Category::whereIn('id', $categoriesCollection)->get()->map(function ($category) {
-            return $category->translated('name');
-        })->toArray();
-        $commaSeparatedNames = implode(', ', $categoryNames);
-        return $commaSeparatedNames;
+        $key = implode(',', $categoriesArray) . '|' . \App\Services\LanguageService::getCurrentId();
+        if (!isset($cache[$key])) {
+            $categoryNames = Category::with('translations')->whereIn('id', $categoriesArray)->get()->map(function ($category) {
+                return $category->translated('name');
+            })->toArray();
+            $cache[$key] = implode(', ', $categoryNames);
+        }
+        return $cache[$key];
     }
 
     public function getPickupStoreTimingsArrayAttribute()

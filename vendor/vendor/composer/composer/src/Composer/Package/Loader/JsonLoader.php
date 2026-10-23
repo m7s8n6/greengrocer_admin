@@ -47,7 +47,7 @@ class JsonLoader
         } else {
             throw new \InvalidArgumentException(sprintf(
                 "JsonLoader: Unknown \$json parameter %s. Please report at https://github.com/composer/composer/issues/new.",
-                get_debug_type($json)
+                gettype($json)
             ));
         }
 

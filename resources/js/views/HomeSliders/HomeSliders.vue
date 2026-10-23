@@ -3,7 +3,7 @@
     <div>
 
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <h3 class="modern-page-title mb-0">{{ __('manage_home_slider_images') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -17,7 +17,7 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="card figma-main-section-card">
                     <div class="card-body p-0">
 
                         <!-- Modern Filter Action Bar -->
@@ -30,21 +30,69 @@
                                         :placeholder="__('search') || 'Search...'" @input="getSliders()">
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="view-toggle" role="group" :aria-label="__('view')">
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                    <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                </div>
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                    @click="getSliders()" v-b-tooltip.hover :title="__('refresh')">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>{{ __('refresh') }}</span>
+                                </button>
+
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="create_new = true" v-if="$can('home_slider_image_create')">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_new') }}</span>
                                 </button>
-
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                    @click="getSliders()" v-b-tooltip.hover :title="__('refresh')">
-                                    <i class="fa fa-refresh"></i>
-                                    <span>{{ __('refresh') }}</span>
-                                </button>
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <!-- Grid view (same rows, search, sort and handlers as the list view) -->
+                        <div v-if="viewMode === 'grid'">
+                            <div v-if="isLoading" class="item-grid-state">
+                                <i class="bi bi-hourglass-split"></i>{{ __('loading') }}...
+                            </div>
+                            <div v-else-if="!gridSliders.length" class="item-grid-state">
+                                <template v-if="filter && translatedSliders.length"><i class="bi bi-search"></i>{{ __('no_records_matching_your_request') }}</template>
+                                <template v-else><i class="bi bi-inbox"></i>{{ __('no_records_to_show') }}</template>
+                            </div>
+                            <div v-else class="item-grid item-grid--wide">
+                                <div v-for="slider in pagedItems(gridSliders)" :key="slider.id" class="item-card">
+                                    <div class="item-card-media item-card-media--banner item-card-media--cover">
+                                        <img :src="slider.image_url || $placeholderImage" alt="" />
+                                        <div class="item-card-badges">
+                                            <span v-if="slider.status === 1" class="badge bg-success">{{ __('active') }}</span>
+                                            <span v-else class="badge bg-danger">{{ __('deactive') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-body">
+                                        <div class="item-card-title">{{ getTranslatedTypeName(slider) || __(slider.type) }}</div>
+                                        <div v-if="slider.type === 'slider_url' && slider.slider_url" class="item-card-meta">
+                                            <a :href="slider.slider_url" target="_blank" rel="noopener">{{ slider.slider_url }}</a>
+                                        </div>
+                                        <div v-if="getTranslatedTypeName(slider)" class="item-card-stats">
+                                            <span class="item-card-chip"><i class="bi bi-link-45deg"></i>{{ __(slider.type) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-card-footer">
+                                        <span class="item-card-meta">#{{ slider.id }}</span>
+                                        <div class="item-card-actions">
+                                            <button class="figma-action-btn" @click="edit_record = slider"
+                                                v-if="$can('home_slider_image_update')" v-b-tooltip.hover :title="__('edit')">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+                                            <button class="figma-action-btn figma-delete-btn"
+                                                @click="deleteSlider(translatedSliders.indexOf(slider), slider.id)"
+                                                v-if="$can('home_slider_image_delete')" v-b-tooltip.hover :title="__('delete')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="table-responsive">
                             <b-table :items="translatedSliders" :fields="fields" :current-page="currentPage"
                                 :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
@@ -58,8 +106,14 @@
                                 </template>
 
 
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
                                 <template #cell(image)="row">
-                                    <img :src="row.item.image_url" height="50" />
+                                    <img :src="row.item.image_url || $placeholderImage" class="slider-thumb" alt="" />
                                 </template>
                                 <template #cell(type_name)="row">
                                     {{ getTranslatedTypeName(row.item) }}
@@ -78,7 +132,7 @@
                                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </button>
                                         <button class="figma-action-btn figma-delete-btn"
-                                            @click="deleteSlider(row.index, row.item.id)"
+                                            @click="deleteSlider(translatedSliders.indexOf(row.item), row.item.id)"
                                             v-if="$can('home_slider_image_delete')" v-b-tooltip.hover
                                             :title="__('delete')">
                                             <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
@@ -90,13 +144,14 @@
                             </b-table>
                         </div>
                     </div>
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                            'of' }} <span class="showing-bold">{{ totalRows }}</span>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                            <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         </div>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
-                            class="figma-pagination mb-0"></b-pagination>
+                            class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                     </div>
                 </div>
             </section>
@@ -112,9 +167,11 @@
 import { VuejsDatatableFactory } from 'vuejs-datatable';
 import EditRecord from './Edit.vue';
 import axios from "axios";
+import ViewModeMixin from '../../mixins/ViewModeMixin';
 
 
 export default {
+    mixins: [ViewModeMixin],
     components: {
         VuejsDatatableFactory,
         'app-edit-record': EditRecord,
@@ -240,6 +297,10 @@ export default {
                 return translatedCategory;
             });
         },
+        // Grid view rows: translatedSliders with the list view's search + sort applied
+        gridSliders() {
+            return this.gridFilterSort(this.translatedSliders, this.filterOn);
+        },
         // Computed property to translate sliders for datatable
         translatedSliders: function () {
             if (!this.currentLanguageId || this.sliders.length === 0) {
@@ -261,6 +322,9 @@ export default {
     watch: {
         $route(to, from) {
             this.showCreateModal();
+        },
+        perPage() {
+            this.currentPage = 1;
         }
     },
     created: function () {
@@ -281,6 +345,7 @@ export default {
         });
     },
     methods: {
+        // Grid view: same client-side search (b-table :filter / :filter-included-fields) and sort as the list view.
         // Fetch active languages and set current language ID
         fetchActiveLanguages() {
             return axios.get(this.$apiUrl + '/active_languages')
@@ -421,8 +486,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -454,3 +519,15 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.slider-thumb {
+    width: 96px;
+    aspect-ratio: 670 / 370;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius) !important;
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
+</style>

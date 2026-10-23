@@ -10,6 +10,7 @@
                         <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page"> {{ __('social_media') }}</li>
                             </ol>
                         </nav>
@@ -59,20 +60,26 @@
                                 :tbody-tr-class="() => 'figma-tr align-middle'"
                             >
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-2">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
                                 </template>
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
                                 <template #cell(icon)="row">
                                     <img v-if="row.item.icon && row.item.icon.startsWith('http')" :src="row.item.icon"
-                                        style="width:24px;height:24px;object-fit:contain;" />
+                                        class="social-icon-thumb" />
                                     <i v-else-if="row.item.icon" v-bind:class="row.item.icon"></i>
                                     <span v-else>—</span>
                                 </template>
 
                                 <template #cell(actions)="row">
-                                    <div class="d-flex gap-2">
+                                    <div class="d-flex gap-2 justify-content-center">
                                         <button class="figma-action-btn" @click="edit_record = row.item" v-if="$can('manage_social_media_update')" v-b-tooltip.hover :title="__('edit')">
                                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </button>
@@ -85,9 +92,7 @@
                         </div>
 
                         <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination
                                     v-model="currentPage"
@@ -123,11 +128,11 @@ export default {
     data: function() {
         return {
             fields: [
-                { key: 'id', label:  __('id') , sortable: true, sortDirection: 'desc', class: 'text-center' },
-                { key: 'icon', label:  __('icon') , sortable: false, class: 'text-center' },
-                { key: 'name', label:  __('name') , sortable: true, class: 'text-center' },
-                { key: 'link', label: __('link') , sortable: true, class: 'text-center' },
-                { key: 'actions', label:  __('actions')  }
+                { key: 'id', label:  __('id') , sortable: true, sortDirection: 'desc', class: 'text-left' },
+                { key: 'icon', label:  __('icon') , sortable: false, class: 'text-left' },
+                { key: 'name', label:  __('name') , sortable: true, class: 'text-left' },
+                { key: 'link', label: __('link') , sortable: true, class: 'text-left' },
+                { key: 'actions', label:  __('actions'), class: 'text-center' }
             ],
             totalRows: 1,
             currentPage: 1,
@@ -199,8 +204,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -224,3 +229,12 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* !important: the shared "#main .table tbody td img" rule (id selector) would otherwise win */
+.social-icon-thumb {
+    width: 24px !important;
+    height: 24px !important;
+    object-fit: contain !important;
+}
+</style>

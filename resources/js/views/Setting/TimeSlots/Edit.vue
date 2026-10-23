@@ -1,12 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end">
+            <b-button variant="outline-secondary" class="mr-2" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="saveRecord" :disabled="isLoading">
                 {{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <b-tabs v-model="activeLanguageTab" content-class="mt-3" v-if="languages.length > 0">
@@ -39,45 +38,45 @@
                     </div>
 
                     <div class="row">
-                        <div class="form-group">
+                        <div class="form-group col-12">
                             <label>{{ __('title') }}</label>
                             <i class="text-danger" v-if="language.is_default">*</i>
                             <input type="text" class="form-control" :required="language.is_default ? true : undefined"
                                 v-model="translations[language.id].title" :placeholder="__('morning_9am_to_12pm')">
                         </div>
                         <template v-if="slot_type === 'express'">
-                            <div class="form-group" v-if="language.is_default">
+                            <div class="form-group col-md-6" v-if="language.is_default">
                                 <label>{{ __('duration_minutes') || 'Duration (minutes)' }}</label>
                                 <i class="text-danger">*</i>
                                 <input type="number" min="1" class="form-control" required
                                     v-model.number="duration_minutes" :placeholder="__('e_g_30') || 'e.g. 30'">
                                 <small class="text-muted">{{ __('express_duration_hint') || 'Delivered within this many minutes of the order being placed.' }}</small>
                             </div>
-                            <div class="form-group" v-if="language.is_default">
-                                <label>{{ __('last_order_time') }}<small>({{ __('24_hours_formate') }}, {{ __('optional') || 'optional' }})</small></label>
+                            <div class="form-group col-md-6" v-if="language.is_default">
+                                <label>{{ __('last_order_time') }} <small class="text-muted">({{ __('24_hours_formate') }}, {{ __('optional') || 'optional' }})</small></label>
                                 <input type="time" class="form-control" v-model="last_order_time">
                             </div>
                         </template>
                         <template v-else>
-                            <div class="form-group" v-if="language.is_default">
-                                <label>{{ __('from_time') }}<small>({{ __('24_hours_formate') }})</small></label>
+                            <div class="form-group col-md-6" v-if="language.is_default">
+                                <label>{{ __('from_time') }} <small class="text-muted">({{ __('24_hours_formate') }})</small></label>
                                 <i class="text-danger">*</i>
                                 <input type="time" class="form-control" required v-model="from_time">
                             </div>
-                            <div class="form-group" v-if="language.is_default">
-                                <label> {{ __('to_time') }}<small>({{ __('24_hours_formate') }})</small></label>
+                            <div class="form-group col-md-6" v-if="language.is_default">
+                                <label>{{ __('to_time') }} <small class="text-muted">({{ __('24_hours_formate') }})</small></label>
                                 <i class="text-danger">*</i>
                                 <input type="time" class="form-control" required v-model="to_time">
                             </div>
-                            <div class="form-group" v-if="language.is_default">
-                                <label> {{ __('last_order_time') }}<small>({{ __('24_hours_formate') }})</small></label>
+                            <div class="form-group col-md-6" v-if="language.is_default">
+                                <label>{{ __('last_order_time') }} <small class="text-muted">({{ __('24_hours_formate') }})</small></label>
                                 <i class="text-danger">*</i>
                                 <input type="time" class="form-control" required v-model="last_order_time">
                             </div>
                         </template>
-                        <div class="form-group" v-if="language.is_default">
+                        <div class="form-group col-md-6" v-if="language.is_default">
                             <label>{{ __('free_delivery') }}</label>
-                            <div class="col-md-9 text-left mt-1">
+                            <div class="mt-1">
                                 <div class="position-relative d-inline-block">
                                     <input type="checkbox" id="is_free_delivery" v-model="is_free_delivery"
                                         class="form-check-input" :value="1" :disabled="hasActiveSubscriptionPlans"
@@ -103,9 +102,9 @@
                             </div>
                         </div>
 
-                        <div class="form-group" v-if="language.is_default">
+                        <div class="form-group col-md-6" v-if="language.is_default">
                             <label>{{ __('status') }}</label>
-                            <div class="col-md-9 text-left mt-1">
+                            <div class="mt-1">
                                 <b-form-radio-group v-model="status" :options="[
                                     { text: __('deactivate'), 'value': 0 },
                                     { text: __('activate'), 'value': 1 },
@@ -113,7 +112,7 @@
                             </div>
                         </div>
                     </div>
-                    <button ref="dummy_submit" style="display:none;"></button>
+                    <button ref="dummy_submit" class="d-none"></button>
                 </b-tab></b-tabs>
         </form>
     </b-modal>
@@ -291,5 +290,11 @@ export default {
 <style scoped>
 .image_preview {
     margin-top: 5px;
+}
+/* Selected status button: global .btn-outline-primary has no .active state */
+::v-deep .btn-group-toggle > .btn.btn-outline-primary.active {
+    background: var(--theme-primary-500) !important; /* beats global !important outline background */
+    border-color: var(--theme-primary-500) !important;
+    color: var(--theme-neutral-50) !important;
 }
 </style>

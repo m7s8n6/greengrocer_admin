@@ -44,11 +44,11 @@
                 <div class="col-12 col-md-12 order-md-1 order-last">
                     <form ref="my-form" @submit.prevent="saveRecord">
                         <div class="card">
-                            <div class="card-header">
-                                <h4>{{ __('seller_information') }} </h4>
-                                <span class="pull-right" v-if="!isSellerRole">
-                                    <router-link to="/sellers" class="btn btn-primary" v-b-tooltip.hover
-                                        title="Manage Seller">{{
+                            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <h4 class="card-title mb-0">{{ __('seller_information') }} </h4>
+                                <span v-if="!isSellerRole">
+                                    <router-link to="/sellers" class="btn btn-light btn-sm d-inline-flex align-items-center gap-2" v-b-tooltip.hover
+                                        title="Manage Seller"><i class="fa fa-list"></i> {{
                                             __('manage_seller') }}</router-link>
                                 </span>
                             </div>
@@ -90,7 +90,7 @@
                                             <!-- Translate buttons END -->
 
                                             <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                     <div class="form-group mb-3">
                                                         <label class="form-label">{{ __('name') }} <i
                                                                 class="text-danger"
@@ -105,7 +105,7 @@
 
                                                 <!-- Non-translatable Fields (only shown in default language tab) -->
                                                 <template v-if="language.is_default">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-6">
                                                         <div class="form-group mb-3">
                                                             <label class="form-label">{{ __('email') }} <i
                                                                     class="text-danger">*</i></label>
@@ -115,7 +115,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-6">
                                                         <div class="form-group mb-3">
                                                             <label class="form-label">{{ __('mobile') }} <i
                                                                     class="text-danger">*</i></label>
@@ -130,7 +130,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-4" v-if="!isSellerRole">
+                                                    <div class="col-md-6" v-if="!isSellerRole">
                                                         <div class="form-group mb-3">
                                                             <label class="form-label">{{ __('password') }} <i v-if="!id"
                                                                     class="text-danger">*</i></label>
@@ -140,20 +140,20 @@
                                                                     :placeholder="__('enter_password')">
                                                                 <button type="button"
                                                                     v-on:click="showPassword = !showPassword"
-                                                                    class="btn btn-primary font-bold">
+                                                                    class="btn btn-light password-toggle">
                                                                     <img v-if="showPassword"
                                                                         :src="$baseUrl + '/images/icons/show_password.svg'"
-                                                                        style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                                        class="password-toggle-icon" />
                                                                     <img v-else
                                                                         :src="$baseUrl + '/images/icons/hide_password.svg'"
-                                                                        style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                                        class="password-toggle-icon" />
                                                                 </button>
                                                             </div>
 
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-4" v-if="!isSellerRole">
+                                                    <div class="col-md-6" v-if="!isSellerRole">
                                                         <div class="form-group mb-3">
                                                             <label class="form-label">{{ __('confirm_password') }} <i
                                                                     v-if="!id" class="text-danger">*</i></label>
@@ -163,13 +163,13 @@
                                                                     :placeholder="__('enter_confirm_password')">
                                                                 <button type="button"
                                                                     v-on:click="showConfirmPassword = !showConfirmPassword"
-                                                                    class="btn btn-primary font-bold">
+                                                                    class="btn btn-light password-toggle">
                                                                     <img v-if="showConfirmPassword"
                                                                         :src="$baseUrl + '/images/icons/show_password.svg'"
-                                                                        style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                                        class="password-toggle-icon" />
                                                                     <img v-else
                                                                         :src="$baseUrl + '/images/icons/hide_password.svg'"
-                                                                        style="filter: brightness(0) invert(1); width: 20px; height: 20px;" />
+                                                                        class="password-toggle-icon" />
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -185,7 +185,7 @@
                                                     <div class="row">
 
                                                         <!-- Translatable Field: Store Name (shown in all language tabs) -->
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-6">
                                                             <div class="form-group mb-3">
                                                                 <label class="form-label">{{ __('store_name') }} <i
                                                                         class="text-danger"
@@ -199,7 +199,7 @@
 
                                                         <!-- Non-translatable Fields (only shown in default language tab) -->
                                                         <template v-if="language.is_default">
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label">{{ __('select_module') }} <i class="text-danger">*</i></label>
                                                                     <select class="form-control form-select" v-model="module_id" :disabled="isSellerRole || !!id" required>
@@ -208,7 +208,7 @@
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-5">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label">{{ __('category_ids') }}<i
                                                                             class="text-danger">*</i></label>
@@ -218,36 +218,28 @@
                                                                         :settings="{ multiple: 'multiple' }" />
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label">{{
                                                                         __('product_status') }}</label>
                                                                     <div class="d-flex align-items-center"
                                                                         style="min-height: 40px;">
-                                                                        <div id="status" class="btn-group"
-                                                                            style="height: 40px;">
-                                                                            <label
-                                                                                class="btn btn-primary d-inline-flex align-items-center justify-content-center"
-                                                                                data-toggle-class="btn-primary"
-                                                                                data-toggle-passive-class="btn-default">
-                                                                                <input type="radio" v-model="status"
-                                                                                    value="1" class="me-2">
+                                                                        <div id="status" class="btn-group btn-group-toggle segmented-toggle seller-status-group">
+                                                                            <label class="btn"
+                                                                                :class="status == 1 ? 'btn-success' : 'btn-outline-secondary'">
+                                                                                <input type="radio" v-model="status" value="1">
                                                                                 {{ __('active') }}
                                                                             </label>
-                                                                            <label
-                                                                                class="btn btn-danger d-inline-flex align-items-center justify-content-center"
-                                                                                data-toggle-class="btn-danger"
-                                                                                data-toggle-passive-class="btn-default">
-                                                                                <input type="radio" v-model="status"
-                                                                                    value="3" class="me-2">
+                                                                            <label class="btn"
+                                                                                :class="status == 3 ? 'btn-danger' : 'btn-outline-secondary'">
+                                                                                <input type="radio" v-model="status" value="3">
                                                                                 {{ __('deactive') }}
                                                                             </label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="row align-items-start">
-                                                                <div class="form-group col-md-4 mt-0"
+                                                                <div class="form-group col-md-6 mt-0"
                                                                     v-if="!isSellerRole">
                                                                     <div class="form-group">
                                                                         <label for="logo"> {{ __('logo') }} <i
@@ -285,9 +277,8 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <div class="form-group col-md-4" v-if="!isSellerRole">
+                                                            <div class="form-group col-md-6" v-if="!isSellerRole">
                                                                 <label>{{ __('commission') }}<i
                                                                         class="text-danger">*</i></label>
                                                                 <input type="number" class="form-control"
@@ -354,7 +345,7 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label for="city_name" class="form-label d-block">{{
                                                                         __('select_or_search_city')
@@ -366,7 +357,7 @@
                                                                         :settings="{ multiple: 'multiple' }" />
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label d-block"> {{ __('state')
                                                                         }}</label>
@@ -376,7 +367,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label d-block"> {{ __('street')
                                                                         }}</label>
@@ -386,20 +377,17 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label for="location" class="form-label d-block">{{
                                                                         __('search_location')
                                                                         }}</label>
 
-                                                                    <div class="input-group">
-                                                                        <GmapAutocomplete type="search"
-                                                                            class="form-control"
+                                                                    <div class="input-group" v-if="mapProvider === 'google'">
+                                                                        <google-place-search
                                                                             :placeholder="__('search_your_location_on_map')"
-                                                                            @place_changed="setPlace"
-                                                                            :options="{ fields: ['formatted_address', 'geometry', 'name'], strictBounds: false }"
-                                                                            id="location">
-                                                                        </GmapAutocomplete>
+                                                                            @place_changed="setPlace" input-id="location">
+                                                                        </google-place-search>
 
                                                                         <b-button type="button" variant="primary"
                                                                             class="search_location_btn"
@@ -417,6 +405,36 @@
                                                                         </b-button>
                                                                     </div>
 
+                                                                    <div class="input-group position-relative" v-else>
+                                                                        <input type="search" class="form-control"
+                                                                            id="osm_location"
+                                                                            :placeholder="__('search_your_location_on_map')"
+                                                                            :value="osmSellerQuery"
+                                                                            @input="onOsmSellerQueryInput($event.target.value)"
+                                                                            autocomplete="off">
+                                                                        <b-button type="button" variant="primary"
+                                                                            class="search_location_btn"
+                                                                            v-b-tooltip.hover
+                                                                            title="Add current location"
+                                                                            @click="getOsmCurrentLocation">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                height="48px" viewBox="0 0 24 24"
+                                                                                width="48px" fill="#FFFFFF">
+                                                                                <title>current-location</title>
+                                                                                <path d="M0 0h24v24H0V0z" fill="none" />
+                                                                                <path
+                                                                                    d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+                                                                            </svg>
+                                                                        </b-button>
+                                                                        <ul v-if="osmSellerSuggestions.length" class="list-group osm-suggestions">
+                                                                            <li v-for="s in osmSellerSuggestions" :key="s.placePrediction.placeId"
+                                                                                class="list-group-item list-group-item-action" style="cursor:pointer"
+                                                                                @mousedown.prevent="selectOsmSellerSuggestion(s)">
+                                                                                {{ s.placePrediction.text.text }}
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+
                                                                     <span class="text-danger d-block font-size-13 mt-1">
                                                                         {{
                                                                             __('only_search_location_when_update_is_necessary')
@@ -429,7 +447,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label d-block"> {{ __('latitude')
                                                                         }}<i class="text-danger">*</i></label>
@@ -439,7 +457,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group mb-3">
                                                                     <label class="form-label d-block"> {{
                                                                         __('longitude') }}<i
@@ -456,7 +474,8 @@
                                                                         __('draf_and_click_marker_to_your_shop_proper_location')
                                                                     }}</div>
                                                                 <div id="map"
-                                                                    style="position: relative; overflow: hidden;">
+                                                                    style="position: relative; overflow: hidden;"
+                                                                    v-if="mapProvider === 'google'">
                                                                     <GmapMap :center="center" :zoom="13"
                                                                         :mapTypeControl=true
                                                                         style="width: 100%; height: 400px; margin-top: 20px"
@@ -476,6 +495,15 @@
                                                                         </gmap-info-window>
                                                                     </GmapMap>
                                                                 </div>
+                                                                <div id="osm_map" v-else>
+                                                                    <osm-map-picker ref="osmSellerMap"
+                                                                        :lat="latitude" :lng="longitude"
+                                                                        height="400px"
+                                                                        :show-search-box="false"
+                                                                        @location-selected="onOsmLocationSelected"
+                                                                        @suggestions-updated="osmSellerSuggestions = $event">
+                                                                    </osm-map-picker>
+                                                                </div>
                                                                 <div v-if="formatted_address">
                                                                     <span class="title font-weight-bolder"><b>{{
                                                                         place_name
@@ -493,7 +521,7 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <div class="form-group col-md-3">
+                                                            <div class="form-group col-md-6">
                                                                 <div class="form-group">
                                                                     <label class="control-label"> {{
                                                                         __('require_product_approval') }}</label><br>
@@ -506,7 +534,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="form-group col-md-3">
+                                                            <div class="form-group col-md-6">
                                                                 <div class="form-group">
                                                                     <label class="control-label"> {{
                                                                         __('door_step_mode') }}</label><br>
@@ -519,7 +547,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="form-group col-md-3">
+                                                            <div class="form-group col-md-6">
                                                                 <div class="form-group">
                                                                     <label class="control-label"> {{
                                                                         __('self_pickup_mode') }}</label><br>
@@ -532,12 +560,30 @@
                                                                 </div>
                                                             </div>
 
+                                                            <div class="form-group col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Who Delivers Their Orders</label><br>
+                                                                    <input v-if="isSellerRole" type="text" class="form-control"
+                                                                        :value="delivery_boy_source === 'own' ? 'Own Delivery Boys' : 'Admin\'s Delivery Boys'"
+                                                                        disabled>
+                                                                    <b-form-radio-group v-else v-model="delivery_boy_source"
+                                                                        :options="[
+                                                                            { text: 'Admin\'s Delivery Boys', 'value': 'shared' },
+                                                                            { text: 'Own Delivery Boys', 'value': 'own' },
+                                                                        ]" buttons button-variant="outline-primary"
+                                                                        required></b-form-radio-group>
+                                                                    <small class="text-muted d-block mt-1">
+                                                                        Only an admin can change this - sellers can't switch it themselves.
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+
                                                         </div>
 
                                                         <!-- Self Pickup Configuration Section -->
                                                         <div v-if="self_pickup_mode == 1" class="row mt-4">
                                                             <div class="col-12">
-                                                                <h5 class="text-primary">{{
+                                                                <h5 class="form-subsection-title">{{
                                                                     __('self_pickup_configuration') }}</h5>
                                                             </div>
 
@@ -549,7 +595,8 @@
                                                                         <!-- Map View -->
                                                                         <div class="form-group">
                                                                             <div id="pickup_map"
-                                                                                style="position: relative; overflow: hidden;">
+                                                                                style="position: relative; overflow: hidden;"
+                                                                                v-if="mapProvider === 'google'">
                                                                                 <GmapMap :zoom="13"
                                                                                     :center="pickupCenter"
                                                                                     :mapTypeControl=true
@@ -574,22 +621,49 @@
                                                                                     </gmap-info-window>
                                                                                 </GmapMap>
                                                                             </div>
+                                                                            <div id="osm_pickup_map" v-else>
+                                                                                <osm-map-picker ref="osmPickupMap"
+                                                                                    :lat="pickup_latitude"
+                                                                                    :lng="pickup_longitude"
+                                                                                    height="400px"
+                                                                                    :show-search-box="false"
+                                                                                    @location-selected="onOsmPickupLocationSelected"
+                                                                                    @suggestions-updated="osmPickupSuggestions = $event">
+                                                                                </osm-map-picker>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
 
                                                                     <!-- Right Side - All Details (50%) -->
                                                                     <div class="col-md-6">
                                                                         <!-- Search Input -->
-                                                                        <div class="form-group">
+                                                                        <div class="form-group" v-if="mapProvider === 'google'">
                                                                             <label for="pickup_city_name">{{
                                                                                 __('search_location') }}</label>
-                                                                            <GmapAutocomplete type="search"
-                                                                                class="form-control"
+                                                                            <google-place-search
                                                                                 :placeholder="__('search_pickup_location_on_map')"
-                                                                                @place_changed="setPickupPlace"
-                                                                                :options="{ fields: ['address_components', 'formatted_address', 'geometry', 'name', 'place_id', 'plus_code', 'types'], strictBounds: false }"
-                                                                                id="pickup_city_name">
-                                                                            </GmapAutocomplete>
+                                                                                @place_changed="setPickupPlace" input-id="pickup_city_name">
+                                                                            </google-place-search>
+                                                                            <span class="text text-primary">{{
+                                                                                __('search_your_pickup_location_and_to_find_coordinates')
+                                                                                }}</span>
+                                                                        </div>
+                                                                        <div class="form-group position-relative" v-else>
+                                                                            <label for="osm_pickup_city_name">{{
+                                                                                __('search_location') }}</label>
+                                                                            <input type="search" class="form-control"
+                                                                                id="osm_pickup_city_name"
+                                                                                :placeholder="__('search_pickup_location_on_map')"
+                                                                                :value="osmPickupQuery"
+                                                                                @input="onOsmPickupQueryInput($event.target.value)"
+                                                                                autocomplete="off">
+                                                                            <ul v-if="osmPickupSuggestions.length" class="list-group osm-suggestions">
+                                                                                <li v-for="s in osmPickupSuggestions" :key="s.placePrediction.placeId"
+                                                                                    class="list-group-item list-group-item-action" style="cursor:pointer"
+                                                                                    @mousedown.prevent="selectOsmPickupSuggestion(s)">
+                                                                                    {{ s.placePrediction.text.text }}
+                                                                                </li>
+                                                                            </ul>
                                                                             <span class="text text-primary">{{
                                                                                 __('search_your_pickup_location_and_to_find_coordinates')
                                                                                 }}</span>
@@ -676,7 +750,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="form-group col-md-4" v-for="field in translatedCustomFields"
+                                            <div class="form-group col-md-6" v-for="field in translatedCustomFields"
                                                 :key="field.id">
                                                 <label>{{ field.name }}
                                                     <i v-if="field.is_required" class="text-danger">*</i></label>
@@ -701,6 +775,8 @@
                                                         class="badge bg-success mt-1"><i class="fa fa-eye"></i> {{ __('view') || 'View' }}</a>
                                                 </template>
 
+                                                <custom-field-date v-else-if="field.type === 'date'" v-model="customFieldValues[field.id]"
+                                                    :placeholder="field.name"></custom-field-date>
                                                 <input v-else :type="field.type === 'number' ? 'number' : 'text'"
                                                     class="form-control" v-model="customFieldValues[field.id]"
                                                     :placeholder="field.name">
@@ -711,18 +787,18 @@
                             </div>
 
                             <!-- Save button - common for all language tabs -->
-                            <div class="card-footer">
+                            <div class="card-footer d-flex justify-content-end flex-wrap gap-2 seller-form-actions">
                                 <template v-if="id">
                                     <b-button type="submit" variant="primary" :disabled="isLoading"> {{ __('update') }}
                                         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                     </b-button>
                                 </template>
                                 <template v-else>
+                                    <button type="button" class="btn btn-outline-secondary" @click="clearForm()">
+                                        {{ __('clear') }}</button>
                                     <b-button type="submit" variant="primary" :disabled="isLoading"> {{ __('save') }}
                                         <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                                     </b-button>
-                                    <button type="button" class="btn btn-danger" @click="clearForm()">
-                                        {{ __('clear') }}</button>
                                 </template>
                             </div>
                         </div>
@@ -804,6 +880,10 @@ export default {
             currentPlace: null,
             markers: [],
             place_name: "",
+            osmSellerQuery: "",
+            osmSellerSuggestions: [],
+            osmPickupQuery: "",
+            osmPickupSuggestions: [],
             formatted_address: "",
             infoWindow: {
                 position: { lat: 0, lng: 0 },
@@ -816,7 +896,6 @@ export default {
             name: "",
             email: "",
             mobile: "",
-            store_url: "",
 
             password: "",
             showPassword: false,
@@ -840,6 +919,7 @@ export default {
             assign_delivery_boy: 0,
             change_order_status_delivered
             : 0,
+            delivery_boy_source: 'shared',
             status: 0,
             store_logo: "",
             store_logo_url: "",
@@ -946,7 +1026,6 @@ export default {
         },
         email: function () { if (!this.id) this.debouncedSave(); },
         mobile: function () { if (!this.id) this.debouncedSave(); },
-        store_url: function () { if (!this.id) this.debouncedSave(); },
         store_name: function () { if (!this.id) this.debouncedSave(); },
         street: function () { if (!this.id) this.debouncedSave(); },
         city_id: { handler: function () { if (!this.id) this.debouncedSave(); }, deep: true },
@@ -1069,6 +1148,9 @@ export default {
             }));
         },
         google: gmapApi,
+        mapProvider() {
+            return window.mapProvider === 'osm' ? 'osm' : 'google';
+        },
         // Computed property to safely access $roleSeller
         roleSeller() {
             return (this.$roleSeller !== undefined) ? this.$roleSeller : '';
@@ -1147,6 +1229,8 @@ export default {
                 plugins: plugins,
                 toolbar: toolbar,
                 font_size_formats: fontSizes,
+                // Phones: wrap the toolbar onto several rows instead of a sideways-scrolling one.
+                ...(window.innerWidth < 576 ? { toolbar_mode: 'wrap' } : {}),
                 ...this.$tinymceImageUploadOptions()
             };
         },
@@ -1352,6 +1436,58 @@ export default {
         updateCoordinates(location) {
             this.handleMapClick(location);
         },
+        onOsmLocationSelected(payload) {
+            this.latitude = payload.lat;
+            this.longitude = payload.lng;
+
+            let addressArr = (payload.formatted_address || '').split(",");
+            this.street = addressArr[0] + " " + (addressArr[1] || "");
+            this.place_name = payload.name || addressArr[1] || payload.formatted_address;
+            this.formatted_address = payload.formatted_address;
+        },
+        resolveMapRef(name) {
+            const r = this.$refs[name];
+            return Array.isArray(r) ? r[0] : r;
+        },
+        onOsmSellerQueryInput(text) {
+            this.osmSellerQuery = text;
+            const map = this.resolveMapRef('osmSellerMap');
+            if (map) {
+                map.setQueryAndSearch(text);
+            }
+        },
+        selectOsmSellerSuggestion(suggestion) {
+            this.osmSellerQuery = suggestion.placePrediction.text.text;
+            this.osmSellerSuggestions = [];
+            const map = this.resolveMapRef('osmSellerMap');
+            if (map) {
+                map.selectSuggestion(suggestion);
+            }
+        },
+        getOsmCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const map = this.resolveMapRef('osmSellerMap');
+                    map && map.setView(position.coords.latitude, position.coords.longitude);
+                    axios.post(this.$apiUrl + '/map/geocode', {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        source: 'web',
+                    }).then((response) => {
+                        const data = response.data && response.data.data ? response.data.data : response.data;
+                        const result = data && data.results && data.results[0];
+                        this.onOsmLocationSelected({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            formatted_address: result ? result.formatted_address : '',
+                            name: result ? result.formatted_address : '',
+                        });
+                    });
+                });
+            } else {
+                this.showError("Geolocation is not supported by this browser.");
+            }
+        },
         setCityId() {
             this.state = this.city.state;
             this.city_id = this.city.id;
@@ -1409,12 +1545,13 @@ export default {
         clearForm() {
             if (this.$refs['my-form']) this.$refs['my-form'].reset();
             Object.assign(this, {
-                name: "", email: "", mobile: "", store_url: "", password: "", confirm_password: "",
+                name: "", email: "", mobile: "", password: "", confirm_password: "",
                 store_name: "", street: "", pincode_id: "", city_id: [], categories_ids: [],
                 state: "", remark: "", commission: "",
                 module_id: "",
                 latitude: "", longitude: "", store_description: "", require_products_approval: 0,
                 view_order_otp: 0, assign_delivery_boy: 0, change_order_status_delivered: 0,
+                delivery_boy_source: 'shared',
                 status: 0, store_logo: "", store_logo_url: "",
                 place_name: "", formatted_address: "",
                 markers: [], self_pickup_mode: 0, door_step_mode: 1, pickup_store_address: "",
@@ -1436,7 +1573,7 @@ export default {
                     : null;
                 const data = {
                     name: defaultTranslation ? defaultTranslation.name : this.name,
-                    email: this.email, mobile: this.mobile, store_url: this.store_url,
+                    email: this.email, mobile: this.mobile,
                     store_name: defaultTranslation ? defaultTranslation.store_name : this.store_name,
                     street: this.street, pincode_id: this.pincode_id,
                     module_id: this.module_id,
@@ -1447,6 +1584,7 @@ export default {
                     store_description: defaultTranslation ? defaultTranslation.store_description : this.store_description,
                     require_products_approval: this.require_products_approval, view_order_otp: this.view_order_otp,
                     assign_delivery_boy: this.assign_delivery_boy, change_order_status_delivered: this.change_order_status_delivered,
+                    delivery_boy_source: this.delivery_boy_source,
                     status: this.status, self_pickup_mode: this.self_pickup_mode, door_step_mode: this.door_step_mode,
                     pickup_store_address: this.pickup_store_address, pickup_latitude: this.pickup_latitude,
                     pickup_longitude: this.pickup_longitude, storeTimings: JSON.parse(JSON.stringify(this.storeTimings)),
@@ -1591,7 +1729,6 @@ export default {
                         this.email = this.record.admin.email ?? this.record.email;
 
                         this.mobile = this.record.mobile;
-                        this.store_url = this.record.store_url;
 
                         this.password = "";
                         this.confirm_password = "";
@@ -1657,6 +1794,7 @@ export default {
                         this.view_order_otp = this.record.view_order_otp;
                         this.assign_delivery_boy = this.record.assign_delivery_boy;
                         this.change_order_status_delivered = this.record.change_order_status_delivered;
+                        this.delivery_boy_source = this.record.delivery_boy_source || 'shared';
 
                         // Self Pickup fields
                         this.self_pickup_mode = (this.record.self_pickup_mode === null || this.record.self_pickup_mode === undefined) ? 0 : this.record.self_pickup_mode;
@@ -1835,7 +1973,6 @@ export default {
                 // All required fields
                 formData.append('email', this.email);
                 formData.append('mobile', this.mobile);
-                formData.append('store_url', this.store_url);
 
                 // Password only for new sellers or when changing
                 if (!sellerId) {
@@ -1862,6 +1999,7 @@ export default {
                 formData.append('view_order_otp', this.view_order_otp);
                 formData.append('assign_delivery_boy', this.assign_delivery_boy);
                 formData.append('change_order_status_delivered', this.change_order_status_delivered);
+                formData.append('delivery_boy_source', this.delivery_boy_source);
                 formData.append('self_pickup_mode', this.self_pickup_mode);
                 formData.append('door_step_mode', this.door_step_mode);
                 formData.append('module_id', this.module_id);
@@ -2034,6 +2172,27 @@ export default {
             this.pickupInfoWindow.open = true;
         },
 
+        onOsmPickupLocationSelected(payload) {
+            this.pickup_latitude = payload.lat;
+            this.pickup_longitude = payload.lng;
+            this.pickup_store_address = payload.formatted_address;
+        },
+        onOsmPickupQueryInput(text) {
+            this.osmPickupQuery = text;
+            const map = this.resolveMapRef('osmPickupMap');
+            if (map) {
+                map.setQueryAndSearch(text);
+            }
+        },
+        selectOsmPickupSuggestion(suggestion) {
+            this.osmPickupQuery = suggestion.placePrediction.text.text;
+            this.osmPickupSuggestions = [];
+            const map = this.resolveMapRef('osmPickupMap');
+            if (map) {
+                map.selectSuggestion(suggestion);
+            }
+        },
+
         ensureAtLeastOneDeliveryMode(changedField) {
             if (this.door_step_mode == 0 && this.self_pickup_mode == 0) {
                 if (changedField === 'door_step_mode') {
@@ -2052,6 +2211,66 @@ export default {
 <style scoped>
 @import "../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
+.osm-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border-strong);
+    border-top: none;
+}
+
+/* Section cards nested inside the main form card: flat (no second shadow), clear header */
+.card .card {
+    box-shadow: none !important; /* global .card shadow would stack on the outer card */
+    margin-bottom: 20px;
+}
+
+/* Dark mode: --ui-border equals the card surface, so a card inside the form card showed no edge */
+body.theme-dark .card .card {
+    border-color: var(--ui-border-strong) !important;
+}
+
+.card > .card-header .card-title,
+.card .card > .card-header h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+/* Show / hide password: neutral addon button instead of a solid primary block */
+.password-toggle {
+    border: 1px solid var(--ui-border-strong);
+    border-left: 0;
+}
+
+.password-toggle-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+}
+
+/* The eye SVGs are black: flip them to white on the dark surface so they stay visible */
+body.theme-dark .password-toggle-icon {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+/* Upload dropzone + preview */
+.file-input-div label {
+    display: block;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.seller-form-actions .btn {
+    min-width: 110px;
+}
+
 /* Compact thumb for logo/identity/address previews - keeps layout aligned when multiple are shown */
 .file-preview-thumb {
     max-height: 80px;
@@ -2059,8 +2278,41 @@ export default {
     width: auto;
     height: auto;
     object-fit: contain;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
     padding: 4px;
+}
+
+/* Phones: this form is nested several levels deep (card > tab > row > col > row > col), and each
+   level adds 12-24px of padding, which left the fields a ~180px strip with the status buttons,
+   logo drop zone and editor toolbar cut off. Tighter padding / gutters and full-width controls. */
+@media (max-width: 575.98px) {
+    .card-body {
+        padding: 12px;
+    }
+
+    .row {
+        --bs-gutter-x: 0.75rem;
+    }
+
+    /* Active / Deactive toggle fills the row, each half equal. */
+    .seller-status-group {
+        width: 100%;
+    }
+
+    .seller-status-group > .btn {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .file-input-div {
+        width: 100%;
+    }
+
+    .seller-form-actions .btn {
+        flex: 1 1 0;
+    }
 }
 </style>

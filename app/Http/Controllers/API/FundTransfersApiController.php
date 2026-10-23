@@ -13,6 +13,7 @@ class FundTransfersApiController extends Controller
     public function index(){
         // Load delivery boys with all translations for language-wise display
         $deliveryBoys = DeliveryBoy::withAllTranslations()
+            ->whereNull('seller_id')
             ->orderBy('id', 'DESC')
             ->get();
 

@@ -648,6 +648,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -737,6 +749,10 @@ __webpack_require__.r(__webpack_exports__);
     this.getPaymentMethods();
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     getPaymentMethods: function getPaymentMethods() {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.$apiUrl + '/payment_methods').then(function (response) {
@@ -876,6 +892,58 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Gateway card header: title + description left, enable switch right */\n.pm-header-text[data-v-555362ea] {\n    min-width: 0;\n}\n.pm-header-switch[data-v-555362ea] {\n    flex: 0 0 auto;\n    margin: 2px 0 0 12px;\n    min-height: 0;\n}\n.payment-methods-grid .card-body small[data-v-555362ea] {\n    color: var(--ui-text-muted);\n}\n.payment-methods-actions[data-v-555362ea] {\n    position: sticky;\n    bottom: 0;\n    z-index: 2;\n    padding-top: 12px;\n    padding-bottom: 12px;\n    margin-bottom: 0;\n    border-top: 1px solid var(--ui-border);\n    background: var(--ui-bg);\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_style_index_0_id_555362ea_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_style_index_0_id_555362ea_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_style_index_0_id_555362ea_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Setting/PaymentMethods.vue":
 /*!*******************************************************!*\
   !*** ./resources/js/views/Setting/PaymentMethods.vue ***!
@@ -886,23 +954,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PaymentMethods.vue?vue&type=template&id=555362ea */ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea");
+/* harmony import */ var _PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true */ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true");
 /* harmony import */ var _PaymentMethods_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PaymentMethods.vue?vue&type=script&lang=js */ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _PaymentMethods_vue_vue_type_style_index_0_id_555362ea_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css */ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _PaymentMethods_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__.render,
-  _PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "555362ea",
   null
   
 )
@@ -929,26 +999,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea":
-/*!*************************************************************************************!*\
-  !*** ./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea ***!
-  \*************************************************************************************/
+/***/ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css ***!
+  \***************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./PaymentMethods.vue?vue&type=template&id=555362ea */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_style_index_0_id_555362ea_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=style&index=0&id=555362ea&scoped=true&lang=css");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea":
-/*!****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea ***!
-  \****************************************************************************************************************************************************************************************************************************/
+/***/ "./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_PaymentMethods_vue_vue_type_template_id_555362ea_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true");
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true":
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/PaymentMethods.vue?vue&type=template&id=555362ea&scoped=true ***!
+  \****************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -992,6 +1074,17 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "li",
                     {
                       staticClass: "breadcrumb-item active",
                       attrs: { "aria-current": "page" },
@@ -1026,67 +1119,40 @@ var render = function () {
             },
           },
           [
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-6 mb-4" }, [
+            _c("div", { staticClass: "row payment-methods-grid" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("cod_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.payment_method.payment_method_settings,
-                          expression: "payment_method.payment_method_settings",
-                        },
-                      ],
-                      attrs: {
-                        type: "hidden",
-                        id: "payment_method_settings",
-                        name: "payment_method_settings",
-                        required: "",
-                        value: "1",
-                        "aria-required": "true",
-                      },
-                      domProps: {
-                        value: _vm.payment_method.payment_method_settings,
-                      },
-                      on: {
-                        input: function ($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.payment_method,
-                            "payment_method_settings",
-                            $event.target.value
-                          )
-                        },
-                      },
-                    }),
-                    _vm._v(" "),
-                    _c("div", {}, [
-                      _c("div", { staticClass: "form-group" }, [
-                        _c("label", { attrs: { for: "cod_payment_method" } }, [
-                          _vm._v(_vm._s(_vm.__("cod_payments")) + " "),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
+                          _vm._v(_vm._s(_vm.__("cod_payments"))),
                         ]),
-                        _c("br"),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-check form-switch" }, [
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "cod_payments_desc",
+                                "Let customers pay in cash when the order is delivered."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
                           _c("input", {
                             directives: [
                               {
@@ -1098,6 +1164,7 @@ var render = function () {
                             ],
                             staticClass: "form-check-input",
                             attrs: {
+                              "aria-label": _vm.__("cod_payments"),
                               id: "cod_payment_method",
                               type: "checkbox",
                               "true-value": "1",
@@ -1152,8 +1219,59 @@ var render = function () {
                               },
                             },
                           }),
-                        ]),
-                      ]),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.payment_method.payment_method_settings,
+                          expression: "payment_method.payment_method_settings",
+                        },
+                      ],
+                      attrs: {
+                        type: "hidden",
+                        id: "payment_method_settings",
+                        name: "payment_method_settings",
+                        required: "",
+                        value: "1",
+                        "aria-required": "true",
+                      },
+                      domProps: {
+                        value: _vm.payment_method.payment_method_settings,
+                      },
+                      on: {
+                        input: function ($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.payment_method,
+                            "payment_method_settings",
+                            $event.target.value
+                          )
+                        },
+                      },
+                    }),
+                    _vm._v(" "),
+                    _c("div", {}, [
+                      _vm.payment_method.cod_payment_method != 1
+                        ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                            _vm._v(
+                              _vm._s(
+                                _vm.tr(
+                                  "payment_gateway_disabled_hint",
+                                  "Turn this gateway on to configure its settings."
+                                )
+                              )
+                            ),
+                          ])
+                        : _vm._e(),
                       _vm._v(" "),
                       _vm.payment_method.cod_payment_method == 1
                         ? _c("div", { staticClass: "form-group" }, [
@@ -1252,100 +1370,125 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("paypal_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "paypal_payment_method" } }, [
-                        _vm._v(" " + _vm._s(_vm.__("paypal_payments"))),
-                        _c("small", [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
+                          _vm._v(_vm._s(_vm.__("paypal_payments"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
                           _vm._v(
-                            "[ " +
-                              _vm._s(_vm.__("enable")) +
-                              " / " +
-                              _vm._s(_vm.__("disable")) +
-                              " ] "
+                            _vm._s(
+                              _vm.tr(
+                                "paypal_payments_desc",
+                                "Accept PayPal payments using your business account."
+                              )
+                            )
                           ),
                         ]),
                       ]),
-                      _c("br"),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.paypal_payment_method,
-                              expression:
-                                "payment_method.paypal_payment_method",
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.payment_method.paypal_payment_method,
+                                expression:
+                                  "payment_method.paypal_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("paypal_payments"),
+                              id: "paypal_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
                             },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "paypal_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.paypal_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.paypal_payment_method
-                            )
-                              ? _vm._i(
-                                  _vm.payment_method.paypal_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.paypal_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.paypal_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paypal_payment_method",
-                                      $$a.concat([$$v])
-                                    )
+                            domProps: {
+                              checked: _vm.payment_method.paypal_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.paypal_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.paypal_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.paypal_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.paypal_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paypal_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paypal_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
                                 } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paypal_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "paypal_payment_method",
+                                    $$c
+                                  )
                                 }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "paypal_payment_method",
-                                  $$c
-                                )
-                              }
+                              },
                             },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          }),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.paypal_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
+                            )
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.paypal_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -1715,104 +1858,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("razorpay_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "razorpay_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("razorpay_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "razorpay_payments_desc",
+                                "Accept cards, UPI and wallets through Razorpay."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.razorpay_payment_method,
+                                expression:
+                                  "payment_method.razorpay_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("razorpay_payments"),
+                              id: "razorpay_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.razorpay_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.razorpay_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.razorpay_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.razorpay_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.razorpay_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "razorpay_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "razorpay_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "razorpay_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.razorpay_payment_method,
-                              expression:
-                                "payment_method.razorpay_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "razorpay_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.razorpay_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.razorpay_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.razorpay_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.razorpay_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.razorpay_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.razorpay_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "razorpay_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "razorpay_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "razorpay_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.razorpay_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -1902,104 +2068,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("paystack_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "paystack_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("paystack_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "paystack_payments_desc",
+                                "Accept card and mobile money payments through Paystack."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.paystack_payment_method,
+                                expression:
+                                  "payment_method.paystack_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("paystack_payments"),
+                              id: "paystack_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.paystack_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.paystack_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.paystack_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.paystack_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.paystack_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paystack_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paystack_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "paystack_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.paystack_payment_method,
-                              expression:
-                                "payment_method.paystack_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "paystack_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.paystack_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.paystack_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.paystack_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.paystack_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.paystack_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.paystack_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paystack_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paystack_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "paystack_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.paystack_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -2186,100 +2375,125 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("stripe_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "stripe_payment_method" } }, [
-                        _vm._v(_vm._s(_vm.__("stripe_payments")) + " "),
-                        _c("small", [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
+                          _vm._v(_vm._s(_vm.__("stripe_payments"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
                           _vm._v(
-                            "[ " +
-                              _vm._s(_vm.__("enable")) +
-                              " / " +
-                              _vm._s(_vm.__("disable")) +
-                              " ] "
+                            _vm._s(
+                              _vm.tr(
+                                "stripe_payments_desc",
+                                "Accept card payments worldwide through Stripe."
+                              )
+                            )
                           ),
                         ]),
                       ]),
-                      _c("br"),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.stripe_payment_method,
-                              expression:
-                                "payment_method.stripe_payment_method",
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.payment_method.stripe_payment_method,
+                                expression:
+                                  "payment_method.stripe_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("stripe_payments"),
+                              id: "stripe_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
                             },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "stripe_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.stripe_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.stripe_payment_method
-                            )
-                              ? _vm._i(
-                                  _vm.payment_method.stripe_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.stripe_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.stripe_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "stripe_payment_method",
-                                      $$a.concat([$$v])
-                                    )
+                            domProps: {
+                              checked: _vm.payment_method.stripe_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.stripe_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.stripe_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.stripe_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.stripe_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "stripe_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "stripe_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
                                 } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "stripe_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "stripe_payment_method",
+                                    $$c
+                                  )
                                 }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "stripe_payment_method",
-                                  $$c
-                                )
-                              }
+                              },
                             },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          }),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.stripe_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
+                            )
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.stripe_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -3158,104 +3372,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("midtrans_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "midtrans_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("midtrans_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "midtrans_payments_desc",
+                                "Accept payments in Indonesia through Midtrans."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.midtrans_payment_method,
+                                expression:
+                                  "payment_method.midtrans_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("midtrans_payments"),
+                              id: "midtrans_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.midtrans_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.midtrans_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.midtrans_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.midtrans_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.midtrans_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "midtrans_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "midtrans_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "midtrans_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.midtrans_payment_method,
-                              expression:
-                                "payment_method.midtrans_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "midtrans_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.midtrans_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.midtrans_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.midtrans_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.midtrans_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.midtrans_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.midtrans_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "midtrans_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "midtrans_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "midtrans_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.midtrans_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -3492,104 +3729,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("phonepay_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "phonepay_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("phonepay_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "phonepay_payments_desc",
+                                "Accept UPI and card payments through PhonePe."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.phonepay_payment_method,
+                                expression:
+                                  "payment_method.phonepay_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("phonepay_payments"),
+                              id: "phonepay_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.phonepay_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.phonepay_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.phonepay_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.phonepay_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.phonepay_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "phonepay_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "phonepay_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "phonepay_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.phonepay_payment_method,
-                              expression:
-                                "payment_method.phonepay_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "phonepay_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.phonepay_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.phonepay_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.phonepay_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.phonepay_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.phonepay_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.phonepay_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "phonepay_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "phonepay_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "phonepay_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.phonepay_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -3854,104 +4114,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("cashfree_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "phonepay_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("cashfree_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "cashfree_payments_desc",
+                                "Accept cards, UPI and net banking through Cashfree."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.cashfree_payment_method,
+                                expression:
+                                  "payment_method.cashfree_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("cashfree_payments"),
+                              id: "cashfree_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.cashfree_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.cashfree_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.cashfree_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.cashfree_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.cashfree_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "cashfree_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "cashfree_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "cashfree_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.cashfree_payment_method,
-                              expression:
-                                "payment_method.cashfree_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "cashfree_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.cashfree_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.cashfree_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.cashfree_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.cashfree_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.cashfree_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.cashfree_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "cashfree_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "cashfree_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "cashfree_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.cashfree_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -4177,104 +4460,127 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("paytabs_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c(
-                        "label",
-                        { attrs: { for: "paytabs_payment_method" } },
-                        [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
                           _vm._v(_vm._s(_vm.__("paytabs_payments"))),
-                          _c("small", [
-                            _vm._v(
-                              "[ " +
-                                _vm._s(_vm.__("enable")) +
-                                " / " +
-                                _vm._s(_vm.__("disable")) +
-                                " ] "
-                            ),
-                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "paytabs_payments_desc",
+                                "Accept card payments through PayTabs."
+                              )
+                            )
+                          ),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.payment_method.paytabs_payment_method,
+                                expression:
+                                  "payment_method.paytabs_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("paytabs_payments"),
+                              id: "paytabs_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
+                            },
+                            domProps: {
+                              checked:
+                                _vm.payment_method.paytabs_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.paytabs_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.paytabs_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.paytabs_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a =
+                                    _vm.payment_method.paytabs_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paytabs_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "paytabs_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
+                                } else {
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "paytabs_payment_method",
+                                    $$c
+                                  )
+                                }
+                              },
+                            },
+                          }),
                         ]
                       ),
-                      _c("br"),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.paytabs_payment_method,
-                              expression:
-                                "payment_method.paytabs_payment_method",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "paytabs_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.paytabs_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.paytabs_payment_method
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.paytabs_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
                             )
-                              ? _vm._i(
-                                  _vm.payment_method.paytabs_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.paytabs_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a =
-                                  _vm.payment_method.paytabs_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paytabs_payment_method",
-                                      $$a.concat([$$v])
-                                    )
-                                } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "paytabs_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
-                                }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "paytabs_payment_method",
-                                  $$c
-                                )
-                              }
-                            },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.paytabs_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -4501,98 +4807,123 @@ var render = function () {
                 ]),
               ]),
               _vm._v(" "),
-              _c("div", { staticClass: "col-6 mb-4" }, [
+              _c("div", { staticClass: "col-12 col-lg-6 mb-4" }, [
                 _c("div", { staticClass: "card h-100" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", { staticClass: "card-title" }, [
-                      _vm._v(_vm._s(_vm.__("dpo_payments"))),
-                    ]),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "dpo_payment_method" } }, [
-                        _vm._v(_vm._s(_vm.__("dpo_payments"))),
-                        _c("small", [
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-start justify-content-between",
+                    },
+                    [
+                      _c("div", { staticClass: "pm-header-text" }, [
+                        _c("h4", { staticClass: "card-title float-none" }, [
+                          _vm._v(_vm._s(_vm.__("dpo_payments"))),
+                        ]),
+                        _vm._v(" "),
+                        _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
                           _vm._v(
-                            "[ " +
-                              _vm._s(_vm.__("enable")) +
-                              " / " +
-                              _vm._s(_vm.__("disable")) +
-                              " ] "
+                            _vm._s(
+                              _vm.tr(
+                                "dpo_payments_desc",
+                                "Accept card and mobile money payments through DPO Pay."
+                              )
+                            )
                           ),
                         ]),
                       ]),
-                      _c("br"),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-check form-switch" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.payment_method.dpo_payment_method,
-                              expression: "payment_method.dpo_payment_method",
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "form-check form-switch pm-header-switch",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.payment_method.dpo_payment_method,
+                                expression: "payment_method.dpo_payment_method",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              "aria-label": _vm.__("dpo_payments"),
+                              id: "dpo_payment_method",
+                              type: "checkbox",
+                              "true-value": "1",
+                              "false-value": "0",
                             },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            id: "dpo_payment_method",
-                            type: "checkbox",
-                            "true-value": "1",
-                            "false-value": "0",
-                          },
-                          domProps: {
-                            checked: _vm.payment_method.dpo_payment_method,
-                            checked: Array.isArray(
-                              _vm.payment_method.dpo_payment_method
-                            )
-                              ? _vm._i(
-                                  _vm.payment_method.dpo_payment_method,
-                                  null
-                                ) > -1
-                              : _vm._q(
-                                  _vm.payment_method.dpo_payment_method,
-                                  "1"
-                                ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              var $$a = _vm.payment_method.dpo_payment_method,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? "1" : "0"
-                              if (Array.isArray($$a)) {
-                                var $$v = null,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "dpo_payment_method",
-                                      $$a.concat([$$v])
-                                    )
+                            domProps: {
+                              checked: _vm.payment_method.dpo_payment_method,
+                              checked: Array.isArray(
+                                _vm.payment_method.dpo_payment_method
+                              )
+                                ? _vm._i(
+                                    _vm.payment_method.dpo_payment_method,
+                                    null
+                                  ) > -1
+                                : _vm._q(
+                                    _vm.payment_method.dpo_payment_method,
+                                    "1"
+                                  ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                var $$a = _vm.payment_method.dpo_payment_method,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? "1" : "0"
+                                if (Array.isArray($$a)) {
+                                  var $$v = null,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "dpo_payment_method",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.payment_method,
+                                        "dpo_payment_method",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
                                 } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.payment_method,
-                                      "dpo_payment_method",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
+                                  _vm.$set(
+                                    _vm.payment_method,
+                                    "dpo_payment_method",
+                                    $$c
+                                  )
                                 }
-                              } else {
-                                _vm.$set(
-                                  _vm.payment_method,
-                                  "dpo_payment_method",
-                                  $$c
-                                )
-                              }
+                              },
                             },
-                          },
-                        }),
-                      ]),
-                    ]),
+                          }),
+                        ]
+                      ),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "card-body" }, [
+                    _vm.payment_method.dpo_payment_method != 1
+                      ? _c("p", { staticClass: "text-muted small mb-0" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.tr(
+                                "payment_gateway_disabled_hint",
+                                "Turn this gateway on to configure its settings."
+                              )
+                            )
+                          ),
+                        ])
+                      : _vm._e(),
                     _vm._v(" "),
                     _vm.payment_method.dpo_payment_method == 1
                       ? _c("div", { staticClass: "form-group" }, [
@@ -4923,7 +5254,10 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "form-group" },
+                {
+                  staticClass:
+                    "form-group col-12 d-flex justify-content-end payment-methods-actions",
+                },
                 [
                   _vm.$can("manage_payment_methods")
                     ? _c(

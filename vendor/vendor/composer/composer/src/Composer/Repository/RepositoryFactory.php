@@ -19,7 +19,6 @@ use Composer\EventDispatcher\EventDispatcher;
 use Composer\Pcre\Preg;
 use Composer\Util\HttpDownloader;
 use Composer\Util\ProcessExecutor;
-use Composer\Util\Url;
 use Composer\Json\JsonFile;
 
 /**
@@ -32,7 +31,7 @@ class RepositoryFactory
      */
     public static function configFromString(IOInterface $io, Config $config, string $repository, bool $allowFilesystem = false)
     {
-        if (0 === stripos($repository, 'http')) {
+        if (0 === strpos($repository, 'http')) {
             $repoConfig = ['type' => 'composer', 'url' => $repository];
         } elseif ("json" === pathinfo($repository, PATHINFO_EXTENSION)) {
             $json = new JsonFile($repository, Factory::createHttpDownloader($io, $config));
@@ -48,7 +47,7 @@ class RepositoryFactory
             // assume it is a json object that makes a repo config
             $repoConfig = JsonFile::parseJson($repository);
         } else {
-            throw new \InvalidArgumentException("Invalid repository url (".Url::sanitize($repository).") given. Has to be a .json file, an http url or a JSON object.");
+            throw new \InvalidArgumentException("Invalid repository url ($repository) given. Has to be a .json file, an http url or a JSON object.");
         }
 
         return $repoConfig;
@@ -100,6 +99,10 @@ class RepositoryFactory
         return self::createRepos($rm, $config->getRepositories());
     }
 
+    /**
+     * @param  EventDispatcher   $eventDispatcher
+     * @param  HttpDownloader    $httpDownloader
+     */
     public static function manager(IOInterface $io, Config $config, ?HttpDownloader $httpDownloader = null, ?EventDispatcher $eventDispatcher = null, ?ProcessExecutor $process = null): RepositoryManager
     {
         if ($httpDownloader === null) {
@@ -155,7 +158,7 @@ class RepositoryFactory
                 throw new \UnexpectedValueException('"repositories" should be an array of repository definitions, only a single repository was given');
             }
             if (!is_array($repo)) {
-                throw new \UnexpectedValueException('Repository "'.$index.'" ('.json_encode($repo).') should be an array, '.get_debug_type($repo).' given');
+                throw new \UnexpectedValueException('Repository "'.$index.'" ('.json_encode($repo).') should be an array, '.gettype($repo).' given');
             }
             if (!isset($repo['type'])) {
                 throw new \UnexpectedValueException('Repository "'.$index.'" ('.json_encode($repo).') must have a type defined');

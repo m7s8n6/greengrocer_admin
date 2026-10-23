@@ -15,3 +15,9 @@ mix.js('resources/js/app.js', 'public/js').vue();
 //.postCss('resources/css/app.css', 'public/css', []
 //mix.sass('resources/sass/app.scss', 'public/css/app.css');
 mix.sass('resources/sass/app.scss', 'public/css');
+
+// Content-hash the built files (mix() in the blade adds ?id=<hash>) so browsers never keep a stale build.
+mix.version();
+
+// Lazy-loaded page chunks get a content hash too, for the same reason.
+mix.webpackConfig({ output: { chunkFilename: 'js/[name].js?id=[chunkhash]' } });

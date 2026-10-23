@@ -184,11 +184,16 @@ class InstallController
                     Artisan::call('storage:link');
                 }
 
-                // The "installed" marker is written after the Purchase Code step succeeds
-                // (see checkPurchaseCode()), not here - writing it this early made isInstalled()
-                // report true while the wizard was still sitting on the Purchase Code tab, so
-                // closing the tab and reopening /install bounced the user to /login instead of
-                // resuming the wizard.
+                $installedLogFile = storage_path('installed');
+                $dateStamp = date('Y/m/d h:i:sa');
+                if (! file_exists($installedLogFile)) {
+                    $message = "eMarket Installer successfully Installed on ".$dateStamp."\n";
+                    file_put_contents($installedLogFile, $message);
+                } else {
+                    $message = "eMarket Installer successfully UPDATED on ".$dateStamp;
+                    file_put_contents($installedLogFile, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
+                }
+
                 \App\Models\Admin::truncate();
                 $superAdmin = \App\Models\Admin::create([
                     'username' => 'superadmin',
@@ -229,19 +234,6 @@ class InstallController
 
             $response = app(StoreSettingsApiController::class)->purchaseCode($request->purchase_code,1);
             if($response){
-
-                // Real end of the install wizard: only now is the app considered "installed" -
-                // moved here from setDatabase() so isInstalled() stays false while the wizard is
-                // still on the Purchase Code step (see setDatabase() for why).
-                $installedLogFile = storage_path('installed');
-                $dateStamp = date('Y/m/d h:i:sa');
-                if (! file_exists($installedLogFile)) {
-                    $message = "eMarket Installer successfully Installed on ".$dateStamp."\n";
-                    file_put_contents($installedLogFile, $message);
-                } else {
-                    $message = "eMarket Installer successfully UPDATED on ".$dateStamp;
-                    file_put_contents($installedLogFile, $message.PHP_EOL, FILE_APPEND | LOCK_EX);
-                }
 
                 return CommonHelper::responseSuccess("Valid");
             }else{

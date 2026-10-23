@@ -1,23 +1,19 @@
 <template>
   <div>
     <div class="page-heading">
-      <div class="row">
-        <div class="col-12 col-md-6 order-md-1 order-last">
-          <h3>{{ __('blog_categories') }}</h3>
-        </div>
-        <div class="col-12 col-md-6 order-md-2 order-first">
-          <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
-              <li class="breadcrumb-item active" aria-current="page">{{ __('blog_categories') }}</li>
-            </ol>
-          </nav>
-        </div>
+      <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h3 class="modern-page-title mb-0">{{ __('blog_categories') }}</h3>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link></li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('blog_categories') }}</li>
+          </ol>
+        </nav>
       </div>
 
       <div class="row">
         <div class="col-12 col-md-12 order-md-1 order-last">
-          <div class="figma-main-section-card">
+          <div class="card figma-main-section-card">
             <div class="card-body p-0">
               <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                 <div class="flex-grow-1">
@@ -28,14 +24,14 @@
                   </div>
                 </div>
                 <div class="d-flex gap-2 align-items-center flex-wrap">
+                  <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getBlogCategories()" v-b-tooltip.hover :title="__('refresh')">
+                    <i class="fa fa-refresh"></i>
+                    <span>{{ __('refresh') }}</span>
+                  </button>
                   <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="openAddModal" v-b-tooltip.hover :title="__('add_new_category')"
                     v-if="$can('blog_category_create')">
                     <i class="fa fa-plus"></i>
                     <span>{{ __('add_category') }}</span>
-                  </button>
-                  <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getBlogCategories()" v-b-tooltip.hover :title="__('refresh')">
-                    <i class="fa fa-refresh"></i>
-                    <span>{{ __('refresh') }}</span>
                   </button>
                 </div>
               </div>
@@ -51,6 +47,10 @@
                       <b-spinner class="align-middle"></b-spinner>
                       <strong>{{ __('loading') }}...</strong>
                     </div>
+                  </template>
+
+                  <template #empty="scope">
+                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
                   </template>
 
                   <template #cell(status)="row">
@@ -77,9 +77,11 @@
                 </b-table>
               </div>
 
-              <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                <div class="showing-results-text small">
-                  {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
+              <div class="figma-table-footer flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                  <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                   <b-pagination
@@ -135,16 +137,14 @@
             <!-- Translate buttons END -->
 
             <!-- Category Name and Slug in flex layout (only for default language) -->
-            <div v-if="lang.is_default" class="d-flex align-items-end mb-3">
-              <div class="form-group flex-grow-1 me-2">
-                <label>{{ __('category_name') }}</label>
-                <i class="text-danger">*</i>
+            <div v-if="lang.is_default" class="row">
+              <div class="form-group col-12 col-md-6">
+                <label>{{ __('category_name') }} <i class="text-danger">*</i></label>
                 <input type="text" class="form-control" required v-model="form.translations[lang.id].name"
                   :placeholder="__('enter_category_name')" @keyup="createSlug(lang.id)" />
               </div>
-              <div class="form-group flex-grow-1">
-                <label>{{ __('slug') }}</label>
-                <i class="text-danger">*</i>
+              <div class="form-group col-12 col-md-6">
+                <label>{{ __('slug') }} <i class="text-danger">*</i></label>
                 <input type="text" class="form-control" :placeholder="__('enter_slug')" v-model="form.slug" required>
               </div>
             </div>
@@ -195,8 +195,8 @@
           </b-tab>
         </b-tabs>
 
-        <div class="form-group d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-secondary" @click="create_new = false; resetForm()">{{
+        <div class="d-flex justify-content-end gap-2 pt-3 mt-2 border-top modal-form-actions">
+          <button type="button" class="btn btn-outline-secondary" @click="create_new = false; resetForm()">{{
             __('cancel')
             }}</button>
           <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
@@ -546,8 +546,8 @@ export default {
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)',
       }).then(async (result) => {
         if (!result.value) return;
         try {
@@ -663,7 +663,12 @@ export default {
       this.getBlogCategories();
     },
     perPage() {
-      this.getBlogCategories();
+      // the currentPage watcher reloads when the page changes - only reload here when it stays 1
+      if (this.currentPage !== 1) {
+        this.currentPage = 1;
+      } else {
+        this.getBlogCategories();
+      }
     }
   }
 
@@ -671,3 +676,9 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.modal-form-actions {
+    border-color: var(--ui-border) !important;
+}
+</style>

@@ -1,11 +1,11 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
         static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
 
         <form ref="my-form" @submit.prevent="saveRecord" novalidate>
@@ -15,8 +15,8 @@
                     :active="lang.is_default == 1">
 
                     <!-- Translate buttons -->
-                    <div class="mb-3" v-if="lang.is_default && languages.length > 1">
-                        <b-button size="sm" variant="outline-primary" class="mr-2" @click="translateEmpty(lang)"
+                    <div class="d-flex flex-wrap gap-2 mb-3" v-if="lang.is_default && languages.length > 1">
+                        <b-button size="sm" variant="outline-primary" @click="translateEmpty(lang)"
                             v-b-tooltip.hover
                             :title="__('only_empty_fields_will_be_translated_existing_content_will_not_be_changed')"
                             :disabled="loadingEmpty">
@@ -35,24 +35,22 @@
                     <!-- Translate buttons END -->
 
                     <div class="row">
-                        <div class="form-group">
-                            <label>{{ __('title') }}</label>
-                            <i class="text-danger" v-if="lang.is_default == 1">*</i>
+                        <div class="form-group col-md-6">
+                            <label>{{ __('title') }} <i class="text-danger" v-if="lang.is_default == 1">*</i></label>
                             <input type="text" class="form-control" v-model="form[lang.id].title"
                                 :placeholder="__('enter_tax_title')"
                                 :required="lang.is_default == 1 ? true : undefined">
                         </div>
-                        <div class="form-group" v-if="lang.is_default == 1">
-                            <label>{{ __('percentage') }}</label>
-                            <i class="text-danger" v-if="lang.is_default">*</i>
+                        <div class="form-group col-md-6" v-if="lang.is_default == 1">
+                            <label>{{ __('percentage') }} <i class="text-danger" v-if="lang.is_default">*</i></label>
                             <input type="number" class="form-control" v-model="percentage"
                                 :placeholder="__('enter_percentage')" min="1" max="100" @input="validatePercentage"
                                 step="0.01" :required="lang.is_default == 1 ? true : undefined">
-                            <span v-if="validationError" class="error">{{ validationError }}</span>
+                            <span v-if="validationError" class="error text-danger small d-block mt-1">{{ validationError }}</span>
                         </div>
-                        <div class="form-group" v-if="id && lang.is_default == 1">
-                            <label>{{ __('status') }}</label>
-                            <div class="col-md-9 text-left mt-1">
+                        <div class="form-group col-12 mb-0" v-if="id && lang.is_default == 1">
+                            <label class="d-block">{{ __('status') }}</label>
+                            <div class="text-left mt-1">
                                 <b-form-radio-group v-model="status" :options="[
                                     { text: __('deactivate'), 'value': 0 },
                                     { text: __('activate'), 'value': 1 },

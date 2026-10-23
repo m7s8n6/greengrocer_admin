@@ -26,3 +26,10 @@
 
 
 </IfModule>
+
+# /storage files are served directly by the web server (not Laravel), so add CORS here
+<IfModule mod_headers.c>
+    <FilesMatch "\.(svg|png|jpe?g|webp|gif)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>

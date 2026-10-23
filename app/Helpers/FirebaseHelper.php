@@ -173,11 +173,15 @@ class FirebaseHelper
 
             if ($info && $result !== false) {
                 $response = json_decode($result, true);
-                if (isset($response['error']['code']) && in_array((int) $response['error']['code'], [400, 404], true)) {
-                    if ($tokenModelClass && method_exists($tokenModelClass, 'where')) {
-                        $tokenModelClass::where('fcm_token', $info['token'])->delete();
+                if (isset($response['error'])) {
+                    if (self::isDeadTokenError($response['error'])) {
+                        if ($tokenModelClass && method_exists($tokenModelClass, 'where')) {
+                            $tokenModelClass::where('fcm_token', $info['token'])->delete();
+                        }
+                        Log::warning("Deleted invalid FCM token: " . $info['token']);
+                    } else {
+                        Log::error('FCM send failed (token kept): ' . json_encode($response['error']));
                     }
-                    Log::warning("Deleted invalid FCM token: " . $info['token']);
                 }
             }
         }
@@ -227,17 +231,43 @@ class FirebaseHelper
           if (isset($response['error']) && isset($response['error']['code'])) {
             $errorCode = $response['error']['code'];
     
-            if ($response['error']['code'] == 404 || $response['error']['code'] == 400 ) {
+            if (self::isDeadTokenError($response['error'])) {
     
                 // Delete the expired token from the database
                 $token = $fields['message']['token'];
+                // Customers' tokens live in user_tokens; seller, admin and delivery-boy tokens in
+                // admin_tokens - clean both, or a dead admin-side token is retried on every order.
                 UserToken::where('fcm_token', $token)->delete();
+                \App\Models\AdminToken::where('fcm_token', $token)->delete();
     
                 Log::warning("Deleted expired FCM token: " . $fields['message']['token']);
+            } else {
+                // 400/403/401 can also mean a bad payload or wrong Firebase project/credentials -
+                // the token itself is fine, so keep it and log the real reason.
+                Log::error('FCM send failed (token kept): ' . json_encode($response['error']));
             }
         }
         
         return $response;
+    }
+
+    /**
+     * Only a token FCM itself reports as unregistered/invalid is safe to delete. A bare
+     * 400/404 is not enough - a malformed payload or wrong project returns those too and
+     * would wipe every valid token.
+     */
+    private static function isDeadTokenError(array $error): bool
+    {
+        foreach ($error['details'] ?? [] as $detail) {
+            if (($detail['errorCode'] ?? null) === 'UNREGISTERED') {
+                return true;
+            }
+        }
+        if (($error['status'] ?? null) === 'NOT_FOUND') {
+            return true;
+        }
+        return ($error['status'] ?? null) === 'INVALID_ARGUMENT'
+            && stripos($error['message'] ?? '', 'registration token') !== false;
     }
 
     private static function getAccessToken()

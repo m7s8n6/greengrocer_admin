@@ -25,16 +25,17 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
+
+                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                @click="getWalletTransactions()" v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') }}</span>
+                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="create_new = true"
                                 v-if="login_user && login_user.role && (login_user.role.name === 'Super Admin' || login_user.role.name === 'Admin')">
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('add_transactions') }}</span>
-                            </button>
-
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                @click="getWalletTransactions()" v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
                             </button>
                         </div>
                     </div>
@@ -43,9 +44,16 @@
                             :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                             :bordered="false" :busy="isLoading" stacked="md" show-empty
                             :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-3">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -76,7 +84,7 @@
                                 {{ row.item.amount }}
                             </template>
                             <template #cell(actions)="row">
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 justify-content-center">
                                     <button class="figma-action-btn" @click="row.toggleDetails" v-b-tooltip.hover
                                         :title="__('view')">
                                         <base-icon v-if="row.detailsShowing" name="Eye" hoverName="Type=Hover (1)"
@@ -88,11 +96,10 @@
                             </template>
 
                             <template #row-details="row">
-                                <b-card no-body class="p-4 bg-white shadow-sm">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <h5 class="text-primary mb-0 me-3"><i class="fa fa-receipt me-1"></i> {{
-                                            __('transaction_details') }}</h5>
-                                        <div class="h-line flex-grow-1 bg-light" style="height: 1px;"></div>
+                                <b-card no-body class="p-3 p-md-4 txn-details mb-0">
+                                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                        <h6 class="mb-0 font-weight-bold"><i class="fa fa-file-text-o me-1 text-primary"></i> {{
+                                            __('transaction_details') }}</h6>
                                     </div>
 
                                     <div class="row g-4 text-break">
@@ -122,15 +129,10 @@
 
                                         <!-- Column 2: Item Info -->
                                         <div class="col-md-5">
-                                            <div class="mb-3">
+                                            <div class="mb-0">
                                                 <label class="text-muted small text-uppercase fw-bold d-block">{{
                                                     __('product') }}</label>
                                                 <span class="fs-6">{{ row.item.product_name }}</span>
-                                            </div>
-                                            <div class="mb-0">
-                                                <label class="text-muted small text-uppercase fw-bold d-block">{{
-                                                    __('measurement') }}</label>
-                                                <span class="fs-6">{{ row.item.variant_name }}</span>
                                             </div>
                                         </div>
 
@@ -156,11 +158,13 @@
 
                                         <!-- Message Row -->
                                         <div
-                                            class="col-12 mt-3 p-3 bg-light rounded shadow-sm border-start border-4 border-primary">
+                                            class="col-12 mt-3">
+                                            <div class="txn-message">
                                             <label class="text-muted small text-uppercase fw-bold d-block mb-1">{{
                                                 __('message') }}</label>
                                             <p class="mb-0 text-dark fs-6 white-space-pre-wrap">{{ row.item.message }}
                                             </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </b-card>
@@ -168,14 +172,16 @@
 
                         </b-table>
                     </div>
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd
-                            }}</span> {{ __('of') ||
-                                    'of' }} <span class="showing-bold">{{ totalRows }}</span>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                            <b-form-select v-model="perPage" :options="pageOptions" size="sm"
+                                class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         </div>
                         <b-pagination v-model="currentPage" @input="getWalletTransactions()" :total-rows="totalRows"
-                            :per-page="perPage" align="right" class="figma-pagination mb-0"></b-pagination>
+                            :per-page="perPage" align="right" class="figma-pagination mb-0"
+                            hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                     </div>
                 </div>
             </div>
@@ -198,17 +204,16 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'seller_id', label: __('seller_id'), sortable: true, class: 'text-center' },
-                { key: 'name', label: __('seller_name'), sortable: true, class: 'text-center' },
-                { key: 'module_name', label: __('module'), sortable: true, class: 'text-center' },
-                { key: 'order_id', label: __('order_id'), sortable: true, class: 'text-center' },
-                { key: 'order_item_id', label: __('order_item_id'), sortable: true, class: 'text-center' },
-                { key: 'product_name', label: __('product_name'), sortable: true, class: 'text-center' },
-                { key: 'variant_name', label: __('measurement'), sortable: true, class: 'text-center' },
-                { key: 'type', label: __('type'), sortable: true, class: 'text-center' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center' },
-                { key: 'created_at', label: __('date'), sortable: true, class: 'text-center' },
+                { key: 'seller_id', label: __('seller_id'), sortable: true },
+                { key: 'name', label: __('seller_name'), sortable: true },
+                { key: 'module_name', label: __('module'), sortable: true },
+                { key: 'order_id', label: __('order_id'), sortable: true },
+                { key: 'order_item_id', label: __('order_item_id'), sortable: true },
+                { key: 'product_name', label: __('product_name'), sortable: true },
+                { key: 'type', label: __('type'), sortable: true },
+                { key: 'amount', label: __('amount'), sortable: true },
+                { key: 'status', label: __('status'), sortable: true },
+                { key: 'created_at', label: __('date'), sortable: true },
                 { key: 'actions', label: __('actions'), class: 'text-center' },
             ],
             totalRows: 0,
@@ -262,6 +267,16 @@ export default {
         this.fetchActiveLanguages().then(() => {
             this.getWalletTransactions();
         });
+    },
+    watch: {
+        perPage() {
+            // the page buttons already reload on change (@input) - only reload here when the page stays 1
+            if (this.currentPage !== 1) {
+                this.currentPage = 1;
+            } else {
+                this.getWalletTransactions();
+            }
+        }
     },
     methods: {
         async fetchActiveLanguages() {
@@ -345,3 +360,30 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* Expanded transaction details inside the table */
+.txn-details {
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: none;
+    text-align: start;
+}
+
+.txn-details label {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+}
+
+.txn-details .fs-6 {
+    font-size: 13px !important; /* compact detail values (Bootstrap .fs-6 is !important) */
+}
+
+.txn-message {
+    padding: 12px 14px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+}
+</style>

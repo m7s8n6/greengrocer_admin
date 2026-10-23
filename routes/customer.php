@@ -4,12 +4,16 @@ use Illuminate\Support\Facades\Route;
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Origin, Content-Type, Authorization, x-access-key, X-Auth-Token, X-Module-Id');
+header('Access-Control-Allow-Headers: Origin, Content-Type, Authorization, x-access-key, X-Auth-Token, X-Module-Id, Content-Language, Accept-Language, X-Requested-With');
 
-// Google Places API routes (public - no authentication required)
-Route::get('/google_places_autocomplete', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'googlePlacesAutocomplete']);
-Route::get('/google_places_details', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'googlePlacesDetails']);
-Route::get('/google_maps_geocoding', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'googleMapsGeocoding']);
+// Map/places routes (public - no authentication required). Names kept as
+// "google_*" for backward compatibility with existing web/app builds - these
+// now dispatch to Google or OSM/Nominatim per the admin's map_provider
+// setting (StoreSettingsApiController::activeMapProvider), so no client
+// change is needed when switching providers.
+Route::get('/google_places_autocomplete', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'placesAutocomplete']);
+Route::get('/google_places_details', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'placesDetails']);
+Route::get('/google_maps_geocoding', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'mapsGeocoding']);
 
 Route::group(['middleware' => ['auth.customer']], function () {
 
@@ -48,6 +52,7 @@ Route::group(['middleware' => ['auth.customer']], function () {
     // Settings
     Route::group(['prefix' => 'settings'], function () {
         Route::get('/', [\App\Http\Controllers\API\Customer\SettingApiController::class, 'getSettings']);
+        Route::get('realtime_config', [\App\Http\Controllers\API\Customer\SettingApiController::class, 'getRealtimeConfig']);
         Route::get('time_slots', [\App\Http\Controllers\API\Customer\SettingApiController::class, 'getTimeSlots']);
         Route::get('payment_methods', [\App\Http\Controllers\API\Customer\SettingApiController::class, 'getPaymentMethods']);
         Route::get('get_seo_settings', [\App\Http\Controllers\API\Customer\SettingApiController::class, 'getSeoSettings']);
@@ -76,6 +81,9 @@ Route::group(['middleware' => ['auth.customer']], function () {
     // API After Login here
 
     Route::group(['middleware' => ['auth:api-customers']], function () {
+
+        // Pusher/Reverb private-channel auth for the customer's live tracking subscription
+        Route::post('broadcasting/auth', [\App\Http\Controllers\API\Customer\OrderApiController::class, 'broadcastAuth']);
 
         // User
         Route::post('logout', [\App\Http\Controllers\API\Customer\CustomerAuthController::class, 'logout']);
@@ -116,6 +124,7 @@ Route::group(['middleware' => ['auth.customer']], function () {
             Route::get('/', [\App\Http\Controllers\API\Customer\CartApiController::class, 'getUserCart']);
             Route::post('/add', [\App\Http\Controllers\API\Customer\CartApiController::class, 'addToCart']);
             Route::post('/remove', [\App\Http\Controllers\API\Customer\CartApiController::class, 'removeFromCart']);
+            Route::post('/clear_unavailable', [\App\Http\Controllers\API\Customer\CartApiController::class, 'clearUnavailable']);
             Route::post('/save_for_later', [\App\Http\Controllers\API\Customer\CartApiController::class, 'addToSaveForLater']);
             Route::post('/bulk_add_to_cart_items', [\App\Http\Controllers\API\Customer\CartApiController::class, 'BulkAddToCartItems']);
             Route::get('/get_cart_count', [\App\Http\Controllers\API\Customer\CartApiController::class, 'getCartCount']);
@@ -193,6 +202,7 @@ Route::group(['middleware' => ['auth.customer']], function () {
         Route::get('user_active_plan', [\App\Http\Controllers\API\SubscriptionPlansApiController::class, 'getPlan']);
 
         Route::get('/live_tracking', [\App\Http\Controllers\API\Customer\OrderApiController::class, 'getLiveTrackingDetails']);
+        Route::get('/live_tracking_route', [\App\Http\Controllers\API\Customer\OrderApiController::class, 'getLiveTrackingRoute']);
     });
 
     //Paypal

@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('order_list') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -28,7 +28,7 @@
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2" :class="{'active': showFilters}" @click="showFilters = !showFilters">
-                                <base-icon name="Funnel" width="24" height="24" useCurrentColor />
+                                <base-icon name="Funnel" width="16" height="16" useCurrentColor />
                                 <span>{{ __('filters') || 'Filters' }}</span>
                                 <i class="bi ms-1" :class="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
                             </button>
@@ -65,11 +65,7 @@
                                                 :maxDate="maxDate" @update="handleFilterChange" :locale-data="dateRangePickerLocale"
                                                 :ranges="dateRangePickerRanges" :append-to-body="true" opens="right" class="w-100">
                                             </date-range-picker>
-                                            <button v-if="dateRange.startDate" type="button"
-                                                class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                @click.stop="clearDate()"
-                                                v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                            <button v-if="dateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                 <i class="fa fa-times-circle text-muted"></i>
                                             </button>
                                             <base-icon name="CalendarDots" width="24" height="24"
@@ -82,14 +78,10 @@
                                         <label class="figma-filter-label">{{ __('from_and_to_delivery_date') }} <span class="text-danger">*</span></label>
                                         <div class="modern-datepicker-container">
                                             <date-range-picker :autoApply="false" :showDropdowns="true" v-model="deliveryDateRange"
-                                                :maxDate="maxDate" @update="handleFilterChange" :ranges="customRanges"
+                                                :maxDate="maxDate" @update="handleFilterChange" :ranges="dateRangePickerRanges"
                                                 :append-to-body="true" opens="left" class="w-100">
                                             </date-range-picker>
-                                            <button v-if="deliveryDateRange.startDate" type="button"
-                                                class="figma-filter-icon-right btn btn-sm p-0 border-0"
-                                                style="right: 48px; background: transparent; pointer-events: auto; cursor: pointer;"
-                                                @click.stop="clearDeliveryDate()"
-                                                v-b-tooltip.hover :title="__('clear') || 'Clear'">
+                                            <button v-if="deliveryDateRange.startDate" type="button" class="figma-filter-clear figma-filter-icon-right btn btn-sm p-0 border-0" @click.stop="clearDeliveryDate()" v-b-tooltip.hover :title="__('clear') || 'Clear'">
                                                 <i class="fa fa-times-circle text-muted"></i>
                                             </button>
                                             <base-icon name="CalendarDots" width="24" height="24"
@@ -111,7 +103,7 @@
                     </b-collapse>
 
                     <!-- Tabs Selection (Orders vs. Order Items) -->
-                    <div class="px-4 pt-3 figma-tabs-container">
+                    <div class="figma-tabs-container">
                         <b-tabs pills active-nav-item-class="font-weight-bold text-uppercase" v-model="activeTab" class="figma-modern-tabs">
                             <b-tab :title="__('orders')" active @click="activeTab = 0; getOrders()">
                                 <!-- Orders Table -->
@@ -123,6 +115,12 @@
                                         :busy="isLoading" stacked="md" show-empty show-details
                                         :tbody-tr-class="() => 'figma-tr align-middle'" small
                                         class="figma-order-table mb-0">
+                                        <template #empty="scope">
+                                            <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                        </template>
+                                        <template #emptyfiltered="scope">
+                                            <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                        </template>
 
                                         <template #table-busy>
                                             <div class="text-center py-4">
@@ -134,7 +132,7 @@
                                             <div class="d-flex align-items-center justify-content-center gap-2">
                                                 <i :class="row.detailsShowing ? 'fa fa-chevron-down' : 'fa fa-chevron-right'"
                                                     @click="toggleOrder(row)"
-                                                    style="cursor:pointer;font-size:0.7rem;color:#aaa;"></i>
+                                                    style="cursor:pointer;font-size:0.7rem;color:var(--theme-neutral-400);"></i>
                                                 <span class="figma-link-blue">#{{ row.item.id }}</span>
                                             </div>
                                         </template>
@@ -175,7 +173,7 @@
                                                 <router-link
                                                     :to="{ name: 'SellerViewOrder', params: { id: row.item.id, record: row.item } }"
                                                     class="figma-action-btn">
-                                                    <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
+                                                    <i class="bi bi-eye"></i>
                                                 </router-link>
                                             </div>
                                         </template>
@@ -217,11 +215,9 @@
                                     </b-table>
                                 </div>
                                 <div class="figma-table-footer flex-wrap gap-3">
-                                    <div class="d-flex align-items-center gap-4">
-                                        <div class="showing-results-text small">
-                                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalOrderRows }}</span>
-                                        </div>
-                                        <div class="d-flex gap-3 text-success small border-start ps-4">
+                                    <div class="d-flex align-items-center flex-wrap gap-3">
+                                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalOrderRows"></table-count>
+                                        <div class="d-flex flex-wrap gap-3 figma-footer-totals">
                                             <span>{{ __('total_amount') }}: <strong>{{ $currency }} {{ total_amount }}</strong></span>
                                             <span>{{ __('total_dchrg') }}: <strong>{{ $currency }} {{ delivery_charge }}</strong></span>
                                             <span>{{ __('total_final_amount') }}: <strong>{{ $currency }} {{ remaining_final }}</strong></span>
@@ -245,6 +241,12 @@
                                         :busy="isLoading" stacked="md" show-empty
                                         :tbody-tr-class="() => 'figma-tr align-middle'" small
                                         class="figma-order-table mb-0">
+                                        <template #empty="scope">
+                                            <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                        </template>
+                                        <template #emptyfiltered="scope">
+                                            <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                        </template>
 
                                         <template #table-busy>
                                             <div class="text-center py-4">
@@ -306,18 +308,16 @@
                                                 <router-link
                                                     :to="{ name: 'SellerViewOrder', params: { id: row.item.order_id, record: row.item } }"
                                                     class="figma-action-btn">
-                                                    <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
+                                                    <i class="bi bi-eye"></i>
                                                 </router-link>
                                             </div>
                                         </template>
                                     </b-table>
                                 </div>
                                 <div class="figma-table-footer flex-wrap gap-3">
-                                    <div class="d-flex align-items-center gap-4">
-                                        <div class="showing-results-text small">
-                                            {{ __('Showing Result') }} : <span class="showing-bold">{{ itemPageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalOrderItemRows }}</span>
-                                        </div>
-                                        <div class="d-flex gap-3 text-success small border-start ps-4">
+                                    <div class="d-flex align-items-center flex-wrap gap-3">
+                                        <table-count :current-page="itemCurrentPage" :per-page="itemPerPage" :total-rows="totalOrderItemRows"></table-count>
+                                        <div class="d-flex flex-wrap gap-3 figma-footer-totals">
                                             <span>{{ __('total') }}: <strong>{{ $currency }} {{ order_items_total_sum }}</strong></span>
                                         </div>
                                     </div>
@@ -709,93 +709,95 @@ export default {
     }
 }
 
-/* Modern Tabs Styling */
+/* Tabs: underline style (active = primary text + 2px underline) */
 .figma-tabs-container {
-    border-bottom: 1px solid #EDEDED;
+    border-bottom: none;
 }
+
 ::v-deep .figma-modern-tabs {
-    margin-top: 10px;
-    
     .nav-pills {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        margin: 0;
+        padding: 0 20px;
         background: transparent !important;
-        padding: 0px;
-        border-radius: 12px;
-        display: inline-flex;
-        gap: 8px;
-        margin-bottom: 20px;
-        border: none;
+        border-bottom: 1px solid var(--ui-border);
+        border-radius: 0;
+        overflow-x: auto;
     }
-    
+
     .nav-item {
         margin: 0;
     }
-    
+
     .nav-link {
-        color: #64748B !important;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 8px 24px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
+        position: relative;
+        padding: 12px 14px;
+        margin-bottom: -1px;
         border: none !important;
+        border-bottom: 2px solid transparent !important;
+        border-radius: 0;
         background: transparent !important;
-        text-transform: uppercase;
+        color: var(--ui-text-muted) !important;
+        font-family: var(--ui-font);
+        font-size: 13px;
+        font-weight: 600 !important;
+        text-transform: none !important;
+        white-space: nowrap;
+        box-shadow: none !important;
+        transition: color 0.2s ease, border-color 0.2s ease;
     }
-    
+
     .nav-link.active {
-        color: #FFFFFF !important;
-        background: var(--figma-primary, #FF9900) !important;
-        box-shadow: 0 4px 12px rgba(85, 174, 123, 0.25) !important;
+        color: var(--theme-primary-600) !important;
+        border-bottom-color: var(--theme-primary-500) !important;
     }
-    
+
     .nav-link:hover:not(.active) {
-        color: #1E293B !important;
-        background: rgba(226, 232, 240, 0.5) !important;
+        color: var(--ui-heading) !important;
+    }
+
+    .tab-content > .tab-pane > .table-responsive {
+        margin-top: 0 !important;
+        border: none;
+        border-radius: 0;
     }
 }
 
-/* Dark Mode Overrides for Tabs */
-.dark-mode, [data-theme="dark"] {
-    ::v-deep .figma-modern-tabs {
-        .nav-pills {
-            background: transparent !important;
-        }
-        
-        .nav-link {
-            color: #94A3B8 !important;
-        }
-        
-        .nav-link.active {
-            color: #FFFFFF !important;
-            background: var(--figma-primary, #FF9900) !important;
-        }
-        
-        .nav-link:hover:not(.active) {
-            color: #F8FAFC !important;
-            background: rgba(51, 65, 85, 0.5) !important;
-        }
-    }
+/* List footer: results + totals left, pagination right */
+.figma-table-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px !important;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface);
 }
 
-@media (prefers-color-scheme: dark) {
-    ::v-deep .figma-modern-tabs {
-        .nav-pills {
-            background: transparent !important;
-        }
-        
-        .nav-link {
-            color: #94A3B8 !important;
-        }
-        
-        .nav-link.active {
-            color: #FFFFFF !important;
-            background: var(--figma-primary, #FF9900) !important;
-        }
-        
-        .nav-link:hover:not(.active) {
-            color: #F8FAFC !important;
-            background: rgba(51, 65, 85, 0.5) !important;
-        }
+.figma-footer-totals {
+    font-size: 13px;
+    color: var(--ui-text-muted);
+    padding-left: 12px;
+    border-left: 1px solid var(--ui-border);
+}
+
+.figma-footer-totals strong {
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+@media (max-width: 767.98px) {
+    .figma-table-footer {
+        justify-content: center;
+        padding: 12px 16px !important;
+    }
+
+    .figma-footer-totals {
+        padding-left: 0;
+        border-left: none;
     }
 }
 </style>

@@ -1,4 +1,6 @@
 import Auth from "./Auth";
+import { loadTheme, themeColor, themeChartColors } from "./ThemePalette";
+import { installEditorTheme } from "./EditorTheme";
 require('./bootstrap');
 import Vue from 'vue';
 import VueRouter from 'vue-router'
@@ -34,6 +36,14 @@ Vue.use(VueFormWizard);
 Vue.component('InfiniteLoading', require('vue-infinite-loading'));
 Vue.component('input-tag', InputTag);
 Vue.component('base-icon', require('./components/BaseIcon.vue').default);
+Vue.component('custom-field-date', require('./components/CustomFieldDate.vue').default);
+Vue.component('osm-map-picker', require('./components/OsmMapPicker.vue').default);
+Vue.component('google-place-search', require('./components/GooglePlaceSearch.vue').default);
+Vue.component('table-count', require('./components/TableCount.vue').default);
+Vue.component('data-table', require('./components/DataTable.vue').default);
+Vue.component('reorder-toggle', require('./components/ReorderToggle.vue').default);
+Vue.component('module-icon', require('./components/ModuleIcon.vue').default);
+Vue.component('command-palette', require('./components/CommandPalette.vue').default);
 Vue.use(Sortable);
 
 import Vuelidate from 'vuelidate';
@@ -85,6 +95,24 @@ Vue.prototype.$deliveryBoyBonusSettings = window.deliveryBoyBonusSettings;
 
 Vue.prototype.$websiteUrl = window.websiteUrl;
 Vue.prototype.$copyrightDetails = window.copyrightDetails;
+Vue.prototype.$placeholderImage = window.placeholderImage || (window.baseUrl + '/storage/front_end/placeholder_image/1750673833_83128.jpeg');
+
+Vue.prototype.$getImageUrl = function (imageUrl) {
+    if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '') {
+        return imageUrl;
+    }
+    return Vue.prototype.$placeholderImage;
+};
+
+// Global image error handler: automatically fallback to settings placeholder image if any image fails to load
+window.addEventListener('error', function (e) {
+    if (e.target && e.target.tagName === 'IMG' && Vue.prototype.$placeholderImage) {
+        if (e.target.src !== Vue.prototype.$placeholderImage && !e.target.dataset.fallbackApplied) {
+            e.target.dataset.fallbackApplied = 'true';
+            e.target.src = Vue.prototype.$placeholderImage;
+        }
+    }
+}, true);
 
 
 
@@ -158,6 +186,13 @@ Vue.prototype.$apiUrl = window.baseUrl + '/api';
 Vue.prototype.$sellerApiUrl = window.baseUrl + '/api/seller';
 Vue.prototype.$deliveryBoyApiUrl = window.baseUrl + '/api/delivery_boy';
 Vue.prototype.$storageUrl = window.baseUrl + '/storage/';
+
+// Paint the panel with the active module's Theme Settings palette.
+loadTheme(window.baseUrl);
+Vue.prototype.$themeColor = themeColor;
+Vue.prototype.$themeChartColors = themeChartColors;
+// TinyMCE editors follow the light / dark theme.
+installEditorTheme();
 
 
 //Role
@@ -262,7 +297,7 @@ var lang = localStorage.getItem("language");
 
 lang = JSON.parse(lang);
 Vue.prototype.$perPage = 10;
-vue__WEBPACK_IMPORTED_MODULE_17__["default"].prototype.$pageOptions = [2, 5, 10, 20, 50, {
+Vue.prototype.$pageOptions = [2, 5, 10, 20, 50, {
     value: 100,
     text: '100'
 }];

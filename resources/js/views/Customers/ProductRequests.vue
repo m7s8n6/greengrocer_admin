@@ -1,20 +1,16 @@
 <template>
-    <div>
+    <div class="product-requests-page">
         <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('product_requests') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('product_requests') }}</li>
-                        </ol>
-                    </nav>
-                </div>
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('product_requests') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link>
+                        </li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('product_requests') }}</li>
+                    </ol>
+                </nav>
             </div>
 
             <div class="row">
@@ -22,15 +18,14 @@
                     <div class="figma-main-section-card">
                         <div class="card-body p-0">
                             <div
-                                class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
+                                class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row p-3">
                                 <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
-                                    <div class="figma-search-container" style="min-width: 250px;">
+                                    <div class="figma-search-container requests-search">
                                         <i class="fa fa-search text-muted"></i>
                                         <input v-model="filter" type="text" class="figma-search-input"
                                             :placeholder="__('search')">
                                     </div>
-                                    <select v-model="statusFilter" class="form-select figma-search-input"
-                                        style="min-width:160px;height:40px;border:1px solid #EDEDED;border-radius:8px;background:#F5F5F5;font-size:14px;"
+                                    <select v-model="statusFilter" class="form-select requests-status-select"
                                         @change="getRequests()">
                                         <option value="">{{ __('all_statuses') }}</option>
                                         <option value="pending">{{ __('pending') }}</option>
@@ -39,6 +34,10 @@
                                     </select>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <div class="view-toggle" role="group" :aria-label="__('view')">
+                                        <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                        <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                    </div>
                                     <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                         @click="getRequests()" v-b-tooltip.hover :title="__('refresh')">
                                         <i class="fa fa-refresh"></i>
@@ -46,14 +45,80 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="table-responsive">
+                            <div v-if="viewMode === 'grid'">
+                                <div v-if="isLoading" class="item-grid-state">
+                                    <i class="fa fa-spinner fa-spin"></i>{{ __('loading') }}...
+                                </div>
+                                <div v-else-if="gridRequests.length === 0" class="item-grid-state">
+                                    <i class="fa" :class="filter ? 'fa-search' : 'fa-inbox'"></i>
+                                    {{ filter ? __('no_records_matching_your_request') : __('no_records_to_show') }}
+                                </div>
+                                <div v-else class="item-grid item-grid--single-xs">
+                                    <div v-for="item in gridRequests" :key="item.id" class="item-card">
+                                        <div class="item-card-media">
+                                            <img :src="item.image_url || $placeholderImage" alt="" class="requests-card-img"
+                                                @click="openImageModal(item.image_url || $placeholderImage)">
+                                            <div class="item-card-badges">
+                                                <span class="badge" :class="getStatusVariant(item.status)">
+                                                    {{ getStatusText(item.status) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="item-card-body">
+                                            <div class="item-card-title" :title="item.description">
+                                                {{ item.description || '-' }}
+                                            </div>
+                                            <div class="item-card-meta" :title="__('customer_name')">
+                                                <i class="bi bi-person"></i>
+                                                {{ item.customer ? item.customer.name : '-' }}
+                                            </div>
+                                            <div class="item-card-meta" v-if="item.product" :title="__('requested_product')">
+                                                <i class="bi bi-box-seam"></i> {{ item.product.name }}
+                                            </div>
+                                        </div>
+                                        <div class="item-card-footer">
+                                            <div class="item-card-actions">
+                                                <button class="figma-action-btn" v-b-tooltip.hover :title="__('view')"
+                                                    @click="viewRequestDetails(item)">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <template v-if="$can('product_request_update')">
+                                                    <button v-if="item.status === 'pending'" class="figma-action-btn"
+                                                        v-b-tooltip.hover :title="__('approve')"
+                                                        @click="acceptRequest(item)">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                    <button v-if="item.status === 'pending'"
+                                                        class="figma-action-btn figma-delete-btn" v-b-tooltip.hover
+                                                        :title="__('reject')" @click="rejectRequest(item)">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                </template>
+                                                <template v-if="$can('product_request_delete')">
+                                                    <button class="figma-action-btn figma-delete-btn" v-b-tooltip.hover
+                                                        :title="__('delete')" @click="deleteRequest(item)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="table-responsive">
                                 <b-table :items="filteredRequests" :fields="fields" :current-page="currentPage"
                                     :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                                     :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                     :bordered="false" :busy="isLoading" stacked="md" show-empty small
-                                    class="figma-table mb-0" :tbody-tr-class="() => 'figma-tr align-middle'">
+                                    class="figma-table requests-table mb-0" :tbody-tr-class="() => 'figma-tr align-middle'">
+                                    <template #empty="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                    </template>
+                                    <template #emptyfiltered="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                    </template>
                                     <template #table-busy>
-                                        <div class="text-center text-black my-2">
+                                        <div class="text-center text-muted my-3">
                                             <b-spinner class="align-middle"></b-spinner>
                                             <strong>{{ __('loading') }}...</strong>
                                         </div>
@@ -63,17 +128,14 @@
                                         <span v-else class="text-muted">-</span>
                                     </template>
                                     <template #cell(description)="row">
-                                        <div v-if="row.item.description" class="text-truncate"
-                                            style="max-width: 200px;">
+                                        <div v-if="row.item.description" class="text-truncate requests-desc">
                                             {{ row.item.description }}
                                         </div>
                                         <span v-else class="text-muted">-</span>
                                     </template>
                                     <template #cell(image)="row">
-                                        <img v-if="row.item.image_url" :src="row.item.image_url" class="img-thumbnail"
-                                            style="width: 50px; height: 50px; object-fit: cover;"
-                                            @click="openImageModal(row.item.image_url)">
-                                        <span v-else class="text-muted">-</span>
+                                        <img :src="row.item.image_url || $placeholderImage" class="requests-thumb" alt=""
+                                            @click="openImageModal(row.item.image_url || $placeholderImage)">
                                     </template>
                                     <template #cell(status)="row">
                                         <span class="badge" :class="getStatusVariant(row.item.status)">
@@ -85,41 +147,35 @@
                                         <span v-else class="text-muted">-</span>
                                     </template>
                                     <template #cell(action)="row">
-                                        <div class="d-flex gap-2 justify-content-center">
+                                        <div class="d-flex gap-1 requests-row-actions">
                                             <button class="figma-action-btn" v-b-tooltip.hover :title="__('view')"
                                                 @click="viewRequestDetails(row.item)">
-                                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="24"
-                                                    height="24" />
+                                                <i class="bi bi-eye"></i>
                                             </button>
                                             <template v-if="$can('product_request_update')">
                                                 <button v-if="row.item.status === 'pending'" class="figma-action-btn"
                                                     v-b-tooltip.hover :title="__('approve')"
                                                     @click="acceptRequest(row.item)">
-                                                    <base-icon name="CheckCircle" width="24" height="24" />
+                                                    <i class="bi bi-check-circle"></i>
                                                 </button>
                                                 <button v-if="row.item.status === 'pending'"
                                                     class="figma-action-btn figma-delete-btn" v-b-tooltip.hover
                                                     :title="__('reject')" @click="rejectRequest(row.item)">
-                                                    <base-icon name="XCircle" width="24" height="24" />
+                                                    <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </template>
                                             <template v-if="$can('product_request_delete')">
                                                 <button class="figma-action-btn figma-delete-btn" v-b-tooltip.hover
                                                     :title="__('delete')" @click="deleteRequest(row.item)">
-                                                    <base-icon name="Type=Default" hoverName="Type=Hover" width="24"
-                                                        height="24" />
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </template>
                                         </div>
                                     </template>
                                 </b-table>
                             </div>
-                            <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span
-                                        class="showing-bold">{{ totalRows
-                                        }}</span>
-                                </div>
+                            <div class="figma-table-footer flex-wrap gap-3">
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                         align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
@@ -160,7 +216,7 @@
                 <div class="row mt-3" v-if="selectedRequest.image_url">
                     <div class="col-12">
                         <h6>{{ __('product_request_image') }}</h6>
-                        <img :src="selectedRequest.image_url" class="img-fluid" style="max-width: 300px;">
+                        <img :src="selectedRequest.image_url" class="img-fluid requests-detail-image" alt="">
                     </div>
                 </div>
 
@@ -175,7 +231,7 @@
 
         <!-- Accept Request Modal -->
         <b-modal v-model="showAcceptModal" size="lg" :title="__('accept_request')">
-            <span class="text-danger">{{ __('add_product_before_accepting_request') }}</span>
+            <div class="alert alert-warning mb-3">{{ __('add_product_before_accepting_request') }}</div>
             <div v-if="selectedRequest">
                 <div class="form-group">
                     <label>{{ __('select_product') }} <span class="text-danger">*</span></label>
@@ -195,8 +251,8 @@
                 </div>
             </div>
             <template #modal-footer>
-                <b-button variant="secondary" @click="showAcceptModal = false">{{ __('cancel') }}</b-button>
-                <b-button variant="success" @click="confirmAcceptRequest" :disabled="!selectedProduct">
+                <b-button variant="outline-secondary" @click="showAcceptModal = false">{{ __('cancel') }}</b-button>
+                <b-button variant="primary" @click="confirmAcceptRequest" :disabled="!selectedProduct">
                     {{ __('accept_request') }}
                 </b-button>
             </template>
@@ -212,7 +268,7 @@
                 </div>
             </div>
             <template #modal-footer>
-                <b-button variant="secondary" @click="showRejectModal = false">{{ __('cancel') }}</b-button>
+                <b-button variant="outline-secondary" @click="showRejectModal = false">{{ __('cancel') }}</b-button>
                 <b-button variant="danger" @click="confirmRejectRequest" :disabled="!adminNotes">
                     {{ __('reject_request') }}
                 </b-button>
@@ -231,8 +287,10 @@
 <script>
 import axios from 'axios';
 import Multiselect from 'vue-multiselect';
+import ViewModeMixin from '../../mixins/ViewModeMixin';
 
 export default {
+    mixins: [ViewModeMixin],
     components: {
         Multiselect
     },
@@ -290,6 +348,10 @@ export default {
                     return { text: f.label, value: f.key }
                 })
         },
+        // Grid view cards: same records, search, order and page slice as the b-table
+        gridRequests() {
+            return this.pagedItems(this.gridFilterSort(this.filteredRequests));
+        },
         filteredRequests() {
             if (!this.statusFilter) {
                 return this.requests;
@@ -311,6 +373,7 @@ export default {
         this.getProducts();
     },
     methods: {
+        // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
         getRequests() {
             this.isLoading = true;
 
@@ -479,8 +542,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.isLoading = true;
@@ -515,5 +578,78 @@ export default {
     white-space: pre-wrap;
     max-width: 100%;
     overflow: hidden;
+}
+
+.requests-search {
+    min-width: 250px;
+    flex: 1 1 250px;
+}
+
+.requests-status-select {
+    width: auto;
+    min-width: 160px;
+    height: 38px;
+    min-height: 38px;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 36px;
+    color: var(--ui-text);
+    font-size: 13px !important;
+}
+
+.product-requests-page ::v-deep .requests-desc {
+    max-width: 220px;
+}
+
+.product-requests-page ::v-deep .requests-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    cursor: pointer;
+}
+
+/* !important: legacy global .figma-action-btn forces 40px with !important */
+.product-requests-page ::v-deep .requests-row-actions .figma-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+.product-requests-page ::v-deep .requests-row-actions {
+    flex-wrap: nowrap;
+}
+
+.product-requests-page .requests-card-img {
+    cursor: zoom-in;
+}
+
+.product-requests-page .item-card-actions {
+    margin-left: auto;
+}
+
+.requests-detail-image {
+    max-width: 300px;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+}
+
+@media (max-width: 767.98px) {
+    .product-requests-page ::v-deep .requests-row-actions {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .requests-search,
+    .requests-status-select {
+        min-width: 0;
+        width: 100%;
+        flex: 1 1 100%;
+    }
 }
 </style>

@@ -120,6 +120,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 
 
 
@@ -149,6 +152,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getAboutUs();
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     getEditorConfig: function getEditorConfig() {
       var plugins = this.$editorPlugins && Array.isArray(this.$editorPlugins) ? this.$editorPlugins : ["autolink", "lists", "link", "image", "charmap", "anchor", "searchreplace", "visualblocks", "media", "table", "wordcount", "code", "codesample"];
       var toolbar = this.$editorToolbar || "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | charmap | code | removeformat";
@@ -648,6 +655,17 @@ var render = function () {
                     1
                   ),
                   _vm._v(" "),
+                  _c(
+                    "li",
+                    { staticClass: "breadcrumb-item" },
+                    [
+                      _c("router-link", { attrs: { to: "/system_settings" } }, [
+                        _vm._v(_vm._s(_vm.__("settings"))),
+                      ]),
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
                   _c("li", { staticClass: "breadcrumb-item active" }, [
                     _vm._v(_vm._s(_vm.__("about_us"))),
                   ]),
@@ -672,8 +690,19 @@ var render = function () {
           [
             _c("div", { staticClass: "card" }, [
               _c("div", { staticClass: "card-header" }, [
-                _c("h4", { staticClass: "card-title" }, [
+                _c("h4", { staticClass: "card-title float-none" }, [
                   _vm._v(_vm._s(_vm.__("update_information"))),
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.tr(
+                        "about_us_desc",
+                        "Content shown on the About Us page of your store, per language."
+                      )
+                    )
+                  ),
                 ]),
               ]),
               _vm._v(" "),
@@ -908,36 +937,39 @@ var render = function () {
                       1
                     )
                   : _vm._e(),
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "card-footer" },
-                [
-                  _c(
-                    "b-button",
-                    {
-                      attrs: {
-                        type: "submit",
-                        variant: "primary",
-                        disabled: _vm.isLoading,
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "d-flex justify-content-end border-top pt-3 mt-2",
+                  },
+                  [
+                    _c(
+                      "b-button",
+                      {
+                        attrs: {
+                          type: "submit",
+                          variant: "primary",
+                          disabled: _vm.isLoading,
+                        },
                       },
-                    },
-                    [
-                      _vm._v(
-                        "\n                            " +
-                          _vm._s(_vm.__("update")) +
-                          "\n                            "
-                      ),
-                      _vm.isLoading
-                        ? _c("b-spinner", { attrs: { small: "" } })
-                        : _vm._e(),
-                    ],
-                    1
-                  ),
-                ],
-                1
-              ),
+                      [
+                        _vm._v(
+                          "\n                                " +
+                            _vm._s(_vm.__("update")) +
+                            "\n                                "
+                        ),
+                        _vm.isLoading
+                          ? _c("b-spinner", { attrs: { small: "" } })
+                          : _vm._e(),
+                      ],
+                      1
+                    ),
+                  ],
+                  1
+                ),
+              ]),
             ]),
           ]
         ),

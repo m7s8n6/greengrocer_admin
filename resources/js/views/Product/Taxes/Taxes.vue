@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                 <h3 class="modern-page-title mb-0">{{ __('taxes') }}</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
@@ -14,7 +14,7 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="card figma-main-section-card">
                     <div class="card-body p-0">
 
                         <!-- Modern Filter Action Bar -->
@@ -27,30 +27,23 @@
                                         :placeholder="__('search') || 'Search...'" @input="getRecords()">
                                 </div>
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                    @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>{{ __('refresh') || 'Refresh' }}</span>
+                                </button>
                                 <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="edit_record = true">
                                     <i class="fa fa-plus"></i>
                                     <span>{{ __('add_tax') }}</span>
                                 </button>
-
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                    @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
-                                    <i class="fa fa-refresh"></i>
-                                    <span>{{ __('refresh') || 'Refresh' }}</span>
-                                </button>
                             </div>
                         </div>
-                        <b-table :items="translatedTaxes" :fields="fields" :filter="filter" :filter-included-fields="filterOn"
-                            :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
-                            :bordered="false" :busy="isLoading" stacked="md" show-empty
-                            :tbody-tr-class="() => 'figma-tr align-middle'" small class="figma-order-table mb-0">
-                            <template #table-busy>
-                                <div class="text-center text-black my-2">
-                                    <b-spinner class="align-middle"></b-spinner>
-                                    <strong>{{ __('loading') }}...</strong>
-                                </div>
-                            </template>
+                        <data-table :items="translatedTaxes" :fields="fields" :busy="isLoading" :total-rows="totalRows"
+                            :current-page.sync="currentPage" :per-page.sync="perPage" :page-options="pageOptions"
+                            :filter="filter" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
+                            :sort-desc.sync="sortDesc" :sort-direction="sortDirection">
 
                             <template #cell(id)="row">
                                 {{ row.item.id }}
@@ -78,19 +71,7 @@
                                     </button>
                                 </div>
                             </template>
-                        </b-table>
-                    </div>
-                    <div class="figma-table-footer flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
-                            <b-form-select v-model="perPage" :options="pageOptions" size="sm"
-                                style="width: auto;"></b-form-select>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                                align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
-                                prev-text="<" next-text=">"></b-pagination>
-                        </div>
+                        </data-table>
                     </div>
                 </div>
 
@@ -249,8 +230,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {

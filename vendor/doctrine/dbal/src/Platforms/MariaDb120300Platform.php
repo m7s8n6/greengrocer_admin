@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL\Platforms;
 
+use Doctrine\DBAL\Platforms\Keywords\KeywordList;
+use Doctrine\DBAL\Platforms\Keywords\MariaDB123Keywords;
 use Doctrine\Deprecations\Deprecation;
 
 /**
  * Provides the behavior, features and SQL dialect of the MariaDB 12.3 database platform.
+ *
+ * @deprecated To be removed along with the keyword list feature.
  */
-class MariaDb120300Platform extends MariaDb110700Platform
+class MariaDB120300Platform extends MariaDB110700Platform
 {
-    /** @deprecated Implement {@see createReservedKeywordsList()} instead. */
-    protected function getReservedKeywordsClass(): string
+    /** @deprecated */
+    protected function createReservedKeywordsList(): KeywordList
     {
         Deprecation::triggerIfCalledFromOutside(
             'doctrine/dbal',
-            'https://github.com/doctrine/dbal/issues/4510',
-            'MariaDb120300Platform::getReservedKeywordsClass() is deprecated,'
-                . ' use MariaDb120300Platform::createReservedKeywordsList() instead.',
+            'https://github.com/doctrine/dbal/pull/6607',
+            '%s is deprecated.',
+            __METHOD__,
         );
 
-        return Keywords\MariaDb123Keywords::class;
+        return new MariaDB123Keywords();
     }
 }

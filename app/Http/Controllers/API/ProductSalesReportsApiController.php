@@ -18,13 +18,26 @@ class ProductSalesReportsApiController extends Controller
             'sellers.name as seller_name','product_variants.measurement',
             DB::raw('(SELECT short_code FROM attribute_values WHERE attribute_values.attribute_id = product_variants.stock_unit_id LIMIT 1) AS unit_name'),
             'order_items.*','orders.active_status as order_active_status',
-            DB::raw('(SELECT SUM(order_items.quantity) FROM order_items WHERE product_variants.id = order_items.product_variant_id AND (order_items.active_status = 6 OR order_items.active_status = 11)) as total_sales'),
-            DB::raw('(SELECT SUM(order_items.sub_total) FROM `order_items` WHERE product_variants.id = order_items.product_variant_id) as total_price')
+            'variant_totals.total_sales',
+            'variant_totals.total_price'
         )
             ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
             ->leftJoin('product_variants', 'order_items.product_variant_id', '=', 'product_variants.id')
             ->leftJoin('products', 'product_variants.product_id', '=', 'products.id')
             ->leftJoin('sellers', 'products.seller_id', '=', 'sellers.id')
+            // Per-variant totals are computed once here. They used to be two correlated
+            // subqueries in the select list, re-run over order_items for every joined row.
+            ->leftJoinSub(
+                DB::table('order_items')
+                    ->select('product_variant_id')
+                    ->selectRaw('SUM(CASE WHEN active_status IN (?, ?) THEN quantity END) as total_sales', [OrderStatusList::$delivered, OrderStatusList::$selfPickupPicked])
+                    ->selectRaw('SUM(sub_total) as total_price')
+                    ->groupBy('product_variant_id'),
+                'variant_totals',
+                'variant_totals.product_variant_id',
+                '=',
+                'product_variants.id'
+            )
             ->where(function($query) {
                 $query->where('orders.active_status', OrderStatusList::$delivered)
                       ->orWhere('orders.active_status', OrderStatusList::$selfPickupPicked);

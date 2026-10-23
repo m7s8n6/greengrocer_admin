@@ -370,6 +370,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -401,6 +419,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       markers: [],
       place_name: "",
       formatted_address: "",
+      osmSellerQuery: "",
+      osmSellerSuggestions: [],
       infoWindow: {
         position: {
           lat: 0,
@@ -414,7 +434,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       name: _Auth_js__WEBPACK_IMPORTED_MODULE_1__["default"].user.username,
       email: _Auth_js__WEBPACK_IMPORTED_MODULE_1__["default"].user.email,
       mobile: "",
-      store_url: "",
       password: "",
       confirm_password: "",
       store_name: "",
@@ -477,7 +496,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
       return temp;
     },
-    google: vue2_google_maps__WEBPACK_IMPORTED_MODULE_6__.gmapApi
+    google: vue2_google_maps__WEBPACK_IMPORTED_MODULE_6__.gmapApi,
+    mapProvider: function mapProvider() {
+      return window.mapProvider === 'osm' ? 'osm' : 'google';
+    }
   },
   methods: {
     getStoreDescriptionEditorInit: function getStoreDescriptionEditorInit() {
@@ -607,6 +629,51 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     updateCoordinates: function updateCoordinates(location) {
       this.handleMapClick(location);
     },
+    onOsmLocationSelected: function onOsmLocationSelected(payload) {
+      this.latitude = payload.lat;
+      this.longitude = payload.lng;
+      var addressArr = (payload.formatted_address || '').split(",");
+      this.street = addressArr[0] + " " + (addressArr[1] || "");
+      this.place_name = payload.name || addressArr[1] || payload.formatted_address;
+      this.formatted_address = payload.formatted_address;
+    },
+    onOsmSellerQueryInput: function onOsmSellerQueryInput(text) {
+      this.osmSellerQuery = text;
+      if (this.$refs.osmSellerDetailsMap) {
+        this.$refs.osmSellerDetailsMap.setQueryAndSearch(text);
+      }
+    },
+    selectOsmSellerSuggestion: function selectOsmSellerSuggestion(suggestion) {
+      this.osmSellerQuery = suggestion.placePrediction.text.text;
+      this.osmSellerSuggestions = [];
+      if (this.$refs.osmSellerDetailsMap) {
+        this.$refs.osmSellerDetailsMap.selectSuggestion(suggestion);
+      }
+    },
+    getOsmCurrentLocation: function getOsmCurrentLocation() {
+      var _this4 = this;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          _this4.$refs.osmSellerDetailsMap && _this4.$refs.osmSellerDetailsMap.setView(position.coords.latitude, position.coords.longitude);
+          axios__WEBPACK_IMPORTED_MODULE_0___default().post(_this4.$apiUrl + '/map/geocode', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            source: 'web'
+          }).then(function (response) {
+            var data = response.data && response.data.data ? response.data.data : response.data;
+            var result = data && data.results && data.results[0];
+            _this4.onOsmLocationSelected({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              formatted_address: result ? result.formatted_address : '',
+              name: result ? result.formatted_address : ''
+            });
+          });
+        });
+      } else {
+        this.showError("Geolocation is not supported by this browser.");
+      }
+    },
     setCityId: function setCityId() {
       this.state = this.city.state;
       this.city_id = this.city.id;
@@ -649,14 +716,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       event.currentTarget.classList.remove('bg-green-300');
     },
     saveSellerDetails: function saveSellerDetails() {
-      var _this4 = this;
+      var _this5 = this;
       var vm = this;
       this.isLoading = true;
       var formData = new FormData();
       formData.append('name', this.name);
       formData.append('email', this.email);
       formData.append('mobile', this.mobile);
-      formData.append('store_url', this.store_url);
       formData.append('password', this.password);
       formData.append('confirm_password', this.confirm_password);
       formData.append('store_name', this.store_name);
@@ -692,7 +758,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }).then(function (res) {
         var data = res.data;
         if (data.status === 1) {
-          _this4.showMessage("success", data.message);
+          _this5.showMessage("success", data.message);
           setTimeout(function () {
             vm.$swal.close();
             _Auth_js__WEBPACK_IMPORTED_MODULE_1__["default"].logout();
@@ -707,11 +773,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       })["catch"](function (error) {
         vm.isLoading = false;
         if (error.request.statusText) {
-          _this4.showError(error.request.statusText);
+          _this5.showError(error.request.statusText);
         } else if (error.message) {
-          _this4.showError(error.message);
+          _this5.showError(error.message);
         } else {
-          _this4.showError("Something went wrong!");
+          _this5.showError("Something went wrong!");
         }
       });
     }
@@ -740,7 +806,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#auth[data-v-655cb019]{\n    overflow: auto!important;\n}\n.auth[data-v-655cb019] {\n    overflow-x: hidden!important;\n}\n.auth-logo[data-v-655cb019] {\n    padding-bottom: 10px;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.osm-suggestions[data-v-655cb019] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    z-index: 1000;\n    max-height: 220px;\n    overflow-y: auto;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border-strong);\n    border-top: none;\n}\n#auth[data-v-655cb019]{\n    overflow: auto!important;\n}\n.auth[data-v-655cb019] {\n    overflow-x: hidden!important;\n}\n.auth-logo[data-v-655cb019] {\n    padding-bottom: 10px;\n}\n.details-logo[data-v-655cb019] {\n    width: 56px;\n    height: 56px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n.details-app-name[data-v-655cb019] {\n    font-size: 20px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n\n/* Section cards inside the profile form: SnapBuy card header + spacing */\n.detail-card .card[data-v-655cb019] {\n    margin-bottom: 20px;\n}\n.detail-card .card > .card-header .card-title[data-v-655cb019] {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.detail-card .file-input-div label[data-v-655cb019] {\n    display: block;\n    margin-bottom: 4px;\n    cursor: pointer;\n}\n.detail-card .custom-image[data-v-655cb019] {\n    width: 64px;\n    height: 64px;\n    margin-top: 8px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n}\n@media (max-width: 575.98px) {\n.complete-btn[data-v-655cb019] {\n        width: 100%;\n}\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -917,31 +983,28 @@ var render = function () {
             _c(
               "a",
               {
-                staticStyle: {
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "flex-start",
-                },
+                staticClass:
+                  "d-flex align-items-center justify-content-start gap-2",
                 attrs: { href: "javascript:void(0)" },
               },
               [
                 _vm.$appLogo != ""
                   ? _c("img", {
-                      staticStyle: { height: "70px", width: "70px" },
+                      staticClass: "details-logo",
                       attrs: {
                         src: _vm.$storageUrl + _vm.$appLogo,
                         alt: "Logo",
                       },
                     })
                   : _c("img", {
-                      staticStyle: { height: "70px", width: "70px" },
+                      staticClass: "details-logo",
                       attrs: {
                         src: _vm.$baseUrl + "/images/logo.png",
                         alt: "Logo",
                       },
                     }),
                 _vm._v(" "),
-                _c("h2", { staticStyle: { margin: "10px" } }, [
+                _c("h2", { staticClass: "details-app-name mb-0" }, [
                   _vm._v(_vm._s(_vm.$appName)),
                 ]),
               ]
@@ -950,7 +1013,7 @@ var render = function () {
           _vm._v(" "),
           _c("h4", [_vm._v("Seller Complete Profile")]),
           _vm._v(" "),
-          _c("p", { staticClass: "auth-subtitle text-primary" }, [
+          _c("p", { staticClass: "auth-subtitle" }, [
             _vm._v("Please Complete the form to complete your registration"),
           ]),
           _vm._v(" "),
@@ -973,7 +1036,7 @@ var render = function () {
                     _vm._v(" "),
                     _c("div", { staticClass: "card-body" }, [
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Name")]),
                             _vm._v(" "),
@@ -1005,7 +1068,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Store Name")]),
                             _vm._v(" "),
@@ -1037,38 +1100,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
-                          _c("div", { staticClass: "form-group" }, [
-                            _c("label", [_vm._v("Store URL")]),
-                            _vm._v(" "),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.store_url,
-                                  expression: "store_url",
-                                },
-                              ],
-                              staticClass: "form-control",
-                              attrs: {
-                                type: "text",
-                                placeholder: "Enter store URL.",
-                              },
-                              domProps: { value: _vm.store_url },
-                              on: {
-                                input: function ($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.store_url = $event.target.value
-                                },
-                              },
-                            }),
-                          ]),
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c(
                             "div",
                             { staticClass: "form-group" },
@@ -1094,7 +1126,7 @@ var render = function () {
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Tax Name")]),
                             _vm._v(" "),
@@ -1126,7 +1158,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Tax Number")]),
                             _vm._v(" "),
@@ -1158,7 +1190,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("PAN Number")]),
                             _vm._v(" "),
@@ -1190,7 +1222,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("National Identity Card")]),
                             _vm._v(" "),
@@ -1293,7 +1325,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Address Proof")]),
                             _vm._v(" "),
@@ -1501,7 +1533,7 @@ var render = function () {
                       _c("div", { staticClass: "row" }, [
                         _c(
                           "div",
-                          { staticClass: "form-group col-md-4" },
+                          { staticClass: "form-group col-md-6" },
                           [
                             _c("label", { attrs: { for: "city_name" } }, [
                               _vm._v("Select or Search City"),
@@ -1573,7 +1605,7 @@ var render = function () {
                           1
                         ),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("State")]),
                             _vm._v(" "),
@@ -1605,7 +1637,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Street")]),
                             _vm._v(" "),
@@ -1637,7 +1669,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Latitude")]),
                             _vm._v(" "),
@@ -1669,7 +1701,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Longitude")]),
                             _vm._v(" "),
@@ -1701,84 +1733,201 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("label", { attrs: { for: "location" } }, [
                             _vm._v("Search Location"),
                           ]),
                           _vm._v(" "),
-                          _c(
-                            "div",
-                            { staticClass: "input-group" },
-                            [
-                              _c("GmapAutocomplete", {
-                                staticClass: "form-control",
-                                attrs: {
-                                  type: "search",
-                                  placeholder: "Search you location on map.",
-                                  options: {
-                                    fields: [
-                                      "formatted_address",
-                                      "geometry",
-                                      "name",
-                                      "address_components",
-                                    ],
-                                    strictBounds: false,
-                                  },
-                                  id: "location",
-                                },
-                                on: { place_changed: _vm.setPlace },
-                              }),
-                              _vm._v(" "),
-                              _c(
-                                "b-button",
-                                {
-                                  directives: [
-                                    {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      modifiers: { hover: true },
-                                    },
-                                  ],
-                                  attrs: {
-                                    type: "button",
-                                    variant: "primary",
-                                    title: "Add current location",
-                                  },
-                                  on: { click: _vm.getCurrentLocation },
-                                },
+                          _vm.mapProvider === "google"
+                            ? _c(
+                                "div",
+                                { staticClass: "input-group" },
                                 [
+                                  _c("google-place-search", {
+                                    attrs: {
+                                      placeholder:
+                                        "Search you location on map.",
+                                      "input-id": "location",
+                                    },
+                                    on: { place_changed: _vm.setPlace },
+                                  }),
+                                  _vm._v(" "),
                                   _c(
-                                    "svg",
+                                    "b-button",
                                     {
+                                      directives: [
+                                        {
+                                          name: "b-tooltip",
+                                          rawName: "v-b-tooltip.hover",
+                                          modifiers: { hover: true },
+                                        },
+                                      ],
+                                      staticClass: "search_location_btn",
                                       attrs: {
-                                        xmlns: "http://www.w3.org/2000/svg",
-                                        height: "48px",
-                                        viewBox: "0 0 24 24",
-                                        width: "48px",
-                                        fill: "#FFFFFF",
+                                        type: "button",
+                                        variant: "primary",
+                                        title: "Add current location",
                                       },
+                                      on: { click: _vm.getCurrentLocation },
                                     },
                                     [
-                                      _c("title", [_vm._v("current-location")]),
-                                      _vm._v(" "),
-                                      _c("path", {
-                                        attrs: {
-                                          d: "M0 0h24v24H0V0z",
-                                          fill: "none",
+                                      _c(
+                                        "svg",
+                                        {
+                                          attrs: {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            height: "48px",
+                                            viewBox: "0 0 24 24",
+                                            width: "48px",
+                                            fill: "#FFFFFF",
+                                          },
                                         },
-                                      }),
-                                      _c("path", {
-                                        attrs: {
-                                          d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
-                                        },
-                                      }),
+                                        [
+                                          _c("title", [
+                                            _vm._v("current-location"),
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("path", {
+                                            attrs: {
+                                              d: "M0 0h24v24H0V0z",
+                                              fill: "none",
+                                            },
+                                          }),
+                                          _c("path", {
+                                            attrs: {
+                                              d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
+                                            },
+                                          }),
+                                        ]
+                                      ),
                                     ]
                                   ),
-                                ]
+                                ],
+                                1
+                              )
+                            : _c(
+                                "div",
+                                {
+                                  staticClass: "input-group position-relative",
+                                },
+                                [
+                                  _c("input", {
+                                    staticClass: "form-control",
+                                    attrs: {
+                                      type: "search",
+                                      id: "osm_location",
+                                      placeholder:
+                                        "Search you location on map.",
+                                      autocomplete: "off",
+                                    },
+                                    domProps: { value: _vm.osmSellerQuery },
+                                    on: {
+                                      input: function ($event) {
+                                        return _vm.onOsmSellerQueryInput(
+                                          $event.target.value
+                                        )
+                                      },
+                                    },
+                                  }),
+                                  _vm._v(" "),
+                                  _c(
+                                    "b-button",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "b-tooltip",
+                                          rawName: "v-b-tooltip.hover",
+                                          modifiers: { hover: true },
+                                        },
+                                      ],
+                                      staticClass: "search_location_btn",
+                                      attrs: {
+                                        type: "button",
+                                        variant: "primary",
+                                        title: "Add current location",
+                                      },
+                                      on: { click: _vm.getOsmCurrentLocation },
+                                    },
+                                    [
+                                      _c(
+                                        "svg",
+                                        {
+                                          attrs: {
+                                            xmlns: "http://www.w3.org/2000/svg",
+                                            height: "48px",
+                                            viewBox: "0 0 24 24",
+                                            width: "48px",
+                                            fill: "#FFFFFF",
+                                          },
+                                        },
+                                        [
+                                          _c("title", [
+                                            _vm._v("current-location"),
+                                          ]),
+                                          _vm._v(" "),
+                                          _c("path", {
+                                            attrs: {
+                                              d: "M0 0h24v24H0V0z",
+                                              fill: "none",
+                                            },
+                                          }),
+                                          _c("path", {
+                                            attrs: {
+                                              d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
+                                            },
+                                          }),
+                                        ]
+                                      ),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _vm.osmSellerSuggestions.length
+                                    ? _c(
+                                        "ul",
+                                        {
+                                          staticClass:
+                                            "list-group osm-suggestions",
+                                        },
+                                        _vm._l(
+                                          _vm.osmSellerSuggestions,
+                                          function (s) {
+                                            return _c(
+                                              "li",
+                                              {
+                                                key: s.placePrediction.placeId,
+                                                staticClass:
+                                                  "list-group-item list-group-item-action",
+                                                staticStyle: {
+                                                  cursor: "pointer",
+                                                },
+                                                on: {
+                                                  mousedown: function ($event) {
+                                                    $event.preventDefault()
+                                                    return _vm.selectOsmSellerSuggestion(
+                                                      s
+                                                    )
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                _vm._v(
+                                                  "\n                                                    " +
+                                                    _vm._s(
+                                                      s.placePrediction.text
+                                                        .text
+                                                    ) +
+                                                    "\n                                                "
+                                                ),
+                                              ]
+                                            )
+                                          }
+                                        ),
+                                        0
+                                      )
+                                    : _vm._e(),
+                                ],
+                                1
                               ),
-                            ],
-                            1
-                          ),
                           _vm._v(" "),
                           _c(
                             "span",
@@ -1810,84 +1959,108 @@ var render = function () {
                               ])
                             : _vm._e(),
                           _vm._v(" "),
-                          _c(
-                            "div",
-                            {
-                              staticStyle: {
-                                position: "relative",
-                                overflow: "hidden",
-                              },
-                              attrs: { id: "map" },
-                            },
-                            [
-                              _c(
-                                "GmapMap",
+                          _vm.mapProvider === "google"
+                            ? _c(
+                                "div",
                                 {
-                                  ref: "mapRef",
                                   staticStyle: {
-                                    width: "100%",
-                                    height: "400px",
-                                    "margin-top": "20px",
+                                    position: "relative",
+                                    overflow: "hidden",
                                   },
-                                  attrs: {
-                                    center: _vm.center,
-                                    zoom: 13,
-                                    mapTypeControl: true,
-                                  },
-                                  on: { click: _vm.handleMapClick },
+                                  attrs: { id: "map" },
                                 },
                                 [
-                                  _vm._l(_vm.markers, function (m, index) {
-                                    return _c("GmapMarker", {
-                                      key: index,
-                                      attrs: {
-                                        position: m.position,
-                                        clickable: true,
-                                        draggable: true,
-                                      },
-                                      on: {
-                                        drag: _vm.updateCoordinates,
-                                        click: _vm.updateCoordinates,
-                                      },
-                                    })
-                                  }),
-                                  _vm._v(" "),
                                   _c(
-                                    "gmap-info-window",
+                                    "GmapMap",
                                     {
+                                      ref: "mapRef",
+                                      staticStyle: {
+                                        width: "100%",
+                                        height: "400px",
+                                        "margin-top": "20px",
+                                      },
                                       attrs: {
-                                        options: {
-                                          maxWidth: 300,
-                                          pixelOffset: {
-                                            width: 0,
-                                            height: -35,
-                                          },
-                                        },
-                                        position: _vm.infoWindow.position,
-                                        opened: _vm.infoWindow.open,
+                                        center: _vm.center,
+                                        zoom: 13,
+                                        mapTypeControl: true,
                                       },
-                                      on: {
-                                        closeclick: function ($event) {
-                                          _vm.infoWindow.open = false
-                                        },
-                                      },
+                                      on: { click: _vm.handleMapClick },
                                     },
                                     [
-                                      _c("div", {
-                                        domProps: {
-                                          innerHTML: _vm._s(
-                                            _vm.infoWindow.template
-                                          ),
-                                        },
+                                      _vm._l(_vm.markers, function (m, index) {
+                                        return _c("GmapMarker", {
+                                          key: index,
+                                          attrs: {
+                                            position: m.position,
+                                            clickable: true,
+                                            draggable: true,
+                                          },
+                                          on: {
+                                            drag: _vm.updateCoordinates,
+                                            click: _vm.updateCoordinates,
+                                          },
+                                        })
                                       }),
-                                    ]
+                                      _vm._v(" "),
+                                      _c(
+                                        "gmap-info-window",
+                                        {
+                                          attrs: {
+                                            options: {
+                                              maxWidth: 300,
+                                              pixelOffset: {
+                                                width: 0,
+                                                height: -35,
+                                              },
+                                            },
+                                            position: _vm.infoWindow.position,
+                                            opened: _vm.infoWindow.open,
+                                          },
+                                          on: {
+                                            closeclick: function ($event) {
+                                              _vm.infoWindow.open = false
+                                            },
+                                          },
+                                        },
+                                        [
+                                          _c("div", {
+                                            domProps: {
+                                              innerHTML: _vm._s(
+                                                _vm.infoWindow.template
+                                              ),
+                                            },
+                                          }),
+                                        ]
+                                      ),
+                                    ],
+                                    2
                                   ),
                                 ],
-                                2
+                                1
+                              )
+                            : _c(
+                                "div",
+                                { attrs: { id: "osm_map" } },
+                                [
+                                  _c("osm-map-picker", {
+                                    ref: "osmSellerDetailsMap",
+                                    attrs: {
+                                      lat: _vm.latitude,
+                                      lng: _vm.longitude,
+                                      height: "400px",
+                                      "show-search-box": false,
+                                    },
+                                    on: {
+                                      "location-selected":
+                                        _vm.onOsmLocationSelected,
+                                      "suggestions-updated": function ($event) {
+                                        _vm.osmSellerSuggestions = $event
+                                      },
+                                    },
+                                  }),
+                                ],
+                                1
                               ),
-                            ],
-                            1
-                          ),
                           _vm._v(" "),
                           _vm.formatted_address
                             ? _c("div", [
@@ -1913,7 +2086,7 @@ var render = function () {
                     _vm._v(" "),
                     _c("div", { staticClass: "card-body" }, [
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Bank Name")]),
                             _vm._v(" "),
@@ -1945,7 +2118,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Account Number")]),
                             _vm._v(" "),
@@ -1977,7 +2150,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Bank's IFSC Code")]),
                             _vm._v(" "),
@@ -2009,7 +2182,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "form-group col-md-4" }, [
+                        _c("div", { staticClass: "form-group col-md-6" }, [
                           _c("div", { staticClass: "form-group" }, [
                             _c("label", [_vm._v("Bank Account Name")]),
                             _vm._v(" "),
@@ -2046,22 +2219,27 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c(
-                  "button",
-                  {
-                    staticClass:
-                      "btn btn-primary btn-block btn-lg shadow-lg mt-5",
-                  },
+                  "div",
+                  { staticClass: "col-12 d-flex justify-content-end mt-3" },
                   [
-                    _vm._v(
-                      "\n                        Complete\n                        "
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary btn-lg px-5 complete-btn",
+                      },
+                      [
+                        _vm._v(
+                          "\n                            Complete\n                            "
+                        ),
+                        _vm.isLoading
+                          ? _c("b-spinner", {
+                              attrs: { small: "", label: "Spinning" },
+                            })
+                          : _vm._e(),
+                      ],
+                      1
                     ),
-                    _vm.isLoading
-                      ? _c("b-spinner", {
-                          attrs: { small: "", label: "Spinning" },
-                        })
-                      : _vm._e(),
-                  ],
-                  1
+                  ]
                 ),
               ]),
             ]
@@ -2088,7 +2266,9 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header" }, [
-      _c("h4", [_vm._v("Store Information")]),
+      _c("h4", { staticClass: "card-title mb-0" }, [
+        _vm._v("Store Information"),
+      ]),
     ])
   },
   function () {
@@ -2120,7 +2300,9 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header" }, [
-      _c("h4", [_vm._v("Store Location Information")]),
+      _c("h4", { staticClass: "card-title mb-0" }, [
+        _vm._v("Store Location Information"),
+      ]),
     ])
   },
   function () {
@@ -2128,7 +2310,9 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "card-header" }, [
-      _c("h4", [_vm._v("Seller Bank Information")]),
+      _c("h4", { staticClass: "card-title mb-0" }, [
+        _vm._v("Seller Bank Information"),
+      ]),
     ])
   },
 ]

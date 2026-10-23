@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
+            <div class="page-title"><div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>{{ __('delivery_boy_privacy_policy_and_term_conditions') }}</h3>
                 </div>
@@ -9,22 +9,23 @@
                     <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                            <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('delivery_boy_privacy_policy_and_term_conditions') }}</li>
                         </ol>
                     </nav>
                 </div>
-            </div>
+            </div></div>
         </div>
             <section class="section">
                 <form id="contact_us_form" method="post" enctype="multipart/form-data" @submit.prevent="saveRecord">
-                    <div class="figma-main-section-card">
-                        <div class="card-body p-0">
-                            <div class="figma-action-bar-row">
-                                <h4 class="card-title mb-0">{{ __('update_privacy_policy') }}</h4>
-                            </div>
-                            <div class="p-4">
+                    <div class="card settings-editor-card">
+                        <div class="card-header">
+                            <h4 class="card-title float-none">{{ __('update_privacy_policy') }}</h4>
+                            <p class="text-muted small mb-0 mt-1">{{ tr('delivery_boy_policies_desc', 'Privacy policy and terms that delivery boys accept, per language.') }}</p>
+                        </div>
+                        <div class="card-body">
                             <!-- Language Tabs -->
-                            <div class="col-md-12 mb-3" v-if="languages.length > 0">
+                            <div class="mb-3" v-if="languages.length > 0">
                                 <b-tabs v-model="activeLanguageTab" content-class="mt-3">
                                     <b-tab v-for="language in languages" :key="language.id" :title="language.name" lazy>
                                         <template #title>
@@ -55,9 +56,9 @@
                                         <!-- Translate buttons END -->
 
                             <div class="form-group">
-                                <div class="d-flex justify-content-between mb-2">
-                                                <label>{{ __('privacy_policy') }} <i class="text-danger" v-if="language.is_default">*</i></label>
-                                                <a :href="$baseUrl+'/delivery-boy-privacy-policy?lang=' + language.code" v-b-tooltip.hover :title="__('privacy_policy')" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                <div class="d-flex justify-content-between align-items-center mb-2 settings-editor-label-row">
+                                                <label class="form-label mb-0">{{ __('privacy_policy') }} <i class="text-danger" v-if="language.is_default">*</i></label>
+                                                <a :href="$baseUrl+'/delivery-boy-privacy-policy?lang=' + language.code" v-b-tooltip.hover.viewport :title="__('privacy_policy')" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fa fa-eye"></i></a>
                                 </div>
                                 <editor
                                     :placeholder="__('privacy_policy')"
@@ -66,11 +67,11 @@
                                 />
                             </div>
 
-                                        <h4 class="card-title mt-4">{{ __('update_term_conditions') }}</h4>
+                                        <h4 class="settings-subsection-title">{{ __('update_term_conditions') }}</h4>
                             <div class="form-group">
-                                <div class="d-flex justify-content-between mb-2">
-                                                <label>{{ __('term_conditions') }} <i class="text-danger" v-if="language.is_default">*</i></label>
-                                                <a :href="$baseUrl+'/delivery-boy-terms-conditions?lang=' + language.code" v-b-tooltip.hover :title="__('terms_conditions')" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-eye"></i></a>
+                                <div class="d-flex justify-content-between align-items-center mb-2 settings-editor-label-row">
+                                                <label class="form-label mb-0">{{ __('term_conditions') }} <i class="text-danger" v-if="language.is_default">*</i></label>
+                                                <a :href="$baseUrl+'/delivery-boy-terms-conditions?lang=' + language.code" v-b-tooltip.hover.viewport :title="__('terms_conditions')" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fa fa-eye"></i></a>
                                 </div>
                                 <editor
                                     :placeholder="__('terms_conditions')"
@@ -86,14 +87,13 @@
                             <div v-else-if="isLoadingLanguages" class="text-center p-3 mb-3">
                                 <b-spinner :label="__('loading')"></b-spinner>
                             </div>
+                            <div class="d-flex justify-content-end border-top pt-3 mt-2">
+                                    <b-button type="submit" variant="primary" :disabled="isLoading">
+                                        {{ __('update') }}
+                                        <b-spinner v-if="isLoading" small />
+                                    </b-button>
+                            </div>
                         </div>
-                            </div>
-                            <div class="figma-action-bar-row border-top">
-                                <b-button type="submit" variant="primary" :disabled="isLoading" class="btn-figma-action px-5">
-                                    {{ __('update') }}
-                                    <b-spinner v-if="isLoading" small />
-                                </b-button>
-                            </div>
                         </div>
                 </form>
             </section>
@@ -133,6 +133,7 @@ export default {
         this.getPrivacyPolicyDeliveryBoy();
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
         // Get editor configuration with safe fallbacks
         getEditorConfig() {
             const plugins = (this.$editorPlugins && Array.isArray(this.$editorPlugins)) 
@@ -356,3 +357,17 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.settings-editor-label-row label {
+    margin-bottom: 0;
+}
+.settings-subsection-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    margin: 24px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+</style>

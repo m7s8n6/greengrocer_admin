@@ -81,7 +81,7 @@ class Git
             $callables[] = static function (string $url) use ($cmd): array {
                 $map = [
                     '%url%' => $url,
-                    '%sanitizedUrl%' => Url::stripCredentials($url),
+                    '%sanitizedUrl%' => Preg::replace('{://([^@]+?):(.+?)@}', '://', $url),
                 ];
 
                 return array_map(static function ($value) use ($map): string {
@@ -141,7 +141,7 @@ class Git
         };
 
         if (Preg::isMatch('{^ssh://[^@]+@[^:]+:[^0-9]+}', $url)) {
-            throw new \InvalidArgumentException('The source URL ' . Url::sanitize($url) . ' is invalid, ssh URLs should have a port number after ":".' . "\n" . 'Use ssh://git@example.com:22/path or just git@example.com:path if you do not want to provide a password or custom port.');
+            throw new \InvalidArgumentException('The source URL ' . $url . ' is invalid, ssh URLs should have a port number after ":".' . "\n" . 'Use ssh://git@example.com:22/path or just git@example.com:path if you do not want to provide a password or custom port.');
         }
 
         if (!$initialClone) {
@@ -326,7 +326,7 @@ class Git
                     $defaultUsername = null;
                     if (isset($authParts) && $authParts !== '') {
                         if (str_contains($authParts, ':')) {
-                            [$defaultUsername] = explode(':', $authParts, 2);
+                            [$defaultUsername, ] = explode(':', $authParts, 2);
                         } else {
                             $defaultUsername = $authParts;
                         }
@@ -361,9 +361,7 @@ class Git
                 $this->filesystem->removeDirectory($origCwd);
             }
 
-            if (\is_array($lastCommand)) {
-                $lastCommand = implode(' ', $lastCommand);
-            }
+            $lastCommand = implode(' ', $lastCommand);
             if (count($credentials) > 0) {
                 $lastCommand = $this->maskCredentials($lastCommand, $credentials);
                 $errorMsg = $this->maskCredentials($errorMsg, $credentials);
@@ -375,7 +373,7 @@ class Git
     public function syncMirror(string $url, string $dir): bool
     {
         if ((bool) Platform::getEnv('COMPOSER_DISABLE_NETWORK') && Platform::getEnv('COMPOSER_DISABLE_NETWORK') !== 'prime') {
-            $this->io->writeError('<warning>Aborting git mirror sync of '.Url::sanitize($url).' as network is disabled</warning>');
+            $this->io->writeError('<warning>Aborting git mirror sync of '.$url.' as network is disabled</warning>');
 
             return false;
         }
@@ -383,17 +381,14 @@ class Git
         // update the repo if it is a valid git repository
         if (is_dir($dir) && 0 === $this->process->execute(['git', 'rev-parse', '--git-dir'], $output, $dir) && trim($output) === '.') {
             try {
-                try {
-                    $commands = [
-                        ['git', 'remote', 'set-url', 'origin', '--', '%url%'],
-                        ['git', 'remote', 'update', '--prune', 'origin'],
-                        ['git', 'gc', '--auto'],
-                    ];
+                $commands = [
+                    ['git', 'remote', 'set-url', 'origin', '--', '%url%'],
+                    ['git', 'remote', 'update', '--prune', 'origin'],
+                    ['git', 'remote', 'set-url', 'origin', '--', '%sanitizedUrl%'],
+                    ['git', 'gc', '--auto'],
+                ];
 
-                    $this->runCommands($commands, $url, $dir);
-                } finally {
-                    $this->runCommands([['git', 'remote', 'set-url', 'origin', '--', '%sanitizedUrl%']], $url, $dir);
-                }
+                $this->runCommands($commands, $url, $dir);
             } catch (\Exception $e) {
                 $this->io->writeError('<error>Sync mirror failed: ' . $e->getMessage() . '</error>', true, IOInterface::DEBUG);
 
@@ -408,8 +403,6 @@ class Git
         $this->filesystem->removeDirectory($dir);
 
         $this->runCommands([['git', 'clone', '--mirror', '--', '%url%', $dir]], $url, $dir, true);
-
-        $this->runCommands([['git', 'remote', 'set-url', 'origin', '--', '%sanitizedUrl%']], $url, $dir);
 
         return true;
     }
@@ -472,54 +465,6 @@ class Git
         return explode(' ', substr($flags, 1));
     }
 
-    /**
-     * Checks if git version supports --no-commit-header flag (git 2.33+)
-     *
-     * @internal
-     */
-    public static function supportsNoCommitHeaderFlag(ProcessExecutor $process): bool
-    {
-        $gitVersion = self::getVersion($process);
-
-        return $gitVersion !== null && version_compare($gitVersion, '2.33.0-rc0', '>=');
-    }
-
-    /**
-     * Builds a git rev-list command with --no-commit-header flag when supported (git 2.33+)
-     *
-     * @internal
-     * @param list<string> $arguments Additional arguments for git rev-list
-     * @return non-empty-list<string>
-     */
-    public static function buildRevListCommand(ProcessExecutor $process, array $arguments): array
-    {
-        $command = ['git', 'rev-list'];
-        if (self::supportsNoCommitHeaderFlag($process)) {
-            $command[] = '--no-commit-header';
-        }
-
-        return array_merge($command, $arguments);
-    }
-
-    /**
-     * Parses git rev-list output, removing 'commit <hash>' header lines for git < 2.33.
-     *
-     * When --no-commit-header is not available (git < 2.33), git rev-list --format outputs
-     * "commit <hash>" before formatted output. This removes those lines.
-     *
-     * @internal
-     */
-    public static function parseRevListOutput(string $output, ProcessExecutor $process): string
-    {
-        // If git supports --no-commit-header, output is already clean
-        if (self::supportsNoCommitHeaderFlag($process)) {
-            return $output;
-        }
-
-        // Filter out "commit <hash>" lines for older git versions
-        return Preg::replace('{^commit [a-f0-9]{40}\n?}m', '', $output);
-    }
-
     private function checkRefIsInMirror(string $dir, string $ref): bool
     {
         if (is_dir($dir) && 0 === $this->process->execute(['git', 'rev-parse', '--git-dir'], $output, $dir) && trim($output) === '.') {
@@ -573,13 +518,10 @@ class Git
                 $commands = [
                     ['git', 'remote', 'set-url', 'origin', '--', '%url%'],
                     ['git', 'remote', 'show', 'origin'],
+                    ['git', 'remote', 'set-url', 'origin', '--', '%sanitizedUrl%'],
                 ];
 
-                try {
-                    $this->runCommands($commands, $url, $dir, false, $output);
-                } finally {
-                    $this->runCommands([['git', 'remote', 'set-url', 'origin', '--', '%sanitizedUrl%']], $url, $dir);
-                }
+                $this->runCommands($commands, $url, $dir, false, $output);
             }
 
             $lines = $this->process->splitLines($output);
@@ -595,9 +537,9 @@ class Git
         return null;
     }
 
-    public static function cleanEnv(?ProcessExecutor $process = null): void
+    public static function cleanEnv(): void
     {
-        $gitVersion = self::getVersion($process ?? new ProcessExecutor());
+        $gitVersion = self::getVersion(new ProcessExecutor());
         if ($gitVersion !== null && version_compare($gitVersion, '2.3.0', '>=')) {
             // added in git 2.3.0, prevents prompting the user for username/password
             if (Platform::getEnv('GIT_TERMINAL_PROMPT') !== '0') {
@@ -644,8 +586,6 @@ class Git
     }
 
     /**
-     * Wraps $message in Url::sanitize() before throwing, so callers do not need to pre-sanitize the URL they pass in.
-     *
      * @param non-empty-string $message
      *
      * @return never
@@ -687,7 +627,7 @@ class Git
         $maskedCredentials = [];
 
         foreach ($credentials as $credential) {
-            if (in_array($credential, Url::NON_SECRET_CREDENTIALS, true)) {
+            if (in_array($credential, ['private-token', 'x-token-auth', 'oauth2', 'gitlab-ci-token', 'x-oauth-basic'])) {
                 $maskedCredentials[] = $credential;
             } elseif (strlen($credential) > 6) {
                 $maskedCredentials[] = substr($credential, 0, 3) . '...' . substr($credential, -3);

@@ -2,13 +2,11 @@
     <div>
         <div>
             <div class="page-heading">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('system_users') }}</h3>
-                    </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
+                <div class="page-title mb-3">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                        <h3 class="mb-0">{{ __('system_users') }}</h3>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard')
                                         }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('system_users') }}</li>
@@ -31,14 +29,14 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-figma-columns d-flex align-items-center gap-2"
-                                    @click="openCreateModal()" v-if="$role('Super Admin')">
-                                    <i class="fa fa-plus"></i>
-                                    <span>{{ __('add_new') }}</span>
-                                </button>
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                     @click="getRecords()" v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
+                                </button>
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    @click="openCreateModal()" v-if="$role('Super Admin')">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{{ __('add_new') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -48,23 +46,29 @@
                                 :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
                                 :bordered="false" :busy="isLoading" stacked="md" show-empty small
-                                :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table">
+                                :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table mb-0">
                                 <template #head()="data">
                                     <span class="figma-th">{{ data.label }}</span>
                                 </template>
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-2">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
                                 </template>
 
+                                <template #cell(username)="row">
+                                    <span class="sys-user-name">{{ row.item.username }}</span>
+                                </template>
+
                                 <template #cell(email)="row">
-                                    {{ row.item.email | emailMask }}
+                                    <span class="text-muted">{{ row.item.email | emailMask }}</span>
                                 </template>
 
                                 <template #cell(role)="row">
-                                    {{ row.item.role.name }}
+                                    <span class="badge" :class="row.item.role && row.item.role.name === 'Super Admin' ? 'bg-primary' : 'bg-secondary'">
+                                        {{ row.item.role ? row.item.role.name : '' }}
+                                    </span>
                                 </template>
 
                                 <template #cell(actions)="row">
@@ -91,16 +95,13 @@
                                 </template>
 
                             </b-table>
+                        </div>
 
-                            <div class="figma-table-footer">
-                                <div class="showing-results-text">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{
-                                    __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                                </div>
-                                <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
-                                    align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
-                                    prev-text="<" next-text=">"></b-pagination>
-                            </div>
+                        <div class="figma-table-footer flex-wrap gap-3">
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+                            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+                                align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
+                                prev-text="<" next-text=">"></b-pagination>
                         </div>
                     </div>
                 </div>
@@ -121,9 +122,9 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'username', label: __('username'), sortable: true, class: 'text-center' },
-                { key: 'email', label: __('email'), sortable: true, class: 'text-center' },
-                { key: 'role', label: __('role'), class: 'text-center' },
+                { key: 'username', label: __('username'), sortable: true },
+                { key: 'email', label: __('email'), sortable: true },
+                { key: 'role', label: __('role') },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,
@@ -189,8 +190,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -231,3 +232,10 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.sys-user-name {
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+</style>

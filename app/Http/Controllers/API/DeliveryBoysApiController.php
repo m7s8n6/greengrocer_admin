@@ -116,7 +116,10 @@ class DeliveryBoysApiController extends Controller
     public function getDeliveryBoy(Request $request)
     {
         $query = DeliveryBoy::withAllTranslations()
-            ->with(['admin', 'city'])
+            ->with(['admin', 'city', 'seller:id,name'])
+            // Admin and seller fleets are separate: sellers' own drivers (seller_id set) are
+            // managed from the seller panel only.
+            ->whereNull('seller_id')
             ->orderBy('id', 'DESC');
 
         if ($request->filled('filterStatus')) {
@@ -135,6 +138,9 @@ class DeliveryBoysApiController extends Controller
 
         $deliveryBoysForResponse = $deliveryBoys->map(function (DeliveryBoy $db) {
             $row = $db->toArray();
+            // seller_id set = driver belongs to that seller's own fleet; empty = admin's (shared) fleet.
+            $row['owner_type'] = $db->seller_id ? 'seller' : 'admin';
+            $row['seller_name'] = $db->seller ? $db->seller->name : '';
             $rawCreated = $db->getAttributes()['created_at'] ?? null;
             if ($rawCreated !== null && $rawCreated !== '') {
                 $row['created_at'] = CommonHelper::formatDateTime($rawCreated);
@@ -158,9 +164,22 @@ class DeliveryBoysApiController extends Controller
             return CommonHelper::responseError('delivery_boy_not_found');
         }
 
-        // Add city information to the admin's deliveryBoy object as an array
-        if ($deliveryBoy->city && $deliveryBoy->admin && $deliveryBoy->admin->deliveryBoy) {
-            $deliveryBoy->admin->deliveryBoy->cities = [$deliveryBoy->city];
+        // Every city served (pivot), main city first; falls back to the legacy single city.
+        $pivotIds = $deliveryBoy->cities()->pluck('cities.id')->map(fn ($id) => (int) $id)->all();
+        $mainId = (int) $deliveryBoy->city_id;
+        $cityIds = array_values(array_unique(array_filter(array_merge([$mainId], $pivotIds))));
+        $deliveryBoy->city_ids = $cityIds;
+
+        // One {id, name} per assigned city, in city_ids order.
+        $cityById = \App\Models\City::whereIn('id', $cityIds)->get(['id', 'name'])->keyBy('id');
+        $cities = collect($cityIds)
+            ->filter(fn ($id) => $cityById->has($id))
+            ->map(fn ($id) => ['id' => (int) $id, 'name' => $cityById[$id]->name])
+            ->values()
+            ->all();
+
+        if ($deliveryBoy->admin && $deliveryBoy->admin->deliveryBoy) {
+            $deliveryBoy->admin->deliveryBoy->cities = $cities;
         }
 
         DeliveryBoy::setOptimizedResponse(false);
@@ -183,7 +202,7 @@ class DeliveryBoysApiController extends Controller
                 'email' => 'email|required|unique:admins,email',
                 'password' => 'required',
                 'confirm_password' => 'required|same:password',
-                'city_id' => 'required',
+                'city_id' => Rule::requiredIf(empty(DeliveryBoy::cityIdsFromRequest($request))),
                 'driving_license' => 'nullable|file',
                 'national_identity_card' => 'nullable|file',
                 'bonus_percentage' => $request->bonus_type == 1 ? 'required|numeric|min:0.1' : 'nullable'
@@ -216,7 +235,7 @@ class DeliveryBoysApiController extends Controller
                 'name'     => $request->name,
                 'mobile'   => $request->mobile,
                 'dob'      => $request->dob,
-                'city_id'  => $request->city_id,
+                'city_id'  => DeliveryBoy::cityIdsFromRequest($request)[0] ?? $request->city_id,
                 'bonus_type' => $request->bonus_type ?? 0,
                 'bonus_percentage' => $request->bonus_percentage ?? 0,
                 'bonus_min_amount' => $request->bonus_min_amount ?? 0,
@@ -226,6 +245,9 @@ class DeliveryBoysApiController extends Controller
 
             $deliveryBoy->custom_field_values = $this->normalizeCustomFieldValues($request);
             $deliveryBoy->save();
+            if ($cityIds = DeliveryBoy::cityIdsFromRequest($request)) {
+                $deliveryBoy->cities()->sync($cityIds);
+            }
 
             /* Save Translation */
             $deliveryBoy->saveTranslation($request->language_id, [
@@ -293,7 +315,8 @@ class DeliveryBoysApiController extends Controller
             $deliveryBoy->name = $request->name;
             $deliveryBoy->mobile = $request->mobile ?? $deliveryBoy->mobile;
             $deliveryBoy->dob    = $request->dob ?? $deliveryBoy->dob;
-            $deliveryBoy->city_id = $request->city_id ?? $deliveryBoy->city_id;
+            $cityIds = DeliveryBoy::cityIdsFromRequest($request);
+            $deliveryBoy->city_id = $cityIds[0] ?? $request->city_id ?? $deliveryBoy->city_id;
             $deliveryBoy->status = $request->status ?? $deliveryBoy->status;
             // Remark field - always update (can be empty string)
             $deliveryBoy->remark = $request->input('remark', '');
@@ -307,6 +330,9 @@ class DeliveryBoysApiController extends Controller
             $deliveryBoy->custom_field_values = $this->normalizeCustomFieldValues($request, $deliveryBoy->custom_field_values ?? []);
 
             $deliveryBoy->save();
+            if (!empty($cityIds)) {
+                $deliveryBoy->cities()->sync($cityIds);
+            }
 
             // Update Admin password when password is provided
             if ($request->filled('password')) {
@@ -348,6 +374,14 @@ class DeliveryBoysApiController extends Controller
             $deliveryBoy = DeliveryBoy::find($request->id);
 
             if ($deliveryBoy) {
+                // A driver switching themselves to Deactive mid-delivery would strand the order, same
+                // as going Off Duty (see DeliveryBoyController::updateDuty). Admin / seller changes
+                // are unaffected - they can reassign the order.
+                $isSelf = auth()->check() && (int) auth()->user()->id === (int) $deliveryBoy->admin_id;
+                if ($isSelf && (int) $request->status !== DeliveryBoy::$statusActive && $deliveryBoy->pending_order_count > 0) {
+                    return CommonHelper::responseError('cannot_deactivate_with_active_delivery');
+                }
+
                 $deliveryBoy->status = $request->status;
                 $deliveryBoy->remark = $request->remark ?? "";
                 $deliveryBoy->save();
@@ -383,10 +417,25 @@ class DeliveryBoysApiController extends Controller
                     @Storage::disk('public')->delete($value);
                 }
             }
+            $adminId = $deliveryBoy->admin_id;
             $deliveryBoy->delete();
+            $this->deleteLoginAccount($adminId);
         }
 
         return CommonHelper::responseSuccess('delivery_boy_deleted_successfully');
+    }
+
+    /**
+     * Drivers log in through an admins row; deleting only the delivery_boys row leaves that
+     * login behind and its email stays "already taken" forever.
+     */
+    private function deleteLoginAccount($adminId): void
+    {
+        if (!$adminId) {
+            return;
+        }
+        \App\Models\AdminToken::where('user_id', $adminId)->where('type', 'Delivery Boy')->delete();
+        \App\Models\Admin::where('id', $adminId)->where('role_id', \App\Models\Role::$roleDeliveryBoy)->delete();
     }
 
     public function getStatus(Request $request)
@@ -413,7 +462,7 @@ class DeliveryBoysApiController extends Controller
             return CommonHelper::responseError('delivery_boy_not_found');
         }
 
-        $data = ['status' => $deliveryBoy->status, 'remark' => $deliveryBoy->remark];
+        $data = ['status' => $deliveryBoy->status, 'remark' => $deliveryBoy->remark, 'is_online' => (bool) $deliveryBoy->is_online];
         return CommonHelper::responseWithData($data);
     }
 
@@ -445,6 +494,8 @@ class DeliveryBoysApiController extends Controller
                     $query->where('s.delivery_boy_id', 0);
                 }
             } else {
+                // Admin fleet only: sellers' own drivers are paid from the seller panel.
+                $query->whereNull('d.seller_id');
                 if ($request->filled('delivery_boy_id')) {
                     $query->where('s.delivery_boy_id', $request->delivery_boy_id);
                 }
@@ -460,7 +511,7 @@ class DeliveryBoysApiController extends Controller
                     $deliveryBoys = [];
                 }
             } else {
-                $deliveryBoys = DeliveryBoy::select('id', 'name', 'mobile')->get();
+                $deliveryBoys = DeliveryBoy::whereNull('seller_id')->select('id', 'name', 'mobile')->get();
             }
 
             return CommonHelper::responseWithData([
@@ -485,6 +536,10 @@ class DeliveryBoysApiController extends Controller
 
         if ($validator->fails()) {
             return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        if (DeliveryBoy::where('id', $request->delivery_boy_id)->whereNotNull('seller_id')->exists()) {
+            return CommonHelper::responseError('delivery_boy_not_found');
         }
 
         try {
@@ -514,6 +569,10 @@ class DeliveryBoysApiController extends Controller
 
         if ($validator->fails()) {
             return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        if (DeliveryBoy::where('id', $request->delivery_boy_id)->whereNotNull('seller_id')->exists()) {
+            return CommonHelper::responseError('delivery_boy_not_found');
         }
 
         try {

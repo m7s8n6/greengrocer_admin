@@ -22,6 +22,7 @@ use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\WalletTransaction;
 use App\Models\User;
+use App\Models\DeliveryBoy;
 use App\Models\LiveTracking;
 use App\Models\PromoCode;
 use App\Models\Product;
@@ -229,7 +230,10 @@ class OrderApiController extends Controller
                     if (!empty($user_address->alternate_mobile)) {
                         $mobilePart .= '/' . $user_address->alternate_mobile;
                     }
-                    $address = $user_address->address . ' ' . $user_address->landmark . ' ' . $user_address->area . ' ' . $user_address->city . ' ' . $user_address->state . ' ' . $user_address->country . '-' . $user_address->pincode . ' ' . $user_address->name . ' ' . $mobilePart;
+                    // $address = $user_address->address . ' ' . $user_address->landmark . ' ' . $user_address->area . ' ' . $user_address->city . ' ' . $user_address->state . ' ' . $user_address->country . '-' . $user_address->pincode . ' ' . $user_address->name . ' ' . $mobilePart;
+                    // house no first, then address, then landmark - empty parts are skipped
+                    $addressStart = trim(implode(' ', array_filter([$user_address->house_no, $user_address->address, $user_address->landmark], fn ($part) => trim((string) $part) !== '')));
+                    $address = $addressStart . ' ' . $user_address->area . ' ' . $user_address->city . ' ' . $user_address->state . ' ' . $user_address->country . '-' . $user_address->pincode . ' ' . $user_address->name . ' ' . $mobilePart;
                     $mobile = $user_address->mobile;
                     $latitude = $user_address->latitude;
                     $longitude = $user_address->longitude;
@@ -471,6 +475,11 @@ class OrderApiController extends Controller
                 $order->latitude = $latitude;
                 $order->longitude = $longitude;
                 $order->delivery_time = $delivery_time;
+                // Remember Quick Delivery orders (auto-assign starts the driver offer at Received for them).
+                $slotModuleId = \App\Models\Order::getCurrentModuleId() ?: 1;
+                $order->slot_type = ($order_type == 'doorstep'
+                    && in_array(Setting::get_value('time_slots_is_enabled_' . $slotModuleId), [1, '1', true, 'true'], true)
+                    && Setting::effectiveTimeSlotType($slotModuleId) === 'express') ? 'express' : null;
                 $order->status = $order_status;
                 $order->active_status = $active_status;
                 $order->order_from = $order_from;
@@ -659,13 +668,39 @@ class OrderApiController extends Controller
                 throw $e;
                 return CommonHelper::responseError(__('could_not_place_order_try_again'));
             }
+
+            // Track platform usage for every placed order (not just online-paid ones via
+            // addTransaction) - COD/wallet orders never call addTransaction, so without this
+            // the Platform Usage dashboard stays empty regardless of real order volume.
+            if ($request->device_type) {
+                try {
+                    AppUsage::create([
+                        'order_id' => $order->id,
+                        'device_type' => $request->device_type,
+                        'app_version' => $request->app_version ?? '',
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("Place order AppUsage error :", [$e->getMessage()]);
+                }
+            }
+
             if (!empty($order) && $payment_method == Transaction::$paymentTypeCod || $payment_method == Transaction::$paymentTypeWallet) {
                 try {
                     dispatch(function () use ($order) {
-                        //push notification 
-                        CommonHelper::sendNotificationOrderStatus($order);
-                        // Send notifications to super admin (role_id=1) and sellers (role_id=3) whose items are in the order
-                        CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                        // Panel notification first, in its own guard: a failure in the push/email
+                        // below must never stop super admin / seller / delivery boy panel notifications.
+                        try {
+                            // Send notifications to super admin (role_id=1) and sellers (role_id=3) whose items are in the order
+                            CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                        } catch (\Throwable $e) {
+                            Log::error("Place order panel notification error :", [$e->getMessage()]);
+                        }
+                        try {
+                            //push notification 
+                            CommonHelper::sendNotificationOrderStatus($order);
+                        } catch (\Throwable $e) {
+                            Log::error("Place order push notification error :", [$e->getMessage()]);
+                        }
                     })->afterResponse();
                 } catch (\Exception $e) {
                     Log::error("Place orderNotification error :", [$e->getMessage()]);
@@ -678,16 +713,25 @@ class OrderApiController extends Controller
                     Log::error("Place order Send mail error :", [$e->getMessage()]);
                 }
 
-                //Place Order Send SMS
+                //Place Order Send SMS - off the request path (provider call + mail are slow)
                 try {
-                    CommonHelper::sendSmsOrderStatus($order, $order->active_status);
+                    dispatch(function () use ($order) {
+                        CommonHelper::sendSmsOrderStatus($order, $order->active_status);
+                    })->afterResponse();
                 } catch (\Exception $e) {
                     Log::error("Place order SMS error :", [$e->getMessage()]);
                 }
             }
 
             try {
-                CommonHelper::sendLowStockNotification($updatedVariants);
+                // Low-stock emails hit SMTP per seller - keep them off the request path too.
+                dispatch(function () use ($updatedVariants) {
+                    try {
+                        CommonHelper::sendLowStockNotification($updatedVariants);
+                    } catch (\Exception $e) {
+                        Log::channel('low_stock_mail')->info("Low stock notification error: " . $e->getMessage());
+                    }
+                })->afterResponse();
             } catch (\Exception $e) {
                 Log::channel('low_stock_mail')->info("Low stock notification error: " . $e->getMessage());
             }
@@ -1423,7 +1467,7 @@ class OrderApiController extends Controller
                     $request->razorpay_signature
                 );
 
-                if (!$signatureIsVaid) {
+                if ($signatureIsVaid) {
                     $status = Transaction::$statusSuccess;
                 }
             } else if ($request->payment_method == Transaction::$paymentTypePaystack) {
@@ -1550,8 +1594,17 @@ class OrderApiController extends Controller
                     // Send Push notifications & Email & SMS
                     try {
                         dispatch(function () use ($order) {
-                            CommonHelper::sendNotificationOrderStatus($order);
-                            CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                            // Panel notification first, in its own guard (see place order above).
+                            try {
+                                CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                            } catch (\Throwable $e) {
+                                Log::error("Place order panel notification error :", [$e->getMessage()]);
+                            }
+                            try {
+                                CommonHelper::sendNotificationOrderStatus($order);
+                            } catch (\Throwable $e) {
+                                Log::error("Place order push notification error :", [$e->getMessage()]);
+                            }
                         })->afterResponse();
                     } catch (\Exception $e) {
                         Log::error("Place orderNotification error :", [$e->getMessage()]);
@@ -1773,7 +1826,7 @@ class OrderApiController extends Controller
                 $currentBalance = $user->balance;
 
                 // Initialize additional charges total at the beginning
-                $additional_charges = json_decode($order->additional_charges, true) ?? [];
+                $additional_charges = CommonHelper::orderChargesArray($order->additional_charges);
                 $additional_charges_total = array_sum(array_column($additional_charges, 'amount'));
                 $refundable_charges_total = 0;
                 $non_refundable_charges_total = 0;
@@ -2160,9 +2213,17 @@ class OrderApiController extends Controller
 
             $res[$i]['date'] = CommonHelper::formatDateTime($row->created_at);
             $res[$i]['created_at'] = $row->created_at;
-            $res[$i]['estimate_date'] = CommonHelper::formatDate(
-                Carbon::parse($row->created_at)->addDays($deliveryEstimateDays)
-            );
+            // The estimate-in-days setting belongs to Fixed Time Window only. A Quick Delivery order is
+            // delivered within minutes of the order, so its estimate date is the order's own date.
+            if (($row->slot_type ?? null) === 'express') {
+                // Quick Delivery has no estimate date, so the field is left out of the reply. It shows
+                // the minutes instead, like the cart does.
+                $res[$i]['delivery_minutes'] = $this->expressSlotMinutes($row->module_id ?? null);
+            } else {
+                $res[$i]['estimate_date'] = CommonHelper::formatDate(
+                    Carbon::parse($row->created_at)->addDays($deliveryEstimateDays)
+                );
+            }
 
             $res[$i]['bank_transfer_message'] = !empty($res[$i]['bank_transfer_message']) ? $res[$i]['bank_transfer_message'] : "";
             $res[$i]['bank_transfer_status'] = !empty($res[$i]['bank_transfer_status']) ? $res[$i]['bank_transfer_status'] : 0;
@@ -2511,6 +2572,26 @@ class OrderApiController extends Controller
         }
     }
 
+    /**
+     * "Ready in N minutes" of the module's Quick Delivery slot (one per module), cached for this
+     * request. Null when the module has no Quick Delivery slot.
+     */
+    private function expressSlotMinutes($moduleId): ?int
+    {
+        static $cache = [];
+        $key = (int) $moduleId;
+        if (!array_key_exists($key, $cache)) {
+            $minutes = \App\Models\TimeSlot::withoutGlobalScopes()
+                ->where('module_id', $key)
+                ->where('slot_type', 'express')
+                ->where('status', 1)
+                ->orderBy('id')
+                ->value('duration_minutes');
+            $cache[$key] = $minutes !== null ? (int) $minutes : null;
+        }
+        return $cache[$key];
+    }
+
     public function getLiveTrackingDetails(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -2524,10 +2605,8 @@ class OrderApiController extends Controller
         // Retrieve the order ID from the request
         $orderId = $request->input('order_id');
 
-        // Fetch the live tracking details based on the order ID
-        $trackingData = LiveTracking::where('order_id', $orderId)
-            ->orderBy('id', 'desc')
-            ->first();
+        // Latest rider position (live_tracking, or the rider's own position if that is newer)
+        $trackingData = LiveTracking::freshestFor(Order::find($orderId));
 
         // Check if the tracking data exists
         if ($trackingData) {
@@ -2535,6 +2614,40 @@ class OrderApiController extends Controller
         } else {
             return CommonHelper::responseError("Live Tracking Not available.");
         }
+    }
+
+    /**
+     * Road route from the driver's latest live location to the order's delivery address,
+     * for the customer's live tracking map. Poll alongside /live_tracking.
+     */
+    public function getLiveTrackingRoute(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|numeric|exists:orders,id',
+        ]);
+        if ($validator->fails()) {
+            return CommonHelper::responseError($validator->errors()->first());
+        }
+
+        $order = Order::find($request->input('order_id'));
+        $payload = LiveTracking::routePayload($order);
+        if (!$payload) {
+            return CommonHelper::responseError("Live Tracking Not available.");
+        }
+
+        return CommonHelper::responseSuccessWithData("Live Tracking Route fetched successfully.", $payload);
+    }
+
+    /** Pusher/Reverb private-channel auth for the customer's live tracking subscription. */
+    public function broadcastAuth(Request $request)
+    {
+        // This route already ran through auth:api-customers. The channel lists the admin guard
+        // first, and a customer's token id can also match an admin row - so pin the caller to the
+        // customer for every guard, otherwise that admin is picked and the owner check fails.
+        $customer = auth('api-customers')->user();
+        $request->setUserResolver(fn ($guard = null) => $customer);
+
+        return \Illuminate\Support\Facades\Broadcast::auth($request);
     }
 
     public function getOrderStatusPhonepe(Request $request)
@@ -2669,8 +2782,17 @@ class OrderApiController extends Controller
                         // Send Push notifications & Email & SMS
                         try {
                             dispatch(function () use ($order) {
-                                CommonHelper::sendNotificationOrderStatus($order);
-                                CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                                // Panel notification first, in its own guard (see place order above).
+                                try {
+                                    CommonHelper::sendOrderNotificationsToAdmins($order, 'new_order', $order->delivery_boy_id ?? null);
+                                } catch (\Throwable $e) {
+                                    Log::error("Place order panel notification error :", [$e->getMessage()]);
+                                }
+                                try {
+                                    CommonHelper::sendNotificationOrderStatus($order);
+                                } catch (\Throwable $e) {
+                                    Log::error("Place order push notification error :", [$e->getMessage()]);
+                                }
                             })->afterResponse();
                         } catch (\Exception $e) {
                             Log::error("Place orderNotification error :", [$e->getMessage()]);
@@ -2788,12 +2910,18 @@ class OrderApiController extends Controller
                 Log::error("Error processing Phonepe callback: " . $e->getMessage());
                 return CommonHelper::responseError("An error occurred while processing the callback.");
             }
+
+            // Every branch above returns; anything reaching here (non-order failure, unknown
+            // type, missing/inactive subscription plan) would otherwise answer 200 with an empty body.
+            return CommonHelper::responseWithData([
+                'status' => $paymentDetails['state'] ?? 'FAILED',
+                'order_id' => $metaInfo['order_id'] ?? null,
+                'user_id' => $metaInfo['user_id'] ?? null,
+                'type' => $metaInfo['type'] ?? null,
+            ]);
         } catch (\Exception $e) {
             Log::error('PhonePe Status Check Error: ' . $e->getMessage());
-            return response()->json([
-                'error' => true,
-                'message' => $e->getMessage()
-            ], 500);
+            return CommonHelper::responseError('something_went_wrong');
         }
     }
 }

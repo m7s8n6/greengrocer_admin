@@ -142,7 +142,14 @@ class CategoryApiController extends Controller
                 $categoryId = $request->input('id');
                 $statusFilter = $request->input('status');
 
-                $categoriesQuery = Category::orderBy('id', 'DESC');
+                $sort = $request->input('sort', 'row_order');
+                $order = strtolower($request->input('order', 'asc')) === 'desc' ? 'DESC' : 'ASC';
+
+                if ($sort === 'row_order') {
+                    $categoriesQuery = Category::orderByRaw('CASE WHEN row_order = 0 OR row_order IS NULL THEN 999999 ELSE row_order END ASC')->orderBy('id', 'DESC');
+                } else {
+                    $categoriesQuery = Category::orderBy($sort, $order);
+                }
 
                 // Optionally filter by status (e.g. status=1 for active-only dropdowns)
                 if (!is_null($statusFilter)) {
@@ -161,19 +168,15 @@ class CategoryApiController extends Controller
                         $query->where('name', 'like', "%{$filter}%")
                             ->orWhere('subtitle', 'like', "%{$filter}%");
                     });
-                    $categoriesQuery = $categoriesQuery->where(function ($query) use ($filter) {
-                        $query->where('name', 'like', "%{$filter}%")
-                            ->orWhere('subtitle', 'like', "%{$filter}%");
-                    });
                 }
                 $total = $categoriesQuery->count();
                 if (!$useContentLanguage) {
                     $categoriesQuery = $categoriesQuery->with('translations');
                 }
                 if (isset($limit) && !is_null($limit)) {
-                    $categories = $categoriesQuery->orderBy('id', 'desc')->skip($offset)->take($limit)->get();
+                    $categories = $categoriesQuery->skip($offset)->take($limit)->get();
                 } else {
-                    $categories = $categoriesQuery->orderBy('id', 'desc')->get();
+                    $categories = $categoriesQuery->get();
                 }
 
                 if ($categories->isEmpty()) {
@@ -249,6 +252,13 @@ class CategoryApiController extends Controller
             if ($count > 0) {
                 $slug .= '-' . ($count + 1);
             }
+        }
+
+        // A new category (default language) must not reuse another category's slug in this module.
+        // Other languages legitimately re-post the same slug to add their translation, so only
+        // the default-language save is checked.
+        if ($isDefaultLanguage && Category::where('slug', $slug)->exists()) {
+            return CommonHelper::responseError('category_slug_already_exists');
         }
 
         $category = Category::where('slug', $slug)->first();
@@ -346,6 +356,12 @@ class CategoryApiController extends Controller
         }
 
         if ($isDefaultLanguage && $request->has('slug')) {
+            // Only a changed slug is checked, so categories that already share a slug can still be
+            // edited without touching it.
+            if ($request->slug !== $category->slug
+                && Category::where('slug', $request->slug)->where('id', '!=', $category->id)->exists()) {
+                return CommonHelper::responseError('category_slug_already_exists');
+            }
             $category->slug = $request->slug;
         }
 

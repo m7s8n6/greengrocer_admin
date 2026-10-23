@@ -31,6 +31,11 @@ class CustomFieldApiController extends Controller
         return $user->seller->id;
     }
 
+    public function getDateFormat()
+    {
+        return CommonHelper::responseWithData(CommonHelper::getDateFormat());
+    }
+
     public function getCustomFields(Request $request)
     {
         $module = $request->get('module');
@@ -44,6 +49,12 @@ class CustomFieldApiController extends Controller
 
         if (!empty($module)) {
             $query->where('module', $module);
+        }
+
+        // Seller-created delivery_boy fields (seller_id set) apply only to that seller's own fleet;
+        // admin/public forms see only the global ones (seller_id null).
+        if ($module === 'delivery_boy') {
+            $sellerId ? $query->where('seller_id', $sellerId) : $query->whereNull('seller_id');
         }
 
         if ($module === 'product') {
@@ -76,7 +87,7 @@ class CustomFieldApiController extends Controller
 
         $customFields = $query->get();
 
-        if ($module === 'product') {
+        if (in_array($module, ['product', 'delivery_boy'])) {
             $customFields->each(function ($field) use ($sellerId) {
                 $field->is_mine = $sellerId && $field->seller_id == $sellerId;
             });
@@ -93,7 +104,7 @@ class CustomFieldApiController extends Controller
             'module' => 'required|in:seller,delivery_boy,customer,product',
             'translations' => 'required|array',
             "translations.{$defaultLanguage->id}.name" => 'required|string',
-            'type' => 'required|in:text,number,dropdown,file,textarea',
+            'type' => 'required|in:text,number,dropdown,file,textarea,date',
             "translations.{$defaultLanguage->id}.options" => 'required_if:type,dropdown',
         ]);
 
@@ -102,7 +113,7 @@ class CustomFieldApiController extends Controller
         }
 
         $sellerId = $this->currentSellerId();
-        if ($sellerId && $request->module !== 'product') {
+        if ($sellerId && !in_array($request->module, ['product', 'delivery_boy'])) {
             return CommonHelper::responseError('not_authorized');
         }
 
@@ -145,7 +156,7 @@ class CustomFieldApiController extends Controller
             'module' => 'required|in:seller,delivery_boy,customer,product',
             'translations' => 'required|array',
             "translations.{$defaultLanguage->id}.name" => 'required|string',
-            'type' => 'required|in:text,number,dropdown,file,textarea',
+            'type' => 'required|in:text,number,dropdown,file,textarea,date',
             "translations.{$defaultLanguage->id}.options" => 'required_if:type,dropdown',
         ]);
 

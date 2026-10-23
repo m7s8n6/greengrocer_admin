@@ -78,7 +78,7 @@ class PlatformRepository extends ArrayRepository
         $this->hhvmDetector = $hhvmDetector ?: new HhvmDetector();
         foreach ($overrides as $name => $version) {
             if (!is_string($version) && false !== $version) { // @phpstan-ignore-line
-                throw new \UnexpectedValueException('config.platform.'.$name.' should be a string or false, but got '.get_debug_type($version).' '.var_export($version, true));
+                throw new \UnexpectedValueException('config.platform.'.$name.' should be a string or false, but got '.gettype($version).' '.var_export($version, true));
             }
             if ($name === 'php' && $version === false) {
                 throw new \UnexpectedValueException('config.platform.'.$name.' cannot be set to false as you cannot disable php entirely.');
@@ -234,26 +234,23 @@ class PlatformRepository extends ArrayRepository
                     $info = $this->runtime->getExtensionInfo($name);
 
                     // SSL Version => OpenSSL/1.0.1t
-                    // unversioned backends (=> Schannel) are not reported, the library must not span lines (#12615)
-                    if (Preg::isMatchStrictGroups('{^SSL Version => (?<library>[^\r\n/]+)/(?<version>[^\r\n]+?)\r?$}im', $info, $sslMatches)) {
+                    if (Preg::isMatchStrictGroups('{^SSL Version => (?<library>[^/]+)/(?<version>.+)$}im', $info, $sslMatches)) {
                         $library = strtolower($sslMatches['library']);
                         if ($library === 'openssl') {
                             $parsedVersion = Version::parseOpenssl($sslMatches['version'], $isFips);
                             $this->addLibrary($libraries, $name.'-openssl'.($isFips ? '-fips' : ''), $parsedVersion, 'curl OpenSSL version ('.$parsedVersion.')', [], $isFips ? ['curl-openssl'] : []);
                         } else {
-                            if (str_starts_with($library, '(securetransport)') && Preg::isMatch('{^\(securetransport\) ([a-z0-9]+)}', $library, $securetransportMatches)) {
+                            if ($library === '(securetransport) openssl') {
                                 $shortlib = 'securetransport';
-                                $sslLib = 'curl-'.$securetransportMatches[1];
                             } else {
                                 $shortlib = $library;
-                                $sslLib = 'curl-openssl';
                             }
-                            $this->addLibrary($libraries, $name.'-'.$shortlib, $sslMatches['version'], 'curl '.$library.' version ('.$sslMatches['version'].')', [$sslLib]);
+                            $this->addLibrary($libraries, $name.'-'.$shortlib, $sslMatches['version'], 'curl '.$library.' version ('.$sslMatches['version'].')', ['curl-openssl']);
                         }
                     }
 
                     // libSSH Version => libssh2/1.4.3
-                    if (Preg::isMatchStrictGroups('{^libSSH Version => (?<library>[^\r\n/]+)/(?<version>.+?)(?:/.*)?$}im', $info, $sshMatches)) {
+                    if (Preg::isMatchStrictGroups('{^libSSH Version => (?<library>[^/]+)/(?<version>.+?)(?:/.*)?$}im', $info, $sshMatches)) {
                         $this->addLibrary($libraries, $name.'-'.strtolower($sshMatches['library']), $sshMatches['version'], 'curl '.$sshMatches['library'].' version');
                     }
 
@@ -394,8 +391,8 @@ class PlatformRepository extends ArrayRepository
                         $this->addLibrary($libraries, $name.'-libmbfl', $libmbflMatches['version'], 'mbstring libmbfl version');
                     }
 
-                    if (\PHP_VERSION_ID < 90000 && $this->runtime->hasConstant('MB_ONIGURUMA_VERSION')) {
-                        $this->addLibrary($libraries, $name.'-oniguruma', Silencer::call([$this->runtime, 'getConstant'], 'MB_ONIGURUMA_VERSION'), 'mbstring oniguruma version');
+                    if ($this->runtime->hasConstant('MB_ONIGURUMA_VERSION')) {
+                        $this->addLibrary($libraries, $name.'-oniguruma', $this->runtime->getConstant('MB_ONIGURUMA_VERSION'), 'mbstring oniguruma version');
 
                     // Multibyte regex (oniguruma) version => 5.9.5
                     // oniguruma version => 6.9.0
@@ -698,12 +695,6 @@ class PlatformRepository extends ArrayRepository
         try {
             $version = $this->versionParser->normalize($prettyVersion);
         } catch (\UnexpectedValueException $e) {
-            return;
-        }
-
-        // a parsing glitch in one of the extension info parsers above must not result in a bogus
-        // package name, as that would then be looked up as if it was a real package, see #12615
-        if (!self::isPlatformPackage('lib-'.$name)) {
             return;
         }
 

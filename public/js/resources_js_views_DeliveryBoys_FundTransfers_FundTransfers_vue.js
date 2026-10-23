@@ -61,10 +61,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 
@@ -285,6 +281,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -301,58 +307,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }, {
         key: 'delivery_boy_id',
         label: __('d_boy_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'name',
         label: __('name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'mobile',
         label: __('mobile'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'address',
         label: __('address'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'opening_balance',
         label: __('opening_balance'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'closing_balance',
         label: __('closing_balance'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'amount',
         label: __('amount'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'type',
         label: __('type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'message',
         label: __('message'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'status',
         label: __('status'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'created_at',
         label: __('date_created'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }],
       totalRows: 1,
       currentPage: 1,
@@ -511,7 +506,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Selected delivery boy summary */\n.db-selected-card[data-v-1eee0e8a] {\n    display: grid;\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n    gap: 10px 16px;\n    padding: 12px 14px;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    background: var(--ui-surface-muted);\n}\n.db-selected-item[data-v-1eee0e8a] {\n    display: flex;\n    flex-direction: column;\n    min-width: 0;\n}\n.db-selected-label[data-v-1eee0e8a] {\n    font-size: 11px;\n    font-weight: 600;\n    text-transform: uppercase;\n    letter-spacing: 0.02em;\n    color: var(--ui-text-muted);\n}\n.db-selected-value[data-v-1eee0e8a] {\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-heading);\n    overflow-wrap: anywhere;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -767,8 +762,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex flex-wrap justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -790,12 +798,6 @@ var render = function () {
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
-          ),
         ],
         1
       ),
@@ -815,7 +817,7 @@ var render = function () {
           _c("div", { staticClass: "row" }, [
             _c(
               "div",
-              { staticClass: "form-group" },
+              { staticClass: "form-group col-12" },
               [
                 _c("label", [_vm._v(_vm._s(_vm.__("delivery_boy")))]),
                 _vm._v(" "),
@@ -842,69 +844,49 @@ var render = function () {
                 }),
                 _vm._v(" "),
                 _vm.fundTransfers.deliveryBoy
-                  ? _c(
-                      "div",
-                      { staticClass: "border border-grey rounded p-2 mt-2" },
-                      [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("name")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " + _vm._s(_vm.fundTransfers.deliveryBoy.name)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("mobile")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.fundTransfers.deliveryBoy.mobile)
-                              ),
-                            ]),
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center text-left",
-                          },
-                          [
-                            _c("span", [_vm._v(_vm._s(_vm.__("id")) + ":-")]),
-                            _c("span", [
-                              _vm._v(
-                                " " + _vm._s(_vm.fundTransfers.deliveryBoy.id)
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("balance")) + ":-"),
-                            ]),
-                            _c("span", [
-                              _vm._v(
-                                " " +
-                                  _vm._s(_vm.fundTransfers.deliveryBoy.balance)
-                              ),
-                            ]),
-                          ]
-                        ),
-                      ]
-                    )
+                  ? _c("div", { staticClass: "db-selected-card mt-2" }, [
+                      _c("div", { staticClass: "db-selected-item" }, [
+                        _c("span", { staticClass: "db-selected-label" }, [
+                          _vm._v(_vm._s(_vm.__("name"))),
+                        ]),
+                        _c("span", { staticClass: "db-selected-value" }, [
+                          _vm._v(_vm._s(_vm.fundTransfers.deliveryBoy.name)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "db-selected-item" }, [
+                        _c("span", { staticClass: "db-selected-label" }, [
+                          _vm._v(_vm._s(_vm.__("mobile"))),
+                        ]),
+                        _c("span", { staticClass: "db-selected-value" }, [
+                          _vm._v(_vm._s(_vm.fundTransfers.deliveryBoy.mobile)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "db-selected-item" }, [
+                        _c("span", { staticClass: "db-selected-label" }, [
+                          _vm._v(_vm._s(_vm.__("id"))),
+                        ]),
+                        _c("span", { staticClass: "db-selected-value" }, [
+                          _vm._v(_vm._s(_vm.fundTransfers.deliveryBoy.id)),
+                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "db-selected-item" }, [
+                        _c("span", { staticClass: "db-selected-label" }, [
+                          _vm._v(_vm._s(_vm.__("balance"))),
+                        ]),
+                        _c("span", { staticClass: "db-selected-value" }, [
+                          _vm._v(_vm._s(_vm.fundTransfers.deliveryBoy.balance)),
+                        ]),
+                      ]),
+                    ])
                   : _vm._e(),
               ],
               1
             ),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12" }, [
               _c("label", { attrs: { for: "amount" } }, [
                 _vm._v(_vm._s(_vm.__("transfer_amount"))),
               ]),
@@ -958,7 +940,7 @@ var render = function () {
                 : _vm._e(),
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "form-group" }, [
+            _c("div", { staticClass: "form-group col-12" }, [
               _c("label", { attrs: { for: "message" } }, [
                 _vm._v(_vm._s(_vm.__("message"))),
               ]),
@@ -992,10 +974,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -1113,28 +1092,6 @@ var render = function () {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "d-flex gap-2" }, [
-                  _vm.$can("fund_transfers_create")
-                    ? _c(
-                        "button",
-                        {
-                          staticClass:
-                            "btn btn-figma-filter d-flex align-items-center gap-2",
-                          on: {
-                            click: function ($event) {
-                              _vm.create_new = true
-                            },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-plus" }),
-                          _vm._v(" "),
-                          _c("span", [
-                            _vm._v(_vm._s(_vm.__("add_fund_transfers"))),
-                          ]),
-                        ]
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
                   _c(
                     "button",
                     {
@@ -1160,6 +1117,28 @@ var render = function () {
                       _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
                     ]
                   ),
+                  _vm._v(" "),
+                  _vm.$can("fund_transfers_create")
+                    ? _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn btn-figma-filter d-flex align-items-center gap-2",
+                          on: {
+                            click: function ($event) {
+                              _vm.create_new = true
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-plus" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("add_fund_transfers"))),
+                          ]),
+                        ]
+                      )
+                    : _vm._e(),
                 ]),
               ]
             ),
@@ -1205,12 +1184,46 @@ var render = function () {
                   },
                   scopedSlots: _vm._u([
                     {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "table-busy",
                       fn: function () {
                         return [
                           _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "text-center text-muted my-2" },
                             [
                               _c("b-spinner", { staticClass: "align-middle" }),
                               _vm._v(" "),
@@ -1229,10 +1242,10 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(_vm.__("opening_balance")) +
                               _vm._s(" (" + _vm.$currency + ")") +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1242,10 +1255,10 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(_vm.__("closing_balance")) +
                               _vm._s(" (" + _vm.$currency + ")") +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1255,10 +1268,10 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(_vm.__("amount")) +
                               _vm._s(" (" + _vm.$currency + ")") +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1296,9 +1309,9 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(_vm.getTranslatedName(row.item)) +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1308,9 +1321,9 @@ var render = function () {
                       fn: function (row) {
                         return [
                           _vm._v(
-                            "\n                            " +
+                            "\n                                " +
                               _vm._s(row.item.created_at) +
-                              "\n                        "
+                              "\n                            "
                           ),
                         ]
                       },
@@ -1325,20 +1338,45 @@ var render = function () {
               "div",
               { staticClass: "figma-table-footer" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
+                _c(
+                  "div",
+                  { staticClass: "d-flex align-items-center gap-3 flex-wrap" },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "d-flex align-items-center gap-2" },
+                      [
+                        _c(
+                          "label",
+                          { staticClass: "showing-results-text mb-0" },
+                          [_vm._v(_vm._s(_vm.__("per_page")))]
+                        ),
+                        _vm._v(" "),
+                        _c("b-form-select", {
+                          staticClass: "w-auto",
+                          attrs: { options: _vm.pageOptions, size: "sm" },
+                          model: {
+                            value: _vm.perPage,
+                            callback: function ($$v) {
+                              _vm.perPage = $$v
+                            },
+                            expression: "perPage",
+                          },
+                        }),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
+                  ],
+                  1
+                ),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",

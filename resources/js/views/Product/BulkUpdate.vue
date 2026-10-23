@@ -21,10 +21,12 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card mb-4">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4">{{ __('product_bulk_update_form') }}</h4>
-                        <div class="alert alert-info border-0 rounded-3 p-3 mb-4">
+                <div class="figma-main-section-card bulk-card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">{{ __('product_bulk_update_form') }}</h4>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <div class="alert alert-info mb-4">
                             <div class="d-flex flex-column gap-2">
                                 <p class="mb-0 fw-bold">{{
                                     __('always_download_and_use_new_sample_file_if_you_did_updated_admin_panel_version')
@@ -37,8 +39,8 @@
                             </div>
                         </div>
                         <!-- Row-level validation errors table (same as BulkUpload) -->
-                        <div class="row" v-if="rowErrors.length">
-                            <div class="col-12">
+                        <div v-if="rowErrors.length">
+                            <div>
                                 <div class="alert alert-danger" ref="rowErrorsAlert">
                                     <p class="mb-2">{{
                                         __('validation_failed_for_some_rows_please_review_and_fix_the_following') }}</p>
@@ -66,15 +68,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div>
                             <!-- form start -->
                             <form method="post" ref="my-form" @submit.prevent="saveRecord"
                                 enctype="multipart/form-data">
-                                <div class="col-md-12">
-                                    <div class="form-group">
+                                <div>
+                                    <div class="form-group mb-0">
                                         <label for="upload_file">{{ __('upload_file') }} {{ __('excel_file')
                                             }}</label>
-                                        <p class="text-muted mb-1">
+                                        <p class="text-muted small mb-2">
                                             {{ __('supported_formats') }}: XLSX, XLS
                                         </p>
                                         <span v-if="fileError" class="error">{{ fileError }}</span>
@@ -92,24 +94,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary" id="submit_btn" name="btnAdd"
-                                        :disabled="isLoading">
-                                        <i class="fa fa-upload" v-if="!isLoading"></i> {{ __('update') }}
-                                        <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
-                                    </button>
-                                    <button type="reset" class="btn btn btn-secondary">
-                                        <i class="fa fa-undo" aria-hidden="true"></i> {{ __('clear') }}
-                                    </button>
-                                    <a @click="downloadProductDataExcel" v-b-tooltip.hover title="Download Excel"
-                                        class="btn btn-info" :disabled="isLoadingDownload">
-                                        <template v-if="isLoadingDownload">
-                                            <b-spinner small label="Spinning"></b-spinner> Downloading...
-                                        </template>
-                                        <template v-else>
-                                            <i class="fa fa-download"></i> {{ __('download_product_data_file') }}
-                                        </template>
-                                    </a>
+                                <div class="bulk-form-actions">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a @click="downloadProductDataExcel" v-b-tooltip.hover title="Download Excel"
+                                            class="btn btn-sm btn-outline-primary" :disabled="isLoadingDownload">
+                                            <template v-if="isLoadingDownload">
+                                                <b-spinner small label="Spinning"></b-spinner> Downloading...
+                                            </template>
+                                            <template v-else>
+                                                <i class="fa fa-download"></i> {{ __('download_product_data_file') }}
+                                            </template>
+                                        </a>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="reset" class="btn btn-outline-secondary">
+                                            <i class="fa fa-undo" aria-hidden="true"></i> {{ __('clear') }}
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="submit_btn" name="btnAdd"
+                                            :disabled="isLoading">
+                                            <i class="fa fa-upload" v-if="!isLoading"></i> {{ __('update') }}
+                                            <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                             <!-- form end -->
@@ -265,3 +271,46 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.bulk-card > .card-header {
+    padding: 14px 20px !important;
+    border-bottom: 1px solid var(--ui-border);
+    background: transparent;
+}
+
+.bulk-card > .card-header .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.bulk-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.bulk-form-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+@media (max-width: 575.98px) {
+    .bulk-form-actions > .d-flex {
+        width: 100%;
+    }
+
+    .bulk-form-actions > .d-flex > .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+</style>

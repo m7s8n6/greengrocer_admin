@@ -1,244 +1,275 @@
 <template>
     <div>
-        <div class="page-heading view_order">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('view_self_pickup_order') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <router-link to="/self_pickup_orders">{{ __('self_pickup_orders') }}</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                {{ __('order_details') }}
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
+        <div class="view_order">
+            <div class="page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+                <h3 class="mb-0">{{ __('view_self_pickup_order') }}</h3>
+                <nav aria-label="breadcrumb" class="breadcrumb-header">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <router-link to="/dashboard">{{ __('dashboard') }}</router-link>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <router-link to="/self_pickup_orders">{{ __('self_pickup_orders') }}</router-link>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            {{ __('order_details') }}
+                        </li>
+                    </ol>
+                </nav>
             </div>
 
-            <div v-if="order" class="row">
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h4>{{ __('order_details') }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <th class="th-width">{{ __('order_id') }}</th>
-                                            <td>{{ order.order_id }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('email') }}</th>
-                                            <td>{{ order.user_email }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('order_note') }}</th>
-                                            <td>{{ order.order_note }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('status') }}</th>
-                                            <td>
-                                                {{ getDisplayName(order.status_name_translation) || order.status_name }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('name') }}</th>
-                                            <td>{{ order.user_name }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('mobile') }}</th>
-                                            <td>{{ order.user_mobile | mobileMask }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('pickup_store') }}</th>
-                                            <td>{{ getDisplayName(order.store_name_translation) || order.store_name }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('store_address') }}</th>
-                                            <td>{{ getPickupAddress(order.pickup_address) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('store_timings') }}</th>
-                                            <td>{{ getPickupTimings(order.pickup_address) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('update_status') }}</th>
-                                            <td>
-                                                <form class="row g-3 align-items-center" ref="my-form"
-                                                    @submit.prevent="updateStatus">
-                                                    <div class="input-group">
-                                                        <label class="visually-hidden" for="status">{{ __('status')
-                                                            }}</label>
-                                                        <select id="status" name="status"
-                                                            class="form-control form-select" v-model="order_status_id">
-                                                            <option value="">{{ __('select_order_status') }}</option>
-                                                            <option v-for="status in statuses" :value='status.id'>{{
-                                                                getStatusDisplayName(status) }}</option>
-                                                        </select>
-                                                        <div class="input-group-append"
-                                                            v-if="$can('self_pickup_order_update')">
-                                                            <button type="submit" class="btn btn-primary"
-                                                                :disabled="order_status_id === '' || isLoadingUstatus">
-                                                                <template v-if="isLoadingUstatus"><b-spinner small
-                                                                        label="Spinning"></b-spinner></template>
-                                                                {{ __('update') }}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h4>{{ __('billing_details') }}</h4>
-                            <span class="pull-right">
-                                <button @click="downloadInvoice" v-b-tooltip.hover :title="__('download_invoice')"
-                                    class="btn btn-secondary btn-sm" :disabled="isLoading">
-                                    <template v-if="isLoading">
-                                        <b-spinner small label="Spinning"></b-spinner> {{ __('downloading') }}...
-                                    </template>
-                                    <template v-else>
-                                        <i class="fa fa-download"></i> {{ __('download_invoice') }}
-                                    </template>
-                                </button>
-
-                                <router-link :to="invoiceRoute" v-b-tooltip.hover :title="__('generate_invoice')"
-                                    class="btn btn-primary btn-sm">
-                                    <i class="fa fa-file" aria-hidden="true"></i> {{ __('generate_invoice') }}
-                                </router-link>
+            <div v-if="order" class="order-details-wrapper">
+                <!-- Order Header Strip -->
+                <div class="mb-4 order-header-card">
+                    <div class="od-header-top">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <h2 class="od-order-id mb-0">{{ __('order_id') }} #{{ order.order_id }}</h2>
+                            <span class="figma-status-pill od-status-pill">
+                                {{ getDisplayName(order.status_name_translation) || order.status_name }}
                             </span>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <tbody>
-                                        <tr>
-                                            <th class="th-width">{{ __('order_date') }}</th>
-                                            <td> {{ order.orders_created_at }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('total') }} ({{ $currency }})</th>
-                                            <td>{{ order.total }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('disc') }} {{ $currency }}( % )</th>
-                                            <td>{{ discount_in_rupees + ' ( ' + order.discount + '% )' }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('wallet_used') }} ({{ $currency }})</th>
-                                            <td>{{ order.wallet_balance }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('promo_discount') }} ({{ $currency }})</th>
-                                            <td>{{ order.promo_discount }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('promo_code') }}</th>
-                                            <td>{{ order.promo_code }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('delivery_charge') }} ({{ $currency }})</th>
-                                            <td>{{ order.delivery_charge }}</td>
-                                        </tr>
-                                        <tr v-if="getAdditionalChargesTotal(order.additional_charges) > 0">
-                                            <th class="th-width">{{ __('additional_charges') }} ({{ $currency }})</th>
-                                            <td>{{ getAdditionalChargesTotal(order.additional_charges) }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('payable_total') }} ( {{ $currency }} )</th>
-                                            <td>
-                                                <span class="fw-bold">{{ order.remaining_final }}</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="th-width">{{ __('payment_method') }}</th>
-                                            <td>{{ order.payment_method }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="d-flex flex-wrap gap-2 od-header-actions">
+                            <button @click="downloadInvoice" v-b-tooltip.hover :title="__('download_invoice')"
+                                class="btn btn-outline-secondary od-head-btn" :disabled="isLoading">
+                                <template v-if="isLoading">
+                                    <b-spinner small label="Spinning"></b-spinner> {{ __('downloading') }}...
+                                </template>
+                                <template v-else>
+                                    <i class="fa fa-download"></i> {{ __('download_invoice') }}
+                                </template>
+                            </button>
+                            <router-link :to="invoiceRoute" v-b-tooltip.hover :title="__('generate_invoice')"
+                                class="btn btn-outline-primary od-head-btn">
+                                <i class="fa fa-file" aria-hidden="true"></i> {{ __('generate_invoice') }}
+                            </router-link>
+                        </div>
+                    </div>
+                    <div class="order-meta-bar">
+                        <div class="order-meta-date">
+                            <i class="far fa-calendar-alt"></i>
+                            <span class="od-meta-label">{{ __('order_date') }} :</span>
+                            <span class="od-meta-value">{{ order.orders_created_at }}</span>
+                        </div>
+                        <div class="order-meta-date">
+                            <i class="far fa-credit-card"></i>
+                            <span class="od-meta-label">{{ __('payment_method') }} :</span>
+                            <span class="od-meta-value">{{ order.payment_method }}</span>
                         </div>
                     </div>
                 </div>
 
-
-
-                <div class="col-12 col-md-12 mt-4">
-                    <h4>{{ __('list_of_order_items') }}</h4>
-                    <div class="row">
-                        <div class="col-md-4" v-for="item in order_items" :key="item.id">
-                            <div class="card position-relative">
-                                <div v-if="item.active_status == 7 || item.active_status == 8"
-                                    class="badge bg-danger position-absolute" style="top: 10px; right: 10px;">
-                                    {{ getDisplayName(item.status_name_translation) || item.status_name }}
+                <div class="row g-4">
+                    <!-- Left Column (8) -->
+                    <div class="col-lg-8">
+                        <!-- Order Items -->
+                        <div class="card od-card">
+                            <div class="od-card-header justify-content-between">
+                                <h5 class="od-card-title">
+                                    <i class="fa fa-box me-2 text-primary"></i>
+                                    {{ __('list_of_order_items') }}
+                                </h5>
+                                <span class="item-count-badge">{{ order_items.length }}</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive od-table-wrap">
+                                    <table class="table align-middle mb-0 od-items-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-start">{{ __('name') }}</th>
+                                                <th class="text-center">{{ __('quantity') }}</th>
+                                                <th class="text-end">{{ __('subtotal') }} ({{ $currency }})</th>
+                                                <th class="text-center">{{ __('status') }}</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="item in order_items" :key="item.id">
+                                                <td class="text-start">
+                                                    <div class="od-product-name">{{ item.product_name + " (" + item.variant_name + ")" }}</div>
+                                                    <div class="od-product-sub">{{ __('variant') }}: {{ item.variant_name }}</div>
+                                                    <template v-if="item.prescriptions && item.prescriptions.length > 0">
+                                                        <div class="od-product-sub mt-1">{{ __('prescriptions') || 'Prescriptions' }}</div>
+                                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                                            <div v-for="(pUrl, pIdx) in item.prescriptions" :key="pIdx"
+                                                                class="od-prescription-thumb position-relative border rounded p-1"
+                                                                @click="showPrescription(pUrl)">
+                                                                <img :src="pUrl" class="w-100 h-100 object-fit-cover rounded" />
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </td>
+                                                <td class="text-center">{{ item.quantity }}</td>
+                                                <td class="text-end od-cell-strong">{{ item.sub_total }}</td>
+                                                <td class="text-center">
+                                                    <span class="figma-status-pill"
+                                                        :class="(item.active_status == 7 || item.active_status == 8) ? 'od-pill-danger' : 'od-status-pill'">
+                                                        {{ getDisplayName(item.status_name_translation) || item.status_name }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="od-row-actions">
+                                                        <b-button v-b-tooltip.hover title="View Item Details"
+                                                            class="btn btn-outline-primary od-row-btn" @click="sendInfo(item)">
+                                                            {{ __('view_item_details') }}
+                                                        </b-button>
+                                                        <template v-if="canReturnProduct(item)">
+                                                            <b-button v-b-tooltip.hover title="Return this product"
+                                                                v-if="$can('self_pickup_order_update')"
+                                                                class="btn btn-outline-secondary od-row-btn" @click="updateStatus(item, 8)"
+                                                                :disabled="isLoadingUstatus">
+                                                                <template v-if="isLoadingUstatus">
+                                                                    <b-spinner small></b-spinner> {{ __('returning') }}...
+                                                                </template>
+                                                                <template v-else>
+                                                                    {{ __('return') }}
+                                                                </template>
+                                                            </b-button>
+                                                        </template>
+                                                        <button v-if="canCancelItem(item)" v-b-tooltip.hover :title="__('cancel_item')"
+                                                            class="btn cancel-item-btn"
+                                                            @click="cancelOrderItem(item)" :disabled="isLoadingCancel">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <button v-if="canCancelItem(item)" v-b-tooltip.hover :title="__('cancel_item')"
-                                    class="btn btn-sm btn-danger cancel-item-btn position-absolute border-0 bg-transparent p-0"
-                                    @click="cancelOrderItem(item)" :disabled="isLoadingCancel">
-                                    <base-icon name="XCircle" width="32" height="32" />
-                                </button>
-                                <div class="card-body">
-                                    <b>{{ __('name') }} :- </b>{{ item.product_name + " (" + item.variant_name + ")" }}
-                                    <br>
-                                    <b>{{ __('quantity') }} :- </b>{{ item.quantity }}
-                                    <br>
-                                    <b>{{ __('variant') }} :- </b>{{ item.variant_name }}
-                                    <br>
-                                    <b>{{ __('subtotal') }} ( {{ $currency }} ) :- </b>{{ item.sub_total }}
-                                    <br>
-                                    <b>{{ __('status') }} :- </b>{{ getDisplayName(item.status_name_translation) ||
-                                        item.status_name }}
-                                    <template v-if="item.prescriptions && item.prescriptions.length > 0">
-                                        <br>
-                                        <b>{{ __('prescriptions') || 'Prescriptions' }} :- </b>
-                                        <div class="d-flex flex-wrap gap-1 mt-2">
-                                            <div v-for="(pUrl, pIdx) in item.prescriptions" :key="pIdx"
-                                                class="position-relative border rounded p-1"
-                                                style="width: 40px; height: 40px; cursor: pointer;"
-                                                @click="showPrescription(pUrl)">
-                                                <img :src="pUrl" class="w-100 h-100 object-fit-cover rounded" />
-                                            </div>
-                                        </div>
-                                    </template>
+                            </div>
+                        </div>
 
-                                    <div class="row mt-3">
-                                        <div class="col-6">
-                                            <b-button v-b-tooltip.hover title="View Item Details"
-                                                class="btn btn-block btn-primary" @click="sendInfo(item)">
-                                                {{ __('view_item_details') }}
-                                            </b-button>
-                                        </div>
-                                        <div class="col-6" v-if="canReturnProduct(item)">
-                                            <b-button v-b-tooltip.hover title="Return this product"
-                                                v-if="$can('self_pickup_order_update')"
-                                                class="btn btn-block btn-primary" @click="updateStatus(item, 8)"
-                                                :disabled="isLoadingUstatus">
-                                                <template v-if="isLoadingUstatus">
-                                                    <b-spinner small></b-spinner> {{ __('returning') }}...
-                                                </template>
-                                                <template v-else>
-                                                    {{ __('return') }}
-                                                </template>
-                                            </b-button>
-                                        </div>
-                                    </div>
+                        <!-- Billing Summary -->
+                        <div class="card od-card">
+                            <div class="od-card-header">
+                                <h5 class="od-card-title">
+                                    <i class="fa fa-receipt me-2"></i>
+                                    {{ __('billing_details') }}
+                                </h5>
+                            </div>
+                            <div class="card-body od-card-body">
+                                <div class="od-sum-row od-sum-row--sub">
+                                    <span>{{ __('total') }} ({{ $currency }})</span>
+                                    <span>{{ order.total }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('disc') }} {{ $currency }}( % )</span>
+                                    <span class="od-sum-val">{{ discount_in_rupees + ' ( ' + order.discount + '% )' }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('wallet_used') }} ({{ $currency }})</span>
+                                    <span class="od-sum-val">{{ order.wallet_balance }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('promo_discount') }} ({{ $currency }})</span>
+                                    <span class="od-sum-val">{{ order.promo_discount }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('promo_code') }}</span>
+                                    <span class="od-sum-val">{{ order.promo_code }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('delivery_charge') }} ({{ $currency }})</span>
+                                    <span class="od-sum-val">{{ order.delivery_charge }}</span>
+                                </div>
+                                <div class="od-sum-row" v-if="getAdditionalChargesTotal(order.additional_charges) > 0">
+                                    <span>{{ __('additional_charges') }} ({{ $currency }})</span>
+                                    <span class="od-sum-val">{{ getAdditionalChargesTotal(order.additional_charges) }}</span>
+                                </div>
+                                <div class="payable-total-box">
+                                    <span>{{ __('payable_total') }} ( {{ $currency }} )</span>
+                                    <span class="fw-bold">{{ order.remaining_final }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update Status -->
+                        <div class="card od-card">
+                            <div class="od-card-header">
+                                <h5 class="od-card-title">
+                                    <i class="far fa-check-circle me-2"></i>
+                                    {{ __('update_status') }}
+                                </h5>
+                            </div>
+                            <div class="card-body od-card-body">
+                                <form class="od-inline-form" ref="my-form" @submit.prevent="updateStatus">
+                                    <label class="visually-hidden" for="status">{{ __('status') }}</label>
+                                    <select id="status" name="status"
+                                        class="form-control form-select" v-model="order_status_id">
+                                        <option value="">{{ __('select_order_status') }}</option>
+                                        <option v-for="status in statuses" :value='status.id'>{{
+                                            getStatusDisplayName(status) }}</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary od-form-btn"
+                                        v-if="$can('self_pickup_order_update')"
+                                        :disabled="order_status_id === '' || isLoadingUstatus">
+                                        <template v-if="isLoadingUstatus"><b-spinner small
+                                                label="Spinning"></b-spinner></template>
+                                        {{ __('update') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (4) -->
+                    <div class="col-lg-4">
+                        <div class="card od-card">
+                            <div class="od-card-header">
+                                <h5 class="od-card-title">
+                                    <i class="far fa-user me-2"></i>
+                                    {{ __('order_details') }}
+                                </h5>
+                            </div>
+                            <div class="card-body od-card-body">
+                                <div class="od-info-row">
+                                    <div class="od-info-label">{{ __('name') }}</div>
+                                    <div class="od-info-value">{{ order.user_name }}</div>
+                                </div>
+                                <div class="od-info-row">
+                                    <div class="od-info-label">{{ __('email') }}</div>
+                                    <div class="od-info-value">{{ order.user_email }}</div>
+                                </div>
+                                <div class="od-info-row mb-0">
+                                    <div class="od-info-label">{{ __('mobile') }}</div>
+                                    <div class="od-info-value">{{ order.user_mobile | mobileMask }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card od-card">
+                            <div class="od-card-header">
+                                <h5 class="od-card-title">
+                                    <i class="fa fa-store me-2"></i>
+                                    {{ __('pickup_store') }}
+                                </h5>
+                            </div>
+                            <div class="card-body od-card-body">
+                                <div class="od-info-row">
+                                    <div class="od-info-label">{{ __('pickup_store') }}</div>
+                                    <div class="od-info-value">{{ getDisplayName(order.store_name_translation) || order.store_name }}</div>
+                                </div>
+                                <div class="od-info-row">
+                                    <div class="od-info-label">{{ __('store_address') }}</div>
+                                    <div class="od-info-value od-info-value--muted">{{ getPickupAddress(order.pickup_address) }}</div>
+                                </div>
+                                <div class="od-info-row mb-0">
+                                    <div class="od-info-label">{{ __('store_timings') }}</div>
+                                    <div class="od-info-value">{{ getPickupTimings(order.pickup_address) }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card od-card" v-if="order.order_note">
+                            <div class="od-card-header">
+                                <h5 class="od-card-title">
+                                    <i class="far fa-sticky-note me-2"></i>
+                                    {{ __('order_note') }}
+                                </h5>
+                            </div>
+                            <div class="card-body od-card-body">
+                                <div class="order-notes-box">
+                                    <p class="mb-0 order-notes-text">{{ order.order_note }}</p>
                                 </div>
                             </div>
                         </div>
@@ -259,8 +290,8 @@
                             <li class="list-group-item">
                                 <span><b>{{ __('product_id') }} :- </b>{{ item.product_id }}</span>
                                 <router-link v-if="item.product_id" :to="viewProductRoute" v-b-tooltip.hover title="View"
-                                    class="btn btn-primary btn-sm pull-right border-0 bg-transparent p-0">
-                                    <base-icon name="Eye" hoverName="Type=Hover (1)" width="32" height="32" />
+                                    class="figma-action-btn float-end">
+                                    <i class="bi bi-eye"></i>
                                 </router-link>
                             </li>
                             <li class="list-group-item"
@@ -537,8 +568,8 @@ export default {
                 cancelButtonText: this.__('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoadingUstatus = true
@@ -689,8 +720,8 @@ export default {
                     cancelButtonText: this.__('cancel'),
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#37a279',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: 'var(--theme-primary-500)',
+                    cancelButtonColor: 'var(--theme-error-500)',
                 }).then(result => {
                     if (result.value) {
                         let ids = uniqueSelectedItems.toString();
@@ -780,8 +811,8 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: this.__('yes_sure'),
                 cancelButtonText: this.__('no'),
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
                 icon: 'warning',
                 inputValidator: (value) => {
                     if (!value || !value.trim()) {
@@ -818,101 +849,227 @@ export default {
 };
 </script>
 <style scoped>
-.th-width {
-    width: 170px;
-    background-color: #F8F9FA !important;
+/* ===== Order detail (SnapBuy layout) ===== */
+.modern-page-title {
+    font-family: var(--ui-font);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 28px;
+    color: var(--ui-heading);
+}
+
+.order-meta-bar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+    padding-top: 12px;
+    border-top: 1px solid var(--ui-border);
+    font-family: var(--ui-font);
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.order-meta-date,
+.order-meta-seller {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.order-meta-bar i {
+    color: var(--ui-text-muted);
+    font-size: 13px;
 }
 
 .card {
-    border: 1px solid #EDEDED !important;
-    border-radius: 12px !important;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius-lg) !important;
     overflow: hidden;
     margin-bottom: 24px;
 }
 
-.card-header {
-    border-bottom: 1px solid #EDEDED !important;
-    background-color: #FFFFFF !important;
-    padding: 1rem 1.25rem !important;
+.item-count-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: var(--ui-radius-sm);
+    background-color: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text);
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
-.card-body {
-    padding: 1.5rem !important;
-}
-
-.table-responsive {
-    border: none !important;
-    background: transparent !important;
-}
-
-.table {
-    margin-bottom: 0 !important;
-}
-
-.table-bordered,
-.table-bordered th,
-.table-bordered td {
-    border: 1px solid #EDEDED !important;
-}
-
-.table thead th {
-    background-color: #F8F9FA !important;
-    border-bottom-width: 1px !important;
+body.theme-dark .item-count-badge {
+    background-color: var(--theme-neutral-700) !important;
+    border-color: var(--theme-neutral-600) !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 .cancel-item-btn {
-    top: 5px;
-    right: 5px;
-    z-index: 2;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.7;
-    transition: opacity 0.2s;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ui-radius);
+    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
+    background: var(--theme-error-50);
+    color: var(--theme-error-500);
 }
 
 .cancel-item-btn:hover {
-    opacity: 1;
+    background: color-mix(in srgb, var(--theme-error-500) 18%, transparent);
+}
+
+.delivery-time-box {
+    padding: 10px 12px;
+    background: var(--theme-error-50);
+    border: 1px solid var(--theme-error-200);
+    border-radius: var(--ui-radius);
+}
+
+body.theme-dark .delivery-time-box {
+    background: color-mix(in srgb, var(--theme-error-500) 15%, transparent) !important;
+    border-color: color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
+}
+
+.order-notes-box {
+    background-color: var(--theme-info-50);
+    border-inline-start: 3px solid var(--theme-info-500);
+    border-radius: var(--ui-radius);
+    padding: 12px 14px;
+    text-align: start;
+}
+
+.order-notes-text {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--ui-text);
+}
+
+@media (max-width: 575.98px) {
+    .order-header-card {
+        padding: 14px 16px;
+    }
+
+    .od-print-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .od-card-body {
+        padding: 16px;
+    }
+
+    .od-card-header {
+        padding: 12px 16px;
+    }
+}
+
+
+/* Self-pickup specific */
+.od-status-pill {
+    background: var(--ui-primary-soft);
+    color: var(--theme-primary-700);
+    border: 1px solid color-mix(in srgb, var(--theme-primary-500) 30%, transparent) !important;
+}
+
+.od-pill-danger {
+    background: var(--theme-error-50);
+    color: var(--theme-error-700);
+    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
+}
+
+.od-head-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+}
+
+.od-row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.od-row-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+    white-space: nowrap;
+}
+
+.payable-total-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.od-info-value {
+    margin-left: 0;
+}
+
+.od-info-value--muted {
+    font-weight: 400;
+    color: var(--ui-text-muted);
+}
+
+.od-items-table {
+    min-width: 640px;
+}
+
+@media (max-width: 575.98px) {
+    .od-header-actions,
+    .od-head-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* Dark Mode Styles */
 body.theme-dark .card {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+    background-color: var(--theme-neutral-800) !important;
+    border-color: var(--theme-neutral-700) !important;
 }
 
-body.theme-dark .card-header {
-    background-color: #1e293b !important;
-    border-bottom-color: #334155 !important;
+body.theme-dark .order-header-card,
+body.theme-dark .od-card-header {
+    background-color: var(--theme-neutral-800) !important;
+    border-color: var(--theme-neutral-700) !important;
 }
 
-body.theme-dark .card-header h4 {
-    color: #f1f5f9 !important;
+body.theme-dark .od-card-title,
+body.theme-dark .od-order-id,
+body.theme-dark .od-product-name,
+body.theme-dark .od-info-value,
+body.theme-dark .od-meta-value,
+body.theme-dark .payable-total-box {
+    color: var(--theme-neutral-100) !important;
 }
 
-body.theme-dark .table-bordered,
-body.theme-dark .table-bordered th,
-body.theme-dark .table-bordered td {
-    border-color: #334155 !important;
-    background-color: #1e293b !important;
-    color: #f1f5f9 !important;
+body.theme-dark .od-items-table thead th {
+    background-color: var(--theme-neutral-700) !important;
 }
 
-body.theme-dark .th-width {
-    background-color: #334155 !important;
+body.theme-dark .od-items-table tbody td {
+    background-color: var(--theme-neutral-800) !important;
+    color: var(--theme-neutral-100) !important;
+    border-color: var(--theme-neutral-700) !important;
 }
 
-body.theme-dark .table thead th {
-    background-color: #334155 !important;
-    color: #f1f5f9 !important;
-}
-
-body.theme-dark h4,
-body.theme-dark b {
-    color: #f1f5f9 !important;
+body.theme-dark .order-notes-box {
+    background-color: color-mix(in srgb, var(--theme-info-500) 15%, transparent) !important;
 }
 </style>

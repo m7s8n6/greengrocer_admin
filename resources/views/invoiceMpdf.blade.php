@@ -68,7 +68,19 @@
                             </address>
                             @if($order->order_type == 'doorstep')
                             <address>
-                                {{ $order->order_address ?? "" }}<br>
+                                @php
+                                // The address text ends with "<mobile>[/<alternate>]". Those numbers are printed
+                                // on their own line below, so cut that exact copy off here to avoid showing them twice.
+                                $invoiceAddress = rtrim((string) ($order->order_address ?? ''));
+                                $mobileTail = implode('/', array_filter([$order->order_mobile ?? '', $order->alternate_mobile ?? '']));
+                                foreach (array_unique([$mobileTail, (string) ($order->order_mobile ?? '')]) as $tail) {
+                                    if ($tail !== '' && substr($invoiceAddress, -strlen($tail)) === $tail) {
+                                        $invoiceAddress = rtrim(substr($invoiceAddress, 0, -strlen($tail)));
+                                        break;
+                                    }
+                                }
+                            @endphp
+                                {{ $invoiceAddress }}<br>
                             </address>
                             @endif
                             <address>

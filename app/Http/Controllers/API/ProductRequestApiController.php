@@ -17,7 +17,7 @@ class ProductRequestApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'description' => 'nullable|string|max:250',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {

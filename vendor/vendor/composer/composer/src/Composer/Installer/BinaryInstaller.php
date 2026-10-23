@@ -40,6 +40,9 @@ class BinaryInstaller
     /** @var string|null */
     private $vendorDir;
 
+    /**
+     * @param Filesystem  $filesystem
+     */
     public function __construct(IOInterface $io, string $binDir, string $binCompat, ?Filesystem $filesystem = null, ?string $vendorDir = null)
     {
         $this->binDir = $binDir;
@@ -66,13 +69,6 @@ class BinaryInstaller
             }
             if (is_dir($binPath)) {
                 $this->io->writeError('    <warning>Skipped installation of bin '.$bin.' for package '.$package->getName().': found a directory at that path</warning>');
-                continue;
-            }
-            // A malicious package can pass the ".." bin metadata check yet ship the bin as a symlink
-            // pointing outside the package (e.g. to ../../../victim.sh), following it here would let
-            // the package chmod/proxy an arbitrary host file (GHSA-96h3-5x6v-m776).
-            if (!self::isBinPathInsidePackage($installPath, $binPath)) {
-                $this->io->writeError('    <warning>Skipped installation of bin '.$bin.' for package '.$package->getName().': the bin resolves to a path outside of the package directory</warning>');
                 continue;
             }
             if (!$this->filesystem->isAbsolutePath($binPath)) {
@@ -149,26 +145,6 @@ class BinaryInstaller
         }
 
         return 'php';
-    }
-
-    /**
-     * Checks that a bin file resolves to a path inside the package's own install directory
-     *
-     * A bin escaping the package, either via ".." metadata or by being a symlink pointing out of it,
-     * would let the package chmod/proxy an arbitrary host file, see GHSA-gjfg-22fp-rrxx and
-     * GHSA-96h3-5x6v-m776.
-     */
-    public static function isBinPathInsidePackage(string $installPath, string $binPath): bool
-    {
-        $realBinPath = realpath($binPath);
-        $realInstallPath = realpath($installPath);
-
-        // fail closed if either path cannot be resolved
-        if (false === $realBinPath || false === $realInstallPath) {
-            return false;
-        }
-
-        return strpos($realBinPath, $realInstallPath.DIRECTORY_SEPARATOR) === 0;
     }
 
     /**

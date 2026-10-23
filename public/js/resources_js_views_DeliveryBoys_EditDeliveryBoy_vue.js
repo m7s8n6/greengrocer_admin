@@ -456,6 +456,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -483,7 +496,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       showPassword: false,
       showConfirmPassword: false,
       record: null,
-      city: "",
+      city: [],
       cities: [],
       id: null,
       bonusSettings: null,
@@ -761,23 +774,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this7 = this;
       this.isLoading = true;
       axios__WEBPACK_IMPORTED_MODULE_2___default().get(this.$apiUrl + '/cities').then(function (response) {
-        var _this7$record;
         _this7.isLoading = false;
         var data = response.data;
         // API returns data.data = { total, cities }; ensure we always set an array for multiselect
         var raw = data.data;
         var list = raw && raw.cities ? raw.cities : raw;
         _this7.cities = Array.isArray(list) ? list : list && _typeof(list) === 'object' ? Object.values(list) : [];
-        if (_this7.deliveryBoys.id && (_this7$record = _this7.record) !== null && _this7$record !== void 0 && _this7$record.city_id && Array.isArray(_this7.cities)) {
-          var matched = _this7.cities.filter(function (item) {
-            return item.id === _this7.record.city_id;
-          });
-          _this7.city = matched.length ? matched[0] : null;
+        if (_this7.deliveryBoys.id && _this7.record && Array.isArray(_this7.cities)) {
+          _this7.selectRecordCities();
         }
       });
     },
     setCityId: function setCityId() {
-      this.deliveryBoys.city_id = this.city && this.city.id != null ? this.city.id : '';
+      this.deliveryBoys.city_id = this.city.length ? this.city[0].id : '';
+    },
+    // Pre-select every city the driver serves (city_ids), falling back to the single city_id.
+    selectRecordCities: function selectRecordCities() {
+      var ids = this.record.city_ids && this.record.city_ids.length ? this.record.city_ids : this.record.city_id ? [this.record.city_id] : [];
+      this.city = this.cities.filter(function (item) {
+        return ids.includes(item.id);
+      });
+      this.setCityId();
     },
     getDeliveryBoy: function getDeliveryBoy() {
       var _this8 = this;
@@ -819,10 +836,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this8.deliveryBoys.password = "";
           _this8.deliveryBoys.confirm_password = "";
           if (Array.isArray(_this8.cities)) {
-            var matched = _this8.cities.find(function (item) {
-              return item.id === _this8.record.city_id;
-            });
-            _this8.city = matched || null;
+            _this8.selectRecordCities();
           }
           _this8.deliveryBoys.city_id = emptyIfNull((_this8$record6 = _this8.record) === null || _this8$record6 === void 0 ? void 0 : _this8$record6.city_id);
           _this8.deliveryBoys.status = _this8.record ? _this8.record.status : 0;
@@ -982,6 +996,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 fd.append('mobile', _this9.deliveryBoys.mobile);
                 fd.append('email', _this9.deliveryBoys.email);
                 fd.append('city_id', _this9.deliveryBoys.city_id);
+                _this9.city.forEach(function (c) {
+                  return fd.append('city_ids[]', c.id);
+                });
                 fd.append('status', _this9.deliveryBoys.status);
                 fd.append('remark', (_this9$deliveryBoys$r = _this9.deliveryBoys.remark) !== null && _this9$deliveryBoys$r !== void 0 ? _this9$deliveryBoys$r : '');
                 fd.append('bonus_type', _this9.deliveryBoys.bonus_type);
@@ -1014,93 +1031,93 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   });
                 }
                 url = _isEdit ? _this9.$apiUrl + '/delivery_boys/update' : _this9.$apiUrl + '/delivery_boys/save';
-                _context.next = 71;
+                _context.next = 72;
                 return axios__WEBPACK_IMPORTED_MODULE_2___default().post(url, fd);
-              case 71:
+              case 72:
                 response = _context.sent;
                 if (!(!response.data || response.data.status !== 1)) {
-                  _context.next = 74;
+                  _context.next = 75;
                   break;
                 }
                 throw new Error(((_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.message) || __('something_went_wrong'));
-              case 74:
+              case 75:
                 if (!_isEdit) {
                   _this9.deliveryBoys.id = (_response$data$data = response.data.data) === null || _response$data$data === void 0 ? void 0 : _response$data$data.id;
                 }
 
                 // Save non-default language translations
                 _iterator2 = _createForOfIteratorHelper(_this9.languages);
-                _context.prev = 76;
+                _context.prev = 77;
                 _iterator2.s();
-              case 78:
+              case 79:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context.next = 96;
+                  _context.next = 97;
                   break;
                 }
                 lang = _step2.value;
                 if (!lang.is_default) {
-                  _context.next = 82;
+                  _context.next = 83;
                   break;
                 }
-                return _context.abrupt("continue", 94);
-              case 82:
+                return _context.abrupt("continue", 95);
+              case 83:
                 t = _this9.translations[lang.id];
                 if (!(!t || !t.name)) {
-                  _context.next = 85;
+                  _context.next = 86;
                   break;
                 }
-                return _context.abrupt("continue", 94);
-              case 85:
+                return _context.abrupt("continue", 95);
+              case 86:
                 tfd = new FormData();
                 tfd.append('id', _this9.deliveryBoys.id);
                 tfd.append('language_id', lang.id);
                 tfd.append('name', (_t$name = t.name) !== null && _t$name !== void 0 ? _t$name : '');
-                _context.next = 91;
+                _context.next = 92;
                 return axios__WEBPACK_IMPORTED_MODULE_2___default().post(_this9.$apiUrl + '/delivery_boys/update', tfd);
-              case 91:
+              case 92:
                 tRes = _context.sent;
                 if (!(!tRes.data || tRes.data.status !== 1)) {
-                  _context.next = 94;
+                  _context.next = 95;
                   break;
                 }
                 throw new Error(((_tRes$data = tRes.data) === null || _tRes$data === void 0 ? void 0 : _tRes$data.message) || __('something_went_wrong'));
-              case 94:
-                _context.next = 78;
+              case 95:
+                _context.next = 79;
                 break;
-              case 96:
-                _context.next = 101;
+              case 97:
+                _context.next = 102;
                 break;
-              case 98:
-                _context.prev = 98;
-                _context.t0 = _context["catch"](76);
+              case 99:
+                _context.prev = 99;
+                _context.t0 = _context["catch"](77);
                 _iterator2.e(_context.t0);
-              case 101:
-                _context.prev = 101;
+              case 102:
+                _context.prev = 102;
                 _iterator2.f();
-                return _context.finish(101);
-              case 104:
+                return _context.finish(102);
+              case 105:
                 _this9.showMessage('success', _isEdit ? __('delivery_boy_updated_successfully') : __('delivery_boy_saved_successfully'));
                 if (!_this9.login_user || _this9.login_user.role_id !== 4) {
                   _this9.$router.push({
                     path: '/delivery_boys'
                   });
                 }
-                _context.next = 111;
+                _context.next = 112;
                 break;
-              case 108:
-                _context.prev = 108;
+              case 109:
+                _context.prev = 109;
                 _context.t1 = _context["catch"](50);
                 _this9.showError(_context.t1.message || (_context.t1 === null || _context.t1 === void 0 ? void 0 : (_error$response = _context.t1.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : _error$response$data.message) || __('something_went_wrong') || 'Something went wrong.');
-              case 111:
-                _context.prev = 111;
+              case 112:
+                _context.prev = 112;
                 _this9.isLoading = false;
-                return _context.finish(111);
-              case 114:
+                return _context.finish(112);
+              case 115:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, null, [[50, 108, 111, 114], [76, 98, 101, 104]]);
+        }, _callee, null, [[50, 109, 112, 115], [77, 99, 102, 105]]);
       }))();
     }
   }
@@ -1428,7 +1445,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* Sectioned form cards */\n.db-form-card[data-v-77323279] {\n    margin-bottom: 20px;\n}\n.db-section-title[data-v-77323279] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.db-pw-toggle[data-v-77323279] {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 44px;\n    padding: 0;\n    border-color: var(--ui-border-strong);\n    background: var(--ui-surface);\n}\n.db-pw-icon[data-v-77323279] {\n    width: 18px;\n    height: 18px;\n    opacity: 0.6;\n}\n\n/* Status choices: hide the native radio dot inside the button-style options */\n.db-status-group[data-v-77323279] {\n    gap: 8px;\n}\n.db-status-group[data-v-77323279]  .btn {\n    margin: 0;\n    border-radius: var(--ui-radius) !important; /* beat BootstrapVue btn-group joined corners */\n    font-size: 13px;\n    font-weight: 600;\n}\n.db-status-group[data-v-77323279]  .btn input[type=\"radio\"] {\n    position: absolute;\n    opacity: 0;\n    pointer-events: none;\n}\n.db-form-actions[data-v-77323279] {\n    display: flex;\n    flex-wrap: wrap;\n    justify-content: flex-end;\n    gap: 10px;\n    margin-bottom: 24px;\n}\n@media (max-width: 575.98px) {\n.db-form-actions .btn[data-v-77323279] {\n        flex: 1 1 0;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1706,1019 +1723,565 @@ var render = function () {
           ),
         ]),
       ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
-          _c("div", { staticClass: "card" }, [
-            this.$roleDeliveryBoy !== this.login_user.role.name
-              ? _c("div", { staticClass: "card-header" }, [
-                  _c("h4", [_vm._v(_vm._s(_vm.__("delivery_boy")))]),
-                  _vm._v(" "),
-                  _c(
-                    "span",
-                    { staticClass: "pull-right" },
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
+        _c(
+          "form",
+          {
+            ref: "my-form",
+            on: {
+              submit: function ($event) {
+                $event.preventDefault()
+                return _vm.saveRecord.apply(null, arguments)
+              },
+            },
+          },
+          [
+            _c("div", { staticClass: "card db-form-card" }, [
+              this.$roleDeliveryBoy !== this.login_user.role.name
+                ? _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex flex-wrap justify-content-between align-items-center gap-2",
+                    },
                     [
+                      _c("h4", { staticClass: "db-section-title mb-0" }, [
+                        _vm._v(_vm._s(_vm.__("delivery_boy"))),
+                      ]),
+                      _vm._v(" "),
                       _c(
-                        "router-link",
-                        {
-                          directives: [
+                        "span",
+                        [
+                          _c(
+                            "router-link",
                             {
-                              name: "b-tooltip",
-                              rawName: "v-b-tooltip.hover",
-                              modifiers: { hover: true },
+                              directives: [
+                                {
+                                  name: "b-tooltip",
+                                  rawName: "v-b-tooltip.hover",
+                                  modifiers: { hover: true },
+                                },
+                              ],
+                              staticClass: "btn btn-sm btn-outline-secondary",
+                              attrs: {
+                                to: "/delivery_boys",
+                                title: "View Delivery boys",
+                              },
                             },
-                          ],
-                          staticClass: "btn btn-primary",
-                          attrs: {
-                            to: "/delivery_boys",
-                            title: "View Delivery boys",
+                            [
+                              _c("i", { staticClass: "fa fa-list me-1" }),
+                              _vm._v(_vm._s(_vm.__("view_delivery_boys"))),
+                            ]
+                          ),
+                        ],
+                        1
+                      ),
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "card-body" },
+                [
+                  _vm.languages.length > 0
+                    ? _c(
+                        "b-tabs",
+                        {
+                          key: "lang-tabs-" + _vm.languagesKey,
+                          attrs: { "content-class": "mt-3" },
+                          model: {
+                            value: _vm.activeLanguageTab,
+                            callback: function ($$v) {
+                              _vm.activeLanguageTab = $$v
+                            },
+                            expression: "activeLanguageTab",
                           },
                         },
-                        [_vm._v(_vm._s(_vm.__("view_delivery_boys")))]
-                      ),
-                    ],
-                    1
-                  ),
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _c(
-              "form",
-              {
-                ref: "my-form",
-                on: {
-                  submit: function ($event) {
-                    $event.preventDefault()
-                    return _vm.saveRecord.apply(null, arguments)
-                  },
-                },
-              },
-              [
-                _c(
-                  "div",
-                  { staticClass: "card-body" },
-                  [
-                    _vm.languages.length > 0
-                      ? _c(
-                          "b-tabs",
-                          {
-                            key: "lang-tabs-" + _vm.languagesKey,
-                            attrs: { "content-class": "mt-3" },
-                            model: {
-                              value: _vm.activeLanguageTab,
-                              callback: function ($$v) {
-                                _vm.activeLanguageTab = $$v
-                              },
-                              expression: "activeLanguageTab",
-                            },
-                          },
-                          [
-                            _vm._l(_vm.languages, function (lang, index) {
-                              return lang.is_default
-                                ? _c(
-                                    "b-tab",
-                                    {
-                                      key: "lang-tab-" + lang.id,
-                                      attrs: { lazy: "" },
-                                      scopedSlots: _vm._u(
-                                        [
-                                          {
-                                            key: "title",
-                                            fn: function () {
-                                              return [
-                                                _c(
-                                                  "span",
-                                                  {
-                                                    class: {
-                                                      "text-primary":
-                                                        lang.is_default,
-                                                    },
-                                                  },
-                                                  [
-                                                    _vm._v(
-                                                      "\n                                            " +
-                                                        _vm._s(lang.name) +
-                                                        "\n                                        "
-                                                    ),
-                                                  ]
-                                                ),
-                                              ]
-                                            },
-                                            proxy: true,
-                                          },
-                                        ],
-                                        null,
-                                        true
-                                      ),
-                                    },
-                                    [
-                                      _vm._v(" "),
-                                      lang.is_default &&
-                                      _vm.languages.length > 1
-                                        ? _c(
-                                            "div",
-                                            { staticClass: "mb-3" },
-                                            [
+                        [
+                          _vm._l(_vm.languages, function (lang, index) {
+                            return lang.is_default
+                              ? _c(
+                                  "b-tab",
+                                  {
+                                    key: "lang-tab-" + lang.id,
+                                    attrs: { lazy: "" },
+                                    scopedSlots: _vm._u(
+                                      [
+                                        {
+                                          key: "title",
+                                          fn: function () {
+                                            return [
                                               _c(
-                                                "b-button",
+                                                "span",
                                                 {
-                                                  directives: [
-                                                    {
-                                                      name: "b-tooltip",
-                                                      rawName:
-                                                        "v-b-tooltip.hover",
-                                                      modifiers: {
-                                                        hover: true,
-                                                      },
-                                                    },
-                                                  ],
-                                                  staticClass: "mr-2",
-                                                  attrs: {
-                                                    size: "sm",
-                                                    variant: "outline-primary",
-                                                    title: _vm.__(
-                                                      "only_empty_fields_will_be_translated_existing_content_will_not_be_changed"
-                                                    ),
-                                                    disabled: _vm.loadingEmpty,
-                                                  },
-                                                  on: {
-                                                    click: function ($event) {
-                                                      return _vm.translateEmpty(
-                                                        lang
-                                                      )
-                                                    },
+                                                  class: {
+                                                    "text-primary":
+                                                      lang.is_default,
                                                   },
                                                 },
                                                 [
-                                                  !_vm.loadingEmpty
-                                                    ? _c("span", [
-                                                        _vm._v(
-                                                          _vm._s(
-                                                            _vm.__(
-                                                              "translate_empty_fields"
-                                                            )
-                                                          )
-                                                        ),
-                                                      ])
-                                                    : _c("b-spinner", {
-                                                        attrs: { small: "" },
-                                                      }),
-                                                ],
-                                                1
-                                              ),
-                                              _vm._v(" "),
-                                              _c(
-                                                "b-button",
-                                                {
-                                                  directives: [
-                                                    {
-                                                      name: "b-tooltip",
-                                                      rawName:
-                                                        "v-b-tooltip.hover",
-                                                      modifiers: {
-                                                        hover: true,
-                                                      },
-                                                    },
-                                                  ],
-                                                  attrs: {
-                                                    size: "sm",
-                                                    variant: "outline-danger",
-                                                    title: _vm.__(
-                                                      "all_fields_will_be_translated_and_existing_content_will_be_overwritten"
-                                                    ),
-                                                    disabled:
-                                                      _vm.loadingOverwrite,
-                                                  },
-                                                  on: {
-                                                    click: function ($event) {
-                                                      return _vm.translateOverwrite(
-                                                        lang
-                                                      )
-                                                    },
-                                                  },
-                                                },
-                                                [
-                                                  !_vm.loadingOverwrite
-                                                    ? _c("span", [
-                                                        _vm._v(
-                                                          _vm._s(
-                                                            _vm.__(
-                                                              "translate_and_overwrite"
-                                                            )
-                                                          )
-                                                        ),
-                                                      ])
-                                                    : _c("b-spinner", {
-                                                        attrs: { small: "" },
-                                                      }),
-                                                ],
-                                                1
-                                              ),
-                                              _vm._v(" "),
-                                              _vm.translateSuccessMessage
-                                                ? _c(
-                                                    "div",
-                                                    {
-                                                      staticClass:
-                                                        "text-success mt-2 font-weight-bold",
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                                            " +
-                                                          _vm._s(
-                                                            _vm.translateSuccessMessage
-                                                          ) +
-                                                          "\n                                        "
-                                                      ),
-                                                    ]
-                                                  )
-                                                : _vm._e(),
-                                            ],
-                                            1
-                                          )
-                                        : _vm._e(),
-                                    ]
-                                  )
-                                : _vm._e()
-                            }),
-                            _vm._v(" "),
-                            _vm._l(_vm.languages, function (lang, index) {
-                              return !lang.is_default
-                                ? _c(
-                                    "b-tab",
-                                    {
-                                      key: "lang-tab-" + lang.id,
-                                      attrs: { lazy: "" },
-                                      scopedSlots: _vm._u(
-                                        [
-                                          {
-                                            key: "title",
-                                            fn: function () {
-                                              return [
-                                                _c("span", [
                                                   _vm._v(
                                                     "\n                                            " +
                                                       _vm._s(lang.name) +
                                                       "\n                                        "
                                                   ),
-                                                ]),
-                                              ]
-                                            },
-                                            proxy: true,
+                                                ]
+                                              ),
+                                            ]
                                           },
-                                        ],
-                                        null,
-                                        true
-                                      ),
-                                    },
-                                    [
-                                      _vm._v(" "),
-                                      _c("div", { staticClass: "row" }, [
-                                        _c(
+                                          proxy: true,
+                                        },
+                                      ],
+                                      null,
+                                      true
+                                    ),
+                                  },
+                                  [
+                                    _vm._v(" "),
+                                    lang.is_default && _vm.languages.length > 1
+                                      ? _c(
                                           "div",
-                                          { staticClass: "col-md-12" },
+                                          {
+                                            staticClass:
+                                              "mb-3 d-flex flex-wrap gap-2",
+                                          },
                                           [
                                             _c(
-                                              "div",
-                                              { staticClass: "form-group" },
+                                              "b-button",
+                                              {
+                                                directives: [
+                                                  {
+                                                    name: "b-tooltip",
+                                                    rawName:
+                                                      "v-b-tooltip.hover",
+                                                    modifiers: { hover: true },
+                                                  },
+                                                ],
+                                                attrs: {
+                                                  size: "sm",
+                                                  variant: "outline-primary",
+                                                  title: _vm.__(
+                                                    "only_empty_fields_will_be_translated_existing_content_will_not_be_changed"
+                                                  ),
+                                                  disabled: _vm.loadingEmpty,
+                                                },
+                                                on: {
+                                                  click: function ($event) {
+                                                    return _vm.translateEmpty(
+                                                      lang
+                                                    )
+                                                  },
+                                                },
+                                              },
                                               [
-                                                _c(
-                                                  "label",
-                                                  { attrs: { for: "name" } },
+                                                !_vm.loadingEmpty
+                                                  ? _c("span", [
+                                                      _vm._v(
+                                                        _vm._s(
+                                                          _vm.__(
+                                                            "translate_empty_fields"
+                                                          )
+                                                        )
+                                                      ),
+                                                    ])
+                                                  : _c("b-spinner", {
+                                                      attrs: { small: "" },
+                                                    }),
+                                              ],
+                                              1
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "b-button",
+                                              {
+                                                directives: [
+                                                  {
+                                                    name: "b-tooltip",
+                                                    rawName:
+                                                      "v-b-tooltip.hover",
+                                                    modifiers: { hover: true },
+                                                  },
+                                                ],
+                                                attrs: {
+                                                  size: "sm",
+                                                  variant: "outline-danger",
+                                                  title: _vm.__(
+                                                    "all_fields_will_be_translated_and_existing_content_will_be_overwritten"
+                                                  ),
+                                                  disabled:
+                                                    _vm.loadingOverwrite,
+                                                },
+                                                on: {
+                                                  click: function ($event) {
+                                                    return _vm.translateOverwrite(
+                                                      lang
+                                                    )
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                !_vm.loadingOverwrite
+                                                  ? _c("span", [
+                                                      _vm._v(
+                                                        _vm._s(
+                                                          _vm.__(
+                                                            "translate_and_overwrite"
+                                                          )
+                                                        )
+                                                      ),
+                                                    ])
+                                                  : _c("b-spinner", {
+                                                      attrs: { small: "" },
+                                                    }),
+                                              ],
+                                              1
+                                            ),
+                                            _vm._v(" "),
+                                            _vm.translateSuccessMessage
+                                              ? _c(
+                                                  "div",
+                                                  {
+                                                    staticClass:
+                                                      "text-success w-100 small font-weight-bold",
+                                                  },
                                                   [
                                                     _vm._v(
-                                                      _vm._s(_vm.__("name"))
+                                                      "\n                                            " +
+                                                        _vm._s(
+                                                          _vm.translateSuccessMessage
+                                                        ) +
+                                                        "\n                                        "
                                                     ),
                                                   ]
+                                                )
+                                              : _vm._e(),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                  ]
+                                )
+                              : _vm._e()
+                          }),
+                          _vm._v(" "),
+                          _vm._l(_vm.languages, function (lang, index) {
+                            return !lang.is_default
+                              ? _c(
+                                  "b-tab",
+                                  {
+                                    key: "lang-tab-" + lang.id,
+                                    attrs: { lazy: "" },
+                                    scopedSlots: _vm._u(
+                                      [
+                                        {
+                                          key: "title",
+                                          fn: function () {
+                                            return [
+                                              _c("span", [
+                                                _vm._v(
+                                                  "\n                                            " +
+                                                    _vm._s(lang.name) +
+                                                    "\n                                        "
                                                 ),
-                                                _vm._v(" "),
-                                                _c("input", {
-                                                  directives: [
-                                                    {
-                                                      name: "model",
-                                                      rawName: "v-model",
-                                                      value:
-                                                        _vm.translations[
-                                                          lang.id
-                                                        ].name,
-                                                      expression:
-                                                        "translations[lang.id].name",
-                                                    },
-                                                  ],
-                                                  staticClass: "form-control",
-                                                  attrs: {
-                                                    type: "text",
-                                                    name: "name",
-                                                    id: "name_" + lang.id,
-                                                    placeholder: _vm.__("name"),
-                                                  },
-                                                  domProps: {
-                                                    value:
-                                                      _vm.translations[lang.id]
-                                                        .name,
-                                                  },
-                                                  on: {
-                                                    input: function ($event) {
-                                                      if (
-                                                        $event.target.composing
-                                                      ) {
-                                                        return
-                                                      }
-                                                      _vm.$set(
-                                                        _vm.translations[
-                                                          lang.id
-                                                        ],
-                                                        "name",
-                                                        $event.target.value
-                                                      )
-                                                    },
-                                                  },
-                                                }),
-                                              ]
+                                              ]),
+                                            ]
+                                          },
+                                          proxy: true,
+                                        },
+                                      ],
+                                      null,
+                                      true
+                                    ),
+                                  },
+                                  [
+                                    _vm._v(" "),
+                                    _c("div", { staticClass: "row" }, [
+                                      _c("div", { staticClass: "col-md-12" }, [
+                                        _c(
+                                          "div",
+                                          { staticClass: "form-group" },
+                                          [
+                                            _c(
+                                              "label",
+                                              { attrs: { for: "name" } },
+                                              [_vm._v(_vm._s(_vm.__("name")))]
                                             ),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value:
+                                                    _vm.translations[lang.id]
+                                                      .name,
+                                                  expression:
+                                                    "translations[lang.id].name",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                type: "text",
+                                                name: "name",
+                                                id: "name_" + lang.id,
+                                                placeholder: _vm.__("name"),
+                                              },
+                                              domProps: {
+                                                value:
+                                                  _vm.translations[lang.id]
+                                                    .name,
+                                              },
+                                              on: {
+                                                input: function ($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    _vm.translations[lang.id],
+                                                    "name",
+                                                    $event.target.value
+                                                  )
+                                                },
+                                              },
+                                            }),
                                           ]
                                         ),
                                       ]),
-                                    ]
-                                  )
-                                : _vm._e()
-                            }),
-                          ],
-                          2
-                        )
-                      : _vm._e(),
-                    _vm._v(" "),
-                    !_vm.languages.length ||
-                    (_vm.defaultLanguage &&
-                      _vm.getCurrentLanguage() &&
-                      _vm.getCurrentLanguage().is_default)
-                      ? _c("div", [
-                          _c("div", { staticClass: "row mt-3" }, [
-                            _c("div", { staticClass: "col-md-4" }, [
-                              _c("div", { staticClass: "form-group" }, [
-                                _c("label", { attrs: { for: "name" } }, [
-                                  _vm._v(_vm._s(_vm.__("name"))),
-                                  _c(
-                                    "span",
-                                    { staticClass: "text-danger text-xs" },
-                                    [_vm._v("*")]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _vm.defaultLanguage
-                                  ? _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value:
-                                            _vm.translations[
-                                              _vm.defaultLanguage.id
-                                            ].name,
-                                          expression:
-                                            "translations[defaultLanguage.id].name",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "text",
-                                        name: "name",
-                                        id: "name",
-                                        placeholder: _vm.__("name"),
-                                      },
-                                      domProps: {
+                                    ]),
+                                  ]
+                                )
+                              : _vm._e()
+                          }),
+                        ],
+                        2
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  !_vm.languages.length ||
+                  (_vm.defaultLanguage &&
+                    _vm.getCurrentLanguage() &&
+                    _vm.getCurrentLanguage().is_default)
+                    ? _c("div", [
+                        _c("div", { staticClass: "row mt-3" }, [
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", { attrs: { for: "name" } }, [
+                                _vm._v(_vm._s(_vm.__("name"))),
+                                _c(
+                                  "span",
+                                  { staticClass: "text-danger text-xs" },
+                                  [_vm._v("*")]
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _vm.defaultLanguage
+                                ? _c("input", {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
                                         value:
                                           _vm.translations[
                                             _vm.defaultLanguage.id
                                           ].name,
+                                        expression:
+                                          "translations[defaultLanguage.id].name",
                                       },
-                                      on: {
-                                        input: function ($event) {
-                                          if ($event.target.composing) {
-                                            return
-                                          }
-                                          _vm.$set(
-                                            _vm.translations[
-                                              _vm.defaultLanguage.id
-                                            ],
-                                            "name",
-                                            $event.target.value
-                                          )
-                                        },
-                                      },
-                                    })
-                                  : _vm._e(),
-                              ]),
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-4" }, [
-                              _c("div", { staticClass: "form-group" }, [
-                                _c("label", { attrs: { for: "dob" } }, [
-                                  _vm._v(_vm._s(_vm.__("date_of_birth")) + " "),
-                                  _c(
-                                    "span",
-                                    { staticClass: "text-danger text-xs" },
-                                    [_vm._v("*")]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.deliveryBoys.dob,
-                                      expression: "deliveryBoys.dob",
+                                    ],
+                                    staticClass: "form-control",
+                                    attrs: {
+                                      type: "text",
+                                      name: "name",
+                                      id: "name",
+                                      placeholder: _vm.__("name"),
                                     },
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    type: "date",
-                                    name: "dob",
-                                    id: "dob",
-                                    required: "",
-                                    placeholder: _vm.__("date_of_birth"),
-                                  },
-                                  domProps: { value: _vm.deliveryBoys.dob },
-                                  on: {
-                                    input: [
-                                      function ($event) {
+                                    domProps: {
+                                      value:
+                                        _vm.translations[_vm.defaultLanguage.id]
+                                          .name,
+                                    },
+                                    on: {
+                                      input: function ($event) {
                                         if ($event.target.composing) {
                                           return
                                         }
                                         _vm.$set(
-                                          _vm.deliveryBoys,
-                                          "dob",
+                                          _vm.translations[
+                                            _vm.defaultLanguage.id
+                                          ],
+                                          "name",
                                           $event.target.value
                                         )
                                       },
-                                      _vm.validateDateOfBirth,
-                                    ],
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _vm.dobvalidationError
-                                  ? _c("span", { staticClass: "error" }, [
-                                      _vm._v(_vm._s(_vm.dobvalidationError)),
-                                    ])
-                                  : _vm._e(),
-                              ]),
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-4" }, [
-                              _c("div", { staticClass: "form-group" }, [
-                                _c("label", { attrs: { for: "mobile" } }, [
-                                  _vm._v(_vm._s(_vm.__("mobile"))),
-                                  _c(
-                                    "span",
-                                    { staticClass: "text-danger text-xs" },
-                                    [_vm._v("*")]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.deliveryBoys.mobile,
-                                      expression: "deliveryBoys.mobile",
                                     },
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    type: "number",
-                                    name: "mobile",
-                                    id: "mobile",
-                                    placeholder: _vm.__("mobile_no"),
-                                  },
-                                  domProps: { value: _vm.deliveryBoys.mobile },
-                                  on: {
-                                    input: [
-                                      function ($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.$set(
-                                          _vm.deliveryBoys,
-                                          "mobile",
-                                          $event.target.value
-                                        )
-                                      },
-                                      _vm.validateMobileNumber,
-                                    ],
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _vm.mobilevalidationError
-                                  ? _c("span", { staticClass: "error" }, [
-                                      _vm._v(_vm._s(_vm.mobilevalidationError)),
-                                    ])
-                                  : _vm._e(),
-                              ]),
+                                  })
+                                : _vm._e(),
                             ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "col-md-4" }, [
-                              _c("div", { staticClass: "form-group" }, [
-                                _c("label", { attrs: { for: "email" } }, [
-                                  _vm._v(_vm._s(_vm.__("email"))),
-                                  _c(
-                                    "span",
-                                    { staticClass: "text-danger text-xs" },
-                                    [_vm._v("*")]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.deliveryBoys.email,
-                                      expression: "deliveryBoys.email",
-                                    },
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    type: "text",
-                                    name: "email",
-                                    id: "email",
-                                    readonly:
-                                      this.$roleDeliveryBoy ===
-                                      this.login_user.role.name,
-                                    placeholder: _vm.__("email"),
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", { attrs: { for: "dob" } }, [
+                                _vm._v(_vm._s(_vm.__("date_of_birth")) + " "),
+                                _c(
+                                  "span",
+                                  { staticClass: "text-danger text-xs" },
+                                  [_vm._v("*")]
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.deliveryBoys.dob,
+                                    expression: "deliveryBoys.dob",
                                   },
-                                  domProps: { value: _vm.deliveryBoys.email },
-                                  on: {
-                                    input: function ($event) {
+                                ],
+                                staticClass: "form-control",
+                                attrs: {
+                                  type: "date",
+                                  name: "dob",
+                                  id: "dob",
+                                  required: "",
+                                  placeholder: _vm.__("date_of_birth"),
+                                },
+                                domProps: { value: _vm.deliveryBoys.dob },
+                                on: {
+                                  input: [
+                                    function ($event) {
                                       if ($event.target.composing) {
                                         return
                                       }
                                       _vm.$set(
                                         _vm.deliveryBoys,
-                                        "email",
+                                        "dob",
                                         $event.target.value
                                       )
                                     },
-                                  },
-                                }),
-                              ]),
+                                    _vm.validateDateOfBirth,
+                                  ],
+                                },
+                              }),
+                              _vm._v(" "),
+                              _vm.dobvalidationError
+                                ? _c("span", { staticClass: "error" }, [
+                                    _vm._v(_vm._s(_vm.dobvalidationError)),
+                                  ])
+                                : _vm._e(),
                             ]),
-                            _vm._v(" "),
-                            this.$roleDeliveryBoy !== this.login_user.role.name
-                              ? _c("div", { staticClass: "col-md-4" }, [
-                                  _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "password" } },
-                                      [
-                                        _vm._v(_vm._s(_vm.__("password"))),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-xs",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("div", { staticClass: "input-group" }, [
-                                      (_vm.showPassword
-                                        ? "text"
-                                        : "password") === "checkbox"
-                                        ? _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys.password,
-                                                expression:
-                                                  "deliveryBoys.password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "password",
-                                              id: "password",
-                                              placeholder: _vm.__("password"),
-                                              type: "checkbox",
-                                            },
-                                            domProps: {
-                                              checked: Array.isArray(
-                                                _vm.deliveryBoys.password
-                                              )
-                                                ? _vm._i(
-                                                    _vm.deliveryBoys.password,
-                                                    null
-                                                  ) > -1
-                                                : _vm.deliveryBoys.password,
-                                            },
-                                            on: {
-                                              change: function ($event) {
-                                                var $$a =
-                                                    _vm.deliveryBoys.password,
-                                                  $$el = $event.target,
-                                                  $$c = $$el.checked
-                                                    ? true
-                                                    : false
-                                                if (Array.isArray($$a)) {
-                                                  var $$v = null,
-                                                    $$i = _vm._i($$a, $$v)
-                                                  if ($$el.checked) {
-                                                    $$i < 0 &&
-                                                      _vm.$set(
-                                                        _vm.deliveryBoys,
-                                                        "password",
-                                                        $$a.concat([$$v])
-                                                      )
-                                                  } else {
-                                                    $$i > -1 &&
-                                                      _vm.$set(
-                                                        _vm.deliveryBoys,
-                                                        "password",
-                                                        $$a
-                                                          .slice(0, $$i)
-                                                          .concat(
-                                                            $$a.slice($$i + 1)
-                                                          )
-                                                      )
-                                                  }
-                                                } else {
-                                                  _vm.$set(
-                                                    _vm.deliveryBoys,
-                                                    "password",
-                                                    $$c
-                                                  )
-                                                }
-                                              },
-                                            },
-                                          })
-                                        : (_vm.showPassword
-                                            ? "text"
-                                            : "password") === "radio"
-                                        ? _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys.password,
-                                                expression:
-                                                  "deliveryBoys.password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "password",
-                                              id: "password",
-                                              placeholder: _vm.__("password"),
-                                              type: "radio",
-                                            },
-                                            domProps: {
-                                              checked: _vm._q(
-                                                _vm.deliveryBoys.password,
-                                                null
-                                              ),
-                                            },
-                                            on: {
-                                              change: function ($event) {
-                                                return _vm.$set(
-                                                  _vm.deliveryBoys,
-                                                  "password",
-                                                  null
-                                                )
-                                              },
-                                            },
-                                          })
-                                        : _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys.password,
-                                                expression:
-                                                  "deliveryBoys.password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "password",
-                                              id: "password",
-                                              placeholder: _vm.__("password"),
-                                              type: _vm.showPassword
-                                                ? "text"
-                                                : "password",
-                                            },
-                                            domProps: {
-                                              value: _vm.deliveryBoys.password,
-                                            },
-                                            on: {
-                                              input: function ($event) {
-                                                if ($event.target.composing) {
-                                                  return
-                                                }
-                                                _vm.$set(
-                                                  _vm.deliveryBoys,
-                                                  "password",
-                                                  $event.target.value
-                                                )
-                                              },
-                                            },
-                                          }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "button",
-                                        {
-                                          staticClass:
-                                            "btn btn-primary font-bold",
-                                          attrs: { type: "button" },
-                                          on: {
-                                            click: function ($event) {
-                                              _vm.showPassword =
-                                                !_vm.showPassword
-                                            },
-                                          },
-                                        },
-                                        [
-                                          _vm.showPassword
-                                            ? _c("img", {
-                                                staticStyle: {
-                                                  filter:
-                                                    "brightness(0) invert(1)",
-                                                  width: "20px",
-                                                  height: "20px",
-                                                },
-                                                attrs: {
-                                                  src:
-                                                    _vm.$baseUrl +
-                                                    "/images/icons/show_password.svg",
-                                                },
-                                              })
-                                            : _c("img", {
-                                                staticStyle: {
-                                                  filter:
-                                                    "brightness(0) invert(1)",
-                                                  width: "20px",
-                                                  height: "20px",
-                                                },
-                                                attrs: {
-                                                  src:
-                                                    _vm.$baseUrl +
-                                                    "/images/icons/hide_password.svg",
-                                                },
-                                              }),
-                                        ]
-                                      ),
-                                    ]),
-                                  ]),
-                                ])
-                              : _vm._e(),
-                            _vm._v(" "),
-                            this.$roleDeliveryBoy !== this.login_user.role.name
-                              ? _c("div", { staticClass: "col-md-4" }, [
-                                  _c("div", { staticClass: "form-group" }, [
-                                    _c(
-                                      "label",
-                                      { attrs: { for: "confirm_password" } },
-                                      [
-                                        _vm._v(
-                                          _vm._s(_vm.__("confirm_password"))
-                                        ),
-                                        !_vm.deliveryBoys.id ||
-                                        _vm.deliveryBoys.password
-                                          ? _c(
-                                              "span",
-                                              {
-                                                staticClass:
-                                                  "text-danger text-xs",
-                                              },
-                                              [_vm._v("*")]
-                                            )
-                                          : _vm._e(),
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c("div", { staticClass: "input-group" }, [
-                                      (_vm.showConfirmPassword
-                                        ? "text"
-                                        : "password") === "checkbox"
-                                        ? _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys
-                                                    .confirm_password,
-                                                expression:
-                                                  "deliveryBoys.confirm_password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "confirm_password",
-                                              id: "confirm_password",
-                                              placeholder:
-                                                _vm.__("confirm_password"),
-                                              type: "checkbox",
-                                            },
-                                            domProps: {
-                                              checked: Array.isArray(
-                                                _vm.deliveryBoys
-                                                  .confirm_password
-                                              )
-                                                ? _vm._i(
-                                                    _vm.deliveryBoys
-                                                      .confirm_password,
-                                                    null
-                                                  ) > -1
-                                                : _vm.deliveryBoys
-                                                    .confirm_password,
-                                            },
-                                            on: {
-                                              change: function ($event) {
-                                                var $$a =
-                                                    _vm.deliveryBoys
-                                                      .confirm_password,
-                                                  $$el = $event.target,
-                                                  $$c = $$el.checked
-                                                    ? true
-                                                    : false
-                                                if (Array.isArray($$a)) {
-                                                  var $$v = null,
-                                                    $$i = _vm._i($$a, $$v)
-                                                  if ($$el.checked) {
-                                                    $$i < 0 &&
-                                                      _vm.$set(
-                                                        _vm.deliveryBoys,
-                                                        "confirm_password",
-                                                        $$a.concat([$$v])
-                                                      )
-                                                  } else {
-                                                    $$i > -1 &&
-                                                      _vm.$set(
-                                                        _vm.deliveryBoys,
-                                                        "confirm_password",
-                                                        $$a
-                                                          .slice(0, $$i)
-                                                          .concat(
-                                                            $$a.slice($$i + 1)
-                                                          )
-                                                      )
-                                                  }
-                                                } else {
-                                                  _vm.$set(
-                                                    _vm.deliveryBoys,
-                                                    "confirm_password",
-                                                    $$c
-                                                  )
-                                                }
-                                              },
-                                            },
-                                          })
-                                        : (_vm.showConfirmPassword
-                                            ? "text"
-                                            : "password") === "radio"
-                                        ? _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys
-                                                    .confirm_password,
-                                                expression:
-                                                  "deliveryBoys.confirm_password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "confirm_password",
-                                              id: "confirm_password",
-                                              placeholder:
-                                                _vm.__("confirm_password"),
-                                              type: "radio",
-                                            },
-                                            domProps: {
-                                              checked: _vm._q(
-                                                _vm.deliveryBoys
-                                                  .confirm_password,
-                                                null
-                                              ),
-                                            },
-                                            on: {
-                                              change: function ($event) {
-                                                return _vm.$set(
-                                                  _vm.deliveryBoys,
-                                                  "confirm_password",
-                                                  null
-                                                )
-                                              },
-                                            },
-                                          })
-                                        : _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value:
-                                                  _vm.deliveryBoys
-                                                    .confirm_password,
-                                                expression:
-                                                  "deliveryBoys.confirm_password",
-                                              },
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              name: "confirm_password",
-                                              id: "confirm_password",
-                                              placeholder:
-                                                _vm.__("confirm_password"),
-                                              type: _vm.showConfirmPassword
-                                                ? "text"
-                                                : "password",
-                                            },
-                                            domProps: {
-                                              value:
-                                                _vm.deliveryBoys
-                                                  .confirm_password,
-                                            },
-                                            on: {
-                                              input: function ($event) {
-                                                if ($event.target.composing) {
-                                                  return
-                                                }
-                                                _vm.$set(
-                                                  _vm.deliveryBoys,
-                                                  "confirm_password",
-                                                  $event.target.value
-                                                )
-                                              },
-                                            },
-                                          }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "button",
-                                        {
-                                          staticClass:
-                                            "btn btn-primary font-bold",
-                                          attrs: { type: "button" },
-                                          on: {
-                                            click: function ($event) {
-                                              _vm.showConfirmPassword =
-                                                !_vm.showConfirmPassword
-                                            },
-                                          },
-                                        },
-                                        [
-                                          _vm.showConfirmPassword
-                                            ? _c("img", {
-                                                staticStyle: {
-                                                  filter:
-                                                    "brightness(0) invert(1)",
-                                                  width: "20px",
-                                                  height: "20px",
-                                                },
-                                                attrs: {
-                                                  src:
-                                                    _vm.$baseUrl +
-                                                    "/images/icons/show_password.svg",
-                                                },
-                                              })
-                                            : _c("img", {
-                                                staticStyle: {
-                                                  filter:
-                                                    "brightness(0) invert(1)",
-                                                  width: "20px",
-                                                  height: "20px",
-                                                },
-                                                attrs: {
-                                                  src:
-                                                    _vm.$baseUrl +
-                                                    "/images/icons/hide_password.svg",
-                                                },
-                                              }),
-                                        ]
-                                      ),
-                                    ]),
-                                  ]),
-                                ])
-                              : _vm._e(),
                           ]),
                           _vm._v(" "),
-                          _c("div", { staticClass: "row" }, [
-                            _c("div", { staticClass: "col-md-4" }, [
-                              _c(
-                                "div",
-                                { staticClass: "form-group" },
-                                [
-                                  _c("label", { attrs: { for: "city_name" } }, [
-                                    _vm._v(
-                                      _vm._s(_vm.__("select_or_search_city"))
-                                    ),
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", { attrs: { for: "mobile" } }, [
+                                _vm._v(_vm._s(_vm.__("mobile"))),
+                                _c(
+                                  "span",
+                                  { staticClass: "text-danger text-xs" },
+                                  [_vm._v("*")]
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.deliveryBoys.mobile,
+                                    expression: "deliveryBoys.mobile",
+                                  },
+                                ],
+                                staticClass: "form-control",
+                                attrs: {
+                                  type: "number",
+                                  name: "mobile",
+                                  id: "mobile",
+                                  placeholder: _vm.__("mobile_no"),
+                                },
+                                domProps: { value: _vm.deliveryBoys.mobile },
+                                on: {
+                                  input: [
+                                    function ($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.deliveryBoys,
+                                        "mobile",
+                                        $event.target.value
+                                      )
+                                    },
+                                    _vm.validateMobileNumber,
+                                  ],
+                                },
+                              }),
+                              _vm._v(" "),
+                              _vm.mobilevalidationError
+                                ? _c("span", { staticClass: "error" }, [
+                                    _vm._v(_vm._s(_vm.mobilevalidationError)),
+                                  ])
+                                : _vm._e(),
+                            ]),
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", { attrs: { for: "email" } }, [
+                                _vm._v(_vm._s(_vm.__("email"))),
+                                _c(
+                                  "span",
+                                  { staticClass: "text-danger text-xs" },
+                                  [_vm._v("*")]
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.deliveryBoys.email,
+                                    expression: "deliveryBoys.email",
+                                  },
+                                ],
+                                staticClass: "form-control",
+                                attrs: {
+                                  type: "text",
+                                  name: "email",
+                                  id: "email",
+                                  readonly:
+                                    this.$roleDeliveryBoy ===
+                                    this.login_user.role.name,
+                                  placeholder: _vm.__("email"),
+                                },
+                                domProps: { value: _vm.deliveryBoys.email },
+                                on: {
+                                  input: function ($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      _vm.deliveryBoys,
+                                      "email",
+                                      $event.target.value
+                                    )
+                                  },
+                                },
+                              }),
+                            ]),
+                          ]),
+                          _vm._v(" "),
+                          this.$roleDeliveryBoy !== this.login_user.role.name
+                            ? _c("div", { staticClass: "col-md-6" }, [
+                                _c("div", { staticClass: "form-group" }, [
+                                  _c("label", { attrs: { for: "password" } }, [
+                                    _vm._v(_vm._s(_vm.__("password"))),
                                     _c(
                                       "span",
                                       { staticClass: "text-danger text-xs" },
@@ -2726,611 +2289,133 @@ var render = function () {
                                     ),
                                   ]),
                                   _vm._v(" "),
-                                  _c("multiselect", {
-                                    attrs: {
-                                      options: _vm.cities,
-                                      placeholder: _vm.__(
-                                        "select_or_search_city"
-                                      ),
-                                      label: "name",
-                                      "track-by": "name",
-                                      id: "city_name",
-                                      required: "",
-                                    },
-                                    on: { close: _vm.setCityId },
-                                    scopedSlots: _vm._u(
-                                      [
-                                        {
-                                          key: "singleLabel",
-                                          fn: function (props) {
-                                            return [
-                                              _c(
-                                                "span",
-                                                { staticClass: "option__desc" },
-                                                [
-                                                  _c(
-                                                    "span",
-                                                    {
-                                                      staticClass:
-                                                        "option__title",
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        _vm._s(
-                                                          props.option.name
-                                                        )
-                                                      ),
-                                                    ]
-                                                  ),
-                                                ]
-                                              ),
-                                            ]
-                                          },
-                                        },
-                                        {
-                                          key: "option",
-                                          fn: function (props) {
-                                            return [
-                                              _c(
-                                                "div",
-                                                { staticClass: "option__desc" },
-                                                [
-                                                  _c(
-                                                    "span",
-                                                    {
-                                                      staticClass:
-                                                        "option__title",
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        _vm._s(
-                                                          props.option
-                                                            .formatted_address
-                                                        )
-                                                      ),
-                                                    ]
-                                                  ),
-                                                ]
-                                              ),
-                                            ]
-                                          },
-                                        },
-                                      ],
-                                      null,
-                                      false,
-                                      3487758553
-                                    ),
-                                    model: {
-                                      value: _vm.city,
-                                      callback: function ($$v) {
-                                        _vm.city = $$v
-                                      },
-                                      expression: "city",
-                                    },
-                                  }),
-                                ],
-                                1
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "list-group-item m-2" }, [
-                            _c(
-                              "div",
-                              {
-                                staticClass:
-                                  "d-flex justify-content-between align-content-center",
-                              },
-                              [
-                                _c("h6", [
-                                  _vm._v(
-                                    _vm._s(_vm.__("delivery_boy_bonus_details"))
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                this.$roleDeliveryBoy !==
-                                this.login_user.role.name
-                                  ? _c(
-                                      "b-button-group",
-                                      [
-                                        _vm.$deliveryBoyBonusSettings == 1
-                                          ? _c(
-                                              "b-button",
-                                              {
-                                                attrs: {
-                                                  type: "button",
-                                                  variant: "primary",
-                                                  size: "sm",
-                                                },
-                                                on: {
-                                                  click: _vm.getBonusSettings,
-                                                },
-                                              },
-                                              [
-                                                _vm._v(
-                                                  "\n                                                " +
-                                                    _vm._s(
-                                                      _vm.__(
-                                                        "add_default_bonus"
-                                                      )
-                                                    ) +
-                                                    "\n                                            "
-                                                ),
-                                              ]
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        _vm.deliveryBoys.id
-                                          ? _c(
-                                              "b-button",
-                                              {
-                                                attrs: {
-                                                  type: "button",
-                                                  size: "sm",
-                                                },
-                                                on: { click: _vm.resetBonus },
-                                              },
-                                              [
-                                                _vm._v(
-                                                  "\n                                                " +
-                                                    _vm._s(
-                                                      _vm.__("reset_bonus")
-                                                    ) +
-                                                    "\n                                            "
-                                                ),
-                                              ]
-                                            )
-                                          : _vm._e(),
-                                      ],
-                                      1
-                                    )
-                                  : _vm._e(),
-                              ],
-                              1
-                            ),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "row mt-2" }, [
-                              _c("div", { staticClass: "col-md-3" }, [
-                                _c("div", { staticClass: "form-group" }, [
-                                  _c(
-                                    "label",
-                                    { attrs: { for: "bonus_type" } },
-                                    [
-                                      _vm._v(_vm._s(_vm.__("bonus_type"))),
-                                      _c(
-                                        "span",
-                                        { staticClass: "text-danger text-xs" },
-                                        [_vm._v("*")]
-                                      ),
-                                    ]
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "select",
-                                    {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value: _vm.deliveryBoys.bonus_type,
-                                          expression: "deliveryBoys.bonus_type",
-                                        },
-                                      ],
-                                      staticClass: "form-control form-select",
-                                      attrs: {
-                                        name: "bonus_type",
-                                        id: "bonus_type",
-                                        disabled:
-                                          this.$roleDeliveryBoy ===
-                                          this.login_user.role.name,
-                                      },
-                                      on: {
-                                        change: [
-                                          function ($event) {
-                                            var $$selectedVal =
-                                              Array.prototype.filter
-                                                .call(
-                                                  $event.target.options,
-                                                  function (o) {
-                                                    return o.selected
-                                                  }
-                                                )
-                                                .map(function (o) {
-                                                  var val =
-                                                    "_value" in o
-                                                      ? o._value
-                                                      : o.value
-                                                  return val
-                                                })
-                                            _vm.$set(
-                                              _vm.deliveryBoys,
-                                              "bonus_type",
-                                              $event.target.multiple
-                                                ? $$selectedVal
-                                                : $$selectedVal[0]
-                                            )
-                                          },
-                                          _vm.changeBonusType,
-                                        ],
-                                      },
-                                    },
-                                    [
-                                      _c("option", { attrs: { value: "" } }, [
-                                        _vm._v(_vm._s(_vm.__("select"))),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("option", { attrs: { value: "1" } }, [
-                                        _vm._v(_vm._s(_vm.__("commission"))),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("option", { attrs: { value: "0" } }, [
-                                        _vm._v(
-                                          _vm._s(_vm.__("fixed_salaried"))
-                                        ),
-                                      ]),
-                                    ]
-                                  ),
-                                ]),
-                              ]),
-                              _vm._v(" "),
-                              _vm.deliveryBoys.bonus_type == 1
-                                ? _c("div", { staticClass: "col-md-3" }, [
-                                    _c("div", { staticClass: "form-group" }, [
-                                      _c(
-                                        "label",
-                                        { attrs: { for: "bonus_percentage" } },
-                                        [
-                                          _vm._v(
-                                            _vm._s(_vm.__("bonus_percentage"))
-                                          ),
-                                          _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "text-danger text-xs",
-                                            },
-                                            [_vm._v("*")]
-                                          ),
-                                        ]
-                                      ),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value:
-                                              _vm.deliveryBoys.bonus_percentage,
-                                            expression:
-                                              "deliveryBoys.bonus_percentage",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0.1",
-                                          max: "100",
-                                          step: "0.1",
-                                          name: "bonus_percentage",
-                                          id: "bonus_percentage",
-                                          placeholder:
-                                            _vm.__("bonus_percentage"),
-                                          readonly:
-                                            this.$roleDeliveryBoy ===
-                                            this.login_user.role.name,
-                                        },
-                                        domProps: {
-                                          value:
-                                            _vm.deliveryBoys.bonus_percentage,
-                                        },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              _vm.deliveryBoys,
-                                              "bonus_percentage",
-                                              $event.target.value
-                                            )
-                                          },
-                                        },
-                                      }),
-                                    ]),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.deliveryBoys.bonus_type == 1
-                                ? _c("div", { staticClass: "col-md-3" }, [
-                                    _c("div", { staticClass: "form-group" }, [
-                                      _c(
-                                        "label",
-                                        { attrs: { for: "bonus_min_amount" } },
-                                        [
-                                          _vm._v(
-                                            _vm._s(
-                                              _vm.__("minimum_bonus_amount")
-                                            )
-                                          ),
-                                        ]
-                                      ),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value:
-                                              _vm.deliveryBoys.bonus_min_amount,
-                                            expression:
-                                              "deliveryBoys.bonus_min_amount",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0",
-                                          step: "0.1",
-                                          required: "",
-                                          name: "bonus_min_amount",
-                                          id: "bonus_min_amount",
-                                          placeholder: "Minimum bonus amount",
-                                          readonly:
-                                            this.$roleDeliveryBoy ===
-                                            this.login_user.role.name,
-                                        },
-                                        domProps: {
-                                          value:
-                                            _vm.deliveryBoys.bonus_min_amount,
-                                        },
-                                        on: {
-                                          input: [
-                                            function ($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                _vm.deliveryBoys,
-                                                "bonus_min_amount",
-                                                $event.target.value
-                                              )
-                                            },
-                                            _vm.validateBonusMinAmount,
-                                          ],
-                                        },
-                                      }),
-                                      _vm._v(" "),
-                                      this.$roleDeliveryBoy !==
-                                      this.login_user.role.name
-                                        ? _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "text text-primary font-size-13",
-                                            },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.__(
-                                                    "set_0_if_you_want_to_remove_limit"
-                                                  )
-                                                )
-                                              ),
-                                            ]
-                                          )
-                                        : _vm._e(),
-                                      _vm._v(" "),
-                                      _vm.bonusMinAmountValidationError
-                                        ? _c("span", { staticClass: "error" }, [
-                                            _vm._v(
-                                              _vm._s(
-                                                _vm.bonusMinAmountValidationError
-                                              )
-                                            ),
-                                          ])
-                                        : _vm._e(),
-                                    ]),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.deliveryBoys.bonus_type == 1
-                                ? _c("div", { staticClass: "col-md-3" }, [
-                                    _c("div", { staticClass: "form-group" }, [
-                                      _c(
-                                        "label",
-                                        { attrs: { for: "bonus_max_amount" } },
-                                        [
-                                          _vm._v(
-                                            _vm._s(
-                                              _vm.__("maximum_bonus_amount")
-                                            )
-                                          ),
-                                        ]
-                                      ),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value:
-                                              _vm.deliveryBoys.bonus_max_amount,
-                                            expression:
-                                              "deliveryBoys.bonus_max_amount",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0",
-                                          step: "0.1",
-                                          required: "",
-                                          name: "bonus_max_amount",
-                                          id: "bonus_max_amount",
-                                          placeholder: _vm.__(
-                                            "maximum_bonus_amount"
-                                          ),
-                                          readonly:
-                                            this.$roleDeliveryBoy ===
-                                            this.login_user.role.name,
-                                        },
-                                        domProps: {
-                                          value:
-                                            _vm.deliveryBoys.bonus_max_amount,
-                                        },
-                                        on: {
-                                          input: [
-                                            function ($event) {
-                                              if ($event.target.composing) {
-                                                return
-                                              }
-                                              _vm.$set(
-                                                _vm.deliveryBoys,
-                                                "bonus_max_amount",
-                                                $event.target.value
-                                              )
-                                            },
-                                            _vm.validateBonusMaxAmount,
-                                          ],
-                                        },
-                                      }),
-                                      _vm._v(" "),
-                                      this.$roleDeliveryBoy !==
-                                      this.login_user.role.name
-                                        ? _c(
-                                            "span",
-                                            {
-                                              staticClass:
-                                                "text text-primary font-size-13",
-                                            },
-                                            [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.__(
-                                                    "set_0_if_you_want_to_remove_limit"
-                                                  )
-                                                )
-                                              ),
-                                            ]
-                                          )
-                                        : _vm._e(),
-                                      _vm._v(" "),
-                                      _vm.bonusMaxAmountValidationError
-                                        ? _c("span", { staticClass: "error" }, [
-                                            _vm._v(
-                                              _vm._s(
-                                                _vm.bonusMaxAmountValidationError
-                                              )
-                                            ),
-                                          ])
-                                        : _vm._e(),
-                                    ]),
-                                  ])
-                                : _vm._e(),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _vm.deliveryBoys.id &&
-                          this.$roleDeliveryBoy !== this.login_user.role.name
-                            ? _c("div", { staticClass: "row" }, [
-                                _c("div", { staticClass: "col-md-8" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "form-group" },
-                                    [
-                                      _c("label", [
-                                        _vm._v(_vm._s(_vm.__("status"))),
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "text-danger text-xs",
-                                          },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]),
-                                      _c("br"),
-                                      _vm._v(" "),
-                                      _c("b-form-radio-group", {
-                                        staticClass:
-                                          "d-flex flex-wrap flex-md-nowrap",
-                                        attrs: {
-                                          options: [
-                                            {
-                                              text: _vm.__("registered"),
-                                              value: 0,
-                                            },
-                                            {
-                                              text: _vm.__("active"),
-                                              value: 1,
-                                            },
-                                            {
-                                              text: _vm.__("not_approved"),
-                                              value: 2,
-                                            },
-                                            {
-                                              text: _vm.__("deactive"),
-                                              value: 3,
-                                            },
-                                            { text: _vm.__("block"), value: 4 },
-                                          ],
-                                          buttons: "",
-                                          "button-variant": "outline-primary",
-                                          required: "",
-                                        },
-                                        model: {
-                                          value: _vm.deliveryBoys.status,
-                                          callback: function ($$v) {
-                                            _vm.$set(
-                                              _vm.deliveryBoys,
-                                              "status",
-                                              $$v
-                                            )
-                                          },
-                                          expression: "deliveryBoys.status",
-                                        },
-                                      }),
-                                    ],
-                                    1
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                [2, 3, 4].includes(_vm.deliveryBoys.status)
-                                  ? _c("div", { staticClass: "col-md-4" }, [
-                                      _c("div", { staticClass: "form-group" }, [
-                                        _c(
-                                          "label",
-                                          { attrs: { for: "remark" } },
-                                          [
-                                            _vm._v(_vm._s(_vm.__("remark"))),
-                                            _c(
-                                              "span",
-                                              {
-                                                staticClass:
-                                                  "text-danger text-xs",
-                                              },
-                                              [_vm._v("*")]
-                                            ),
-                                          ]
-                                        ),
-                                        _vm._v(" "),
-                                        _c("textarea", {
+                                  _c("div", { staticClass: "input-group" }, [
+                                    (_vm.showPassword ? "text" : "password") ===
+                                    "checkbox"
+                                      ? _c("input", {
                                           directives: [
                                             {
                                               name: "model",
                                               rawName: "v-model",
-                                              value: _vm.deliveryBoys.remark,
-                                              expression: "deliveryBoys.remark",
+                                              value: _vm.deliveryBoys.password,
+                                              expression:
+                                                "deliveryBoys.password",
                                             },
                                           ],
                                           staticClass: "form-control",
                                           attrs: {
-                                            name: "remark",
-                                            id: "remark",
-                                            required: "",
-                                            placeholder: _vm.__("remark"),
+                                            name: "password",
+                                            id: "password",
+                                            placeholder: _vm.__("password"),
+                                            type: "checkbox",
                                           },
                                           domProps: {
-                                            value: _vm.deliveryBoys.remark,
+                                            checked: Array.isArray(
+                                              _vm.deliveryBoys.password
+                                            )
+                                              ? _vm._i(
+                                                  _vm.deliveryBoys.password,
+                                                  null
+                                                ) > -1
+                                              : _vm.deliveryBoys.password,
+                                          },
+                                          on: {
+                                            change: function ($event) {
+                                              var $$a =
+                                                  _vm.deliveryBoys.password,
+                                                $$el = $event.target,
+                                                $$c = $$el.checked
+                                                  ? true
+                                                  : false
+                                              if (Array.isArray($$a)) {
+                                                var $$v = null,
+                                                  $$i = _vm._i($$a, $$v)
+                                                if ($$el.checked) {
+                                                  $$i < 0 &&
+                                                    _vm.$set(
+                                                      _vm.deliveryBoys,
+                                                      "password",
+                                                      $$a.concat([$$v])
+                                                    )
+                                                } else {
+                                                  $$i > -1 &&
+                                                    _vm.$set(
+                                                      _vm.deliveryBoys,
+                                                      "password",
+                                                      $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        )
+                                                    )
+                                                }
+                                              } else {
+                                                _vm.$set(
+                                                  _vm.deliveryBoys,
+                                                  "password",
+                                                  $$c
+                                                )
+                                              }
+                                            },
+                                          },
+                                        })
+                                      : (_vm.showPassword
+                                          ? "text"
+                                          : "password") === "radio"
+                                      ? _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.deliveryBoys.password,
+                                              expression:
+                                                "deliveryBoys.password",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            name: "password",
+                                            id: "password",
+                                            placeholder: _vm.__("password"),
+                                            type: "radio",
+                                          },
+                                          domProps: {
+                                            checked: _vm._q(
+                                              _vm.deliveryBoys.password,
+                                              null
+                                            ),
+                                          },
+                                          on: {
+                                            change: function ($event) {
+                                              return _vm.$set(
+                                                _vm.deliveryBoys,
+                                                "password",
+                                                null
+                                              )
+                                            },
+                                          },
+                                        })
+                                      : _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.deliveryBoys.password,
+                                              expression:
+                                                "deliveryBoys.password",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            name: "password",
+                                            id: "password",
+                                            placeholder: _vm.__("password"),
+                                            type: _vm.showPassword
+                                              ? "text"
+                                              : "password",
+                                          },
+                                          domProps: {
+                                            value: _vm.deliveryBoys.password,
                                           },
                                           on: {
                                             input: function ($event) {
@@ -3339,519 +2424,1331 @@ var render = function () {
                                               }
                                               _vm.$set(
                                                 _vm.deliveryBoys,
-                                                "remark",
+                                                "password",
                                                 $event.target.value
                                               )
                                             },
                                           },
                                         }),
-                                      ]),
-                                    ])
-                                  : _vm._e(),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass:
+                                          "btn btn-outline-secondary db-pw-toggle",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.showPassword = !_vm.showPassword
+                                          },
+                                        },
+                                      },
+                                      [
+                                        _vm.showPassword
+                                          ? _c("img", {
+                                              staticClass: "db-pw-icon",
+                                              attrs: {
+                                                src:
+                                                  _vm.$baseUrl +
+                                                  "/images/icons/show_password.svg",
+                                              },
+                                            })
+                                          : _c("img", {
+                                              staticClass: "db-pw-icon",
+                                              attrs: {
+                                                src:
+                                                  _vm.$baseUrl +
+                                                  "/images/icons/hide_password.svg",
+                                              },
+                                            }),
+                                      ]
+                                    ),
+                                  ]),
+                                ]),
                               ])
                             : _vm._e(),
                           _vm._v(" "),
-                          _vm.customFields.length
-                            ? _c(
+                          this.$roleDeliveryBoy !== this.login_user.role.name
+                            ? _c("div", { staticClass: "col-md-6" }, [
+                                _c("div", { staticClass: "form-group" }, [
+                                  _c(
+                                    "label",
+                                    { attrs: { for: "confirm_password" } },
+                                    [
+                                      _vm._v(
+                                        _vm._s(_vm.__("confirm_password"))
+                                      ),
+                                      !_vm.deliveryBoys.id ||
+                                      _vm.deliveryBoys.password
+                                        ? _c(
+                                            "span",
+                                            {
+                                              staticClass:
+                                                "text-danger text-xs",
+                                            },
+                                            [_vm._v("*")]
+                                          )
+                                        : _vm._e(),
+                                    ]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "input-group" }, [
+                                    (_vm.showConfirmPassword
+                                      ? "text"
+                                      : "password") === "checkbox"
+                                      ? _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                _vm.deliveryBoys
+                                                  .confirm_password,
+                                              expression:
+                                                "deliveryBoys.confirm_password",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            name: "confirm_password",
+                                            id: "confirm_password",
+                                            placeholder:
+                                              _vm.__("confirm_password"),
+                                            type: "checkbox",
+                                          },
+                                          domProps: {
+                                            checked: Array.isArray(
+                                              _vm.deliveryBoys.confirm_password
+                                            )
+                                              ? _vm._i(
+                                                  _vm.deliveryBoys
+                                                    .confirm_password,
+                                                  null
+                                                ) > -1
+                                              : _vm.deliveryBoys
+                                                  .confirm_password,
+                                          },
+                                          on: {
+                                            change: function ($event) {
+                                              var $$a =
+                                                  _vm.deliveryBoys
+                                                    .confirm_password,
+                                                $$el = $event.target,
+                                                $$c = $$el.checked
+                                                  ? true
+                                                  : false
+                                              if (Array.isArray($$a)) {
+                                                var $$v = null,
+                                                  $$i = _vm._i($$a, $$v)
+                                                if ($$el.checked) {
+                                                  $$i < 0 &&
+                                                    _vm.$set(
+                                                      _vm.deliveryBoys,
+                                                      "confirm_password",
+                                                      $$a.concat([$$v])
+                                                    )
+                                                } else {
+                                                  $$i > -1 &&
+                                                    _vm.$set(
+                                                      _vm.deliveryBoys,
+                                                      "confirm_password",
+                                                      $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        )
+                                                    )
+                                                }
+                                              } else {
+                                                _vm.$set(
+                                                  _vm.deliveryBoys,
+                                                  "confirm_password",
+                                                  $$c
+                                                )
+                                              }
+                                            },
+                                          },
+                                        })
+                                      : (_vm.showConfirmPassword
+                                          ? "text"
+                                          : "password") === "radio"
+                                      ? _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                _vm.deliveryBoys
+                                                  .confirm_password,
+                                              expression:
+                                                "deliveryBoys.confirm_password",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            name: "confirm_password",
+                                            id: "confirm_password",
+                                            placeholder:
+                                              _vm.__("confirm_password"),
+                                            type: "radio",
+                                          },
+                                          domProps: {
+                                            checked: _vm._q(
+                                              _vm.deliveryBoys.confirm_password,
+                                              null
+                                            ),
+                                          },
+                                          on: {
+                                            change: function ($event) {
+                                              return _vm.$set(
+                                                _vm.deliveryBoys,
+                                                "confirm_password",
+                                                null
+                                              )
+                                            },
+                                          },
+                                        })
+                                      : _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                _vm.deliveryBoys
+                                                  .confirm_password,
+                                              expression:
+                                                "deliveryBoys.confirm_password",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            name: "confirm_password",
+                                            id: "confirm_password",
+                                            placeholder:
+                                              _vm.__("confirm_password"),
+                                            type: _vm.showConfirmPassword
+                                              ? "text"
+                                              : "password",
+                                          },
+                                          domProps: {
+                                            value:
+                                              _vm.deliveryBoys.confirm_password,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                _vm.deliveryBoys,
+                                                "confirm_password",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                    _vm._v(" "),
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass:
+                                          "btn btn-outline-secondary db-pw-toggle",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.showConfirmPassword =
+                                              !_vm.showConfirmPassword
+                                          },
+                                        },
+                                      },
+                                      [
+                                        _vm.showConfirmPassword
+                                          ? _c("img", {
+                                              staticClass: "db-pw-icon",
+                                              attrs: {
+                                                src:
+                                                  _vm.$baseUrl +
+                                                  "/images/icons/show_password.svg",
+                                              },
+                                            })
+                                          : _c("img", {
+                                              staticClass: "db-pw-icon",
+                                              attrs: {
+                                                src:
+                                                  _vm.$baseUrl +
+                                                  "/images/icons/hide_password.svg",
+                                              },
+                                            }),
+                                      ]
+                                    ),
+                                  ]),
+                                ]),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c(
+                              "div",
+                              { staticClass: "form-group" },
+                              [
+                                _c("label", { attrs: { for: "city_name" } }, [
+                                  _vm._v(
+                                    _vm._s(_vm.__("select_or_search_city"))
+                                  ),
+                                  _c(
+                                    "span",
+                                    { staticClass: "text-danger text-xs" },
+                                    [_vm._v("*")]
+                                  ),
+                                ]),
+                                _vm._v(" "),
+                                _c("multiselect", {
+                                  attrs: {
+                                    options: _vm.cities,
+                                    multiple: true,
+                                    "close-on-select": false,
+                                    "clear-on-select": false,
+                                    "hide-selected": true,
+                                    placeholder: _vm.__(
+                                      "select_or_search_city"
+                                    ),
+                                    label: "name",
+                                    "track-by": "id",
+                                    id: "city_name",
+                                  },
+                                  on: { close: _vm.setCityId },
+                                  scopedSlots: _vm._u(
+                                    [
+                                      {
+                                        key: "option",
+                                        fn: function (props) {
+                                          return [
+                                            _c(
+                                              "div",
+                                              { staticClass: "option__desc" },
+                                              [
+                                                _c(
+                                                  "span",
+                                                  {
+                                                    staticClass:
+                                                      "option__title",
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(
+                                                        props.option
+                                                          .formatted_address
+                                                      )
+                                                    ),
+                                                  ]
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        },
+                                      },
+                                    ],
+                                    null,
+                                    false,
+                                    4052974533
+                                  ),
+                                  model: {
+                                    value: _vm.city,
+                                    callback: function ($$v) {
+                                      _vm.city = $$v
+                                    },
+                                    expression: "city",
+                                  },
+                                }),
+                              ],
+                              1
+                            ),
+                          ]),
+                        ]),
+                      ])
+                    : _vm._e(),
+                ],
+                1
+              ),
+            ]),
+            _vm._v(" "),
+            !_vm.languages.length ||
+            (_vm.defaultLanguage &&
+              _vm.getCurrentLanguage() &&
+              _vm.getCurrentLanguage().is_default)
+              ? _c("div", [
+                  _c("div", { staticClass: "card db-form-card" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "card-header d-flex flex-wrap justify-content-between align-items-center gap-2",
+                      },
+                      [
+                        _c("h4", { staticClass: "db-section-title mb-0" }, [
+                          _vm._v(_vm._s(_vm.__("delivery_boy_bonus_details"))),
+                        ]),
+                        _vm._v(" "),
+                        this.$roleDeliveryBoy !== this.login_user.role.name
+                          ? _c(
+                              "div",
+                              { staticClass: "d-flex flex-wrap gap-2" },
+                              [
+                                _vm.deliveryBoys.id
+                                  ? _c(
+                                      "b-button",
+                                      {
+                                        attrs: {
+                                          type: "button",
+                                          variant: "outline-secondary",
+                                          size: "sm",
+                                        },
+                                        on: { click: _vm.resetBonus },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                                " +
+                                            _vm._s(_vm.__("reset_bonus")) +
+                                            "\n                                            "
+                                        ),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.$deliveryBoyBonusSettings == 1
+                                  ? _c(
+                                      "b-button",
+                                      {
+                                        attrs: {
+                                          type: "button",
+                                          variant: "primary",
+                                          size: "sm",
+                                        },
+                                        on: { click: _vm.getBonusSettings },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                                " +
+                                            _vm._s(
+                                              _vm.__("add_default_bonus")
+                                            ) +
+                                            "\n                                            "
+                                        ),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                              ],
+                              1
+                            )
+                          : _vm._e(),
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-body" }, [
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-6 col-xl-3" }, [
+                          _c("div", { staticClass: "form-group" }, [
+                            _c("label", { attrs: { for: "bonus_type" } }, [
+                              _vm._v(_vm._s(_vm.__("bonus_type"))),
+                              _c(
+                                "span",
+                                { staticClass: "text-danger text-xs" },
+                                [_vm._v("*")]
+                              ),
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "select",
+                              {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.deliveryBoys.bonus_type,
+                                    expression: "deliveryBoys.bonus_type",
+                                  },
+                                ],
+                                staticClass: "form-control form-select",
+                                attrs: {
+                                  name: "bonus_type",
+                                  id: "bonus_type",
+                                  disabled:
+                                    this.$roleDeliveryBoy ===
+                                    this.login_user.role.name,
+                                },
+                                on: {
+                                  change: [
+                                    function ($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call(
+                                          $event.target.options,
+                                          function (o) {
+                                            return o.selected
+                                          }
+                                        )
+                                        .map(function (o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.$set(
+                                        _vm.deliveryBoys,
+                                        "bonus_type",
+                                        $event.target.multiple
+                                          ? $$selectedVal
+                                          : $$selectedVal[0]
+                                      )
+                                    },
+                                    _vm.changeBonusType,
+                                  ],
+                                },
+                              },
+                              [
+                                _c("option", { attrs: { value: "" } }, [
+                                  _vm._v(_vm._s(_vm.__("select"))),
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "1" } }, [
+                                  _vm._v(_vm._s(_vm.__("commission"))),
+                                ]),
+                                _vm._v(" "),
+                                _c("option", { attrs: { value: "0" } }, [
+                                  _vm._v(_vm._s(_vm.__("fixed_salaried"))),
+                                ]),
+                              ]
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _vm.deliveryBoys.bonus_type == 1
+                          ? _c("div", { staticClass: "col-md-6 col-xl-3" }, [
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  { attrs: { for: "bonus_percentage" } },
+                                  [
+                                    _vm._v(_vm._s(_vm.__("bonus_percentage"))),
+                                    _c(
+                                      "span",
+                                      { staticClass: "text-danger text-xs" },
+                                      [_vm._v("*")]
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.deliveryBoys.bonus_percentage,
+                                      expression:
+                                        "deliveryBoys.bonus_percentage",
+                                    },
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "number",
+                                    min: "0.1",
+                                    max: "100",
+                                    step: "0.1",
+                                    name: "bonus_percentage",
+                                    id: "bonus_percentage",
+                                    placeholder: _vm.__("bonus_percentage"),
+                                    readonly:
+                                      this.$roleDeliveryBoy ===
+                                      this.login_user.role.name,
+                                  },
+                                  domProps: {
+                                    value: _vm.deliveryBoys.bonus_percentage,
+                                  },
+                                  on: {
+                                    input: function ($event) {
+                                      if ($event.target.composing) {
+                                        return
+                                      }
+                                      _vm.$set(
+                                        _vm.deliveryBoys,
+                                        "bonus_percentage",
+                                        $event.target.value
+                                      )
+                                    },
+                                  },
+                                }),
+                              ]),
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.deliveryBoys.bonus_type == 1
+                          ? _c("div", { staticClass: "col-md-6 col-xl-3" }, [
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  { attrs: { for: "bonus_min_amount" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(_vm.__("minimum_bonus_amount"))
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.deliveryBoys.bonus_min_amount,
+                                      expression:
+                                        "deliveryBoys.bonus_min_amount",
+                                    },
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "number",
+                                    min: "0",
+                                    step: "0.1",
+                                    required: "",
+                                    name: "bonus_min_amount",
+                                    id: "bonus_min_amount",
+                                    placeholder: "Minimum bonus amount",
+                                    readonly:
+                                      this.$roleDeliveryBoy ===
+                                      this.login_user.role.name,
+                                  },
+                                  domProps: {
+                                    value: _vm.deliveryBoys.bonus_min_amount,
+                                  },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.deliveryBoys,
+                                          "bonus_min_amount",
+                                          $event.target.value
+                                        )
+                                      },
+                                      _vm.validateBonusMinAmount,
+                                    ],
+                                  },
+                                }),
+                                _vm._v(" "),
+                                this.$roleDeliveryBoy !==
+                                this.login_user.role.name
+                                  ? _c(
+                                      "span",
+                                      {
+                                        staticClass:
+                                          "form-text text-muted small d-block",
+                                      },
+                                      [
+                                        _vm._v(
+                                          _vm._s(
+                                            _vm.__(
+                                              "set_0_if_you_want_to_remove_limit"
+                                            )
+                                          )
+                                        ),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.bonusMinAmountValidationError
+                                  ? _c("span", { staticClass: "error" }, [
+                                      _vm._v(
+                                        _vm._s(
+                                          _vm.bonusMinAmountValidationError
+                                        )
+                                      ),
+                                    ])
+                                  : _vm._e(),
+                              ]),
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.deliveryBoys.bonus_type == 1
+                          ? _c("div", { staticClass: "col-md-6 col-xl-3" }, [
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  { attrs: { for: "bonus_max_amount" } },
+                                  [
+                                    _vm._v(
+                                      _vm._s(_vm.__("maximum_bonus_amount"))
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.deliveryBoys.bonus_max_amount,
+                                      expression:
+                                        "deliveryBoys.bonus_max_amount",
+                                    },
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "number",
+                                    min: "0",
+                                    step: "0.1",
+                                    required: "",
+                                    name: "bonus_max_amount",
+                                    id: "bonus_max_amount",
+                                    placeholder: _vm.__("maximum_bonus_amount"),
+                                    readonly:
+                                      this.$roleDeliveryBoy ===
+                                      this.login_user.role.name,
+                                  },
+                                  domProps: {
+                                    value: _vm.deliveryBoys.bonus_max_amount,
+                                  },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.deliveryBoys,
+                                          "bonus_max_amount",
+                                          $event.target.value
+                                        )
+                                      },
+                                      _vm.validateBonusMaxAmount,
+                                    ],
+                                  },
+                                }),
+                                _vm._v(" "),
+                                this.$roleDeliveryBoy !==
+                                this.login_user.role.name
+                                  ? _c(
+                                      "span",
+                                      {
+                                        staticClass:
+                                          "form-text text-muted small d-block",
+                                      },
+                                      [
+                                        _vm._v(
+                                          _vm._s(
+                                            _vm.__(
+                                              "set_0_if_you_want_to_remove_limit"
+                                            )
+                                          )
+                                        ),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.bonusMaxAmountValidationError
+                                  ? _c("span", { staticClass: "error" }, [
+                                      _vm._v(
+                                        _vm._s(
+                                          _vm.bonusMaxAmountValidationError
+                                        )
+                                      ),
+                                    ])
+                                  : _vm._e(),
+                              ]),
+                            ])
+                          : _vm._e(),
+                      ]),
+                    ]),
+                  ]),
+                  _vm._v(" "),
+                  _vm.deliveryBoys.id &&
+                  this.$roleDeliveryBoy !== this.login_user.role.name
+                    ? _c("div", { staticClass: "card db-form-card" }, [
+                        _c("div", { staticClass: "card-header" }, [
+                          _c("h4", { staticClass: "db-section-title mb-0" }, [
+                            _vm._v(_vm._s(_vm.__("status"))),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "card-body" }, [
+                          _c("div", { staticClass: "row" }, [
+                            _c("div", { staticClass: "col-lg-8" }, [
+                              _c(
                                 "div",
-                                { staticClass: "row mt-3" },
+                                { staticClass: "form-group" },
                                 [
-                                  _c("div", { staticClass: "col-12" }, [
-                                    _c("h5", { staticClass: "text-primary" }, [
-                                      _vm._v(_vm._s(_vm.__("custom_fields"))),
-                                    ]),
+                                  _c("label", [
+                                    _vm._v(_vm._s(_vm.__("status"))),
+                                    _c(
+                                      "span",
+                                      { staticClass: "text-danger text-xs" },
+                                      [_vm._v("*")]
+                                    ),
                                   ]),
                                   _vm._v(" "),
-                                  _vm._l(
-                                    _vm.translatedCustomFields,
-                                    function (field) {
-                                      return _c(
-                                        "div",
+                                  _c("b-form-radio-group", {
+                                    staticClass:
+                                      "d-flex flex-wrap db-status-group",
+                                    attrs: {
+                                      options: [
                                         {
-                                          key: field.id,
-                                          staticClass: "col-md-4",
+                                          text: _vm.__("registered"),
+                                          value: 0,
                                         },
-                                        [
-                                          _c(
-                                            "div",
-                                            { staticClass: "form-group" },
-                                            [
-                                              _c("label", [
-                                                _vm._v(
-                                                  _vm._s(field.name) +
-                                                    "\n                                                "
-                                                ),
-                                                field.is_required
-                                                  ? _c(
-                                                      "span",
-                                                      {
-                                                        staticClass:
-                                                          "text-danger",
-                                                      },
-                                                      [_vm._v("*")]
-                                                    )
-                                                  : _vm._e(),
-                                              ]),
-                                              _vm._v(" "),
-                                              field.type === "textarea"
-                                                ? _c("textarea", {
-                                                    directives: [
-                                                      {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value:
-                                                          _vm.customFieldValues[
-                                                            field.id
-                                                          ],
-                                                        expression:
-                                                          "customFieldValues[field.id]",
-                                                      },
+                                        { text: _vm.__("active"), value: 1 },
+                                        {
+                                          text: _vm.__("not_approved"),
+                                          value: 2,
+                                        },
+                                        { text: _vm.__("deactive"), value: 3 },
+                                        { text: _vm.__("block"), value: 4 },
+                                      ],
+                                      buttons: "",
+                                      "button-variant": "outline-primary",
+                                      required: "",
+                                    },
+                                    model: {
+                                      value: _vm.deliveryBoys.status,
+                                      callback: function ($$v) {
+                                        _vm.$set(
+                                          _vm.deliveryBoys,
+                                          "status",
+                                          $$v
+                                        )
+                                      },
+                                      expression: "deliveryBoys.status",
+                                    },
+                                  }),
+                                ],
+                                1
+                              ),
+                            ]),
+                            _vm._v(" "),
+                            [2, 3, 4].includes(_vm.deliveryBoys.status)
+                              ? _c("div", { staticClass: "col-lg-4" }, [
+                                  _c("div", { staticClass: "form-group" }, [
+                                    _c("label", { attrs: { for: "remark" } }, [
+                                      _vm._v(_vm._s(_vm.__("remark"))),
+                                      _c(
+                                        "span",
+                                        { staticClass: "text-danger text-xs" },
+                                        [_vm._v("*")]
+                                      ),
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("textarea", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.deliveryBoys.remark,
+                                          expression: "deliveryBoys.remark",
+                                        },
+                                      ],
+                                      staticClass: "form-control",
+                                      attrs: {
+                                        name: "remark",
+                                        id: "remark",
+                                        required: "",
+                                        placeholder: _vm.__("remark"),
+                                      },
+                                      domProps: {
+                                        value: _vm.deliveryBoys.remark,
+                                      },
+                                      on: {
+                                        input: function ($event) {
+                                          if ($event.target.composing) {
+                                            return
+                                          }
+                                          _vm.$set(
+                                            _vm.deliveryBoys,
+                                            "remark",
+                                            $event.target.value
+                                          )
+                                        },
+                                      },
+                                    }),
+                                  ]),
+                                ])
+                              : _vm._e(),
+                          ]),
+                        ]),
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.customFields.length
+                    ? _c("div", { staticClass: "card db-form-card" }, [
+                        _c("div", { staticClass: "card-header" }, [
+                          _c("h4", { staticClass: "db-section-title mb-0" }, [
+                            _vm._v(_vm._s(_vm.__("custom_fields"))),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "card-body" }, [
+                          _c(
+                            "div",
+                            { staticClass: "row" },
+                            _vm._l(
+                              _vm.translatedCustomFields,
+                              function (field) {
+                                return _c(
+                                  "div",
+                                  { key: field.id, staticClass: "col-md-6" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "form-group" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(field.name) +
+                                              "\n                                                "
+                                          ),
+                                          field.is_required
+                                            ? _c(
+                                                "span",
+                                                { staticClass: "text-danger" },
+                                                [_vm._v("*")]
+                                              )
+                                            : _vm._e(),
+                                        ]),
+                                        _vm._v(" "),
+                                        field.type === "textarea"
+                                          ? _c("textarea", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value:
+                                                    _vm.customFieldValues[
+                                                      field.id
                                                     ],
-                                                    staticClass: "form-control",
-                                                    attrs: {
-                                                      placeholder: field.name,
-                                                    },
-                                                    domProps: {
-                                                      value:
-                                                        _vm.customFieldValues[
-                                                          field.id
-                                                        ],
-                                                    },
-                                                    on: {
-                                                      input: function ($event) {
-                                                        if (
-                                                          $event.target
-                                                            .composing
-                                                        ) {
-                                                          return
-                                                        }
-                                                        _vm.$set(
-                                                          _vm.customFieldValues,
-                                                          field.id,
-                                                          $event.target.value
-                                                        )
-                                                      },
-                                                    },
-                                                  })
-                                                : field.type === "dropdown"
-                                                ? _c(
-                                                    "select",
-                                                    {
-                                                      directives: [
-                                                        {
-                                                          name: "model",
-                                                          rawName: "v-model",
-                                                          value:
-                                                            _vm
-                                                              .customFieldValues[
-                                                              field.id
-                                                            ],
-                                                          expression:
-                                                            "customFieldValues[field.id]",
-                                                        },
+                                                  expression:
+                                                    "customFieldValues[field.id]",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                placeholder: field.name,
+                                              },
+                                              domProps: {
+                                                value:
+                                                  _vm.customFieldValues[
+                                                    field.id
+                                                  ],
+                                              },
+                                              on: {
+                                                input: function ($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    _vm.customFieldValues,
+                                                    field.id,
+                                                    $event.target.value
+                                                  )
+                                                },
+                                              },
+                                            })
+                                          : field.type === "dropdown"
+                                          ? _c(
+                                              "select",
+                                              {
+                                                directives: [
+                                                  {
+                                                    name: "model",
+                                                    rawName: "v-model",
+                                                    value:
+                                                      _vm.customFieldValues[
+                                                        field.id
                                                       ],
-                                                      staticClass:
-                                                        "form-control form-select",
-                                                      on: {
-                                                        change: function (
-                                                          $event
-                                                        ) {
-                                                          var $$selectedVal =
-                                                            Array.prototype.filter
-                                                              .call(
-                                                                $event.target
-                                                                  .options,
-                                                                function (o) {
-                                                                  return o.selected
-                                                                }
-                                                              )
-                                                              .map(function (
-                                                                o
-                                                              ) {
-                                                                var val =
-                                                                  "_value" in o
-                                                                    ? o._value
-                                                                    : o.value
-                                                                return val
-                                                              })
-                                                          _vm.$set(
-                                                            _vm.customFieldValues,
-                                                            field.id,
-                                                            $event.target
-                                                              .multiple
-                                                              ? $$selectedVal
-                                                              : $$selectedVal[0]
-                                                          )
+                                                    expression:
+                                                      "customFieldValues[field.id]",
+                                                  },
+                                                ],
+                                                staticClass:
+                                                  "form-control form-select",
+                                                on: {
+                                                  change: function ($event) {
+                                                    var $$selectedVal =
+                                                      Array.prototype.filter
+                                                        .call(
+                                                          $event.target.options,
+                                                          function (o) {
+                                                            return o.selected
+                                                          }
+                                                        )
+                                                        .map(function (o) {
+                                                          var val =
+                                                            "_value" in o
+                                                              ? o._value
+                                                              : o.value
+                                                          return val
+                                                        })
+                                                    _vm.$set(
+                                                      _vm.customFieldValues,
+                                                      field.id,
+                                                      $event.target.multiple
+                                                        ? $$selectedVal
+                                                        : $$selectedVal[0]
+                                                    )
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                _c(
+                                                  "option",
+                                                  { attrs: { value: "" } },
+                                                  [
+                                                    _vm._v(
+                                                      _vm._s(
+                                                        _vm.__("select") ||
+                                                          "Select"
+                                                      )
+                                                    ),
+                                                  ]
+                                                ),
+                                                _vm._v(" "),
+                                                _vm._l(
+                                                  field.options,
+                                                  function (option) {
+                                                    return _c(
+                                                      "option",
+                                                      {
+                                                        key: option,
+                                                        domProps: {
+                                                          value: option,
                                                         },
+                                                      },
+                                                      [_vm._v(_vm._s(option))]
+                                                    )
+                                                  }
+                                                ),
+                                              ],
+                                              2
+                                            )
+                                          : field.type === "file"
+                                          ? [
+                                              _c("input", {
+                                                staticClass: "form-control",
+                                                attrs: { type: "file" },
+                                                on: {
+                                                  change: function ($event) {
+                                                    return _vm.handleCustomFieldFile(
+                                                      $event,
+                                                      field.id
+                                                    )
+                                                  },
+                                                },
+                                              }),
+                                              _vm._v(" "),
+                                              _vm.customFieldExistingFileUrl(
+                                                field.id
+                                              )
+                                                ? _c(
+                                                    "a",
+                                                    {
+                                                      staticClass:
+                                                        "badge bg-success mt-1",
+                                                      attrs: {
+                                                        href: _vm.customFieldExistingFileUrl(
+                                                          field.id
+                                                        ),
+                                                        target: "_blank",
                                                       },
                                                     },
                                                     [
-                                                      _c(
-                                                        "option",
-                                                        {
-                                                          attrs: { value: "" },
-                                                        },
-                                                        [
-                                                          _vm._v(
-                                                            _vm._s(
-                                                              _vm.__(
-                                                                "select"
-                                                              ) || "Select"
-                                                            )
-                                                          ),
-                                                        ]
-                                                      ),
-                                                      _vm._v(" "),
-                                                      _vm._l(
-                                                        field.options,
-                                                        function (option) {
-                                                          return _c(
-                                                            "option",
-                                                            {
-                                                              key: option,
-                                                              domProps: {
-                                                                value: option,
-                                                              },
-                                                            },
-                                                            [
-                                                              _vm._v(
-                                                                _vm._s(option)
-                                                              ),
-                                                            ]
+                                                      _c("i", {
+                                                        staticClass:
+                                                          "fa fa-eye",
+                                                      }),
+                                                      _vm._v(
+                                                        " " +
+                                                          _vm._s(
+                                                            _vm.__("view") ||
+                                                              "View"
                                                           )
-                                                        }
                                                       ),
-                                                    ],
-                                                    2
+                                                    ]
                                                   )
-                                                : field.type === "file"
-                                                ? [
-                                                    _c("input", {
-                                                      staticClass:
-                                                        "form-control",
-                                                      attrs: { type: "file" },
-                                                      on: {
-                                                        change: function (
-                                                          $event
-                                                        ) {
-                                                          return _vm.handleCustomFieldFile(
-                                                            $event,
-                                                            field.id
-                                                          )
-                                                        },
-                                                      },
-                                                    }),
-                                                    _vm._v(" "),
-                                                    _vm.customFieldExistingFileUrl(
+                                                : _vm._e(),
+                                            ]
+                                          : field.type === "date"
+                                          ? _c("custom-field-date", {
+                                              attrs: {
+                                                placeholder: field.name,
+                                              },
+                                              model: {
+                                                value:
+                                                  _vm.customFieldValues[
+                                                    field.id
+                                                  ],
+                                                callback: function ($$v) {
+                                                  _vm.$set(
+                                                    _vm.customFieldValues,
+                                                    field.id,
+                                                    $$v
+                                                  )
+                                                },
+                                                expression:
+                                                  "customFieldValues[field.id]",
+                                              },
+                                            })
+                                          : (field.type === "number"
+                                              ? "number"
+                                              : "text") === "checkbox"
+                                          ? _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value:
+                                                    _vm.customFieldValues[
                                                       field.id
-                                                    )
-                                                      ? _c(
-                                                          "a",
-                                                          {
-                                                            staticClass:
-                                                              "badge bg-success mt-1",
-                                                            attrs: {
-                                                              href: _vm.customFieldExistingFileUrl(
-                                                                field.id
-                                                              ),
-                                                              target: "_blank",
-                                                            },
-                                                          },
-                                                          [
-                                                            _c("i", {
-                                                              staticClass:
-                                                                "fa fa-eye",
-                                                            }),
-                                                            _vm._v(
-                                                              " " +
-                                                                _vm._s(
-                                                                  _vm.__(
-                                                                    "view"
-                                                                  ) || "View"
-                                                                )
-                                                            ),
-                                                          ]
-                                                        )
-                                                      : _vm._e(),
+                                                    ],
+                                                  expression:
+                                                    "customFieldValues[field.id]",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                placeholder: field.name,
+                                                type: "checkbox",
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  _vm.customFieldValues[
+                                                    field.id
                                                   ]
-                                                : (field.type === "number"
-                                                    ? "number"
-                                                    : "text") === "checkbox"
-                                                ? _c("input", {
-                                                    directives: [
-                                                      {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value:
-                                                          _vm.customFieldValues[
-                                                            field.id
-                                                          ],
-                                                        expression:
-                                                          "customFieldValues[field.id]",
-                                                      },
+                                                )
+                                                  ? _vm._i(
+                                                      _vm.customFieldValues[
+                                                        field.id
+                                                      ],
+                                                      null
+                                                    ) > -1
+                                                  : _vm.customFieldValues[
+                                                      field.id
                                                     ],
-                                                    staticClass: "form-control",
-                                                    attrs: {
-                                                      placeholder: field.name,
-                                                      type: "checkbox",
-                                                    },
-                                                    domProps: {
-                                                      checked: Array.isArray(
-                                                        _vm.customFieldValues[
-                                                          field.id
-                                                        ]
-                                                      )
-                                                        ? _vm._i(
-                                                            _vm
-                                                              .customFieldValues[
-                                                              field.id
-                                                            ],
-                                                            null
-                                                          ) > -1
-                                                        : _vm.customFieldValues[
-                                                            field.id
-                                                          ],
-                                                    },
-                                                    on: {
-                                                      change: function (
-                                                        $event
-                                                      ) {
-                                                        var $$a =
-                                                            _vm
-                                                              .customFieldValues[
-                                                              field.id
-                                                            ],
-                                                          $$el = $event.target,
-                                                          $$c = $$el.checked
-                                                            ? true
-                                                            : false
-                                                        if (
-                                                          Array.isArray($$a)
-                                                        ) {
-                                                          var $$v = null,
-                                                            $$i = _vm._i(
-                                                              $$a,
-                                                              $$v
-                                                            )
-                                                          if ($$el.checked) {
-                                                            $$i < 0 &&
-                                                              _vm.$set(
-                                                                _vm.customFieldValues,
-                                                                field.id,
-                                                                $$a.concat([
-                                                                  $$v,
-                                                                ])
-                                                              )
-                                                          } else {
-                                                            $$i > -1 &&
-                                                              _vm.$set(
-                                                                _vm.customFieldValues,
-                                                                field.id,
-                                                                $$a
-                                                                  .slice(0, $$i)
-                                                                  .concat(
-                                                                    $$a.slice(
-                                                                      $$i + 1
-                                                                    )
-                                                                  )
-                                                              )
-                                                          }
-                                                        } else {
-                                                          _vm.$set(
-                                                            _vm.customFieldValues,
-                                                            field.id,
-                                                            $$c
-                                                          )
-                                                        }
-                                                      },
-                                                    },
-                                                  })
-                                                : (field.type === "number"
-                                                    ? "number"
-                                                    : "text") === "radio"
-                                                ? _c("input", {
-                                                    directives: [
-                                                      {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value:
-                                                          _vm.customFieldValues[
-                                                            field.id
-                                                          ],
-                                                        expression:
-                                                          "customFieldValues[field.id]",
-                                                      },
-                                                    ],
-                                                    staticClass: "form-control",
-                                                    attrs: {
-                                                      placeholder: field.name,
-                                                      type: "radio",
-                                                    },
-                                                    domProps: {
-                                                      checked: _vm._q(
-                                                        _vm.customFieldValues[
-                                                          field.id
-                                                        ],
-                                                        null
-                                                      ),
-                                                    },
-                                                    on: {
-                                                      change: function (
-                                                        $event
-                                                      ) {
-                                                        return _vm.$set(
-                                                          _vm.customFieldValues,
-                                                          field.id,
-                                                          null
-                                                        )
-                                                      },
-                                                    },
-                                                  })
-                                                : _c("input", {
-                                                    directives: [
-                                                      {
-                                                        name: "model",
-                                                        rawName: "v-model",
-                                                        value:
-                                                          _vm.customFieldValues[
-                                                            field.id
-                                                          ],
-                                                        expression:
-                                                          "customFieldValues[field.id]",
-                                                      },
-                                                    ],
-                                                    staticClass: "form-control",
-                                                    attrs: {
-                                                      placeholder: field.name,
-                                                      type:
-                                                        field.type === "number"
-                                                          ? "number"
-                                                          : "text",
-                                                    },
-                                                    domProps: {
-                                                      value:
-                                                        _vm.customFieldValues[
-                                                          field.id
-                                                        ],
-                                                    },
-                                                    on: {
-                                                      input: function ($event) {
-                                                        if (
-                                                          $event.target
-                                                            .composing
-                                                        ) {
-                                                          return
-                                                        }
+                                              },
+                                              on: {
+                                                change: function ($event) {
+                                                  var $$a =
+                                                      _vm.customFieldValues[
+                                                        field.id
+                                                      ],
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = null,
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
                                                         _vm.$set(
                                                           _vm.customFieldValues,
                                                           field.id,
-                                                          $event.target.value
+                                                          $$a.concat([$$v])
                                                         )
-                                                      },
-                                                    },
-                                                  }),
-                                            ],
-                                            2
-                                          ),
-                                        ]
-                                      )
-                                    }
-                                  ),
-                                ],
-                                2
-                              )
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        _vm.$set(
+                                                          _vm.customFieldValues,
+                                                          field.id,
+                                                          $$a
+                                                            .slice(0, $$i)
+                                                            .concat(
+                                                              $$a.slice($$i + 1)
+                                                            )
+                                                        )
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      _vm.customFieldValues,
+                                                      field.id,
+                                                      $$c
+                                                    )
+                                                  }
+                                                },
+                                              },
+                                            })
+                                          : (field.type === "number"
+                                              ? "number"
+                                              : "text") === "radio"
+                                          ? _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value:
+                                                    _vm.customFieldValues[
+                                                      field.id
+                                                    ],
+                                                  expression:
+                                                    "customFieldValues[field.id]",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                placeholder: field.name,
+                                                type: "radio",
+                                              },
+                                              domProps: {
+                                                checked: _vm._q(
+                                                  _vm.customFieldValues[
+                                                    field.id
+                                                  ],
+                                                  null
+                                                ),
+                                              },
+                                              on: {
+                                                change: function ($event) {
+                                                  return _vm.$set(
+                                                    _vm.customFieldValues,
+                                                    field.id,
+                                                    null
+                                                  )
+                                                },
+                                              },
+                                            })
+                                          : _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value:
+                                                    _vm.customFieldValues[
+                                                      field.id
+                                                    ],
+                                                  expression:
+                                                    "customFieldValues[field.id]",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                placeholder: field.name,
+                                                type:
+                                                  field.type === "number"
+                                                    ? "number"
+                                                    : "text",
+                                              },
+                                              domProps: {
+                                                value:
+                                                  _vm.customFieldValues[
+                                                    field.id
+                                                  ],
+                                              },
+                                              on: {
+                                                input: function ($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    _vm.customFieldValues,
+                                                    field.id,
+                                                    $event.target.value
+                                                  )
+                                                },
+                                              },
+                                            }),
+                                      ],
+                                      2
+                                    ),
+                                  ]
+                                )
+                              }
+                            ),
+                            0
+                          ),
+                        ]),
+                      ])
+                    : _vm._e(),
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "db-form-actions" },
+              [
+                _vm.deliveryBoys.id
+                  ? [
+                      _c(
+                        "b-button",
+                        {
+                          attrs: {
+                            type: "submit",
+                            variant: "primary",
+                            disabled: _vm.isLoading,
+                          },
+                        },
+                        [
+                          _vm._v(
+                            "\n                                    " +
+                              _vm._s(_vm.__("update")) +
+                              "\n                                    "
+                          ),
+                          _vm.isLoading
+                            ? _c("b-spinner", {
+                                attrs: { small: "", label: "Spinning" },
+                              })
                             : _vm._e(),
-                        ])
-                      : _vm._e(),
-                  ],
-                  1
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "card-footer" },
-                  [
-                    _vm.deliveryBoys.id
-                      ? [
-                          _c(
-                            "b-button",
-                            {
-                              attrs: {
-                                type: "submit",
-                                variant: "primary",
-                                disabled: _vm.isLoading,
-                              },
-                            },
-                            [
-                              _vm._v(
-                                "\n                                    " +
-                                  _vm._s(_vm.__("update")) +
-                                  "\n                                    "
-                              ),
-                              _vm.isLoading
-                                ? _c("b-spinner", {
-                                    attrs: { small: "", label: "Spinning" },
-                                  })
-                                : _vm._e(),
-                            ],
-                            1
-                          ),
-                        ]
-                      : [
-                          _c(
-                            "b-button",
-                            {
-                              attrs: {
-                                type: "submit",
-                                variant: "primary",
-                                disabled: _vm.isLoading,
-                              },
-                            },
-                            [
-                              _vm._v(
-                                "\n                                    " +
-                                  _vm._s(_vm.__("save")) +
-                                  "\n                                    "
-                              ),
-                              _vm.isLoading
-                                ? _c("b-spinner", {
-                                    attrs: { small: "", label: "Spinning" },
-                                  })
-                                : _vm._e(),
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          this.$roleDeliveryBoy !== this.login_user.role.name
-                            ? _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-danger",
-                                  attrs: { type: "reset" },
-                                },
-                                [_vm._v(_vm._s(_vm.__("clear")))]
-                              )
-                            : _c(
-                                "button",
-                                {
-                                  staticClass: "btn btn-danger",
-                                  attrs: { type: "button" },
-                                  on: {
-                                    click: function ($event) {
-                                      return _vm.$router.go(-1)
-                                    },
-                                  },
-                                },
-                                [_vm._v(_vm._s(_vm.__("back")))]
-                              ),
                         ],
-                  ],
-                  2
-                ),
-              ]
+                        1
+                      ),
+                    ]
+                  : [
+                      this.$roleDeliveryBoy !== this.login_user.role.name
+                        ? _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-secondary",
+                              attrs: { type: "reset" },
+                            },
+                            [_vm._v(_vm._s(_vm.__("clear")))]
+                          )
+                        : _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-secondary",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function ($event) {
+                                  return _vm.$router.go(-1)
+                                },
+                              },
+                            },
+                            [_vm._v(_vm._s(_vm.__("back")))]
+                          ),
+                      _vm._v(" "),
+                      _c(
+                        "b-button",
+                        {
+                          attrs: {
+                            type: "submit",
+                            variant: "primary",
+                            disabled: _vm.isLoading,
+                          },
+                        },
+                        [
+                          _vm._v(
+                            "\n                                    " +
+                              _vm._s(_vm.__("save")) +
+                              "\n                                    "
+                          ),
+                          _vm.isLoading
+                            ? _c("b-spinner", {
+                                attrs: { small: "", label: "Spinning" },
+                              })
+                            : _vm._e(),
+                        ],
+                        1
+                      ),
+                    ],
+              ],
+              2
             ),
-          ]),
-        ]),
+          ]
+        ),
       ]),
     ]),
   ])

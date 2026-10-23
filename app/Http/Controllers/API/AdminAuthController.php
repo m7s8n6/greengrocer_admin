@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -366,6 +367,7 @@ class AdminAuthController extends Controller
             'store_logo' => 'required|mimes:jpeg,jpg,png,gif,webp,pdf',
             'store_description' => 'required',
             'module_id' => 'required|exists:modules,id',
+            'delivery_boy_source' => 'nullable|in:shared,own',
         ], [
             'email.unique' => 'The :attribute has already been taken.',
         ]);
@@ -398,11 +400,13 @@ class AdminAuthController extends Controller
             $seller->email = $request->email;
             $seller->mobile = $request->mobile;
             $seller->status = Seller::$statusRegistered;
-            $seller->store_url = $request->store_url;
             $seller->categories = $request->categories_ids;
             $seller->city_id = $request->city_id;
             $seller->store_description = $request->store_description;
             $seller->commission = $request->commission;
+            // Chosen once at registration (plan §2b) - only an admin can change this
+            // afterward via SellerApiController::save/update, never the seller themselves.
+            $seller->delivery_boy_source = $request->delivery_boy_source ?: 'shared';
 
             // Store latitude and longitude from the selected city
             $city = City::find($request->city_id);
@@ -487,7 +491,6 @@ class AdminAuthController extends Controller
         $record->name = $request->name;
         $record->email = $request->email;
         $record->mobile = $request->mobile;
-        $record->store_url = $request->store_url;
         $record->store_name = $request->store_name;
         $record->street = $request->street;
         $record->pincode_id = ($request->pincode_id) ?? 0;
@@ -534,22 +537,49 @@ class AdminAuthController extends Controller
     {
 
         $requestData = $request->all();
+
+        // A rejected request, or a login left behind by a deleted driver, keeps its admins row.
+        // That row must not block the same email from registering again - it is reused below.
+        $reusableAdmin = Admin::where('email', $request->email)
+            ->where('role_id', Role::$roleDeliveryBoy)
+            ->first();
+        if ($reusableAdmin) {
+            $existingDeliveryBoy = DeliveryBoy::where('admin_id', $reusableAdmin->id)->first();
+            if ($existingDeliveryBoy && (int) $existingDeliveryBoy->status !== (int) DeliveryBoy::$statusRejected) {
+                $reusableAdmin = null; // active / pending driver - email genuinely taken
+            }
+        }
+
+        $cityIds = DeliveryBoy::cityIdsFromRequest($request);
+
         $validator = Validator::make($requestData, [
             'name' => 'required',
-            'email' => 'email|required|unique:admins',
+            'email' => ['email', 'required', Rule::unique('admins', 'email')->ignore($reusableAdmin->id ?? null)],
             'mobile' => 'required',
             'dob' => 'required',
             'password' => 'min:6|required_with:confirm_password|same:confirm_password',
-            'city_id' => 'required',
+            'city_id' => Rule::requiredIf(empty($cityIds)),
             'bonus_type' => 'required',
             'bonus_percentage' => $request->bonus_type == 1 ? 'required' : '',
+            'register_to' => 'nullable|in:admin,seller',
+            'seller_id' => [
+                'required_if:register_to,seller',
+                'nullable',
+                Rule::exists('sellers', 'id')->where(fn ($q) => $q
+                    ->whereIn('id', Seller::registrableForDeliveryBoy($cityIds)->select('sellers.id'))),
+            ],
         ], [
             'email.unique' => 'The :attribute has already been taken.',
+            'seller_id.required_if' => 'Please select a seller.',
+            'seller_id.exists' => 'Selected seller is not available in your city.',
         ]);
 
         if ($validator->fails()) {
             return CommonHelper::responseError($validator->errors()->first());
         }
+
+        // Request goes to the chosen seller (who accepts/rejects it) or, by default, to admin.
+        $sellerId = $request->register_to === 'seller' ? (int) $request->seller_id : null;
 
         $customFieldResult = $this->processCustomFieldValues($request, 'delivery_boy', 'delivery_boy/custom_fields', $this->mapLegacyDeliveryBoyFieldsToCustomFieldValues($request));
         if (isset($customFieldResult['error'])) {
@@ -564,11 +594,18 @@ class AdminAuthController extends Controller
             $data['password'] = bcrypt($request->password);
             $data['role_id'] = Role::$roleDeliveryBoy;
             $data['created_by'] = 0;
-            $admin = Admin::create($data);
-
-            $deliveryBoy = new DeliveryBoy();
-            $deliveryBoy->city_id = $request->city_id;
+            if ($reusableAdmin) {
+                $reusableAdmin->update($data);
+                $admin = $reusableAdmin;
+                $deliveryBoy = DeliveryBoy::where('admin_id', $admin->id)->first() ?? new DeliveryBoy();
+                $deliveryBoy->remark = null;
+            } else {
+                $admin = Admin::create($data);
+                $deliveryBoy = new DeliveryBoy();
+            }
+            $deliveryBoy->city_id = $cityIds[0] ?? $request->city_id;
             $deliveryBoy->admin_id = $admin->id;
+            $deliveryBoy->seller_id = $sellerId;
             $deliveryBoy->name = $request->name;
             $deliveryBoy->mobile = $request->mobile;
             $deliveryBoy->dob = $request->dob;
@@ -579,6 +616,9 @@ class AdminAuthController extends Controller
 
             $deliveryBoy->custom_field_values = $customFieldResult['values'];
             $deliveryBoy->save();
+            if (!empty($cityIds)) {
+                $deliveryBoy->cities()->sync($cityIds);
+            }
 
             try {
                 CommonHelper::sendMailAdminStatus("delivery_boy", $deliveryBoy, $deliveryBoy->status, $request->email);

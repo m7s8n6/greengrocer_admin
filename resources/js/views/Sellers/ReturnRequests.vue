@@ -2,7 +2,7 @@
     <div>
         <div class="page-heading">
             <div class="page-title mb-2">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h3 class="modern-page-title mb-0">{{ __('return_requests') }}</h3>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
@@ -19,7 +19,7 @@
                 <div class="figma-main-section-card">
                     <div class="card-body p-0">
                         <div
-                            class="d-flex justify-content-between align-items-center flex-wrap gap-3 figma-action-bar-row p-3">
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                             <div class="flex-grow-1">
                                 <div class="figma-search-container">
                                     <i class="fa fa-search text-muted"></i>
@@ -40,7 +40,8 @@
                             <b-table :items="returnRequestsForTable" :fields="fields" :current-page="currentPage"
                                 :per-page="perPage" :filter="filter" :filter-included-fields="filterOn"
                                 :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" :sort-direction="sortDirection"
-                                :bordered="false" :busy="isLoading" stacked="md" show-empty small class="mb-0">
+                                :bordered="false" :busy="isLoading" stacked="md" show-empty :empty-text="__('no_records_to_show')" :empty-filtered-text="__('no_records_matching_your_request')" small
+                                :tbody-tr-class="() => 'figma-tr align-middle'" class="figma-table mb-0">
 
                                 <template #table-busy>
                                     <div class="text-center text-black my-2">
@@ -83,7 +84,7 @@
                                             v-if="$can('return_request_update')" v-b-tooltip.hover :title="__('edit')">
                                             <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
                                         </button>
-                                        <button class="figma-action-btn"
+                                        <button class="figma-action-btn figma-delete-btn"
                                             @click="deleteReturnRequests(row.index, row.item.id)"
                                             v-if="$can('return_request_delete')" v-b-tooltip.hover
                                             :title="__('delete')">
@@ -96,9 +97,7 @@
                             </b-table>
                         </div>
                         <div class="figma-table-footer flex-wrap gap-3">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageStart }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                     align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis

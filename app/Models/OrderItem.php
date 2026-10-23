@@ -49,7 +49,7 @@ protected $casts = [
             $image_url = asset('storage/'.$this->image);
             return $image_url;
         }
-        return $this->image;
+        return \App\Helpers\CommonHelper::getPlaceholderImageUrl();
 
     }
 

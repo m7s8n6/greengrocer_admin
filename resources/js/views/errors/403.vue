@@ -1,13 +1,14 @@
 <template>
     <div>
-        <div id="error" class="py-0" style="height: 77vh;">
-            <div class="error-page container">
-                <div class="col-md-8 col-12 offset-md-2">
-                    <div class="text-center">
-                        <img :src="img_url" alt="Not Found" style="height: 200px;">
-                        <h1 class="error-title mt-0">Forbidden</h1>
-                        <p class="fs-5 text-gray-600">You are unauthorized to see this page.</p>
-                        <button type="button" class="btn btn-lg btn-outline-primary mt-3" @click="$router.go(-1)">Go Back</button>
+        <div class="error-state-wrap">
+            <div class="card error-state-card">
+                <div class="card-body text-center">
+                    <div class="error-state-code">403</div>
+                    <h1 class="error-state-title">Forbidden</h1>
+                    <p class="error-state-text">You are unauthorized to see this page.</p>
+                    <div class="error-state-actions">
+                        <router-link :to="homePath" class="btn btn-primary"><i class="bi bi-house-door me-2"></i>{{ __('dashboard') }}</router-link>
+                        <button type="button" class="btn btn-outline-secondary" @click="$router.go(-1)"><i class="bi bi-arrow-left me-2"></i>Go Back</button>
                     </div>
                 </div>
             </div>
@@ -24,6 +25,15 @@ export default {
             img_url: this.$baseUrl + '/images/error-403.png'
         };
     },
+    computed: {
+        // Dashboard of the panel the user came from (admin / seller / delivery boy)
+        homePath: function () {
+            const path = (this.$route && this.$route.path) || '';
+            if (path.indexOf('/seller') === 0) return '/seller';
+            if (path.indexOf('/delivery_boy') === 0) return '/delivery_boy';
+            return '/dashboard';
+        }
+    },
     created() {
         setTimeout(
             function() {
@@ -37,3 +47,21 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+
+@media (max-width: 575.98px) {
+    .error-state-card .card-body {
+        padding: 32px 20px;
+    }
+
+    .error-state-code {
+        font-size: 56px;
+    }
+
+    .error-state-actions .btn {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+}
+</style>

@@ -650,6 +650,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -1846,8 +1847,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         text: "Are you sure you want to ".concat(actionText, " the order?"),
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)',
         confirmButtonText: "Yes, ".concat(actionText, " it"),
         cancelButtonText: 'Cancel'
       }).then(function (result) {
@@ -2210,7 +2211,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.product-card[data-v-3a395e78] {\n    border: 1px solid #e9ecef;\n    border-radius: 8px;\n    overflow: hidden;\n    transition: all 0.3s ease;\n    cursor: pointer;\n    height: 100%;\n    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);\n    display: flex;\n    flex-direction: column;\n}\n.product-card[data-v-3a395e78]:hover {\n    transform: translateY(-5px);\n    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);\n}\n.product-image[data-v-3a395e78] {\n    height: 160px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    overflow: hidden;\n    background-color: #f8f9fa;\n    padding: 10px;\n}\n.product-image img[data-v-3a395e78] {\n    max-height: 140px;\n    max-width: 100%;\n    -o-object-fit: contain;\n       object-fit: contain;\n    display: block;\n    margin: 0 auto;\n}\n.product-info[data-v-3a395e78] {\n    padding: 12px;\n    display: flex;\n    flex-direction: column;\n    flex-grow: 1;\n}\n.product-name-measure-row[data-v-3a395e78] {\n    flex-wrap: nowrap;\n}\n.product-title[data-v-3a395e78] {\n    font-size: 16px;\n    overflow: hidden;\n    display: -webkit-box;\n    -webkit-line-clamp: 2;\n    -webkit-box-orient: vertical;\n    min-width: 0;\n}\n.single-variant[data-v-3a395e78] {\n    font-size: 0.75rem;\n    color: #6c757d;\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n.variant-info[data-v-3a395e78] {\n    font-weight: 600;\n}\n.form-select-sm[data-v-3a395e78] {\n    font-size: 0.8rem;\n    padding: 0.25rem 0.5rem;\n    height: 30px;\n}\n.product-card .product-info select.form-select.mini-select.short-select[data-v-3a395e78] {\n    font-size: 0.75rem !important;\n    padding: 0.2rem 1.5rem 0.2rem 0.4rem !important;\n    height: 25px !important;\n    line-height: 1.2 !important;\n    color: #1E293B !important;\n}\n.short-select[data-v-3a395e78] {\n    width: auto;\n    min-width: 80px;\n    max-width: 120px;\n}\n.btn-xs[data-v-3a395e78] {\n    padding: 0.2rem 0.5rem;\n    font-size: 0.8rem;\n    line-height: 1.2;\n    margin-top: 5px;\n}\n.no-variants[data-v-3a395e78] {\n    padding: 8px 0;\n    text-align: center;\n    font-size: 12px;\n}\n.product-actions[data-v-3a395e78] {\n    margin-top: auto;\n}\n.product-price[data-v-3a395e78] {\n    font-weight: bold;\n    color: #435ebe;\n    margin-bottom: 5px;\n}\n.original-price[data-v-3a395e78] {\n    text-decoration: line-through;\n    color: #6c757d;\n    font-size: 11px;\n    font-weight: normal;\n    margin-left: 4px;\n}\n.add-btn[data-v-3a395e78] {\n    padding: 2px 6px;\n    font-size: 12px;\n}\n.product-price .discounted[data-v-3a395e78] {\n    color: #dc3545;\n}\n.product-price .original-price[data-v-3a395e78] {\n    text-decoration: line-through;\n    color: #6c757d;\n    font-size: 12px;\n    margin-left: 5px;\n}\n.cart-items[data-v-3a395e78] {\n    max-height: 400px;\n    overflow-y: auto;\n}\n.cart-item[data-v-3a395e78] {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    padding: 10px 0;\n    border-bottom: 1px solid #e9ecef;\n    position: relative;\n}\n.item-image[data-v-3a395e78] {\n    width: 60px;\n    height: 60px;\n    overflow: hidden;\n    border-radius: 4px;\n    margin-right: 10px;\n    border: 1px solid #e9ecef;\n}\n.item-image img[data-v-3a395e78] {\n    width: 100%;\n    height: 100%;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.item-details[data-v-3a395e78] {\n    flex: 1;\n    min-width: 150px;\n    padding-right: 10px;\n}\n.item-details h5[data-v-3a395e78] {\n    font-size: 14px;\n    margin-bottom: 3px;\n    font-weight: 600;\n}\n.item-details p.variant-info[data-v-3a395e78] {\n    font-size: 12px;\n    color: #6c757d;\n    margin-bottom: 5px;\n    font-weight: 600;\n}\n.item-details .price[data-v-3a395e78] {\n    font-weight: bold;\n    color: #435ebe;\n    font-size: 13px;\n}\n.item-quantity[data-v-3a395e78] {\n    width: 120px;\n    margin: 10px 0;\n}\n.item-quantity .form-control[data-v-3a395e78] {\n    padding: 0.25rem 0.5rem;\n    text-align: center;\n}\n.item-quantity .input-group[data-v-3a395e78] {\n    flex-wrap: nowrap;\n}\n.item-total[data-v-3a395e78] {\n    width: 80px;\n    text-align: right;\n    font-weight: bold;\n    margin-right: 10px;\n}\n.item-actions[data-v-3a395e78] {\n    margin-left: auto;\n}\n\n/* Figma Quantity Selector */\n.figma-qty-selector[data-v-3a395e78] {\n    display: flex;\n    align-items: center;\n    border: 1px solid #EDEDED;\n    border-radius: 8px;\n    overflow: hidden;\n    width: -moz-fit-content;\n    width: fit-content;\n    background: #FFFFFF;\n}\n.figma-qty-btn[data-v-3a395e78] {\n    width: 36px;\n    height: 36px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border: none;\n    background: #F7F7F7;\n    color: #333333;\n    font-size: 18px;\n    font-weight: 500;\n    transition: all 0.2s ease;\n    padding: 0;\n    cursor: pointer;\n}\n.figma-qty-btn[data-v-3a395e78]:hover {\n    background: #EDEDED;\n    color: #000000;\n}\n.figma-qty-input[data-v-3a395e78] {\n    width: 44px;\n    height: 36px;\n    border: none !important;\n    border-left: 1px solid #EDEDED !important;\n    border-right: 1px solid #EDEDED !important;\n    text-align: center;\n    font-weight: 700;\n    font-size: 14px;\n    color: #333333;\n    background: #FFFFFF;\n    border-radius: 0 !important;\n    padding: 0 !important;\n}\n.figma-qty-input[data-v-3a395e78]:focus {\n    outline: none !important;\n    box-shadow: none !important;\n}\n.figma-qty-input[data-v-3a395e78]::-webkit-outer-spin-button,\n.figma-qty-input[data-v-3a395e78]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\n.figma-qty-input[type=number][data-v-3a395e78] {\n    -moz-appearance: textfield;\n}\n\n/* Dark Mode Overrides for Quantity Selector */\nbody.theme-dark .figma-qty-selector[data-v-3a395e78] {\n    background-color: #0F172A !important;\n    border-color: #334155 !important;\n}\nbody.theme-dark .figma-qty-btn[data-v-3a395e78] {\n    background-color: #1E293B !important;\n    color: #F8FAFC !important;\n}\nbody.theme-dark .figma-qty-btn[data-v-3a395e78]:hover {\n    background-color: #334155 !important;\n    color: #FFFFFF !important;\n}\nbody.theme-dark .figma-qty-input[data-v-3a395e78] {\n    background-color: #0F172A !important;\n    color: #F8FAFC !important;\n    border-left-color: #334155 !important;\n    border-right-color: #334155 !important;\n}\n@media (min-width: 768px) {\n.cart-item[data-v-3a395e78] {\n        flex-wrap: nowrap;\n}\n.item-quantity[data-v-3a395e78] {\n        margin: 0 10px;\n}\n}\n@media (max-width: 767.98px) {\n.cart-item[data-v-3a395e78] {\n        padding: 15px 0;\n}\n.item-details[data-v-3a395e78] {\n        width: calc(100% - 70px);\n}\n.item-quantity[data-v-3a395e78] {\n        width: auto;\n        flex-shrink: 0;\n}\n.item-total[data-v-3a395e78] {\n        width: 30%;\n        margin-left: auto;\n}\n.item-actions[data-v-3a395e78] {\n        position: absolute;\n        top: 10px;\n        right: 0;\n}\n}\n@media (min-width: 576px) {\n.product-image[data-v-3a395e78] {\n        height: 110px;\n}\n.product-actions .d-flex[data-v-3a395e78] {\n        flex-direction: column;\n        align-items: stretch;\n        gap: 6px;\n}\n.product-actions .btn[data-v-3a395e78] {\n        width: 100%;\n        font-size: 0.75rem;\n        padding: 0.25rem 0.4rem;\n        text-align: center;\n}\n.product-price[data-v-3a395e78] {\n        font-size: 0.8rem;\n}\n.product-info[data-v-3a395e78] {\n        padding: 8px;\n}\n.product-title[data-v-3a395e78] {\n        font-size: 13px;\n}\n}\n.item-quantity .form-control[data-v-3a395e78]::-webkit-outer-spin-button,\n.item-quantity .form-control[data-v-3a395e78]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\n.item-quantity .form-control[type=number][data-v-3a395e78] {\n    -moz-appearance: textfield;\n}\n.fullscreen-header[data-v-3a395e78] {\n    background: #e2e3e7;\n    color: white;\n    margin-bottom: 15px;\n}\n.fullscreen-header h5[data-v-3a395e78] {\n    margin-bottom: 0;\n}\n.pos-tabs-container[data-v-3a395e78] {\n    background: #fff;\n    padding: 10px;\n    border-radius: 4px;\n    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);\n}\n.pos-tabs-wrapper[data-v-3a395e78] {\n    display: flex;\n    width: 100%;\n    gap: 8px;\n    overflow-x: auto;\n    -webkit-overflow-scrolling: touch;\n    scrollbar-width: none;\n    /* Firefox */\n    padding-bottom: 2px;\n}\n.pos-tabs-wrapper[data-v-3a395e78]::-webkit-scrollbar {\n    display: none;\n    /* Chrome / Safari */\n}\n.pos-tab[data-v-3a395e78] {\n    width: auto;\n    flex: 0 0 auto;\n    padding: 10px 15px;\n    background-color: #f8f9fa;\n    border: 1px solid #dee2e6;\n    border-radius: 8px;\n    cursor: pointer;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    transition: all 0.2s;\n}\n.pos-tab[data-v-3a395e78]:hover {\n    background-color: #e9ecef;\n}\n.pos-tab.active[data-v-3a395e78] {\n    background-color: #37a279;\n    color: white;\n    border-color: #37a279;\n}\n.pos-tab-close[data-v-3a395e78] {\n    font-size: 18px;\n    margin-left: 8px;\n    cursor: pointer;\n}\n.pos-tab-close[data-v-3a395e78]:hover {\n    color: #dc3545;\n}\n@media (max-width: 575.98px) {\n.fullscreen-header .btn[data-v-3a395e78],\n    .fullscreen-header h5[data-v-3a395e78] {\n        font-size: 0.8rem;\n        white-space: nowrap;\n}\n.fullscreen-header h5[data-v-3a395e78] {\n        margin-bottom: 0;\n}\n.pos-tab[data-v-3a395e78] {\n        padding: 5px 8px;\n        font-size: 0.78rem;\n        white-space: nowrap;\n}\n.pos-tab-close[data-v-3a395e78] {\n        font-size: 14px;\n        margin-left: 4px;\n}\n.pos-tabs-container[data-v-3a395e78] {\n        padding: 6px;\n}\n\n    /* Hide \"Hold Bill & Create Another\" text, keep only + icon */\n.pos-tabs-wrapper>.btn[data-v-3a395e78] {\n        font-size: 0;\n        padding: 5px 10px;\n        line-height: 1;\n}\n.pos-tabs-wrapper>.btn .fas[data-v-3a395e78] {\n        font-size: 0.9rem;\n}\n}\n.previous-bill-tab[data-v-3a395e78] {\n    background-color: #007bff !important;\n    color: white !important;\n    border-color: #007bff !important;\n    position: relative;\n}\n.previous-bill-tab[data-v-3a395e78]::after {\n    content: \"Editing\";\n    position: absolute;\n    top: -8px;\n    right: 5px;\n    background-color: #dc3545;\n    color: white;\n    font-size: 10px;\n    padding: 2px 5px;\n    border-radius: 3px;\n    font-weight: bold;\n}\n.disabled-tab[data-v-3a395e78] {\n    opacity: 0.6;\n    cursor: not-allowed;\n    background-color: #f0f0f0 !important;\n}\n.disabled-tab[data-v-3a395e78]:hover {\n    background-color: #f0f0f0 !important;\n}\n.previous-bill-badge[data-v-3a395e78] {\n    animation: pulse-data-v-3a395e78 2s infinite;\n}\n@keyframes pulse-data-v-3a395e78 {\n0% {\n        transform: scale(1);\n        opacity: 1;\n}\n50% {\n        transform: scale(1.05);\n        opacity: 0.8;\n}\n100% {\n        transform: scale(1);\n        opacity: 1;\n}\n}\n.previous-bill-indicator[data-v-3a395e78] {\n    border-left: 4px solid #0d6efd;\n}\n.badge[data-v-3a395e78] {\n    font-size: 85%;\n}\n.search-select[data-v-3a395e78] {\n    position: relative;\n    width: 100%;\n    z-index: 1051 !important;\n}\n.search-results[data-v-3a395e78] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 0 0 12px 12px;\n    max-height: 250px;\n    overflow-y: auto !important;\n    -webkit-overflow-scrolling: touch;\n    z-index: 99999 !important;\n    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);\n}\n.search-option[data-v-3a395e78] {\n    padding: 12px 16px !important;\n    cursor: pointer;\n    border-bottom: 1px solid #f0f0f0;\n    transition: all 0.2s ease;\n    display: flex;\n    align-items: center;\n    font-size: 14px;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n.search-option[data-v-3a395e78]:last-child {\n    border-bottom: none;\n}\n.out-of-stock[data-v-3a395e78] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    min-height: 32px;\n}\n.out-of-stock .badge[data-v-3a395e78] {\n    font-size: 0.75rem;\n    padding: 0.4rem 0.6rem;\n    font-weight: 600;\n    background-color: #dc3545 !important;\n    color: white;\n    border-radius: 4px;\n}\n\n/* Dark Mode Alignment & Padding Fixes */\nbody.theme-dark .product-card[data-v-3a395e78] {\n    border-color: #334155 !important;\n    background-color: #1E293B !important;\n}\nbody.theme-dark .product-image[data-v-3a395e78] {\n    background-color: #0F172A !important;\n}\nbody.theme-dark .search-results[data-v-3a395e78] {\n    background-color: #1E293B !important;\n    border-color: #334155 !important;\n    color: #F8FAFC !important;\n}\nbody.theme-dark .product-card .product-info select.form-select.mini-select.short-select[data-v-3a395e78] {\n    background-color: #0F172A !important;\n    border-color: #334155 !important;\n    color: #F8FAFC !important;\n}\nbody.theme-dark .search-option[data-v-3a395e78] {\n    border-bottom-color: #334155 !important;\n    color: #E2E8F0 !important;\n}\nbody.theme-dark .search-option[data-v-3a395e78]:hover {\n    background-color: #334155 !important;\n    color: #FFFFFF !important;\n}\nbody.theme-dark .cart-item[data-v-3a395e78] {\n    border-bottom-color: #334155 !important;\n}\nbody.theme-dark .item-image[data-v-3a395e78] {\n    border-color: #334155 !important;\n}\nbody.theme-dark .item-details h5[data-v-3a395e78],\nbody.theme-dark .item-details .price[data-v-3a395e78],\nbody.theme-dark .item-total[data-v-3a395e78] {\n    color: #F8FAFC !important;\n}\nbody.theme-dark .variant-info[data-v-3a395e78] {\n    color: #94A3B8 !important;\n}\nbody.theme-dark .figma-table-footer[data-v-3a395e78] {\n    background-color: #1E293B !important;\n    border-top-color: #334155 !important;\n}\nbody.theme-dark .pos-tab[data-v-3a395e78] {\n    background-color: #0F172A !important;\n    border-color: #334155 !important;\n    color: #94A3B8 !important;\n}\nbody.theme-dark .pos-tab.active[data-v-3a395e78] {\n    background-color: #37a279 !important;\n    color: #FFFFFF !important;\n    border-color: #37a279 !important;\n}\n.card[data-v-3a395e78] {\n    overflow: visible !important;\n}\n.customer-details-card[data-v-3a395e78] {\n    position: relative !important;\n    z-index: 1050 !important;\n    overflow: visible !important;\n}\n.customer-details-card .card-body[data-v-3a395e78] {\n    overflow: visible !important;\n}\n.card-header[data-v-3a395e78] {\n    padding: 1.25rem 1.5rem !important;\n}\n.figma-btn-standard[data-v-3a395e78] {\n    height: 48px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: 600;\n}\nbody.theme-dark .search-results[data-v-3a395e78] {\n    background-color: #1E293B !important;\n    border-color: #334155 !important;\n    color: #F8FAFC !important;\n    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);\n}\nbody.theme-dark .card-header[data-v-3a395e78] {\n    border-bottom: 1px solid #334155 !important;\n}\nbody.theme-dark .fullscreen-header[data-v-3a395e78] {\n    background-color: #111827 !important;\n    border-bottom: 1px solid #334155 !important;\n}\n.search-option i[data-v-3a395e78] {\n    width: 20px;\n    text-align: center;\n    color: #64748B;\n}\nbody.theme-dark .search-option i[data-v-3a395e78] {\n    color: #94A3B8;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.product-card[data-v-3a395e78] {\n    border: 1px solid var(--ui-border);\n    border-radius: 8px;\n    overflow: hidden;\n    transition: all 0.3s ease;\n    cursor: pointer;\n    height: 100%;\n    box-shadow: var(--ui-shadow);\n    display: flex;\n    flex-direction: column;\n}\n.product-card[data-v-3a395e78]:hover {\n    transform: translateY(-5px);\n    box-shadow: var(--ui-shadow-lg);\n}\n.product-image[data-v-3a395e78] {\n    height: 160px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    overflow: hidden;\n    background-color: var(--theme-neutral-100, #f8f9fa);\n    padding: 10px;\n}\n.product-image img[data-v-3a395e78] {\n    max-height: 140px;\n    max-width: 100%;\n    -o-object-fit: contain;\n       object-fit: contain;\n    display: block;\n    margin: 0 auto;\n}\n.product-info[data-v-3a395e78] {\n    padding: 12px;\n    display: flex;\n    flex-direction: column;\n    flex-grow: 1;\n}\n.product-name-measure-row[data-v-3a395e78] {\n    flex-wrap: nowrap;\n}\n.product-title[data-v-3a395e78] {\n    font-size: 16px;\n    overflow: hidden;\n    display: -webkit-box;\n    -webkit-line-clamp: 2;\n    -webkit-box-orient: vertical;\n    min-width: 0;\n}\n.single-variant[data-v-3a395e78] {\n    font-size: 0.75rem;\n    color: var(--theme-neutral-500, #6c757d);\n    white-space: nowrap;\n    flex-shrink: 0;\n}\n.variant-info[data-v-3a395e78] {\n    font-weight: 600;\n}\n.form-select-sm[data-v-3a395e78] {\n    font-size: 0.8rem;\n    padding: 0.25rem 0.5rem;\n    height: 30px;\n}\n.product-card .product-info select.form-select.mini-select.short-select[data-v-3a395e78] {\n    font-size: 0.75rem !important;\n    padding: 0.2rem 0.4rem !important;\n    padding-inline-end: 1.5rem !important; /* room for the caret (left side in RTL) */\n    height: 25px !important;\n    line-height: 1.2 !important;\n    color: var(--theme-neutral-800, #1E293B) !important;\n}\n.short-select[data-v-3a395e78] {\n    width: auto;\n    min-width: 80px;\n    max-width: 120px;\n}\n.btn-xs[data-v-3a395e78] {\n    padding: 0.2rem 0.5rem;\n    font-size: 0.8rem;\n    line-height: 1.2;\n    margin-top: 5px;\n}\n.no-variants[data-v-3a395e78] {\n    padding: 8px 0;\n    text-align: center;\n    font-size: 12px;\n}\n.product-actions[data-v-3a395e78] {\n    margin-top: auto;\n}\n.product-price[data-v-3a395e78] {\n    font-weight: bold;\n    color: var(--theme-primary-500, #435ebe);\n    margin-bottom: 5px;\n}\n.original-price[data-v-3a395e78] {\n    text-decoration: line-through;\n    color: var(--theme-neutral-500, #6c757d);\n    font-size: 11px;\n    font-weight: normal;\n    margin-left: 4px;\n}\n.add-btn[data-v-3a395e78] {\n    padding: 2px 6px;\n    font-size: 12px;\n}\n.product-price .discounted[data-v-3a395e78] {\n    color: var(--theme-error-500, #dc3545);\n}\n.product-price .original-price[data-v-3a395e78] {\n    text-decoration: line-through;\n    color: var(--theme-neutral-500, #6c757d);\n    font-size: 12px;\n    margin-left: 5px;\n}\n.cart-items[data-v-3a395e78] {\n    max-height: 400px;\n    overflow-y: auto;\n}\n.cart-item[data-v-3a395e78] {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    padding: 10px 0;\n    border-bottom: 1px solid var(--theme-neutral-200, #e9ecef);\n    position: relative;\n}\n.item-image[data-v-3a395e78] {\n    width: 60px;\n    height: 60px;\n    overflow: hidden;\n    border-radius: 4px;\n    margin-right: 10px;\n    border: 1px solid var(--theme-neutral-200, #e9ecef);\n}\n.item-image img[data-v-3a395e78] {\n    width: 100%;\n    height: 100%;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.item-details[data-v-3a395e78] {\n    flex: 1;\n    min-width: 150px;\n    padding-right: 10px;\n}\n.item-details h5[data-v-3a395e78] {\n    font-size: 14px;\n    margin-bottom: 3px;\n    font-weight: 600;\n}\n.item-details p.variant-info[data-v-3a395e78] {\n    font-size: 12px;\n    color: var(--theme-neutral-500, #6c757d);\n    margin-bottom: 5px;\n    font-weight: 600;\n}\n.item-details .price[data-v-3a395e78] {\n    font-weight: bold;\n    color: var(--theme-primary-500, #435ebe);\n    font-size: 13px;\n}\n.item-quantity[data-v-3a395e78] {\n    width: 120px;\n    margin: 10px 0;\n}\n.item-quantity .form-control[data-v-3a395e78] {\n    padding: 0.25rem 0.5rem;\n    text-align: center;\n}\n.item-quantity .input-group[data-v-3a395e78] {\n    flex-wrap: nowrap;\n}\n.item-total[data-v-3a395e78] {\n    width: 80px;\n    text-align: right;\n    font-weight: bold;\n    margin-right: 10px;\n}\n.item-actions[data-v-3a395e78] {\n    margin-left: auto;\n}\n\n/* Figma Quantity Selector */\n.figma-qty-selector[data-v-3a395e78] {\n    display: flex;\n    align-items: center;\n    border: 1px solid var(--theme-neutral-200, #EDEDED);\n    border-radius: 8px;\n    overflow: hidden;\n    width: -moz-fit-content;\n    width: fit-content;\n    background: var(--ui-surface);\n}\n.figma-qty-btn[data-v-3a395e78] {\n    width: 36px;\n    height: 36px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border: none;\n    background: var(--theme-neutral-100, #F7F7F7);\n    color: var(--theme-neutral-700, #333333);\n    font-size: 18px;\n    font-weight: 500;\n    transition: all 0.2s ease;\n    padding: 0;\n    cursor: pointer;\n}\n.figma-qty-btn[data-v-3a395e78]:hover {\n    background: var(--theme-neutral-200, #EDEDED);\n    color: var(--theme-neutral-950, #000000);\n}\n.figma-qty-input[data-v-3a395e78] {\n    width: 44px;\n    height: 36px;\n    border: none !important;\n    border-left: 1px solid var(--theme-neutral-200, #EDEDED) !important;\n    border-right: 1px solid var(--theme-neutral-200, #EDEDED) !important;\n    text-align: center;\n    font-weight: 700;\n    font-size: 14px;\n    color: var(--theme-neutral-700, #333333);\n    background: var(--ui-surface);\n    border-radius: 0 !important;\n    padding: 0 !important;\n}\n.figma-qty-input[data-v-3a395e78]:focus {\n    outline: none !important;\n    box-shadow: none !important;\n}\n.figma-qty-input[data-v-3a395e78]::-webkit-outer-spin-button,\n.figma-qty-input[data-v-3a395e78]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\n.figma-qty-input[type=number][data-v-3a395e78] {\n    -moz-appearance: textfield;\n}\n\n/* Dark Mode Overrides for Quantity Selector */\nbody.theme-dark .figma-qty-selector[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #0F172A) !important;\n    border-color: var(--theme-neutral-700, #334155) !important;\n}\nbody.theme-dark .figma-qty-btn[data-v-3a395e78] {\n    background-color: var(--theme-neutral-800, #1E293B) !important;\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n}\nbody.theme-dark .figma-qty-btn[data-v-3a395e78]:hover {\n    background-color: var(--theme-neutral-700, #334155) !important;\n    color: #FFFFFF !important;\n}\nbody.theme-dark .figma-qty-input[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #0F172A) !important;\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n    border-left-color: var(--theme-neutral-700, #334155) !important;\n    border-right-color: var(--theme-neutral-700, #334155) !important;\n}\n@media (min-width: 768px) {\n.cart-item[data-v-3a395e78] {\n        flex-wrap: nowrap;\n}\n.item-quantity[data-v-3a395e78] {\n        margin: 0 10px;\n}\n}\n@media (max-width: 767.98px) {\n.cart-item[data-v-3a395e78] {\n        padding: 15px 0;\n}\n.item-details[data-v-3a395e78] {\n        width: calc(100% - 70px);\n}\n.item-quantity[data-v-3a395e78] {\n        width: auto;\n        flex-shrink: 0;\n}\n.item-total[data-v-3a395e78] {\n        width: 30%;\n        margin-left: auto;\n}\n.item-actions[data-v-3a395e78] {\n        position: absolute;\n        top: 10px;\n        right: 0;\n}\n}\n@media (min-width: 576px) {\n.product-image[data-v-3a395e78] {\n        height: 110px;\n}\n.product-actions .d-flex[data-v-3a395e78] {\n        flex-direction: column;\n        align-items: stretch;\n        gap: 6px;\n}\n.product-actions .btn[data-v-3a395e78] {\n        width: 100%;\n        font-size: 0.75rem;\n        padding: 0.25rem 0.4rem;\n        text-align: center;\n}\n.product-price[data-v-3a395e78] {\n        font-size: 0.8rem;\n}\n.product-info[data-v-3a395e78] {\n        padding: 8px;\n}\n.product-title[data-v-3a395e78] {\n        font-size: 13px;\n}\n}\n.item-quantity .form-control[data-v-3a395e78]::-webkit-outer-spin-button,\n.item-quantity .form-control[data-v-3a395e78]::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n}\n.item-quantity .form-control[type=number][data-v-3a395e78] {\n    -moz-appearance: textfield;\n}\n.fullscreen-header[data-v-3a395e78] {\n    background: var(--theme-neutral-200, #e2e3e7);\n    color: white;\n    margin-bottom: 15px;\n}\n.fullscreen-header h5[data-v-3a395e78] {\n    margin-bottom: 0;\n}\n.pos-tabs-container[data-v-3a395e78] {\n    background: var(--ui-surface);\n    padding: 10px;\n    border-radius: 4px;\n    box-shadow: var(--ui-shadow);\n}\n.pos-tabs-wrapper[data-v-3a395e78] {\n    display: flex;\n    width: 100%;\n    gap: 8px;\n    overflow-x: auto;\n    -webkit-overflow-scrolling: touch;\n    scrollbar-width: none;\n    /* Firefox */\n    padding-bottom: 2px;\n}\n.pos-tabs-wrapper[data-v-3a395e78]::-webkit-scrollbar {\n    display: none;\n    /* Chrome / Safari */\n}\n.pos-tab[data-v-3a395e78] {\n    width: auto;\n    flex: 0 0 auto;\n    padding: 10px 15px;\n    background-color: var(--theme-neutral-100, #f8f9fa);\n    border: 1px solid var(--theme-neutral-300, #dee2e6);\n    border-radius: 8px;\n    cursor: pointer;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    transition: all 0.2s;\n}\n.pos-tab[data-v-3a395e78]:hover {\n    background-color: var(--theme-neutral-200, #e9ecef);\n}\n.pos-tab.active[data-v-3a395e78] {\n    background-color: var(--theme-primary-500, #37a279);\n    color: white;\n    border-color: var(--theme-primary-500, #37a279);\n}\n.pos-tab-close[data-v-3a395e78] {\n    font-size: 18px;\n    margin-left: 8px;\n    cursor: pointer;\n}\n.pos-tab-close[data-v-3a395e78]:hover {\n    color: var(--theme-error-500, #dc3545);\n}\n@media (max-width: 575.98px) {\n.fullscreen-header .btn[data-v-3a395e78],\n    .fullscreen-header h5[data-v-3a395e78] {\n        font-size: 0.8rem;\n        white-space: nowrap;\n}\n.fullscreen-header h5[data-v-3a395e78] {\n        margin-bottom: 0;\n}\n.pos-tab[data-v-3a395e78] {\n        padding: 5px 8px;\n        font-size: 0.78rem;\n        white-space: nowrap;\n}\n.pos-tab-close[data-v-3a395e78] {\n        font-size: 14px;\n        margin-left: 4px;\n}\n.pos-tabs-container[data-v-3a395e78] {\n        padding: 6px;\n}\n\n    /* Hide \"Hold Bill & Create Another\" text, keep only + icon */\n.pos-tabs-wrapper>.btn[data-v-3a395e78] {\n        font-size: 0;\n        padding: 5px 10px;\n        line-height: 1;\n}\n.pos-tabs-wrapper>.btn .fas[data-v-3a395e78] {\n        font-size: 0.9rem;\n}\n}\n.previous-bill-tab[data-v-3a395e78] {\n    background-color: var(--theme-primary-500, #007bff) !important;\n    color: white !important;\n    border-color: var(--theme-primary-500, #007bff) !important;\n    position: relative;\n}\n.previous-bill-tab[data-v-3a395e78]::after {\n    content: \"Editing\";\n    position: absolute;\n    top: -8px;\n    right: 5px;\n    background-color: var(--theme-error-500, #dc3545);\n    color: white;\n    font-size: 10px;\n    padding: 2px 5px;\n    border-radius: 3px;\n    font-weight: bold;\n}\n.disabled-tab[data-v-3a395e78] {\n    opacity: 0.6;\n    cursor: not-allowed;\n    background-color: var(--theme-neutral-100, #f0f0f0) !important;\n}\n.disabled-tab[data-v-3a395e78]:hover {\n    background-color: var(--theme-neutral-100, #f0f0f0) !important;\n}\n.previous-bill-badge[data-v-3a395e78] {\n    animation: pulse-data-v-3a395e78 2s infinite;\n}\n@keyframes pulse-data-v-3a395e78 {\n0% {\n        transform: scale(1);\n        opacity: 1;\n}\n50% {\n        transform: scale(1.05);\n        opacity: 0.8;\n}\n100% {\n        transform: scale(1);\n        opacity: 1;\n}\n}\n.previous-bill-indicator[data-v-3a395e78] {\n    border-left: 4px solid var(--theme-info-500, #0d6efd);\n}\n.badge[data-v-3a395e78] {\n    font-size: 85%;\n}\n.search-select[data-v-3a395e78] {\n    position: relative;\n    width: 100%;\n    z-index: 1051 !important;\n}\n.search-results[data-v-3a395e78] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    background: white;\n    border: 1px solid var(--theme-neutral-200, #ddd);\n    border-radius: 0 0 12px 12px;\n    max-height: 250px;\n    overflow-y: auto !important;\n    -webkit-overflow-scrolling: touch;\n    z-index: 99999 !important;\n    box-shadow: var(--ui-shadow-lg);\n}\n.search-option[data-v-3a395e78] {\n    padding: 12px 16px !important;\n    cursor: pointer;\n    border-bottom: 1px solid var(--theme-neutral-100, #f0f0f0);\n    transition: all 0.2s ease;\n    display: flex;\n    align-items: center;\n    font-size: 14px;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n.search-option[data-v-3a395e78]:last-child {\n    border-bottom: none;\n}\n.out-of-stock[data-v-3a395e78] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    min-height: 32px;\n}\n.out-of-stock .badge[data-v-3a395e78] {\n    font-size: 0.75rem;\n    padding: 0.4rem 0.6rem;\n    font-weight: 600;\n    background-color: var(--theme-error-500, #dc3545) !important;\n    color: white;\n    border-radius: 4px;\n}\n\n/* Dark Mode Alignment & Padding Fixes */\nbody.theme-dark .product-card[data-v-3a395e78] {\n    border-color: var(--theme-neutral-700, #334155) !important;\n    background-color: var(--theme-neutral-800, #1E293B) !important;\n}\nbody.theme-dark .product-image[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #0F172A) !important;\n}\nbody.theme-dark .search-results[data-v-3a395e78] {\n    background-color: var(--theme-neutral-800, #1E293B) !important;\n    border-color: var(--theme-neutral-700, #334155) !important;\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n}\nbody.theme-dark .product-card .product-info select.form-select.mini-select.short-select[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #0F172A) !important;\n    border-color: var(--theme-neutral-700, #334155) !important;\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n}\nbody.theme-dark .search-option[data-v-3a395e78] {\n    border-bottom-color: var(--theme-neutral-700, #334155) !important;\n    color: var(--theme-neutral-200, #E2E8F0) !important;\n}\nbody.theme-dark .search-option[data-v-3a395e78]:hover {\n    background-color: var(--theme-neutral-700, #334155) !important;\n    color: #FFFFFF !important;\n}\nbody.theme-dark .cart-item[data-v-3a395e78] {\n    border-bottom-color: var(--theme-neutral-700, #334155) !important;\n}\nbody.theme-dark .item-image[data-v-3a395e78] {\n    border-color: var(--theme-neutral-700, #334155) !important;\n}\nbody.theme-dark .item-details h5[data-v-3a395e78],\nbody.theme-dark .item-details .price[data-v-3a395e78],\nbody.theme-dark .item-total[data-v-3a395e78] {\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n}\nbody.theme-dark .variant-info[data-v-3a395e78] {\n    color: var(--theme-neutral-400, #94A3B8) !important;\n}\nbody.theme-dark .figma-table-footer[data-v-3a395e78] {\n    background-color: var(--theme-neutral-800, #1E293B) !important;\n    border-top-color: var(--theme-neutral-700, #334155) !important;\n}\nbody.theme-dark .pos-tab[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #0F172A) !important;\n    border-color: var(--theme-neutral-700, #334155) !important;\n    color: var(--theme-neutral-400, #94A3B8) !important;\n}\nbody.theme-dark .pos-tab.active[data-v-3a395e78] {\n    background-color: var(--theme-primary-500, #37a279) !important;\n    color: #FFFFFF !important;\n    border-color: var(--theme-primary-500, #37a279) !important;\n}\n.card[data-v-3a395e78] {\n    overflow: visible !important;\n}\n.customer-details-card[data-v-3a395e78] {\n    position: relative !important;\n    z-index: 1050 !important;\n    overflow: visible !important;\n}\n.customer-details-card .card-body[data-v-3a395e78] {\n    overflow: visible !important;\n}\n.card-header[data-v-3a395e78] {\n    padding: 1.25rem 1.5rem !important;\n}\n.figma-btn-standard[data-v-3a395e78] {\n    height: 48px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: 600;\n}\nbody.theme-dark .search-results[data-v-3a395e78] {\n    background-color: var(--theme-neutral-800, #1E293B) !important;\n    border-color: var(--theme-neutral-700, #334155) !important;\n    color: var(--theme-neutral-100, #F8FAFC) !important;\n    box-shadow: var(--ui-shadow-lg);\n}\nbody.theme-dark .card-header[data-v-3a395e78] {\n    border-bottom: 1px solid var(--theme-neutral-700, #334155) !important;\n}\nbody.theme-dark .fullscreen-header[data-v-3a395e78] {\n    background-color: var(--theme-neutral-900, #111827) !important;\n    border-bottom: 1px solid var(--theme-neutral-700, #334155) !important;\n}\n.search-option i[data-v-3a395e78] {\n    width: 20px;\n    text-align: center;\n    color: var(--theme-neutral-500, #64748B);\n}\nbody.theme-dark .search-option i[data-v-3a395e78] {\n    color: var(--theme-neutral-400, #94A3B8);\n}\n\n/* ===== SnapBuy look: panels, toolbar, product tiles, cart summary ===== */\n.pos-panel[data-v-3a395e78] {\n    border: 1px solid var(--ui-border) !important;\n    border-radius: var(--ui-radius-lg) !important;\n    box-shadow: var(--ui-shadow) !important;\n    background: var(--ui-surface) !important;\n}\n.pos-panel > .card-header[data-v-3a395e78] {\n    padding: 14px 20px !important;\n    background: transparent !important;\n    border-bottom: 1px solid var(--ui-border) !important;\n}\n.pos-panel > .card-body[data-v-3a395e78] {\n    padding: 16px 20px;\n}\n.pos-panel-title[data-v-3a395e78] {\n    font-family: var(--ui-font);\n    font-size: 15px !important;\n    font-weight: 700 !important;\n    color: var(--ui-heading) !important;\n}\n.pos-category-select[data-v-3a395e78] {\n    min-width: 160px;\n    height: 38px;\n    font-size: 13px;\n    border-radius: var(--ui-radius);\n}\n.pos-search-input[data-v-3a395e78] {\n    flex: 1 1 220px;\n    max-width: 320px;\n}\n.pos-empty[data-v-3a395e78] {\n    color: var(--ui-text-muted);\n    font-size: 13px;\n}\n.pos-empty i[data-v-3a395e78] {\n    font-size: 28px;\n    color: var(--ui-text-subtle);\n}\n\n/* Product tiles: flat card, primary border on hover (no lift / heavy shadow) */\n.product-card[data-v-3a395e78] {\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    box-shadow: none;\n    background: var(--ui-surface);\n}\n.product-card[data-v-3a395e78]:hover {\n    transform: none;\n    border-color: var(--theme-primary-300);\n    box-shadow: var(--ui-shadow);\n}\n.product-image[data-v-3a395e78] {\n    background-color: var(--ui-surface-muted);\n}\n.product-title[data-v-3a395e78] {\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--ui-heading);\n}\n.product-price[data-v-3a395e78] {\n    font-weight: 700;\n    color: var(--theme-primary-600);\n}\n.product-actions .btn[data-v-3a395e78] {\n    font-weight: 600;\n    border-radius: var(--ui-radius);\n}\n.out-of-stock .badge[data-v-3a395e78] {\n    background: var(--theme-error-50) !important;\n    color: var(--theme-error-700) !important;\n    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent);\n    border-radius: var(--ui-radius-sm);\n    font-size: 11px;\n}\n\n/* Side actions + customer search */\n.pos-side-btn[data-v-3a395e78] {\n    height: 40px !important;\n}\n.customer-details-card .form-control[data-v-3a395e78],\n.pos-register-btn[data-v-3a395e78] {\n    min-height: 40px;\n    font-size: 13px;\n    font-weight: 600;\n    border-radius: var(--ui-radius);\n}\n\n/* Cart */\n.item-image[data-v-3a395e78] {\n    border-radius: var(--ui-radius);\n    border-color: var(--ui-border);\n}\n.item-details h5[data-v-3a395e78] {\n    color: var(--ui-heading);\n}\n.item-details .price[data-v-3a395e78] {\n    color: var(--theme-primary-600);\n}\n.item-total[data-v-3a395e78] {\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.cart-item[data-v-3a395e78] {\n    border-bottom-color: var(--ui-border);\n}\n.cart-summary[data-v-3a395e78] {\n    padding: 14px 16px;\n    font-size: 13px;\n    color: var(--ui-text);\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n}\n.cart-summary .pos-grand-total[data-v-3a395e78] {\n    margin-top: 6px;\n    font-size: 16px;\n    font-weight: 700 !important;\n    color: var(--ui-heading);\n    border-top-color: var(--ui-border) !important;\n}\n.pos-cart label.form-label[data-v-3a395e78] {\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-text);\n}\n.pos-checkout-btn[data-v-3a395e78] {\n    height: 44px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 14px;\n    font-weight: 700;\n    border-radius: var(--ui-radius);\n}\n\n/* Full-screen POS header + bill tabs */\n.fullscreen-header[data-v-3a395e78] {\n    padding: 10px 0;\n    background: var(--ui-surface);\n    color: var(--ui-heading);\n    border-bottom: 1px solid var(--ui-border);\n}\n.fullscreen-header h5[data-v-3a395e78] {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.pos-fs-store[data-v-3a395e78] {\n    color: var(--ui-text-muted) !important;\n    font-weight: 600 !important;\n}\n.pos-tabs-container[data-v-3a395e78] {\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    box-shadow: none;\n}\n.pos-tab[data-v-3a395e78] {\n    padding: 8px 14px;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-text);\n    background-color: var(--ui-surface);\n    border-color: var(--ui-border-strong);\n}\n.pos-tab[data-v-3a395e78]:hover {\n    background-color: var(--ui-primary-soft);\n}\n.pos-tab.active[data-v-3a395e78] {\n    background-color: var(--theme-primary-500);\n    border-color: var(--theme-primary-500);\n    color: var(--theme-neutral-50);\n}\n\n/* Modals (bootstrap markup) */\n.modal-content[data-v-3a395e78] {\n    border-radius: var(--ui-radius-lg);\n    border: 1px solid var(--ui-border);\n}\n.modal-header[data-v-3a395e78],\n.modal-footer[data-v-3a395e78] {\n    border-color: var(--ui-border);\n}\n.modal-body[data-v-3a395e78] {\n    padding: 20px;\n}\n@media (max-width: 575.98px) {\n.pos-search-input[data-v-3a395e78] {\n        max-width: none;\n        flex-basis: 100%;\n}\n.pos-filter-item[data-v-3a395e78],\n    .pos-category-select[data-v-3a395e78] {\n        width: 100%;\n}\n.pos-panel > .card-body[data-v-3a395e78] {\n        padding: 12px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2403,7 +2404,7 @@ var render = function () {
                     _c(
                       "button",
                       {
-                        staticClass: "btn btn-danger me-3 mt-1",
+                        staticClass: "btn btn-outline-danger me-3",
                         on: { click: _vm.confirmExit },
                       },
                       [
@@ -2416,9 +2417,13 @@ var render = function () {
                       ]
                     ),
                     _vm._v(" "),
-                    _c("h5", [_vm._v(_vm._s(_vm.__("pos_billing")))]),
+                    _c("h5", { staticClass: "pos-fs-title" }, [
+                      _vm._v(_vm._s(_vm.__("pos_billing"))),
+                    ]),
                     _vm._v(" "),
-                    _c("h5", [_vm._v(_vm._s(_vm.storeName))]),
+                    _c("h5", { staticClass: "pos-fs-store" }, [
+                      _vm._v(_vm._s(_vm.storeName)),
+                    ]),
                   ]
                 ),
               ]),
@@ -2601,7 +2606,7 @@ var render = function () {
     _vm._v(" "),
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-lg-8 col-12" }, [
-        _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card pos-panel" }, [
           _c("div", { staticClass: "card-header" }, [
             _c(
               "div",
@@ -2610,7 +2615,7 @@ var render = function () {
                   "d-flex justify-content-between align-items-center flex-wrap gap-2",
               },
               [
-                _c("h4", { staticClass: "mb-0" }, [
+                _c("h4", { staticClass: "mb-0 pos-panel-title" }, [
                   _vm._v(_vm._s(_vm.__("products"))),
                 ]),
                 _vm._v(" "),
@@ -2618,9 +2623,48 @@ var render = function () {
                   "div",
                   {
                     staticClass:
-                      "d-flex flex-wrap gap-2 flex-grow-1 justify-content-end",
+                      "d-flex flex-wrap gap-2 flex-grow-1 align-items-center",
                   },
                   [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "pos-filter-item pos-search-input figma-search-container",
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-search" }),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.searchTerm,
+                              expression: "searchTerm",
+                            },
+                          ],
+                          staticClass: "form-control figma-search-input",
+                          attrs: {
+                            type: "text",
+                            placeholder: _vm.__("products"),
+                          },
+                          domProps: { value: _vm.searchTerm },
+                          on: {
+                            input: [
+                              function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.searchTerm = $event.target.value
+                              },
+                              _vm.debounceSearch,
+                            ],
+                          },
+                        }),
+                      ]
+                    ),
+                    _vm._v(" "),
                     _c("div", { staticClass: "pos-filter-item" }, [
                       _c(
                         "select",
@@ -2633,8 +2677,7 @@ var render = function () {
                               expression: "selectedCategory",
                             },
                           ],
-                          staticClass: "form-select",
-                          staticStyle: { "min-width": "160px" },
+                          staticClass: "form-select pos-category-select",
                           on: {
                             change: [
                               function ($event) {
@@ -2679,40 +2722,6 @@ var render = function () {
                         2
                       ),
                     ]),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      { staticClass: "pos-filter-item pos-search-input" },
-                      [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.searchTerm,
-                              expression: "searchTerm",
-                            },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: _vm.__("products"),
-                          },
-                          domProps: { value: _vm.searchTerm },
-                          on: {
-                            input: [
-                              function ($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.searchTerm = $event.target.value
-                              },
-                              _vm.debounceSearch,
-                            ],
-                          },
-                        }),
-                      ]
-                    ),
                   ]
                 ),
               ]
@@ -2736,7 +2745,9 @@ var render = function () {
                   ),
                 ])
               : _vm.products.length === 0
-              ? _c("div", { staticClass: "text-center p-5" }, [
+              ? _c("div", { staticClass: "text-center p-5 pos-empty" }, [
+                  _c("i", { staticClass: "bi bi-box-seam d-block mb-2" }),
+                  _vm._v(" "),
                   _c("p", { staticClass: "mb-0" }, [
                     _vm._v(_vm._s(_vm.__("no_products_found"))),
                   ]),
@@ -3163,25 +3174,15 @@ var render = function () {
                   "div",
                   { staticClass: "d-flex align-items-center flex-wrap gap-2" },
                   [
-                    _c(
-                      "div",
-                      { staticClass: "showing-results-text small text-nowrap" },
-                      [
-                        _vm._v(
-                          "\n                                " +
-                            _vm._s(_vm.__("Showing Result")) +
-                            " : "
-                        ),
-                        _c("span", { staticClass: "showing-bold" }, [
-                          _vm._v(_vm._s(_vm.paginationInfo.to)),
-                        ]),
-                        _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                        _c("span", { staticClass: "showing-bold" }, [
-                          _vm._v(_vm._s(_vm.paginationInfo.total)),
-                        ]),
-                      ]
-                    ),
-                  ]
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.paginationInfo.total,
+                      },
+                    }),
+                  ],
+                  1
                 ),
                 _vm._v(" "),
                 _c(
@@ -3218,12 +3219,13 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-lg-4 col-12" }, [
-        _c("div", { staticClass: "row g-3 mb-4 mt-1" }, [
+        _c("div", { staticClass: "row g-2 mb-3" }, [
           _c("div", { staticClass: "col-6" }, [
             _c(
               "button",
               {
-                staticClass: "btn btn-primary w-100 py-2 figma-btn-standard",
+                staticClass:
+                  "btn btn-figma-filter w-100 d-flex align-items-center justify-content-center gap-2 pos-side-btn",
                 attrs: { disabled: _vm.cart.length === 0 },
                 on: { click: _vm.showDiscountModal },
               },
@@ -3240,7 +3242,8 @@ var render = function () {
             _c(
               "button",
               {
-                staticClass: "btn btn-primary w-100 py-2 figma-btn-standard",
+                staticClass:
+                  "btn btn-figma-filter w-100 d-flex align-items-center justify-content-center gap-2 pos-side-btn",
                 attrs: { disabled: _vm.cart.length === 0 },
                 on: { click: _vm.showAdditionalChargeModal },
               },
@@ -3255,120 +3258,125 @@ var render = function () {
           ]),
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "card mb-4 customer-details-card" }, [
-          _c("div", { staticClass: "card-header py-3" }, [
-            _c("h4", { staticClass: "mb-0" }, [
-              _vm._v(_vm._s(_vm.__("customer_details"))),
+        _c(
+          "div",
+          { staticClass: "card mb-3 customer-details-card pos-panel" },
+          [
+            _c("div", { staticClass: "card-header" }, [
+              _c("h4", { staticClass: "mb-0 pos-panel-title" }, [
+                _vm._v(_vm._s(_vm.__("customer_details"))),
+              ]),
             ]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card-body p-4" }, [
-            _c("div", { staticClass: "row g-3 align-items-stretch mt-1" }, [
-              _c("div", { staticClass: "col-sm-8 col-12" }, [
-                _c("div", { staticClass: "search-select" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.customerSearchTerm,
-                        expression: "customerSearchTerm",
-                      },
-                    ],
-                    staticClass: "form-control py-2 h-100",
-                    attrs: {
-                      type: "text",
-                      placeholder: _vm.__("search_customer"),
-                    },
-                    domProps: { value: _vm.customerSearchTerm },
-                    on: {
-                      input: [
-                        function ($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.customerSearchTerm = $event.target.value
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("div", { staticClass: "row g-2 align-items-stretch" }, [
+                _c("div", { staticClass: "col-sm-8 col-12" }, [
+                  _c("div", { staticClass: "search-select" }, [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.customerSearchTerm,
+                          expression: "customerSearchTerm",
                         },
-                        _vm.searchCustomers,
                       ],
-                    },
-                  }),
-                  _vm._v(" "),
-                  _vm.showCustomerResults && _vm.filteredUsers.length > 0
-                    ? _c(
-                        "div",
-                        { staticClass: "search-results shadow-lg" },
-                        [
-                          _c(
-                            "div",
-                            {
-                              staticClass: "search-option",
-                              on: {
-                                click: function ($event) {
-                                  return _vm.selectCashSale()
-                                },
-                              },
-                            },
-                            [
-                              _c("i", {
-                                staticClass: "fas fa-money-bill-wave me-2",
-                              }),
-                              _vm._v(
-                                _vm._s(_vm.__("cash_sale")) +
-                                  "\n                                    "
-                              ),
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _vm._l(_vm.filteredUsers, function (user) {
-                            return _c(
+                      staticClass: "form-control py-2 h-100",
+                      attrs: {
+                        type: "text",
+                        placeholder: _vm.__("search_customer"),
+                      },
+                      domProps: { value: _vm.customerSearchTerm },
+                      on: {
+                        input: [
+                          function ($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.customerSearchTerm = $event.target.value
+                          },
+                          _vm.searchCustomers,
+                        ],
+                      },
+                    }),
+                    _vm._v(" "),
+                    _vm.showCustomerResults && _vm.filteredUsers.length > 0
+                      ? _c(
+                          "div",
+                          { staticClass: "search-results shadow-lg" },
+                          [
+                            _c(
                               "div",
                               {
-                                key: user.id + "-" + user.user_type,
                                 staticClass: "search-option",
                                 on: {
                                   click: function ($event) {
-                                    return _vm.selectUser(user)
+                                    return _vm.selectCashSale()
                                   },
                                 },
                               },
                               [
-                                _c("i", { staticClass: "fas fa-user me-2" }),
+                                _c("i", {
+                                  staticClass: "fas fa-money-bill-wave me-2",
+                                }),
                                 _vm._v(
-                                  _vm._s(user.name) +
+                                  _vm._s(_vm.__("cash_sale")) +
                                     "\n                                    "
                                 ),
                               ]
-                            )
-                          }),
-                        ],
-                        2
-                      )
-                    : _vm._e(),
+                            ),
+                            _vm._v(" "),
+                            _vm._l(_vm.filteredUsers, function (user) {
+                              return _c(
+                                "div",
+                                {
+                                  key: user.id + "-" + user.user_type,
+                                  staticClass: "search-option",
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.selectUser(user)
+                                    },
+                                  },
+                                },
+                                [
+                                  _c("i", { staticClass: "fas fa-user me-2" }),
+                                  _vm._v(
+                                    _vm._s(user.name) +
+                                      "\n                                    "
+                                  ),
+                                ]
+                              )
+                            }),
+                          ],
+                          2
+                        )
+                      : _vm._e(),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-sm-4 col-12" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass:
+                        "btn btn-outline-primary w-100 h-100 pos-register-btn",
+                      on: { click: _vm.showRegisterModal },
+                    },
+                    [
+                      _vm._v(
+                        "\n                                " +
+                          _vm._s(_vm.__("register_user")) +
+                          "\n                            "
+                      ),
+                    ]
+                  ),
                 ]),
               ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-4 col-12" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary w-100 py-2 h-100",
-                    on: { click: _vm.showRegisterModal },
-                  },
-                  [
-                    _vm._v(
-                      "\n                                " +
-                        _vm._s(_vm.__("register_user")) +
-                        "\n                            "
-                    ),
-                  ]
-                ),
-              ]),
             ]),
-          ]),
-        ]),
+          ]
+        ),
         _vm._v(" "),
-        _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card pos-panel pos-cart" }, [
           _c(
             "div",
             {
@@ -3376,7 +3384,9 @@ var render = function () {
                 "card-header d-flex justify-content-between align-items-center",
             },
             [
-              _c("h4", [_vm._v(_vm._s(_vm.__("cart")))]),
+              _c("h4", { staticClass: "mb-0 pos-panel-title" }, [
+                _vm._v(_vm._s(_vm.__("cart"))),
+              ]),
               _vm._v(" "),
               _vm.cart.length > 0
                 ? _c(
@@ -3399,8 +3409,12 @@ var render = function () {
           _vm._v(" "),
           _c("div", { staticClass: "card-body" }, [
             _vm.cart.length === 0
-              ? _c("div", { staticClass: "text-center p-4" }, [
-                  _c("p", [_vm._v(_vm._s(_vm.__("cart_empty")))]),
+              ? _c("div", { staticClass: "text-center p-4 pos-empty" }, [
+                  _c("i", { staticClass: "bi bi-cart3 d-block mb-2" }),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "mb-0" }, [
+                    _vm._v(_vm._s(_vm.__("cart_empty"))),
+                  ]),
                 ])
               : _c("div", [
                   _c(
@@ -3415,8 +3429,7 @@ var render = function () {
                             _c("img", {
                               staticClass: "img-fluid rounded",
                               attrs: {
-                                src:
-                                  item.image || "/assets/img/placeholder.png",
+                                src: item.image || _vm.$placeholderImage,
                                 alt: item.name,
                               },
                             }),
@@ -3650,7 +3663,7 @@ var render = function () {
                         "div",
                         {
                           staticClass:
-                            "d-flex justify-content-between mb-2 pt-2 border-top fw-bold",
+                            "d-flex justify-content-between pt-2 border-top fw-bold pos-grand-total",
                         },
                         [
                           _c("span", [_vm._v(_vm._s(_vm.__("total")) + ":")]),
@@ -3728,7 +3741,8 @@ var render = function () {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-outline-primary flex-grow-1",
+                          staticClass:
+                            "btn btn-outline-primary flex-grow-1 pos-checkout-btn",
                           attrs: { disabled: _vm.cart.length === 0 },
                           on: { click: _vm.placeOrderAndPrint },
                         },
@@ -3745,7 +3759,8 @@ var render = function () {
                       _c(
                         "button",
                         {
-                          staticClass: "btn btn-primary flex-grow-1",
+                          staticClass:
+                            "btn btn-primary flex-grow-1 pos-checkout-btn",
                           attrs: { disabled: _vm.cart.length === 0 },
                           on: {
                             click: function ($event) {
@@ -3866,7 +3881,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-secondary",
+                  staticClass: "btn btn-outline-secondary",
                   attrs: { type: "button" },
                   on: { click: _vm.closeRegisterModal },
                 },
@@ -4298,7 +4313,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-secondary",
+                  staticClass: "btn btn-outline-secondary",
                   attrs: { type: "button", "data-bs-dismiss": "modal" },
                 },
                 [_vm._v(_vm._s(_vm.__("cancel")))]
@@ -4498,7 +4513,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-secondary",
+                  staticClass: "btn btn-outline-secondary",
                   attrs: { type: "button", "data-bs-dismiss": "modal" },
                 },
                 [_vm._v(_vm._s(_vm.__("cancel")))]
@@ -4507,7 +4522,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-danger",
+                  staticClass: "btn btn-outline-danger",
                   attrs: { type: "button" },
                   on: { click: _vm.clearDiscount },
                 },
@@ -4722,7 +4737,7 @@ var render = function () {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-outline-success w-100 mt-2",
+                    staticClass: "btn btn-outline-primary w-100 mt-2",
                     attrs: { type: "button" },
                     on: {
                       click: function ($event) {
@@ -4748,7 +4763,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-secondary",
+                  staticClass: "btn btn-outline-secondary",
                   attrs: { type: "button", "data-bs-dismiss": "modal" },
                 },
                 [_vm._v(_vm._s(_vm.__("cancel")))]
@@ -4757,7 +4772,7 @@ var render = function () {
               _c(
                 "button",
                 {
-                  staticClass: "btn btn-danger",
+                  staticClass: "btn btn-outline-danger",
                   attrs: { type: "button" },
                   on: { click: _vm.clearAdditionalCharges },
                 },

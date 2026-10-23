@@ -71,9 +71,6 @@ class PluginManager
     /** @var bool */
     private $runningInGlobalDir = false;
 
-    /** @var array<string, true> */
-    private $autoloadedPackages = [];
-
     /** @var int */
     private static $classCounter = 0;
 
@@ -137,17 +134,6 @@ class PluginManager
     }
 
     /**
-     * Gets all currently active plugin instances
-     *
-     * @internal
-     * @return array<string> Plugin package names which are currently active
-     */
-    public function getRegisteredPlugins(): array
-    {
-        return array_keys($this->registeredPlugins);
-    }
-
-    /**
      * Gets global composer or null when main composer is not fully loaded
      */
     public function getGlobalComposer(): ?PartialComposer
@@ -170,7 +156,6 @@ class PluginManager
     {
         if ($this->arePluginsDisabled($isGlobalPlugin ? 'global' : 'local')) {
             $this->io->writeError('<warning>The "'.$package->getName().'" plugin was not loaded as plugins are disabled.</warning>');
-
             return;
         }
 
@@ -248,10 +233,7 @@ class PluginManager
         $autoloadPackages = $this->collectDependencies($installedRepo, $autoloadPackages, $package);
 
         $generator = $this->composer->getAutoloadGenerator();
-        $autoloads = [];
-        if ($this->shouldAutoloadPackage($rootPackage, '')) {
-            $autoloads[] = [$rootPackage, ''];
-        }
+        $autoloads = [[$rootPackage, '']];
         foreach ($autoloadPackages as $autoloadPackage) {
             if ($autoloadPackage === $rootPackage) {
                 continue;
@@ -261,14 +243,7 @@ class PluginManager
             if ($installPath === null) {
                 continue;
             }
-            // call shouldAutoloadPackage first here to ensure the plugin package gets marked in the autoloadedPackages array
-            if ($this->shouldAutoloadPackage($autoloadPackage, $installPath) || $autoloadPackage === $package) {
-                $autoloads[] = [$autoloadPackage, $installPath];
-            }
-        }
-
-        if (\count($autoloads) === 0) {
-            throw new \LogicException('At least the plugin package should always be autoloaded for the code below to work');
+            $autoloads[] = [$autoloadPackage, $installPath];
         }
 
         $map = $generator->parseAutoloads($autoloads, $rootPackage);
@@ -326,18 +301,6 @@ class PluginManager
                 throw new \UnexpectedValueException('Plugin '.$package->getName().' could not be initialized, class not found: '.$class);
             }
         }
-    }
-
-    private function shouldAutoloadPackage(PackageInterface $package, string $path): bool
-    {
-        $key = $package->getName().':'.$package->getVersion().':'.$path;
-        if (isset($this->autoloadedPackages[$key])) {
-            return false;
-        }
-
-        $this->autoloadedPackages[$key] = true;
-
-        return true;
     }
 
     /**
@@ -743,11 +706,13 @@ class PluginManager
         // an allow-plugins config being present cannot be made.
         if ($rules === null) {
             if (!$this->io->isInteractive()) {
-                throw new \RuntimeException(
-                    'Your composer.lock was generated before the allow-plugins security feature was introduced and your composer.json does not define allow-plugins. '
-                    . 'Run "composer update --lock" locally and commit the updated composer.lock, then add an explicit allow-plugins section to composer.json. '
-                    . 'See https://getcomposer.org/allow-plugins'
-                );
+                $this->io->writeError('<warning>For additional security you should declare the allow-plugins config with a list of packages names that are allowed to run code. See https://getcomposer.org/allow-plugins</warning>');
+                $this->io->writeError('<warning>This warning will become an exception once you run composer update!</warning>');
+
+                $rules = ['{}' => true];
+
+                // if no config is defined we allow all plugins for BC
+                return true;
             }
 
             // keep going and prompt the user

@@ -1,55 +1,41 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="page-title">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('subscription_faqs') }}</h3>
-                    </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard')
-                                }}</router-link></li>
-                                <li class="breadcrumb-item active" aria-current="page">{{ __('subscription_faqs') }}
-                                </li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('subscription_faqs') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link></li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('subscription_faqs') }}</li>
+                    </ol>
+                </nav>
             </div>
             <section class="section">
                 <div class="row">
                     <div class="col-12 col-md-12 order-md-1 order-last">
-                        <div class="figma-main-section-card">
+                        <div class="card figma-main-section-card">
                             <div class="card-body p-0">
                                 <div
                                     class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
-                                    <div class="d-flex align-items-center gap-3 flex-grow-1 flex-wrap">
-                                        <div class="figma-search-container" style="min-width: 250px;">
+                                    <div class="flex-grow-1">
+                                        <div class="figma-search-container">
                                             <i class="fa fa-search text-muted"></i>
                                             <input v-model="filter" type="text" class="figma-search-input"
                                                 :placeholder="__('search')" @input="getFaqs()">
                                         </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input type="checkbox" v-model="enableDragDrop" class="form-check-input"
-                                                id="dragDropSwitch">
-                                            <label class="form-check-label text-nowrap ms-2" for="dragDropSwitch">
-                                                {{ __('enable_drag_and_drop') }}
-                                            </label>
-                                        </div>
                                     </div>
                                     <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <reorder-toggle v-model="enableDragDrop"></reorder-toggle>
+                                        <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                            @click="getFaqs()" v-b-tooltip.hover :title="__('refresh')">
+                                            <i class="fa fa-refresh"></i>
+                                            <span>{{ __('refresh') }}</span>
+                                        </button>
                                         <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                             @click="openAddModal" v-b-tooltip.hover
                                             v-if="$can('subscription_faq_create')">
                                             <i class="fa fa-plus"></i>
                                             <span>{{ __('add_subscription_faq') }}</span>
-                                        </button>
-                                        <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                            @click="getFaqs()" v-b-tooltip.hover :title="__('refresh')">
-                                            <i class="fa fa-refresh"></i>
-                                            <span>{{ __('refresh') }}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -59,13 +45,13 @@
                                     <table class="table figma-table mb-0">
                                         <thead>
                                             <tr>
-                                                <th class="text-center" style="width: 50px;">{{ __('drag') }}</th>
-                                                <th class="text-center" style="width: 80px;">{{ __('id') }}</th>
+                                                <th class="text-center faq-col-drag">{{ __('drag') }}</th>
+                                                <th class="text-center faq-col-id">{{ __('id') }}</th>
                                                 <th>{{ __('frequently_asked_questions') }}</th>
-                                                <th class="text-center" style="width: 100px;">{{ __('sort_order') }}
+                                                <th class="text-center faq-col-sm">{{ __('sort_order') }}
                                                 </th>
-                                                <th class="text-center" style="width: 100px;">{{ __('status') }}</th>
-                                                <th class="text-center" style="width: 120px;">{{ __('actions') }}</th>
+                                                <th class="text-center faq-col-sm">{{ __('status') }}</th>
+                                                <th class="text-center faq-col-actions">{{ __('actions') }}</th>
                                             </tr>
                                         </thead>
                                         <draggable v-model="faqs" tag="tbody" :disabled="!enableDragDrop"
@@ -73,12 +59,12 @@
                                             @change="updateFaqsOrder" handle=".drag-handle">
                                             <tr v-for="faq in translatedFaqs" :key="faq.id"
                                                 :class="{ 'dragging': isDragging }" class="figma-tr align-middle">
-                                                <td class="text-center drag-handle" style="cursor: move;">
+                                                <td class="text-center drag-handle">
                                                     <i class="fas fa-arrows-alt"></i>
                                                 </td>
                                                 <td class="text-center">{{ faq.id }}</td>
                                                 <td>
-                                                    <a href="javascript:void(0)" style="color:#435ebe;">{{ faq.question
+                                                    <a href="javascript:void(0)" class="faq-question">{{ faq.question
                                                     }}</a>
                                                     <div class="faq-answer">
                                                         <p class="mb-0"
@@ -91,7 +77,7 @@
                                                         <a v-if="shouldTruncate(faq.answer)"
                                                             @click="toggleFaqExpansion(faq.id)"
                                                             href="javascript:void(0)"
-                                                            style="color: #007bff; font-size: 12px; cursor: pointer;">
+                                                            class="faq-toggle">
                                                             {{ expandedFaqs[faq.id] ? __('view_less') : __('view_more')
                                                             }}
                                                         </a>
@@ -141,8 +127,11 @@
                                                 <strong>{{ __('loading') }}...</strong>
                                             </div>
                                         </template>
+                                        <template #empty="scope">
+                                            <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                        </template>
                                         <template #cell(faqs)="row">
-                                            <a href="javascript:void(0)" style="color:#435ebe;">{{ row.item.question
+                                            <a href="javascript:void(0)" class="faq-question">{{ row.item.question
                                             }}</a>
                                             <div class="faq-answer">
                                                 <p class="mb-0"
@@ -155,7 +144,7 @@
                                                 <!-- View More/Less Link -->
                                                 <a v-if="shouldTruncate(row.item.answer)"
                                                     @click="toggleFaqExpansion(row.item.id)" href="javascript:void(0)"
-                                                    style="color: #007bff; font-size: 12px; cursor: pointer;">
+                                                    class="faq-toggle">
                                                     {{ expandedFaqs[row.item.id] ? __('view_less') : __('view_more') }}
                                                 </a>
                                             </div>
@@ -188,11 +177,8 @@
                                     </b-table>
                                 </div>
 
-                                <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                    <div class="showing-results-text small">
-                                        {{ __('Showing Result') }} : <span class=\"showing-bold\">{{ pageEnd }}</span>
-                                        {{ __('of') }} <span class=\"showing-bold\">{{ totalRows }}</span>
-                                    </div>
+                                <div class="figma-table-footer flex-wrap gap-3">
+                                    <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                     <div class="d-flex align-items-center gap-3">
                                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                             align="right" class="figma-pagination mb-0" hide-goto-end-buttons
@@ -210,12 +196,12 @@
         <b-modal ref="faq-modal" :title="modalTitle" @hidden="hideModal" scrollable no-close-on-backdrop no-fade static
             size="lg" v-model="create_new">
 
-            <div slot="modal-footer">
+            <div slot="modal-footer" class="d-flex justify-content-end flex-wrap gap-2 w-100">
+                <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
                 <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isSubmitting">
                     {{ __('save') }}
                     <b-spinner v-if="isSubmitting" small label="Spinning"></b-spinner>
                 </b-button>
-                <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             </div>
 
             <!-- Loading languages -->
@@ -261,8 +247,7 @@
 
                             <!-- Question -->
                             <div class="form-group">
-                                <i class="text-danger" v-if="language.is_default">*</i>
-                                <label for="question">{{ __('query') }}</label>
+                                <label for="question">{{ __('query') }} <i class="text-danger" v-if="language.is_default">*</i></label>
 
                                 <input type="text" name="question" id="question" class="form-control"
                                     :required="language.is_default ? true : undefined"
@@ -275,8 +260,7 @@
                         <div class="form-group">
 
                             <div class="form-group">
-                                <i class="text-danger" v-if="language.is_default">*</i>
-                                <label for="answer">{{ __('answer') }}</label>
+                                <label for="answer">{{ __('answer') }} <i class="text-danger" v-if="language.is_default">*</i></label>
 
                                 <textarea class="form-control" name="answer" id="answer" rows="5"
                                     :required="language.is_default ? true : undefined"
@@ -287,18 +271,18 @@
 
                         <!-- Status & Sort only once (default language) -->
                         <div class="row align-items-end" v-if="language.is_default">
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
                                     <label for="sort_order">{{ __('sort_order') }}</label>
                                     <input type="number" class="form-control" name="sort_order" id="sort_order"
                                         v-model="form.sort_order" :placeholder="__('enter_sort_order')" min="0">
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="form-group mb-0">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <label class="mb-0">{{ __('status') }}</label>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <div>
+                                        <label class="d-block">{{ __('status') }}</label>
                                         <b-form-radio-group v-model="form.status" :options="[
                                             { text: __('deactive'), value: 0 },
                                             { text: __('active'), value: 1 }
@@ -683,8 +667,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -870,19 +854,45 @@ export default {
 
 <style scoped>
 .faq-answer {
-    margin-top: 8px;
-    color: #666;
-    font-size: 14px;
+    margin-top: 4px;
+    color: var(--ui-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* table prefix: global "#main .table tbody td a" paints links in primary */
+#main .table tbody td .faq-question {
+    display: block;
+    overflow-wrap: anywhere;
+    font-weight: 700 !important;
+    color: var(--ui-heading) !important;
+}
+
+#main .table tbody td .faq-toggle {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px !important;
+    cursor: pointer;
+    color: var(--theme-primary-600) !important;
+}
+
+.faq-col-drag { width: 50px; }
+.faq-col-id { width: 80px; }
+.faq-col-sm { width: 100px; }
+.faq-col-actions { width: 120px; }
+
+.drag-handle i {
+    color: var(--ui-text-subtle);
 }
 
 /* Drag and drop styles */
 .ghost {
     opacity: 0.5;
-    background: #c8ebfb;
+    background: var(--theme-info-100);
 }
 
 .chosen {
-    background: #e3f2fd;
+    background: var(--theme-info-50);
 }
 
 .dragging {
@@ -895,7 +905,7 @@ export default {
 }
 
 .drag-handle:hover {
-    color: #007bff;
+    color: var(--theme-primary-500);
 }
 
 .table tbody tr {
@@ -903,7 +913,7 @@ export default {
 }
 
 .table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--ui-surface-muted);
 }
 </style>
 

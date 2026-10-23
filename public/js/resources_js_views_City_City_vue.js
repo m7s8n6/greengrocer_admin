@@ -299,8 +299,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this5.isLoading = true;
@@ -407,24 +407,22 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-          _c("h3", [
-            _vm._v(
-              _vm._s(_vm.__("manage_citys_center_points_latitude_longitude"))
-            ),
-          ]),
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-          _c(
-            "nav",
-            {
-              staticClass: "breadcrumb-header float-start float-lg-end",
-              attrs: { "aria-label": "breadcrumb" },
-            },
-            [
-              _c("ol", { staticClass: "breadcrumb" }, [
+      _c("div", { staticClass: "page-title mb-3" }, [
+        _c(
+          "div",
+          {
+            staticClass:
+              "d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2",
+          },
+          [
+            _c("h3", { staticClass: "mb-0" }, [
+              _vm._v(
+                _vm._s(_vm.__("manage_citys_center_points_latitude_longitude"))
+              ),
+            ]),
+            _vm._v(" "),
+            _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
                 _c(
                   "li",
                   { staticClass: "breadcrumb-item" },
@@ -445,9 +443,9 @@ var render = function () {
                   [_vm._v(_vm._s(_vm.__("manage_cities")))]
                 ),
               ]),
-            ]
-          ),
-        ]),
+            ]),
+          ]
+        ),
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "row" }, [
@@ -468,41 +466,34 @@ var render = function () {
                         "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
                     },
                     [
-                      _c(
-                        "div",
-                        {
-                          staticClass: "figma-search-container",
-                          staticStyle: { "min-width": "250px" },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-search text-muted" }),
-                          _vm._v(" "),
-                          _c("input", {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.filter,
-                                expression: "filter",
-                              },
-                            ],
-                            staticClass: "figma-search-input",
-                            attrs: {
-                              type: "text",
-                              placeholder: _vm.__("search"),
+                      _c("div", { staticClass: "figma-search-container" }, [
+                        _c("i", { staticClass: "fa fa-search text-muted" }),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.filter,
+                              expression: "filter",
                             },
-                            domProps: { value: _vm.filter },
-                            on: {
-                              input: function ($event) {
-                                if ($event.target.composing) {
-                                  return
-                                }
-                                _vm.filter = $event.target.value
-                              },
+                          ],
+                          staticClass: "figma-search-input",
+                          attrs: {
+                            type: "text",
+                            placeholder: _vm.__("search"),
+                          },
+                          domProps: { value: _vm.filter },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.filter = $event.target.value
                             },
-                          }),
-                        ]
-                      ),
+                          },
+                        }),
+                      ]),
                     ]
                   ),
                   _vm._v(" "),
@@ -512,6 +503,32 @@ var render = function () {
                       staticClass: "d-flex gap-2 align-items-center flex-wrap",
                     },
                     [
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass:
+                            "btn btn-figma-columns d-flex align-items-center gap-2",
+                          attrs: { title: _vm.__("refresh") },
+                          on: {
+                            click: function ($event) {
+                              return _vm.getRecords()
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-refresh" }),
+                          _vm._v(" "),
+                          _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                        ]
+                      ),
+                      _vm._v(" "),
                       _vm.$can("city_create")
                         ? _c(
                             "router-link",
@@ -529,32 +546,6 @@ var render = function () {
                             ]
                           )
                         : _vm._e(),
-                      _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          directives: [
-                            {
-                              name: "b-tooltip",
-                              rawName: "v-b-tooltip.hover",
-                              modifiers: { hover: true },
-                            },
-                          ],
-                          staticClass:
-                            "btn btn-figma-filter d-flex align-items-center gap-2",
-                          attrs: { title: _vm.__("refresh") },
-                          on: {
-                            click: function ($event) {
-                              return _vm.getRecords()
-                            },
-                          },
-                        },
-                        [
-                          _c("i", { staticClass: "fa fa-refresh" }),
-                          _vm._v(" "),
-                          _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                        ]
-                      ),
                     ],
                     1
                   ),
@@ -610,7 +601,7 @@ var render = function () {
                           return [
                             _c(
                               "div",
-                              { staticClass: "text-center text-black my-2" },
+                              { staticClass: "text-center text-muted my-3" },
                               [
                                 _c("b-spinner", {
                                   staticClass: "align-middle",
@@ -625,6 +616,41 @@ var render = function () {
                           ]
                         },
                         proxy: true,
+                      },
+                      {
+                        key: "empty",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyText)),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "emptyfiltered",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass:
+                                    "fa fa-search fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyFilteredText)),
+                              ]
+                            ),
+                          ]
+                        },
                       },
                       {
                         key: "cell(actions)",
@@ -721,22 +747,15 @@ var render = function () {
               _vm._v(" "),
               _c(
                 "div",
-                { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
+                { staticClass: "figma-table-footer flex-wrap gap-3" },
                 [
-                  _c("div", { staticClass: "showing-results-text small" }, [
-                    _vm._v(
-                      "\n                                " +
-                        _vm._s(_vm.__("Showing Result")) +
-                        " : "
-                    ),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.pageEnd)),
-                    ]),
-                    _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                    _c("span", { staticClass: "showing-bold" }, [
-                      _vm._v(_vm._s(_vm.totalRows)),
-                    ]),
-                  ]),
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
+                    },
+                  }),
                   _vm._v(" "),
                   _c(
                     "div",
@@ -765,7 +784,8 @@ var render = function () {
                     ],
                     1
                   ),
-                ]
+                ],
+                1
               ),
             ]),
           ]),

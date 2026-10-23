@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="ratings-page">
         <div class="page-heading">
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+        <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
             <h3 class="modern-page-title mb-0">{{ __('product_ratings') }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -18,7 +18,7 @@
                     <div class="card-body p-0">
                         <!-- Modern Filter Action Bar -->
                         <div
-                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row p-3">
                             <div class="flex-grow-1" v-if="product_id">
                                 <div class="figma-search-container">
                                     <i class="fa fa-search text-muted"></i>
@@ -32,7 +32,7 @@
                                 </div>
 
                                 <select @change="getRecords()" v-model="product_id"
-                                    class="form-control form-select modern-select" style="min-width: 250px;">
+                                    class="form-select ratings-product-select">
                                     <option value="">{{ __('select_product') }}</option>
                                     <option v-for="product in translatedProducts" :value="product.id">
                                         {{ product.name }}
@@ -46,11 +46,18 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="table-responsive mb-0">
                         <b-table :items="ratings" :fields="fields" :current-page="currentPage" :per-page="perPage"
                             :filter="filter" :filter-included-fields="filterOn" :sort-by.sync.sync="sortBy"
                             :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                             :busy="isLoading" stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'"
                             small class="figma-order-table mb-0">
+                            <template #empty="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                            </template>
+                            <template #emptyfiltered="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                            </template>
 
                             <template #cell(rate)="row">
                                 <!-- Use the renderStarRating method to display the star rating -->
@@ -62,7 +69,7 @@
                             </template>
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-3">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -71,8 +78,8 @@
                                 {{ new Date(row.item.updated_at).toLocaleString() }}
                             </template>
                             <template #cell(images)="row">
-                                <a v-for="(image, index) in row.item.images" :key="index" @click="openLightbox(image.image_url)" style="cursor: pointer;">
-                                    <img class="images_border" :src="image.image_url" alt="Image" height="50">
+                                <a v-for="(image, index) in row.item.images" :key="index" @click="openLightbox(image.image_url)" class="rating-thumb-link">
+                                    <img class="images_border rating-thumb" :src="image.image_url" alt="Image">
                                 </a>
                             </template>
                             <template #cell(status)="row">
@@ -80,26 +87,23 @@
                                 <span class='badge bg-danger' v-if="row.item.status == 0">{{ __('deactivate') }}</span>
                             </template>
                             <template #cell(actions)="row">
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-1 rating-row-actions">
                                     <button class="figma-action-btn" @click="edit_record = row.item" v-b-tooltip.hover
                                         :title="__('edit')">
-                                        <base-icon name="edit icon" hoverName="edit Hover" width="24" height="24" />
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="figma-action-btn" @click="deleteDietary(row.index, row.item.id)"
+                                    <button class="figma-action-btn figma-delete-btn" @click="deleteDietary(row.index, row.item.id)"
                                         v-b-tooltip.hover :title="__('delete')">
-                                        <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </template>
 
                         </b-table>
-                    </div>
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('total_ratings') }} : <span class="showing-bold">{{ totalRows }}</span> , {{
-                            __('average_rating') }} :
-                            <span class="showing-bold">{{ calculateAverageRating().toFixed(2) }}</span>
                         </div>
+                    </div>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -317,8 +321,13 @@ export default {
                 params: param
             }).then((response) => {
                 this.isLoading = false;
-                this.ratings = response.data.data.rating_list;
+                const data = response.data && response.data.data;
+                this.ratings = (data && data.rating_list) || [];
                 this.totalRows = this.ratings.length
+            }).catch(() => {
+                this.isLoading = false;
+                this.ratings = [];
+                this.totalRows = 0;
             });
         },
 
@@ -343,7 +352,7 @@ export default {
 
 .ghost {
     opacity: 0.5;
-    background: #c8ebfb;
+    background: var(--theme-info-100);
 }
 
 .list-group {
@@ -362,27 +371,79 @@ export default {
     white-space: normal;
     word-break: break-word;
     max-width: 320px;
-    text-align: left;
+    text-align: start;
 }
 
 .figma-warning-text {
-    color: #EF4444;
-    font-size: 14px;
+    color: var(--theme-warn-700);
+    font-size: 13px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    background: rgba(239, 68, 68, 0.08);
-    border-radius: 8px;
-    border: 1px solid rgba(239, 68, 68, 0.15);
+    padding: 8px 12px;
+    background: var(--theme-warn-50);
+    border-radius: var(--ui-radius);
+    border: 1px solid color-mix(in srgb, var(--theme-warn-500) 30%, transparent);
 }
 
 /* Dark theme support */
 body.theme-dark .figma-warning-text {
-    background: rgba(239, 68, 68, 0.15);
-    color: #F87171;
-    border-color: rgba(239, 68, 68, 0.3);
+    background: color-mix(in srgb, var(--theme-warn-500) 15%, transparent);
+    color: var(--theme-warn-300);
+    border-color: color-mix(in srgb, var(--theme-warn-500) 30%, transparent);
+}
+
+.ratings-product-select {
+    width: 250px;
+    max-width: 100%;
+    height: 38px;
+    padding: 0 32px 0 12px;
+    line-height: 36px;
+    font-size: 13px;
+    color: var(--ui-text);
+    border-color: var(--ui-border-strong);
+    border-radius: var(--ui-radius);
+}
+
+@media (max-width: 575.98px) {
+    .ratings-product-select {
+        width: 100%;
+    }
+}
+
+.ratings-page ::v-deep .rating-thumb-link {
+    display: inline-block;
+    margin: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.ratings-page ::v-deep .rating-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+}
+
+/* !important: legacy global .figma-action-btn forces 40px with !important */
+.ratings-page ::v-deep .rating-row-actions .figma-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+@media (max-width: 575.98px) {
+    .ratings-product-select {
+        min-width: 0;
+        width: 100% !important;
+    }
+
+    .figma-warning-text {
+        width: 100%;
+    }
 }
 </style>
 <style>
@@ -394,7 +455,7 @@ body.theme-dark .figma-warning-text {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: color-mix(in srgb, var(--theme-neutral-950) 70%, transparent);
     justify-content: center;
     align-items: center;
     overflow: hidden;

@@ -1,64 +1,165 @@
 <template>
     <header class="figma-header border-bottom">
         <nav class="navbar navbar-expand-lg align-items-center py-0">
-            <div class="container-fluid px-4 py-2 d-flex justify-content-between">
+            <div class="container-fluid px-4 py-2 d-flex justify-content-between flex-nowrap">
 
                 <!-- LEFT SIDE -->
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
                     <a href="javascript:void(0)"
-                        class="burger-btn d-flex align-items-center justify-content-center text-decoration-none"
-                        style="width: 40px; height: 40px; margin: 0; padding: 0; background: none; border: none; box-shadow: none;">
-                        <base-icon name="Button" width="40" height="40" />
+                        class="burger-btn header-icon-btn d-flex align-items-center justify-content-center text-decoration-none"
+                        role="button"
+                        aria-label="Toggle sidebar">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.5 5.5H16.5M3.5 10H16.5M3.5 14.5H16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
                     </a>
 
                     <button type="button" class="header-cache-btn d-flex align-items-center justify-content-center"
-                        @click="popoverShow = true"
-                        style="width: 125px; height: 40px; gap: 8px; margin: 0;">
+                        @click="popoverShow = true">
                         <b-spinner v-if="isSystemRefreshing" small></b-spinner>
-                        <span v-else>{{ __('Clear Cache') }}</span>
+                        <template v-else>
+                            <i class="bi bi-arrow-repeat fs-6 me-1"></i>
+                            <span>{{ __('Clear Cache') }}</span>
+                        </template>
+                    </button>
+
+                    <!-- Quick search (command palette): also Ctrl+K / Cmd+K anywhere -->
+                    <button type="button" class="header-cache-btn header-search-btn d-flex align-items-center"
+                        @click="$root.$emit('open-command-palette')" :aria-label="__('search')">
+                        <i class="bi bi-search"></i>
+                        <span>{{ __('search') }}</span>
+                        <kbd class="header-search-kbd">{{ isMac ? '⌘K' : 'Ctrl K' }}</kbd>
                     </button>
                 </div>
 
                 <!-- RIGHT SIDE -->
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2 header-right">
 
                     <!-- Module Dropdown -->
-                    <div class="dropdown me-2" v-if="role === this.$roleSuperAdmin">
-                        <div class="module-selector d-flex align-items-center justify-content-between p-2"
-                            data-bs-toggle="dropdown" aria-expanded="false"
-                            style="cursor:pointer; font-size: 0.85rem;">
-                            <div class="d-flex align-items-center">
-                                <img :src="(currentModule && currentModule.image_url) || ($baseUrl + '/images/icons/module_default.svg')"
-                                    class="me-2" style="width: 20px; height: 20px; object-fit: contain;" />
-                                <span class="fw-bold text-dark fs-6 ms-1">{{ currentModuleName }}</span>
+                    <div class="dropdown header-module" v-if="role !== this.$roleSeller && role !== this.$roleDeliveryBoy">
+                        <div class="module-selector d-flex align-items-center justify-content-between"
+                            data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                            <div class="d-flex align-items-center text-truncate">
+                                <module-icon :src="(currentModule && currentModule.image_url) || ($baseUrl + '/images/icons/module_default.svg')"
+                                    class="module-icon me-2" :size="22" :alt="currentModuleName"></module-icon>
+                                <span class="module-name text-truncate">{{ currentModuleName }}</span>
                             </div>
-                            <i class="bi bi-chevron-down text-dark fw-bold ms-2" style="font-size: 0.8rem;"></i>
+                            <i class="bi bi-chevron-down module-chevron ms-2"></i>
                         </div>
-                        <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu shadow border-0 mt-2">
+                        <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu shadow border mt-2">
                             <li v-for="mod in modules" :key="mod.id">
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2"
-                                    :class="{ 'active': activeModuleId === mod.id }"
+                                    :class="{ 'active': currentModule && currentModule.id === mod.id }"
                                     href="javascript:void(0)"
                                     @click="selectModule(mod.id)">
-                                    <img :src="mod.image_url || ($baseUrl + '/images/icons/module_default.svg')"
-                                        class="me-1" style="width: 20px; height: 20px; object-fit: contain;" />
+                                    <module-icon :src="mod.image_url || ($baseUrl + '/images/icons/module_default.svg')"
+                                        class="me-1" :size="20" :alt="mod.name"></module-icon>
                                     <span class="fw-semibold">{{ mod.name }}</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Language Dropdown -->
-                    <div class="dropdown">
-                        <div class="lang-selector d-flex align-items-center justify-content-between p-2"
-                            data-bs-toggle="dropdown" aria-expanded="false"
-                            style="cursor:pointer; font-size: 0.85rem;">
-                            <img :src="currentFlag" class="rounded-circle"
-                                style="width: 24px; height: 24px; object-fit: cover;" alt="flag">
-                            <span class="fw-bold text-dark fs-6 ms-1">{{ currentLanguageName }}</span>
-                            <i class="bi bi-chevron-down text-dark fw-bold ms-1" style="font-size: 0.8rem;"></i>
-                        </div>
-                        <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu shadow border-0 mt-2">
+                    <!-- Theme -->
+                    <button class="header-icon-btn d-none d-sm-inline-flex theme-toggle-btn"
+                        :class="[themeIconSpinning ? 'theme-toggle-btn--spin' : '']"
+                        @click="toggleTheme" title="Toggle theme" type="button">
+                        <i v-if="userTheme === 'theme-dark'" class="bi bi-sun fs-5"></i>
+                        <i v-else class="bi bi-moon fs-5"></i>
+                    </button>
+
+                    <!-- Website Link (phones: moved into the avatar menu) -->
+                    <div class="d-none d-sm-flex align-items-center">
+                        <a :href="websiteUrl" target="_blank"
+                            class="header-icon-btn"
+                            title="Visit Website">
+                            <i class="bi bi-globe fs-5"></i>
+                        </a>
+                    </div>
+
+                    <!-- Auto-assign delivery boy feature disabled - active order offers button:
+                    <div v-if="role == this.$roleDeliveryBoy && liveOffers.length > 0"
+                        class="d-flex align-items-center">
+                        <a class="header-icon-btn position-relative" href="#" title="Active order offers"
+                            @click.prevent="offerPopupOpen = true">
+                            <i class="bi bi-bag-check fs-5"></i>
+                            <span class="header-badge-count">{{ liveOffers.length > 9 ? '9+' : liveOffers.length }}</span>
+                        </a>
+                    </div>
+                    -->
+
+                    <!-- 1. Notifications bell -->
+                    <div class="dropdown header-notification d-flex align-items-center">
+                        <a class="header-icon-btn position-relative"
+                            href="#"
+                            data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span v-if="notifications_unread_count > 0"
+                                class="header-badge-count">
+                                {{ notifications_unread_count > 9 ? '9+' : notifications_unread_count }}
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown ntf-popup mt-2 p-0"
+                            aria-labelledby="dropdownMenuButton">
+
+                            <!-- Header -->
+                            <div class="ntf-head">
+                                <div class="d-flex align-items-center gap-2 min-w-0">
+                                    <span class="ntf-head-title">{{ __('notifications') }}</span>
+                                    <span v-if="notifications_unread_count > 0" class="ntf-new-pill">
+                                        {{ notifications_unread_count > 99 ? '99+' : notifications_unread_count }} {{ __('new') === 'new' ? 'new' : __('new') }}
+                                    </span>
+                                </div>
+                                <button v-if="notifications_unread_count > 0" type="button" class="ntf-read-all" @click.stop="confirmMarkAllAsRead">
+                                    <i class="bi bi-check2-all"></i>
+                                    <span>{{ __('read_all_notifications') }}</span>
+                                </button>
+                            </div>
+
+                            <!-- List -->
+                            <div class="ntf-list">
+                                <li v-for="notification of notifications.slice(0, 4)" :key="notification.id"
+                                    class="ntf-item" :class="{ 'is-unread': notification.read_at == null }"
+                                    @click="handleNotificationClick(notification)">
+                                    <span class="ntf-icon" :class="'ntf-tone-' + parseNotification(notification).tone">
+                                        <i :class="parseNotification(notification).icon"></i>
+                                    </span>
+                                    <div class="ntf-content">
+                                        <div class="ntf-title">{{ parseNotification(notification).title }}</div>
+                                        <p class="ntf-body">{{ parseNotification(notification).body }}</p>
+                                        <div class="ntf-time"><i class="bi bi-clock"></i>{{ changeDateTime(notification.created_at) }}</div>
+                                    </div>
+                                    <span v-if="notification.read_at == null" class="ntf-dot" aria-hidden="true"></span>
+                                </li>
+                                <li v-if="notifications.length == 0" class="ntf-empty">
+                                    <span class="ntf-empty-icon"><i class="bi bi-bell-slash"></i></span>
+                                    <span>{{ __('no_new_notification') }}</span>
+                                </li>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="ntf-foot">
+                                <a href="javascript:void(0)" class="ntf-see-all"
+                                    @click="$router.push(isSellerRoute ? '/seller/notification_panel' : (isDeliveryBoyRoute ? '/delivery_boy/notification_panel' : '/notification_panel'))">
+                                    <span>{{ __('see_all_notifications') === 'see_all_notifications' ? 'See all notifications' : __('see_all_notifications') }}</span>
+                                    <i class="bi bi-arrow-right ntf-arrow"></i>
+                                </a>
+                            </div>
+                        </ul>
+                    </div>
+
+                    <!-- Language (phones: moved into the avatar menu) -->
+                    <div class="dropdown d-none d-sm-block header-lang">
+                        <a class="header-icon-btn" href="#" data-bs-toggle="dropdown" aria-expanded="false"
+                            :title="currentLanguageName" :aria-label="currentLanguageName">
+                            <!-- translate glyph (line style, matches the other header icons) -->
+                            <svg class="header-lang-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" />
+                                <path d="m22 22-5-10-5 10" /><path d="M14 18h6" />
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu shadow border mt-2">
                             <li v-for="language in languages" :key="language.code">
                                 <a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                     :class="{ 'active': lang === language.code }"
@@ -66,129 +167,25 @@
                                     @click="selectLanguage(language.code)">
                                     <img :src="getFlagByCode(language.code)" class="rounded-circle"
                                         style="width: 18px; height: 18px; object-fit: cover;" alt="flag">
-                                    <span class="fw-semibold">{{ language.name.substring(0, 3) }}</span>
+                                    <span class="fw-semibold flex-grow-1">{{ language.name }}</span>
+                                    <i v-if="lang === language.code" class="bi bi-check2 text-primary"></i>
                                 </a>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Theme -->
-                    <button class="btn p-0 border-0 d-flex align-items-center justify-content-center"
-                        :class="userTheme === 'theme-dark' ? 'text-white' : 'text-dark'" @click="toggleTheme"
-                        style="width: 40px; height: 40px;">
-                        <svg v-if="userTheme === 'theme-dark'" width="28" height="28" viewBox="8 8 36 36" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="26" cy="26" r="9" fill="currentColor" />
-                            <path
-                                d="M26 13V9M26 43V39M13 26H9M43 26H39M16.8076 16.8076L13.9792 13.9792M38.0208 38.0208L35.1924 35.1924M16.8076 35.1924L13.9792 38.0208M38.0208 13.9792L35.1924 16.8076"
-                                stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                        </svg>
-                        <base-icon v-else name="Theme Switch" width="24" height="24" style="transform: scale(2.2); flex: none;" useCurrentColor />
-                    </button>
-
-                    <!-- Website Link -->
-                    <div class="d-flex align-items-center">
-                        <a :href="websiteUrl" target="_blank"
-                            class="btn p-0 border-0 d-flex align-items-center justify-content-center"
-                            :class="userTheme === 'theme-dark' ? 'text-white' : 'text-dark'"
-                            style="width: 40px; height: 40px;">
-                            <base-icon name="Website" width="24" height="24" style="transform: scale(2.2); flex: none;" useCurrentColor />
-                        </a>
-                    </div>
-
-                    <!-- 1. Notifications bell -->
-                    <li class="nav-item dropdown d-flex align-items-center">
-                        <a class="nav-link p-1 position-relative d-flex align-items-center justify-content-center"
-                            :class="userTheme === 'theme-dark' ? 'text-white' : 'text-dark'" href="#"
-                            data-bs-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px;">
-                            <base-icon name="Bell" width="24" height="24" useCurrentColor />
-                            <span v-if="notifications_unread_count > 0"
-                                class="position-absolute translate-middle badge rounded-circle bg-danger p-0 d-flex align-items-center justify-content-center"
-                                style="font-size: 0.65rem; min-width: 16px; height: 16px; top: 10px; left: 30px; border: 1.5px solid #fff;">
-                                {{ notifications_unread_count }}
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown shadow border-0 mt-2 p-0"
-                            aria-labelledby="dropdownMenuButton" style="width: 400px; max-width: 400px; overflow: hidden; border-radius: 0;">
-                            
-                            <!-- Header -->
-                            <div class="dropdown-header d-flex justify-content-between align-items-center px-4 py-3 border-bottom" style="background: #ffffff; border-radius: 0;">
-                                <span class="fw-bold text-dark fs-6">{{ __('notifications') }}</span>
-                                <button v-if="notifications_unread_count > 0" class="btn btn-sm btn-link text-primary p-0 font-medium text-decoration-none shadow-none" @click.stop="confirmMarkAllAsRead" style="font-size: 0.8rem;">
-                                    <i class="bi bi-check-all me-1"></i>{{ __('read_all_notifications') }}
-                                </button>
-                            </div>
-
-                            <!-- List -->
-                            <div class="notification-list-scroll" style="max-height: 464px; overflow-y: auto;">
-                                <li class="notification-item-custom"
-                                    v-for="notification of notifications.slice(0, 4)" :key="notification.id"
-                                    @click="handleNotificationClick(notification)">
-                                    
-                                    <div class="d-flex align-items-start w-100" style="gap: 16px;">
-                                        <!-- Icon -->
-                                        <base-icon name="notification" width="40" height="40" style="flex-shrink: 0;" />
-                                        
-                                        <!-- Content Column -->
-                                        <div class="d-flex flex-column flex-grow-1" style="min-width: 0; gap: 4px;">
-                                            <!-- Top: Title and Time -->
-                                            <div class="d-flex justify-content-between align-items-center w-100">
-                                                <span class="text-truncate notification-title-custom">
-                                                    {{ parseNotification(notification).title }}
-                                                </span>
-                                                <span class="notification-time-custom ms-2">
-                                                    {{ changeDateTime(notification.created_at) }}
-                                                </span>
-                                            </div>
-                                            <!-- Bottom: Body Text -->
-                                            <p class="notification-body-custom">
-                                                {{ parseNotification(notification).body }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="p-4 text-center text-muted" v-if="notifications.length == 0">
-                                    {{ __('no_new_notification') }}
-                                </li>
-                            </div>
-
-                            <!-- Footer See All -->
-                            <div class="notification-footer p-0">
-                                <a v-if="isSellerRoute" href="javascript:void(0)" @click="$router.push('/seller/notification_panel')"
-                                    class="see-all-btn-custom">
-                                    <span>{{ __('see_all_notifications') === 'see_all_notifications' ? 'See All Notifications' : __('see_all_notifications') }}</span>
-                                    <base-icon name="ArrowRight" width="16" height="16" />
-                                </a>
-                                <a v-else-if="isDeliveryBoyRoute" href="javascript:void(0)" @click="$router.push('/delivery_boy/notification_panel')"
-                                    class="see-all-btn-custom">
-                                    <span>{{ __('see_all_notifications') === 'see_all_notifications' ? 'See All Notifications' : __('see_all_notifications') }}</span>
-                                    <base-icon name="ArrowRight" width="16" height="16" />
-                                </a>
-                                <a v-else href="javascript:void(0)" @click="$router.push('/notification_panel')"
-                                    class="see-all-btn-custom">
-                                    <span>{{ __('see_all_notifications') === 'see_all_notifications' ? 'See All Notifications' : __('see_all_notifications') }}</span>
-                                    <base-icon name="ArrowRight" width="16" height="16" />
-                                </a>
-                            </div>
-                        </ul>
-                    </li>
-
-                    <div class="vr mx-2 bg-secondary" style="width: 1px; height: 32px; opacity: 0.25;"></div>
+                    <div class="header-divider d-none d-sm-block"></div>
 
                     <!-- USER -->
-                    <div class="dropdown">
+                    <div class="dropdown header-user">
                         <a href="#" data-bs-toggle="dropdown" aria-expanded="false"
-                            class="d-flex align-items-center gap-2 text-decoration-none">
-                            <img :src="profile_url" class="rounded-circle shadow-sm" width="40" height="40"
-                                style="object-fit: cover;">
-                            <div class="d-none d-sm-flex flex-column text-start align-items-start"
-                                style="line-height: 1.1;">
-                                <div class="fw-bold text-dark fs-6">{{ user.username }}</div>
-                                <span class="text-muted text-uppercase fw-bold figma-user-role-text"
-                                    style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ role
-                                    }}</span>
+                            class="user-dropdown-toggle d-flex align-items-center text-decoration-none">
+                            <img :src="profile_url" class="user-avatar" width="36" height="36" alt="avatar">
+                            <div class="d-none d-sm-flex flex-column text-start align-items-start user-meta">
+                                <div class="user-username">{{ user.username }}</div>
+                                <span class="figma-user-role-text user-role">{{ role }}</span>
                             </div>
-                            <i class="bi bi-chevron-down text-dark fw-bold ms-1" style="font-size: 0.8rem;"></i>
+                            <i class="bi bi-chevron-down user-chevron ms-1"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu"
                             aria-labelledby="dropdownMenuButton">
@@ -222,17 +219,17 @@
                             <!-- Seller Status Toggle -->
                             <li v-if="role == this.$roleSeller">
                                 <div class="dropdown-item">
-                                    <div class="form-check form-switch fs-6">
-                                        <input class="form-check-input me-0" type="checkbox" id="status"
-                                            style="cursor: pointer" :true-value="1" :false-value="3"
-                                            v-model="sellerStatus" :disabled="sellerStatusLoading"
-                                            @change="toggleSellerStatus">
-                                        <label v-if="sellerStatus === 1" class="badge bg-success ms-2">
-                                            {{ __('active') }}
-                                        </label>
-                                        <label v-else class="badge bg-danger ms-2">
-                                            {{ __('deactive') }}
-                                        </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check form-switch fs-6 mb-0">
+                                            <input class="form-check-input me-0" type="checkbox" id="status"
+                                                style="cursor: pointer" :true-value="1" :false-value="3"
+                                                v-model="sellerStatus" :disabled="sellerStatusLoading"
+                                                @change="toggleSellerStatus">
+                                        </div>
+                                        <span class="status-pill flex-fill" :class="sellerStatus === 1 ? 'status-pill-soft' : 'status-pill-muted'">
+                                            <i class="bi bi-person-fill"></i>
+                                            {{ sellerStatus === 1 ? __('active') : __('deactive') }}
+                                        </span>
                                     </div>
                                 </div>
                             </li>
@@ -241,22 +238,63 @@
                             <!-- Delivery Boy Status Toggle -->
                             <li v-if="role == this.$roleDeliveryBoy">
                                 <div class="dropdown-item">
-                                    <div class="form-check form-switch fs-6">
-                                        <input class="form-check-input me-0" type="checkbox" id="status"
-                                            style="cursor: pointer" :true-value="1" :false-value="3"
-                                            v-model="deliveryBoyStatus" :disabled="deliveryBoyStatusLoading"
-                                            @change="toggleDeliveryBoyStatus">
-                                        <label v-if="deliveryBoyStatus === 1" class="badge bg-success ms-2">
-                                            {{ __('active') }}
-                                        </label>
-                                        <label v-else class="badge bg-danger ms-2">
-                                            {{ __('deactive') }}
-                                        </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check form-switch fs-6 mb-0">
+                                            <input class="form-check-input me-0" type="checkbox" id="status"
+                                                style="cursor: pointer" :true-value="1" :false-value="3"
+                                                v-model="deliveryBoyStatus" :disabled="deliveryBoyStatusLoading"
+                                                @change="toggleDeliveryBoyStatus">
+                                        </div>
+                                        <span class="status-pill flex-fill" :class="deliveryBoyStatus === 1 ? 'status-pill-soft' : 'status-pill-muted'">
+                                            <i class="bi bi-person-fill"></i>
+                                            {{ deliveryBoyStatus === 1 ? __('active') : __('deactive') }}
+                                        </span>
                                     </div>
                                 </div>
                             </li>
                             <!-- Delivery Boy Status Toggle end -->
 
+                            <!-- Auto-assign delivery boy feature disabled - On Duty toggle:
+                            <li v-if="role == this.$roleDeliveryBoy">
+                                <div class="dropdown-item">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="form-check form-switch fs-6 mb-0">
+                                            <input class="form-check-input me-0" type="checkbox" id="on-duty-toggle"
+                                                style="cursor: pointer" v-model="onDuty" :disabled="onDutyLoading"
+                                                @change="toggleOnDuty">
+                                        </div>
+                                        <span class="status-pill flex-fill" :class="onDuty ? 'status-pill-soft' : 'status-pill-muted'">
+                                            <i class="bi bi-briefcase-fill"></i>
+                                            {{ onDuty ? 'On Duty' : 'Off Duty' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            On Duty toggle end -->
+
+                            <!-- Phones only: the header has no room for these three, so they live here -->
+                            <li class="d-sm-none">
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li class="d-sm-none">
+                                <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)" @click="toggleTheme($event)">
+                                    <i class="icon-mid bi me-2" :class="userTheme === 'theme-dark' ? 'bi-sun' : 'bi-moon'"></i>{{ userTheme === 'theme-dark' ? 'Light' : 'Dark' }}
+                                </a>
+                            </li>
+                            <li class="d-sm-none" v-if="websiteUrl">
+                                <a class="dropdown-item d-flex align-items-center" :href="websiteUrl" target="_blank">
+                                    <i class="icon-mid bi bi-globe me-2"></i>{{ __('website') }}
+                                </a>
+                            </li>
+                            <li class="d-sm-none" v-for="language in languages" :key="'m-' + language.code">
+                                <a class="dropdown-item d-flex align-items-center gap-2"
+                                    :class="{ 'active': lang === language.code }"
+                                    href="javascript:void(0)" @click="selectLanguage(language.code)">
+                                    <img :src="getFlagByCode(language.code)" class="rounded-circle"
+                                        style="width: 18px; height: 18px; object-fit: cover;" alt="flag">
+                                    <span class="fw-semibold">{{ language.name }}</span>
+                                </a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -290,6 +328,48 @@
                 </b-button>
             </div>
         </b-modal>
+
+        <!-- Auto-assign delivery boy feature disabled - incoming order-offer popup (every open offer
+             is shown at once, closes itself when none is left):
+        <b-modal id="order-offer-modal" :title="'New Order Offers (' + liveOffers.length + ')'"
+            :visible="offerPopupOpen && liveOffers.length > 0" @hidden="offerPopupOpen = false"
+            hide-footer centered scrollable>
+            <div v-for="offer in liveOffers" :key="offer.attempt_id" class="border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h5 class="mb-0">Order #{{ offer.order_id }}</h5>
+                        <p class="text-muted small mb-0" v-if="offer.area || offer.city">
+                            {{ offer.area }}<span v-if="offer.area && offer.city">, </span>{{ offer.city }}
+                        </p>
+                    </div>
+                    <span class="badge bg-warning text-dark">{{ offerSecondsLeft(offer) }}s left</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Items</span>
+                    <strong>{{ offer.item_count }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted">Order Value</span>
+                    <strong>{{ $currency }}{{ offer.final_total }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-3" v-if="offer.distance_km">
+                    <span class="text-muted">Distance</span>
+                    <strong>{{ Number(offer.distance_km).toFixed(1) }} km</strong>
+                </div>
+                <div class="d-flex gap-2">
+                    <b-button variant="outline-danger" class="flex-fill" :disabled="offerRespondingId !== null"
+                        @click="respondToOffer(offer, 'reject')">
+                        Reject
+                    </b-button>
+                    <b-button variant="success" class="flex-fill" :disabled="offerRespondingId !== null"
+                        @click="respondToOffer(offer, 'accept')">
+                        Accept
+                        <b-spinner v-if="offerRespondingId === offer.order_id" small></b-spinner>
+                    </b-button>
+                </div>
+            </div>
+        </b-modal> -->
+        <command-palette></command-palette>
     </header>
 </template>
 
@@ -317,14 +397,34 @@ export default {
             notifications: [],
 
             userTheme: "theme-light",
+            themeIconSpinning: false,
             isToggle: false,
 
             //seller status
             sellerStatus: null,
             sellerStatusLoading: false,
-            deliveryBoyStatus: null,
+            // Start from what the login response (or last stored user) says about this driver, so the
+            // switches are right straight after login; getDeliveryBoyStatus() then refreshes them.
+            deliveryBoyStatus: Auth.user && (Auth.user.delivery_boy || Auth.user.deliveryBoy)
+                ? Number((Auth.user.delivery_boy || Auth.user.deliveryBoy).status)
+                : null,
             deliveryBoyStatusLoading: false,
             remark: '',
+
+            // // On Duty (auto-assign delivery boy, plan §1) - distinct from deliveryBoyStatus
+            // // above, which is the account approval status, not live availability.
+            // onDuty: !!(Auth.user && (Auth.user.delivery_boy || Auth.user.deliveryBoy)
+                // && (Auth.user.delivery_boy || Auth.user.deliveryBoy).is_online),
+            // onDutyLoading: false,
+            // onDutyWatchId: null,
+            // onDutyLastSentAt: 0,
+            // offerPollInterval: null,
+            // offerQueue: [],
+            // offerPopupOpen: false,
+            // offerSeenIds: [],
+            // offerNow: Date.now(),
+            // offerTickInterval: null,
+            // offerRespondingId: null,
 
             popoverShow: false,
             isSystemRefreshing: false,
@@ -338,6 +438,14 @@ export default {
         };
     },
     computed: {
+        // // Offers still inside their time limit. Shrinks by itself as offers run out, which is
+        // // also what closes the popup at 0s.
+        // liveOffers() {
+            // return this.offerQueue.filter((o) => this.offerSecondsLeft(o) > 0);
+        // },
+        isMac() {
+            return /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
+        },
         isSellerRoute() {
             // Use this.$route to access the current route
             return this.$route.path.startsWith('/seller/') || this.$route.path === '/seller';
@@ -404,11 +512,17 @@ export default {
             return lang ? lang.name.substring(0, 3) : (this.lang || 'en').substring(0, 3);
         },
         currentModule() {
-            const activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
-            return this.modules.find(m => m.id === activeModuleId) || null;
+            const stored = localStorage.getItem('active_module_id');
+            if (stored) {
+                const found = this.modules.find(m => m.id === Number(stored));
+                if (found) return found;
+            }
+            // No module picked yet in this browser - show whichever module is flagged
+            // default on the server instead of assuming id 1 (Grocery).
+            return this.modules.find(m => m.is_default) || this.modules[0] || null;
         },
         currentModuleName() {
-            return this.currentModule ? this.currentModule.name : 'Grocery';
+            return this.currentModule ? this.currentModule.name : '';
         },
     },
     beforeDestroy() {
@@ -416,6 +530,8 @@ export default {
         window.removeEventListener('DOMContentLoaded', this.onResize);
         this.$eventBus.$off('modulesUpdated');
         this.$eventBus.$off('languagesUpdated');
+        // this.stopOnDutyLocationWatch();
+        // this.stopOfferPolling();
     },
     mounted: function () {
         // Fetch initial seller status if the user is a seller
@@ -423,8 +539,9 @@ export default {
             this.getSellerStatus();
 
         // Fetch initial delivery boy status if the user is a delivery boy
-        if (this.role === this.$roleDeliveryBoy)
+        if (this.role === this.$roleDeliveryBoy) {
             this.getDeliveryBoyStatus();
+        }
 
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
@@ -439,12 +556,12 @@ export default {
         }, 40000); // 40 seconds
 
         this.getLanguage();
-        if (this.role === this.$roleSuperAdmin) {
+        if (this.role !== this.$roleSeller && this.role !== this.$roleDeliveryBoy) {
             this.getModules();
         }
 
         this.$eventBus.$on('modulesUpdated', () => {
-            if (this.role === this.$roleSuperAdmin) {
+            if (this.role !== this.$roleSeller && this.role !== this.$roleDeliveryBoy) {
                 this.getModules();
             }
         });
@@ -486,18 +603,181 @@ export default {
 
         //delivery boy status toggle
         getDeliveryBoyStatus() {
-            axios.post(this.$apiUrl + '/delivery_boy/get_delivery_boy_status', {
-                id: this.user.delivery_boy.id
-            })
+            // The stored user may carry the driver under `delivery_boy` or `deliveryBoy`, or not yet at
+            // all right after login; the API falls back to the logged-in driver when no id is sent, so
+            // never let a missing id stop the status (Active / On Duty) from being restored.
+            const driver = (this.user && (this.user.delivery_boy || this.user.deliveryBoy)) || null;
+            axios.post(this.$apiUrl + '/delivery_boy/get_delivery_boy_status', driver && driver.id ? { id: driver.id } : {})
                 .then(response => {
                     if (response.data && response.data.data) {
                         this.deliveryBoyStatus = Number(response.data.data.status);
+                        // this.onDuty = !!response.data.data.is_online;
+                        // if (this.onDuty) {
+                            // this.startOnDutyLocationWatch();
+                            // this.startOfferPolling();
+                        // } else {
+                            // this.stopOnDutyLocationWatch();
+                            // this.stopOfferPolling();
+                        // }
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching delivery boy status:', error.response?.data || error);
                 });
         },
+
+        // // On Duty toggle (auto-assign delivery boy, plan §1) - starts/stops the browser
+        // // geolocation watch and the incoming-offer poll. Distinct from the account
+        // // active/deactive status toggle above.
+        // toggleOnDuty() {
+            // if (this.onDutyLoading) return;
+            // this.onDutyLoading = true;
+            // // v-model already flipped this.onDuty to the desired new state by the time
+            // // @change fires - mirrors toggleDeliveryBoyStatus's optimistic-update pattern.
+            // const turningOn = this.onDuty;
+            // const previousState = !turningOn;
+
+            // const submit = (latitude, longitude) => {
+                // const formData = new FormData();
+                // formData.append('is_online', turningOn ? 1 : 0);
+                // if (latitude && longitude) {
+                    // formData.append('latitude', latitude);
+                    // formData.append('longitude', longitude);
+                // }
+
+                // axios.post(this.$deliveryBoyApiUrl + '/toggle_duty', formData)
+                    // .then((response) => {
+                        // if (response.data.status === 1) {
+                            // if (turningOn) {
+                                // this.startOnDutyLocationWatch();
+                                // this.startOfferPolling();
+                            // } else {
+                                // this.stopOnDutyLocationWatch();
+                                // this.stopOfferPolling();
+                                // this.offerQueue = [];
+                            // }
+                        // } else {
+                            // this.onDuty = previousState;
+                            // this.showError(response.data.message);
+                        // }
+                    // })
+                    // .catch((error) => {
+                        // this.onDuty = previousState;
+                        // console.error('Error toggling on-duty status:', error.response?.data || error);
+                    // })
+                    // .finally(() => {
+                        // this.onDutyLoading = false;
+                    // });
+            // };
+
+            // if (turningOn && navigator.geolocation) {
+                // navigator.geolocation.getCurrentPosition(
+                    // (position) => submit(position.coords.latitude, position.coords.longitude),
+                    // () => submit(null, null),
+                    // { enableHighAccuracy: true, timeout: 8000 }
+                // );
+            // } else {
+                // submit(null, null);
+            // }
+        // },
+
+        // startOnDutyLocationWatch() {
+            // if (this.onDutyWatchId !== null || !navigator.geolocation) return;
+            // this.onDutyWatchId = navigator.geolocation.watchPosition(
+                // (position) => this.sendOnDutyLocationUpdate(position),
+                // (error) => console.error('On-duty location error:', error.message),
+                // { enableHighAccuracy: true, maximumAge: 10000 }
+            // );
+        // },
+        // stopOnDutyLocationWatch() {
+            // if (this.onDutyWatchId === null) return;
+            // navigator.geolocation.clearWatch(this.onDutyWatchId);
+            // this.onDutyWatchId = null;
+        // },
+        // sendOnDutyLocationUpdate(position) {
+            // // watchPosition can fire far more often than needed - send at most every 20s.
+            // const now = Date.now();
+            // if (now - this.onDutyLastSentAt < 20000) return;
+            // this.onDutyLastSentAt = now;
+
+            // const formData = new FormData();
+            // formData.append('latitude', position.coords.latitude);
+            // formData.append('longitude', position.coords.longitude);
+
+            // axios.post(this.$deliveryBoyApiUrl + '/update_location', formData)
+                // .catch((error) => {
+                    // console.error('Failed to send on-duty location update:', error);
+                // });
+        // },
+
+        // // Incoming-offer popup - polled, not websocket-driven (works identically on
+        // // shared hosting or a VPS, no Pusher/Reverb dependency). It reads the whole offer queue
+        // // (DeliveryBoyController::requestedOrders), so several offers can be answered one by one.
+        // startOfferPolling() {
+            // if (this.offerPollInterval !== null) return;
+            // this.pollCurrentOffer();
+            // this.offerPollInterval = setInterval(() => this.pollCurrentOffer(), 6000);
+            // // One-second clock: counts every offer down and drops it from the popup at 0s.
+            // this.offerTickInterval = setInterval(() => { this.offerNow = Date.now(); }, 1000);
+        // },
+        // stopOfferPolling() {
+            // if (this.offerPollInterval !== null) {
+                // clearInterval(this.offerPollInterval);
+                // this.offerPollInterval = null;
+            // }
+            // if (this.offerTickInterval !== null) {
+                // clearInterval(this.offerTickInterval);
+                // this.offerTickInterval = null;
+            // }
+        // },
+        // pollCurrentOffer() {
+            // if (this.offerRespondingId !== null) return;
+            // axios.get(this.$deliveryBoyApiUrl + '/requested_orders')
+                // .then((response) => {
+                    // this.offerQueue = response.data && response.data.data ? response.data.data : [];
+                    // this.offerNow = Date.now();
+
+                    // // Open the popup when a new offer arrives. If the driver closed it, it stays
+                    // // closed until the next new offer; the header button reopens it any time.
+                    // const fresh = this.offerQueue.filter((o) =>
+                        // this.offerSecondsLeft(o) > 0 && !this.offerSeenIds.includes(o.attempt_id));
+                    // if (fresh.length) {
+                        // this.offerSeenIds = this.offerSeenIds.concat(fresh.map((o) => o.attempt_id)).slice(-100);
+                        // this.offerPopupOpen = true;
+                    // }
+                // })
+                // .catch((error) => {
+                    // console.error('Error polling offers:', error.response?.data || error);
+                // });
+        // },
+        // offerSecondsLeft(offer) {
+            // if (!offer.expires_at) return 0;
+            // return Math.max(0, Math.round((new Date(offer.expires_at).getTime() - this.offerNow) / 1000));
+        // },
+        // respondToOffer(offer, action) {
+            // if (this.offerRespondingId !== null) return;
+            // this.offerRespondingId = offer.order_id;
+
+            // const formData = new FormData();
+            // formData.append('order_id', offer.order_id);
+            // formData.append('action', action);
+
+            // axios.post(this.$deliveryBoyApiUrl + '/requested_orders/respond', formData)
+                // .then((response) => {
+                    // if (response.data.status === 1 && action === 'accept') {
+                        // this.$router.push({ path: '/delivery_boy/orders' }).catch(() => {});
+                    // }
+                // })
+                // .catch((error) => {
+                    // console.error('Error responding to offer:', error.response?.data || error);
+                // })
+                // .finally(() => {
+                    // this.offerRespondingId = null;
+                    // // Drop it now, then reload so the remaining offers stay accurate.
+                    // this.offerQueue = this.offerQueue.filter((o) => o.order_id !== offer.order_id);
+                    // this.pollCurrentOffer();
+                // });
+        // },
 
         // Toggle seller status update
         toggleSellerStatus() {
@@ -551,6 +831,7 @@ export default {
                     } else {
                         console.error('API returned error:', response.data.message);
                         this.deliveryBoyStatus = previousStatus;
+                        this.showError(response.data.message);
                     }
                 })
                 .catch((error) => {
@@ -718,6 +999,16 @@ export default {
                     if (response.data && response.data.data) {
                         this.modules = response.data.data;
                         localStorage.setItem('modules', JSON.stringify(response.data.data));
+
+                        // First time in this browser - nothing picked yet, so lock in the
+                        // server's default module instead of silently sending header 1.
+                        if (!localStorage.getItem('active_module_id')) {
+                            const defaultModule = this.modules.find(m => m.is_default) || this.modules[0];
+                            if (defaultModule) {
+                                localStorage.setItem('active_module_id', defaultModule.id);
+                                window.axios.defaults.headers.common['X-Module-Id'] = defaultModule.id;
+                            }
+                        }
                     }
                 })
                 .catch(error => {
@@ -741,6 +1032,8 @@ export default {
             } else {
                 document.body.classList.remove('rtl');
             }
+            // Remembered so pages without this header (login, error pages) can apply RTL on first paint.
+            try { localStorage.setItem('is_rtl', isRtl ? '1' : '0'); } catch (e) { }
         },
         getNotifications(event) {
             axios.get(this.$apiUrl + '/get_top_notifications')
@@ -766,8 +1059,8 @@ export default {
                 showCancelButton: true,
                 confirmButtonText: __('yes_sure'),
                 cancelButtonText: __('cancel'),
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then((result) => {
                 // If user confirms, proceed to mark all as read
                 if (result.value) {
@@ -792,12 +1085,61 @@ export default {
         changeDateTime(dateTime) {
                 return moment(dateTime).fromNow();
         },
-        setTheme(theme) {
-            sessionStorage.setItem("user-theme", theme);
-            this.userTheme = theme;
-            // Only swap theme classes so RTL class is preserved (sidebar stays on correct side in RTL + dark mode).
-            document.body.classList.remove('theme-light', 'theme-dark');
-            document.body.classList.add(theme);
+        setTheme(theme, event) {
+            if (theme !== 'theme-dark' && theme !== 'theme-light') theme = this.getMediaPreference();
+            const applyThemeClass = () => {
+                sessionStorage.setItem("user-theme", theme);
+                this.userTheme = theme;
+                // Only swap theme classes so RTL class is preserved (sidebar stays on correct side in RTL + dark mode).
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add(theme);
+            };
+
+            // Circular reveal expanding from the toggle button, via the View Transitions API.
+            // Only for an actual user click (event present) - skip it on initial page
+            // load/login where setTheme() just applies the stored/OS-preferred theme.
+            // Falls back to the plain CSS color-fade (custom-egrocer.scss) otherwise.
+            if (!event || !document.startViewTransition || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+                applyThemeClass();
+                return;
+            }
+
+            const x = event ? event.clientX : window.innerWidth / 2;
+            const y = event ? event.clientY : 0;
+            const endRadius = Math.hypot(
+                Math.max(x, window.innerWidth - x),
+                Math.max(y, window.innerHeight - y)
+            );
+
+            const transition = document.startViewTransition(applyThemeClass);
+            transition.ready.then(() => {
+                document.documentElement.animate(
+                    {
+                        clipPath: [
+                            `circle(0px at ${x}px ${y}px)`,
+                            `circle(${endRadius}px at ${x}px ${y}px)`,
+                        ],
+                    },
+                    {
+                        duration: 650,
+                        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+                        pseudoElement: '::view-transition-new(root)',
+                    }
+                );
+                // Old theme gently recedes (fade + scale) instead of just sitting static
+                // underneath the reveal, giving the swap some depth.
+                document.documentElement.animate(
+                    {
+                        opacity: [1, 0],
+                        transform: ['scale(1)', 'scale(1.03)'],
+                    },
+                    {
+                        duration: 650,
+                        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+                        pseudoElement: '::view-transition-old(root)',
+                    }
+                );
+            });
         },
 
         getMediaPreference() {
@@ -813,15 +1155,21 @@ export default {
 
         getTheme() {
             let user_theme = sessionStorage.getItem("user-theme");
+            // nothing saved yet (or an old "null" value): follow the OS preference
+            if (user_theme !== 'theme-dark' && user_theme !== 'theme-light') {
+                user_theme = this.getMediaPreference();
+            }
             this.userTheme = user_theme;
             return user_theme;
         },
-        toggleTheme() {
+        toggleTheme(event) {
             const activeTheme = sessionStorage.getItem("user-theme");
+            this.themeIconSpinning = true;
+            setTimeout(() => { this.themeIconSpinning = false; }, 650);
             if (activeTheme === "theme-light" || activeTheme == "" || activeTheme == "undefined" || activeTheme == "null") {
-                this.setTheme("theme-dark");
+                this.setTheme("theme-dark", event);
             } else {
-                this.setTheme("theme-light");
+                this.setTheme("theme-light", event);
             }
         },
         onResize() {
@@ -900,31 +1248,76 @@ export default {
             const lowerText = text.toLowerCase();
 
             // Body always comes from the real server-computed text - never fabricate customer/store/total data.
-            if (type === 'return_request_new' || type === 'return_request_sent' || type === 'return_request_status' || lowerText.includes('return')) {
+            // icon + tone (theme colour family) for the popup tile
+            let icon = 'bi bi-truck';
+            let tone = 'info';
+            if (type === 'auto_assign_failed') {
+                // Checked first: its text contains "assign", which would otherwise read as "Order Assigned".
+                title = 'Manual Assignment Needed';
+                icon = 'bi bi-exclamation-triangle'; tone = 'warn';
+            } else if (type === 'return_request_new' || type === 'return_request_sent' || type === 'return_request_status' || lowerText.includes('return')) {
                 title = 'Return Request Received';
+                icon = 'bi bi-arrow-counterclockwise'; tone = 'warn';
             } else if (lowerText.includes('cancel')) {
                 title = 'Order Cancelled';
+                icon = 'bi bi-x-circle'; tone = 'error';
             } else if (lowerText.includes('receive') || lowerText.includes('place') || lowerText.includes('new order')) {
                 title = 'New Order Placed';
+                icon = 'bi bi-bag-check'; tone = 'primary';
             } else if (lowerText.includes('assign')) {
                 title = 'Order Assigned';
+                icon = 'bi bi-person-check'; tone = 'info';
             } else if (lowerText.includes('picked') || lowerText.includes('pickup')) {
                 title = 'Order Out for Pickup';
+                icon = 'bi bi-box-seam'; tone = 'info';
             } else if (lowerText.includes('deliver')) {
                 title = 'Order Delivered';
+                icon = 'bi bi-check2-circle'; tone = 'success';
             } else {
                 title = 'Order Status Update';
             }
 
             return {
                 title,
-                body
+                body,
+                icon,
+                tone
             };
         }
     }
 }
 </script>
 <style scoped>
+/* Active/On-Duty pills (delivery boy dropdown) - reuse the theme's own orange tokens
+   instead of Bootstrap's green/red so they don't clash with the orange toggle switch. */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.status-pill-soft {
+    background: var(--figma-primary-light, var(--theme-primary-50));
+    color: var(--figma-primary, var(--theme-primary-500));
+}
+.status-pill-muted {
+    background: var(--theme-neutral-100);
+    color: var(--theme-neutral-400);
+}
+/* Dark mode: the light pill backgrounds above made the label unreadable - use a translucent tint
+   with a lighter text colour so Active / Deactive / On Duty stay visible. */
+body.theme-dark .status-pill.status-pill-soft {
+    background: color-mix(in srgb, var(--theme-primary-500) 18%, transparent);
+    color: var(--theme-warn-400);
+}
+body.theme-dark .status-pill.status-pill-muted {
+    background: color-mix(in srgb, var(--theme-neutral-400) 18%, transparent);
+    color: var(--theme-neutral-300);
+}
+
 /* .navbar {
     background: transparent;
     padding: 0.75rem 1rem;
@@ -935,7 +1328,7 @@ export default {
     position: sticky;
     top: 0;
     z-index: 1020;
-    border-bottom: 1px solid #F1F5F9;
+    border-bottom: 1px solid var(--ui-border);
 } */
 .figma-header {
     background: #fff;
@@ -958,114 +1351,213 @@ export default {
 
 
 .website-link {
-    background: #F8FAFC;
+    background: var(--theme-neutral-100);
     border-radius: 6px;
     font-size: 0.8rem;
-    color: #475569;
+    color: var(--theme-neutral-600);
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
 .website-link:hover {
-    background: #E2E8F0;
-    color: #10B981;
+    background: var(--theme-neutral-200);
+    color: var(--theme-success-500);
 }
 
-/* Sidebar Toggle Button */
-.burger-btn {
-    background: #fff;
-    border: 1px solid #E2E8F0;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    padding: 8px 10px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.burger-btn:hover {
-    background: #F8FAFC;
-    transform: translateY(-1px);
-}
-
-/* Clear Cache Button - Light Green Style */
-.header-cache-btn {
-    background: color-mix(in srgb, var(--figma-primary) 12%, white) !important;
-    color: var(--figma-primary) !important;
-    border: none !important;
-    padding: 8px 16px !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    transition: all 0.2s ease !important;
-    box-shadow: none !important;
-}
-
-.header-cache-btn:hover {
-    background: color-mix(in srgb, var(--figma-primary) 20%, white) !important;
-}
-
-/* Language Selector */
-.lang-selector {
-    background: #ffffff;
-    border: 1px solid #EDEDED;
-    border-radius: 20px;
+/* Header Icon Buttons & Sidebar Toggle */
+.header-icon-btn {
+    width: 40px;
     height: 40px;
-    width: 97px;
-    transition: all 0.2s ease;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background: var(--ui-surface-muted);
+        border-color: var(--ui-border-strong);
+        color: var(--theme-primary-500);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-primary-500) 25%, transparent);
+    }
 }
 
-.lang-selector:hover {
-    background: #F8FAFC;
+.burger-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    box-shadow: none;
+
+    &:hover {
+        background: var(--ui-surface-muted);
+        border-color: var(--ui-border-strong);
+        color: var(--theme-primary-500);
+    }
 }
 
-.lang-selector select:focus {
-    outline: none !important;
+/* Clear Cache Button */
+.header-cache-btn {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius) !important;
+    background: var(--ui-surface) !important;
+    color: var(--ui-text) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: var(--ui-font) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
     box-shadow: none !important;
-    border: none !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--ui-surface-muted) !important;
+        border-color: var(--ui-border-strong) !important;
+        color: var(--theme-primary-500) !important;
+    }
 }
+
+/* Module & Language Selector */
+.module-selector,
+.lang-selector {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius) !important;
+    background: var(--ui-surface) !important;
+    color: var(--ui-text) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        background: var(--ui-surface-muted) !important;
+        border-color: var(--ui-border-strong) !important;
+    }
+
+    .module-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    .lang-flag {
+        width: 20px;
+        height: 20px;
+        object-fit: cover;
+    }
+
+    .module-name,
+    .lang-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ui-heading);
+    }
+
+    .module-chevron,
+    .lang-chevron {
+        font-size: 11px;
+        color: var(--ui-text-subtle);
+    }
+}
+
+/* Notification badge */
+.header-badge-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--theme-error-500);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ui-surface);
+}
+
+/* Divider */
+.header-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--ui-border);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+/* User dropdown toggle */
+/* user chip: styled with the other header controls in custom-egrocer.scss ("Header controls") */
 
 /* Custom Language Dropdown Menu */
 .lang-dropdown-menu {
     min-width: 110px !important;
     padding: 6px !important;
     border-radius: 12px !important;
-    border: 1px solid #EDEDED !important;
+    border: 1px solid var(--ui-border) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
 }
 .lang-dropdown-menu .dropdown-item {
     border-radius: 8px !important;
     padding: 6px 12px !important;
-    color: #475569 !important;
+    color: var(--ui-text) !important;
     font-size: 0.85rem !important;
     transition: all 0.2s ease !important;
 }
 .lang-dropdown-menu .dropdown-item:hover,
 .lang-dropdown-menu .dropdown-item.active {
-    background-color: #F1F5F9 !important;
-    color: #10B981 !important;
+    background-color: var(--ui-primary-soft) !important;
+    color: var(--theme-primary-600) !important;
 }
 body.theme-dark .lang-dropdown-menu {
-    background-color: #1b1b29 !important;
-    border-color: #2d2d44 !important;
+    background-color: var(--ui-surface) !important;
+    border-color: var(--ui-border) !important;
 }
 body.theme-dark .lang-dropdown-menu .dropdown-item {
-    color: #cbd5e1 !important;
+    color: var(--ui-text) !important;
 }
 body.theme-dark .lang-dropdown-menu .dropdown-item:hover,
 body.theme-dark .lang-dropdown-menu .dropdown-item.active {
-    background-color: #2d2d44 !important;
-    color: #34d399 !important;
-}
-
-/* Icons styling */
-.nav-link i,
-.btn i {
-    transition: color 0.2s ease;
-}
-
-.nav-link:hover i,
-.btn:hover i {
-    color: #10B981 !important;
+    background-color: var(--ui-primary-soft) !important;
+    color: var(--theme-primary-400) !important;
 }
 
 /* User Menu */
@@ -1077,7 +1569,7 @@ body.theme-dark .lang-dropdown-menu .dropdown-item.active {
 }
 
 .user-dropdown-link:hover {
-    background: #F8FAFC;
+    background: var(--theme-neutral-100);
 }
 
 .avatar-md img {
@@ -1099,17 +1591,17 @@ body.theme-dark .lang-dropdown-menu .dropdown-item.active {
     border-radius: 8px;
     padding: 0.6rem 1rem;
     font-weight: 500;
-    color: #475569;
+    color: var(--theme-neutral-600);
 }
 
 .dropdown-item:hover {
-    background-color: #F8FAFC;
-    color: #10B981;
+    background-color: var(--theme-neutral-100);
+    color: var(--theme-success-500);
 }
 
 .dropdown-header {
     font-weight: 600;
-    color: #1E293B;
+    color: var(--theme-neutral-800);
     padding: 0.5rem 1rem;
 }
 
@@ -1123,15 +1615,15 @@ body.theme-dark .lang-dropdown-menu .dropdown-item.active {
 }
 
 .text-gray-400 {
-    color: #94A3B8;
+    color: var(--theme-neutral-400);
 }
 
 .text-gray-600 {
-    color: #475569;
+    color: var(--theme-neutral-600);
 }
 
 .text-gray-800 {
-    color: #1E293B;
+    color: var(--theme-neutral-800);
 }
 
 .text-xs {
@@ -1149,6 +1641,96 @@ body.theme-dark .lang-dropdown-menu .dropdown-item.active {
     }
 }
 
+/* Phones: one row that always fits, down to 320px.
+   Kept visible: burger, module chip, notification bell, avatar. The module chip is the only
+   flexible item - it takes whatever room is left and truncates its name with an ellipsis.
+   Clear Cache, language, theme and website link leave the row (the last three move into the
+   avatar menu), so nothing can overflow or wrap and no inner scrolling is needed. */
+@media (max-width: 575.98px) {
+    .figma-header .container-fluid {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        gap: 0.4rem;
+    }
+
+    .figma-header .container-fluid>.d-flex:first-child {
+        flex-shrink: 0;
+    }
+
+    .figma-header .header-right {
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: flex-end;
+        gap: 0.25rem !important;
+    }
+
+    .header-cache-btn {
+        display: none !important;
+    }
+
+    .header-module {
+        flex: 0 1 auto;
+        min-width: 0;
+        margin-right: 0 !important;
+    }
+
+    .module-selector {
+        width: auto !important;
+        min-width: 0 !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .module-selector>.d-flex {
+        min-width: 0;
+    }
+
+    .module-selector .module-name {
+        display: block;
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 96px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.8rem !important;
+    }
+
+    /* Avatar chevron adds width for no benefit on phones. */
+    .header-right .dropdown>a>.bi-chevron-down {
+        display: none;
+    }
+
+    /* Notifications: a fixed 400px popover is wider than the phone and anchors off-screen.
+       Anchor it to the header itself (full width, small gutter) so it always opens right under
+       the header - whatever sits above it (announcement banner etc.) and wherever the bell is. */
+    /* sticky (not relative): it still anchors the popover, and relative + the sticky "top" offset
+       pushed the header down by the banner height and over the page content */
+    .figma-header {
+        position: sticky;
+    }
+
+    .header-right .nav-item.dropdown {
+        position: static;
+    }
+
+    .header-right .notification-dropdown {
+        position: absolute !important;
+        top: 100% !important;
+        left: 0.75rem !important;
+        right: 0.75rem !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        margin-top: 0 !important;
+    }
+
+    .header-right .user-dropdown-menu {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+}
+
 
 .text-wrap-custom {
     word-break: break-word !important;
@@ -1158,160 +1740,321 @@ body.theme-dark .lang-dropdown-menu .dropdown-item.active {
 </style>
 
 <style>
-/* Unscoped high-fidelity overrides for Notifications Popover */
-.notification-dropdown {
-    width: 400px !important;
-    max-width: 400px !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    overflow: hidden !important;
-}
-
-.notification-item-custom {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    min-height: 116px !important;
-    padding: 16px !important;
-    gap: 0 !important;
-    border-bottom: 1px solid #EDEDED !important;
-    background: #ffffff !important;
-    cursor: pointer !important;
-    transition: background-color 0.2s ease !important;
-    white-space: normal !important;
-    text-decoration: none !important;
-    list-style: none !important;
-    text-align: left !important;
-}
-
-.notification-item-custom:hover {
-    background-color: #F8FAFC !important;
-}
-
-.notification-title-custom {
-    font-weight: 600 !important;
-    font-size: 16px !important;
-    line-height: 1.5 !important;
-    letter-spacing: 0 !important;
-    color: var(--Colors-Shades-Neutral-N---950, #000000) !important;
-    text-align: left !important;
-}
-
-.notification-time-custom {
-    font-family: inherit !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 1.25 !important;
-    letter-spacing: 0 !important;
-    text-align: right !important;
-    color: var(--Colors-Shades-Neutral-N---800, #333333) !important;
-    flex-shrink: 0 !important;
-}
-
-.notification-body-custom {
-    font-family: inherit !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-    color: var(--Colors-Shades-Neutral-N---600, #666666) !important;
-    padding-left: 0 !important;
-    margin-top: 4px !important;
-    margin-bottom: 0 !important;
-    text-align: left !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    white-space: normal !important;
-    display: block !important;
-    width: 100% !important;
-}
-
 body.theme-dark .notification-dropdown,
 body.theme-dark .dropdown-header {
-    background-color: #1b1b29 !important;
-    border-color: #2d2d44 !important;
-}
-
-body.theme-dark .notification-item-custom {
-    background: #1b1b29 !important;
-    border-color: #2d2d44 !important;
-    text-align: left !important;
-}
-
-body.theme-dark .notification-item-custom:hover {
-    background-color: #2d2d44 !important;
-}
-
-body.theme-dark .notification-item-custom .text-dark {
-    color: #ffffff !important;
-}
-
-body.theme-dark .notification-item-custom .text-muted {
-    color: #94A3B8 !important;
-}
-
-body.theme-dark .notification-title-custom {
-    color: #ffffff !important;
-    text-align: left !important;
-}
-
-body.theme-dark .notification-time-custom {
-    color: #94A3B8 !important;
-}
-
-body.theme-dark .notification-body-custom {
-    color: #94A3B8 !important;
-    text-align: left !important;
-}
-
-.see-all-btn-custom {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 400px !important;
-    height: 40px !important;
-    padding: 8px 16px !important;
-    gap: 8px !important;
-    border-radius: 0 !important;
-    background: var(--Colors-Shades-Neutral-N---950, #000000) !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    border: none !important;
-    text-decoration: none !important;
-    transition: background-color 0.2s ease !important;
-}
-
-.see-all-btn-custom:hover {
-    background-color: #1E293B !important;
-    color: #ffffff !important;
-}
-
-body.theme-dark .see-all-btn-custom {
-    background-color: #11111d !important;
-    color: #ffffff !important;
-}
-
-body.theme-dark .see-all-btn-custom:hover {
-    background-color: #2d2d44 !important;
+    background-color: var(--theme-neutral-900) !important;
+    border-color: var(--theme-neutral-800) !important;
 }
 
 /* Module Selector Styling */
 .module-selector {
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    background: var(--theme-neutral-100);
+    border: 1px solid var(--ui-border);
     border-radius: 8px;
     height: 40px;
     min-width: 145px !important;
     transition: all 0.2s ease;
 }
 .module-selector:hover {
-    background: #e5e7eb;
+    background: var(--theme-neutral-200);
 }
 body.theme-dark .module-selector {
-    background: #232334;
-    border-color: #3b3b4f;
+    background: var(--theme-neutral-800);
+    border-color: var(--theme-neutral-700);
 }
 body.theme-dark .module-selector:hover {
-    background: #2d2d44;
+    background: var(--theme-neutral-800);
+}
+
+/* Header dropdown rows (avatar menu + language menu): hover and active use the theme's primary
+   colour instead of the template's green / Bootstrap blue. */
+html body .header-right .user-dropdown-menu .dropdown-item:hover,
+html body .header-right .user-dropdown-menu .dropdown-item:focus,
+html body .header-right .user-dropdown-menu .dropdown-item.active,
+html body .header-right .lang-dropdown-menu .dropdown-item:hover,
+html body .header-right .lang-dropdown-menu .dropdown-item.active {
+    background-color: var(--figma-primary-light, var(--theme-primary-50)) !important;
+    color: var(--figma-primary, var(--theme-primary-500)) !important;
+}
+
+html body.theme-dark .header-right .user-dropdown-menu .dropdown-item:hover,
+html body.theme-dark .header-right .user-dropdown-menu .dropdown-item:focus,
+html body.theme-dark .header-right .user-dropdown-menu .dropdown-item.active,
+html body.theme-dark .header-right .lang-dropdown-menu .dropdown-item:hover,
+html body.theme-dark .header-right .lang-dropdown-menu .dropdown-item.active {
+    background-color: color-mix(in srgb, var(--figma-primary, var(--theme-primary-500)) 18%, var(--theme-neutral-900)) !important;
+    color: var(--figma-primary, var(--theme-primary-500)) !important;
+}
+
+
+/* ==========================================================================
+   Notifications popup (ntf-*)
+   ========================================================================== */
+.notification-dropdown.ntf-popup {
+    width: 380px;
+    max-width: calc(100vw - 24px);
+    padding: 0 !important;
+    overflow: hidden;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: 14px !important;
+    background: var(--ui-surface) !important;
+    box-shadow: var(--ui-shadow-lg) !important;
+}
+
+.ntf-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--ui-border);
+}
+
+.ntf-head-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-text);
+}
+
+.ntf-new-pill {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--ui-primary-soft);
+    color: var(--theme-primary-700);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ntf-read-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--theme-primary-600);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.ntf-read-all:hover {
+    background: var(--ui-primary-soft);
+}
+
+.ntf-read-all i {
+    font-size: 15px;
+}
+
+.ntf-list {
+    max-height: min(420px, calc(100vh - 220px));
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.ntf-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px;
+    padding-inline-end: 24px;
+    border-radius: 10px;
+    list-style: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.ntf-item + .ntf-item {
+    margin-top: 2px;
+}
+
+.ntf-item:hover {
+    background: var(--ui-surface-muted);
+}
+
+.ntf-item.is-unread {
+    background: color-mix(in srgb, var(--theme-primary-500) 6%, transparent);
+}
+
+.ntf-item.is-unread:hover {
+    background: color-mix(in srgb, var(--theme-primary-500) 11%, transparent);
+}
+
+/* icon tile: tinted from its tone colour, so it follows the theme in light and dark mode */
+.ntf-icon {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 17px;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.ntf-tone-primary { color: var(--theme-primary-600); }
+.ntf-tone-info { color: var(--theme-info-600); }
+.ntf-tone-success { color: var(--theme-success-600); }
+.ntf-tone-warn { color: var(--theme-warn-600); }
+.ntf-tone-error { color: var(--theme-error-600); }
+
+.ntf-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.ntf-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ui-text);
+}
+
+.ntf-body {
+    margin: 2px 0 4px;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--ui-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.ntf-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--ui-text-muted);
+}
+
+.ntf-time i {
+    font-size: 11px;
+}
+
+.ntf-dot {
+    position: absolute;
+    top: 16px;
+    inset-inline-end: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--theme-primary-500);
+}
+
+.ntf-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 16px;
+    list-style: none;
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.ntf-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--ui-surface-muted);
+    font-size: 20px;
+}
+
+.ntf-foot {
+    border-top: 1px solid var(--ui-border);
+}
+
+.ntf-see-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 44px;
+    color: var(--theme-primary-600) !important;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.ntf-see-all:hover {
+    background: var(--ui-primary-soft);
+}
+
+.ntf-see-all .ntf-arrow {
+    transition: transform 0.15s ease;
+}
+
+.ntf-see-all:hover .ntf-arrow {
+    transform: translateX(3px);
+}
+
+.rtl .ntf-see-all .ntf-arrow {
+    transform: scaleX(-1);
+}
+
+.rtl .ntf-see-all:hover .ntf-arrow {
+    transform: scaleX(-1) translateX(3px);
+}
+
+/* dark mode: brighter tone shades, and keep the popup on the theme surface */
+body.theme-dark .notification-dropdown.ntf-popup {
+    background: var(--ui-surface) !important;
+    border-color: var(--ui-border-strong) !important;
+}
+
+/* the global dark-mode text reset forces span/i colours with !important, so the tone colours must too */
+body.theme-dark .ntf-popup .ntf-tone-primary,
+body.theme-dark .ntf-popup .ntf-tone-primary i { color: var(--theme-primary-400) !important; }
+body.theme-dark .ntf-popup .ntf-tone-info,
+body.theme-dark .ntf-popup .ntf-tone-info i { color: var(--theme-info-400) !important; }
+body.theme-dark .ntf-popup .ntf-tone-success,
+body.theme-dark .ntf-popup .ntf-tone-success i { color: var(--theme-success-400) !important; }
+body.theme-dark .ntf-popup .ntf-tone-warn,
+body.theme-dark .ntf-popup .ntf-tone-warn i { color: var(--theme-warn-400) !important; }
+body.theme-dark .ntf-popup .ntf-tone-error,
+body.theme-dark .ntf-popup .ntf-tone-error i { color: var(--theme-error-400) !important; }
+
+/* same size and spacing as light mode (dark mode resets button font size and paragraph margins elsewhere) */
+body .ntf-popup .ntf-read-all,
+body .ntf-popup .ntf-read-all span {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+body .ntf-popup .ntf-body {
+    margin: 2px 0 4px !important;
+}
+
+body .ntf-popup .ntf-time,
+body .ntf-popup .ntf-time i {
+    font-size: 11.5px !important;
+}
+
+body.theme-dark :is(.ntf-title, .ntf-head-title) {
+    color: var(--ui-text) !important;
+}
+
+body.theme-dark :is(.ntf-body, .ntf-time) {
+    color: var(--ui-text-muted) !important;
+}
+
+body.theme-dark .ntf-new-pill {
+    color: var(--theme-primary-300) !important;
+}
+
+body.theme-dark :is(.ntf-read-all, .ntf-read-all span, .ntf-see-all, .ntf-see-all span) {
+    color: var(--theme-primary-400) !important;
 }
 </style>

@@ -20,6 +20,8 @@ class PromoCode extends Model
         $image_url = '';
         if($this->image){
             $image_url = asset('storage/'.$this->image);
+        } else {
+            $image_url = \App\Helpers\CommonHelper::getPlaceholderImageUrl();
         }
         return $image_url;
     }

@@ -151,8 +151,19 @@ class CommonHelper
         self::resolveResponseLanguage();
         return Response::json([
             'status'  => 0,
-            'message' => __($messageKey),
+            'message' => self::hideInternalError($messageKey),
         ]);
+    }
+
+    // Many catch blocks pass $e->getMessage() straight to responseError(). DB/framework exceptions
+    // carry raw SQL, table names or file paths - log those server-side and send a generic message.
+    private static function hideInternalError($messageKey)
+    {
+        if (is_string($messageKey) && preg_match('/SQLSTATE|\(SQL:|Stack trace|Illuminate\\\\|\/vendor\/|\/var\/www|\/home\//i', $messageKey)) {
+            Log::error('Internal error hidden from API response: ' . $messageKey);
+            return __('something_went_wrong');
+        }
+        return __($messageKey);
     }
 
     public static function responseErrorWithData($messageKey, $data)
@@ -998,9 +1009,17 @@ class CommonHelper
         $cityIds = [];
 
         foreach ($cities as $city) {
-            $polygon = json_decode($city->boundary_points, true);
+            $boundaryPoints = json_decode($city->boundary_points, true);
+            if (!is_array($boundaryPoints) || empty($boundaryPoints)) {
+                continue;
+            }
 
-            if (is_array($polygon) && !empty($polygon) && self::isPointInPolygon($point, $polygon)) {
+            if ($city->geolocation_type == 'circle') {
+                // Circle zones store the centre as the first point and the radius in meters.
+                if (self::isPointInCircle($point, $boundaryPoints[0], $city->radius)) {
+                    $cityIds[] = $city->id;
+                }
+            } elseif (self::isPointInPolygon($point, $boundaryPoints)) {
                 $cityIds[] = $city->id;
             }
         }
@@ -1061,12 +1080,21 @@ class CommonHelper
             return false;
         }
     }
+    public static function getPlaceholderImageUrl()
+    {
+        $placeholder = Setting::get_value('placeholder_image');
+        if ($placeholder) {
+            return asset('storage/' . $placeholder);
+        }
+        return asset('images/placeholder.png');
+    }
+
     public static function getImage($image)
     {
         if ($image) {
             return asset('storage/' . $image);
         } else {
-            return '';
+            return self::getPlaceholderImageUrl();
         }
     }
     public static function getImages($product_id, $variant_id = 0)
@@ -1079,6 +1107,10 @@ class CommonHelper
 
     public static function getProductIdsSection($section, $user_id = null, $moduleId = null)
     {
+        if (is_null($section)) {
+            return '';
+        }
+
         if (is_null($moduleId)) {
             $moduleId = request()->header('X-Module-Id') ?: 1;
         }
@@ -1662,6 +1694,8 @@ class CommonHelper
 
     public static function getCartCount($user_id)
     {
+        // Only orderable items count: sold-out / out-of-stock variants stay visible in the cart
+        // list but are excluded from the count, quantities and totals.
         $moduleId = request()->header('X-Module-Id') ?: 1;
 
         $total = Cart::select(DB::raw('COUNT(carts.id) AS cart_items_count'), DB::raw('sum(carts.qty) AS cart_total_qty'))
@@ -1669,6 +1703,10 @@ class CommonHelper
             ->Join('product_variants', 'carts.product_variant_id', '=', 'product_variants.id')
             ->where('carts.save_for_later', '=', 0)
             ->where('products.module_id', $moduleId)
+            ->where('product_variants.status', ProductVariant::$statusAvailable)
+            ->where(function ($q) {
+                $q->where('products.is_unlimited_stock', 1)->orWhere('product_variants.stock', '>', 0);
+            })
             ->where('user_id', $user_id)->first();
         $total->cart_items_count = intval($total->cart_items_count);
         $total->cart_total_qty = intval($total->cart_total_qty);
@@ -1678,6 +1716,10 @@ class CommonHelper
             ->Join('product_variants', 'carts.product_variant_id', '=', 'product_variants.id')
             ->where('carts.save_for_later', '=', 0)
             ->where('products.module_id', $moduleId)
+            ->where('product_variants.status', ProductVariant::$statusAvailable)
+            ->where(function ($q) {
+                $q->where('products.is_unlimited_stock', 1)->orWhere('product_variants.stock', '>', 0);
+            })
             ->where('user_id', '=', $user_id)
             ->get();
 
@@ -1888,10 +1930,233 @@ class CommonHelper
 
     public static function findGoogleMapDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
     {
-        $origins = implode(",", [$latitudeFrom, $longitudeFrom]);
-        $destinations = implode(",", [$latitudeTo, $longitudeTo]);
-        $result = (new GoogleMaps)->findGoogleMapDistance($origins, $destinations);
-        return $result;
+        if (Setting::get_value('map_provider') === 'osm') {
+            return self::findOsmDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo);
+        }
+        // Google: the Routes API only (Distance Matrix is Legacy and can't be enabled on new projects;
+        // existing installs enable the Routes API instead).
+        $routes = self::googleComputeRoute($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, false);
+        if ($routes) {
+            $meters = (float) $routes['meters'];
+            $seconds = (float) $routes['seconds'];
+            return [
+                'http_code' => '200',
+                'body' => [
+                    'status' => 'OK',
+                    'rows' => [[
+                        'elements' => [[
+                            'status' => 'OK',
+                            'distance' => ['text' => round($meters / 1000, 1) . ' km', 'value' => (int) round($meters)],
+                            'duration' => ['text' => max(1, (int) round($seconds / 60)) . ' mins', 'value' => (int) round($seconds)],
+                        ]],
+                    ]],
+                ],
+            ];
+        }
+
+        // Same error shape the delivery-charge code already handles (http_code + body.error_message).
+        return [
+            'http_code' => '403',
+            'body' => [
+                'status' => 'REQUEST_DENIED',
+                'error_message' => self::$googleRouteError ?: 'Google Routes API is not available. Enable the Routes API for the Google key saved in settings.',
+            ],
+        ];
+    }
+
+    /** Last error text from googleComputeRoute(), so callers can show the real reason. */
+    public static $googleRouteError = '';
+
+    /**
+     * One driving route from Google's Routes API (computeRoutes). Returns
+     * ['meters' => int, 'seconds' => int, 'polyline' => encoded string|null], or null when Google
+     * gives no route (no key, API not enabled, key restricted, timeout). In that case the reason is
+     * kept in self::$googleRouteError.
+     */
+    public static function googleComputeRoute($fromLat, $fromLng, $toLat, $toLng, bool $withPolyline = false): ?array
+    {
+        $key = Setting::get_value('apiKey');
+        self::$googleRouteError = '';
+        if (empty($key)) {
+            self::$googleRouteError = 'Google API key is not configured.';
+            return null;
+        }
+
+        $body = [
+            'origin' => ['location' => ['latLng' => ['latitude' => (float) $fromLat, 'longitude' => (float) $fromLng]]],
+            'destination' => ['location' => ['latLng' => ['latitude' => (float) $toLat, 'longitude' => (float) $toLng]]],
+            'travelMode' => 'DRIVE',
+        ];
+        $fields = 'routes.distanceMeters,routes.duration' . ($withPolyline ? ',routes.polyline.encodedPolyline' : '');
+
+        try {
+            $ch = curl_init('https://routes.googleapis.com/directions/v2:computeRoutes');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => json_encode($body),
+                CURLOPT_TIMEOUT => 5,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'X-Goog-Api-Key: ' . $key,
+                    'X-Goog-FieldMask: ' . $fields,
+                ],
+            ]);
+            $response = curl_exec($ch);
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            $data = $response ? json_decode($response, true) : null;
+            $route = $data['routes'][0] ?? null;
+            if ($httpCode !== 200 || !$route || !isset($route['distanceMeters'])) {
+                self::$googleRouteError = $data['error']['message'] ?? 'Google Routes API returned no route.';
+                return null;
+            }
+
+            return [
+                'meters' => (int) $route['distanceMeters'],
+                'seconds' => (int) rtrim((string) ($route['duration'] ?? '0'), 's'), // "123s"
+                'polyline' => $route['polyline']['encodedPolyline'] ?? null,
+            ];
+        } catch (\Throwable $e) {
+            self::$googleRouteError = $e->getMessage();
+            Log::error('googleComputeRoute failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Distance for the OpenStreetMap provider (no Google key). Uses the public OSRM
+     * router for road distance and falls back to straight-line distance. The result
+     * mimics the Google Distance Matrix shape so getDeliveryCharge() stays unchanged.
+     */
+    public static function findOsmDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
+    {
+        $meters = null;
+        $seconds = null;
+
+        try {
+            $url = "https://router.project-osrm.org/route/v1/driving/{$longitudeFrom},{$latitudeFrom};{$longitudeTo},{$latitudeTo}?overview=false";
+            $json = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 5]]));
+            $route = $json ? (json_decode($json, true)['routes'][0] ?? null) : null;
+            if ($route) {
+                $meters = (float) $route['distance'];
+                $seconds = (float) $route['duration'];
+            }
+        } catch (\Throwable $e) {
+            // fall through to straight-line distance
+        }
+
+        if ($meters === null) {
+            $earth = 6371000;
+            $dLat = deg2rad($latitudeTo - $latitudeFrom);
+            $dLng = deg2rad($longitudeTo - $longitudeFrom);
+            $a = sin($dLat / 2) ** 2 + cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * sin($dLng / 2) ** 2;
+            $meters = $earth * 2 * atan2(sqrt($a), sqrt(1 - $a));
+            $seconds = $meters / (30 * 1000 / 3600); // assume 30 km/h
+        }
+
+        return [
+            'http_code' => '200',
+            'body' => [
+                'status' => 'OK',
+                'rows' => [[
+                    'elements' => [[
+                        'status' => 'OK',
+                        'distance' => ['text' => round($meters / 1000, 1) . ' km', 'value' => (int) round($meters)],
+                        'duration' => ['text' => max(1, (int) round($seconds / 60)) . ' mins', 'value' => (int) round($seconds)],
+                    ]],
+                ]],
+            ],
+        ];
+    }
+
+    /**
+     * Road route between two points for live-tracking maps. Uses the public OSRM router
+     * for the OSM provider and the Google Routes API otherwise. Result is cached ~10s keyed on
+     * rounded coordinates so polling clients don't hammer the router. On any failure it
+     * falls back to a two-point straight line with is_road_path = false.
+     *
+     * @return array{is_road_path: bool, distance: int, duration: int, coordinates: array}
+     */
+    public static function getRoutePath($fromLat, $fromLng, $toLat, $toLng)
+    {
+        $provider = Setting::get_value('map_provider') === 'osm' ? 'osm' : 'google';
+        $key = 'route_path_' . $provider . '_' . implode('_', array_map(fn($v) => round((float) $v, 4), [$fromLat, $fromLng, $toLat, $toLng]));
+
+        return \Illuminate\Support\Facades\Cache::remember($key, 10, function () use ($provider, $fromLat, $fromLng, $toLat, $toLng) {
+            $coordinates = null;
+            $meters = null;
+            $seconds = null;
+            $context = stream_context_create(['http' => ['timeout' => 5, 'header' => "User-Agent: eGrocer/1.0\r\n"]]);
+
+            try {
+                if ($provider === 'osm') {
+                    $url = "https://router.project-osrm.org/route/v1/driving/{$fromLng},{$fromLat};{$toLng},{$toLat}?overview=full&geometries=geojson";
+                    $json = @file_get_contents($url, false, $context);
+                    $route = $json ? (json_decode($json, true)['routes'][0] ?? null) : null;
+                    if ($route) {
+                        // GeoJSON is [lng, lat]; clients expect [lat, lng]
+                        $coordinates = array_map(fn($c) => [$c[1], $c[0]], $route['geometry']['coordinates']);
+                        $meters = (float) $route['distance'];
+                        $seconds = (float) $route['duration'];
+                    }
+                } else {
+                    // Google: the Routes API only (Directions is Legacy and can't be enabled on new projects).
+                    $routes = self::googleComputeRoute($fromLat, $fromLng, $toLat, $toLng, true);
+                    if ($routes && !empty($routes['polyline'])) {
+                        $coordinates = self::decodePolyline($routes['polyline']);
+                        $meters = (float) $routes['meters'];
+                        $seconds = (float) $routes['seconds'];
+                    } else {
+                        Log::warning('Google Routes API gave no route: ' . self::$googleRouteError);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('getRoutePath failed: ' . $e->getMessage());
+            }
+
+            if (empty($coordinates)) {
+                return [
+                    'is_road_path' => false,
+                    'distance' => 0,
+                    'duration' => 0,
+                    'coordinates' => [[(float) $fromLat, (float) $fromLng], [(float) $toLat, (float) $toLng]],
+                ];
+            }
+
+            return [
+                'is_road_path' => true,
+                'distance' => (int) round($meters),
+                'duration' => (int) round($seconds),
+                'coordinates' => $coordinates,
+            ];
+        });
+    }
+
+    /** Decode a Google encoded polyline into [[lat, lng], ...]. */
+    public static function decodePolyline($encoded)
+    {
+        $points = [];
+        $index = 0;
+        $lat = 0;
+        $lng = 0;
+        $length = strlen($encoded);
+        while ($index < $length) {
+            foreach (['lat', 'lng'] as $axis) {
+                $shift = 0;
+                $result = 0;
+                do {
+                    $b = ord($encoded[$index++]) - 63;
+                    $result |= ($b & 0x1f) << $shift;
+                    $shift += 5;
+                } while ($b >= 0x20);
+                $delta = ($result & 1) ? ~($result >> 1) : ($result >> 1);
+                $$axis += $delta;
+            }
+            $points[] = [$lat / 1e5, $lng / 1e5];
+        }
+        return $points;
     }
 
     public static function findGoogleMapDistanceLocal($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
@@ -2781,7 +3046,7 @@ class CommonHelper
             'host' => Setting::get_value('smtp_host'),
             'username' => Setting::get_value('smtp_from_mail'),
             'password' => Setting::get_value('smtp_email_password'),
-            'port' => Setting::get_value('smtp_port'),
+            'port' => ($port = Setting::get_value('smtp_port')) !== null && $port !== '' ? (int) $port : null,
             'encryption' => Setting::get_value('smtp_encryption_type'),
             'from'       => [
                 'address' => Setting::get_value('smtp_from_mail'),
@@ -3612,7 +3877,6 @@ class CommonHelper
         } else {
             Log::warning('[sendNotification] No tokens to send to');
         }
-        Log::info('[sendNotification] END');
     }
 
     public static function getDefaultLanguageId(): int
@@ -3737,6 +4001,17 @@ class CommonHelper
                 return;
             }
 
+            // A new order is announced once. The same order can reach here from more than one
+            // place (the payment gateway callback and the app's own confirm call, for example),
+            // sometimes within the same second. Cache::add is an atomic "first one wins" claim.
+            $newOrderClaimKey = null;
+            if ($notification_type === 'new_order') {
+                $newOrderClaimKey = 'new_order_panel_notified_' . $order->id;
+                if (!\Illuminate\Support\Facades\Cache::add($newOrderClaimKey, 1, now()->addMinutes(10))) {
+                    return;
+                }
+            }
+
             $admin_ids_to_notify = [];
 
             // 1. Always notify super admins (role_id = 1)
@@ -3806,6 +4081,10 @@ class CommonHelper
                 }
             }
         } catch (\Exception $e) {
+            // Let a later attempt for this order try again instead of staying claimed.
+            if (!empty($newOrderClaimKey)) {
+                \Illuminate\Support\Facades\Cache::forget($newOrderClaimKey);
+            }
             Log::error("Error in sendOrderNotificationsToAdmins for order #{$order->id}: " . $e->getMessage());
         }
     }
@@ -3998,7 +4277,8 @@ class CommonHelper
 
     public static function updateSellerWalletBalance($new_balance, $id)
     {
-        $seller = Seller::where("id", $id)->first();
+
+        $seller = Seller::withoutGlobalScopes()->where("id", $id)->first();
         if ($seller) {
             $seller->balance = $new_balance;
             $seller->save();
@@ -4007,7 +4287,7 @@ class CommonHelper
 
     public static function getSellerWalletBalance($id)
     {
-        $seller = Seller::find($id);
+        $seller = Seller::withoutGlobalScopes()->find($id);
         $balance = 0;
         if ($seller) {
             $balance = $seller->balance;
@@ -4015,9 +4295,32 @@ class CommonHelper
         return $balance;
     }
 
+    /**
+     * Additional charges of an order as a plain array. The Order model casts the column to an array,
+     * while query-builder rows give the raw JSON text - json_decode() on the cast array throws a
+     * TypeError, so callers use this instead.
+     */
+    public static function orderChargesArray($charges): array
+    {
+        if (is_array($charges)) {
+            return $charges;
+        }
+        if (is_string($charges) && $charges !== '') {
+            $decoded = json_decode($charges, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
+    }
+
+    /** The Map Provider chosen in Store Settings, always 'google' or 'osm' (Google when unset). */
+    public static function activeMapProvider(): string
+    {
+        return Setting::get_value('map_provider') === 'osm' ? 'osm' : 'google';
+    }
+
     public static function getSellerCommission($id)
     {
-        $seller = Seller::find($id);
+        $seller = Seller::withoutGlobalScopes()->find($id);
         $balance = 0;
         if ($seller) {
             $balance = $seller->balance;
@@ -4168,6 +4471,29 @@ class CommonHelper
 
     public static function getGuestCartCount($variant_id, $quantity)
     {
+        // Only orderable items count: sold-out / out-of-stock variants stay in the cart list
+        // but are excluded from the count, quantities and totals (same rule as getCartCount).
+        $orderableIds = ProductVariant::select('product_variants.id')
+            ->join('products', 'product_variants.product_id', '=', 'products.id')
+            ->whereIn('product_variants.id', $variant_id)
+            ->where('product_variants.status', ProductVariant::$statusAvailable)
+            ->where(function ($q) {
+                $q->where('products.is_unlimited_stock', 1)->orWhere('product_variants.stock', '>', 0);
+            })
+            ->pluck('id')
+            ->map(fn($id) => (string) $id)
+            ->all();
+
+        $orderableVariants = [];
+        $orderableQuantities = [];
+        foreach ($variant_id as $key => $id) {
+            if (in_array((string) $id, $orderableIds, true)) {
+                $orderableVariants[] = $id;
+                $orderableQuantities[] = $quantity[$key] ?? 0;
+            }
+        }
+        $variant_id = $orderableVariants;
+        $quantity = $orderableQuantities;
 
         $total['cart_items_count'] = count($variant_id);
         $total['cart_total_qty '] = count($quantity);

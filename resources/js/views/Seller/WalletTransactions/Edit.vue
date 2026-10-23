@@ -1,16 +1,16 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" scrollable no-close-on-backdrop no-fade
         static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex flex-wrap justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()"
                 :disabled="isLoading || (graterAmount === true)">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
-                <div class="form-group">
+                <div class="form-group col-12">
                     <label>{{ __('seller') }}</label>
                     <multiselect v-model="walletTransaction.seller" :options="translatedSellers" @close="checkAmount"
                         :placeholder="__('select_seller')" label="name" track-by="id" required>
@@ -28,23 +28,27 @@
                             </div>
                         </template>
                     </multiselect>
-                    <div class="border border-grey rounded p-2 mt-2" v-if="walletTransaction.seller">
-                        <div class="d-flex justify-content-between align-items-center text-left mb-1">
-                            <span>{{ __('name') }}:-</span><span> {{ walletTransaction.seller.name }}</span>
-                            <span>{{ __('mobile') }}:-</span><span> {{ walletTransaction.seller.mobile }}</span>
+                    <div class="seller-summary row g-2 mx-0 mt-2" v-if="walletTransaction.seller">
+                        <div class="col-6">
+                            <span class="d-block small text-muted">{{ __('name') }}</span><span class="font-weight-bold"> {{ walletTransaction.seller.name }}</span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center text-left mb-1">
-                            <span>{{ __('id') }}:-</span><span> {{ walletTransaction.seller.id }}</span>
-                            <span>{{ __('module') }}:-</span><span> {{ walletTransaction.seller.module ?
+                        <div class="col-6">
+                            <span class="d-block small text-muted">{{ __('mobile') }}</span><span class="font-weight-bold"> {{ walletTransaction.seller.mobile }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="d-block small text-muted">{{ __('id') }}</span><span class="font-weight-bold"> {{ walletTransaction.seller.id }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="d-block small text-muted">{{ __('module') }}</span><span class="font-weight-bold"> {{ walletTransaction.seller.module ?
                                 walletTransaction.seller.module.name
                                 : '' }}</span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center text-left">
-                            <span>{{ __('balance') }}:-</span><span> {{ walletTransaction.seller.balance }}</span>
+                        <div class="col-6">
+                            <span class="d-block small text-muted">{{ __('balance') }}</span><span class="font-weight-bold"> {{ walletTransaction.seller.balance }}</span>
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12 col-sm-6">
                     <label for="type">{{ __('type') }}</label>
                     <select name="type" id="type" v-model="walletTransaction.type" v-on:change="checkAmount" required
                         class="form-control form-select">
@@ -53,7 +57,7 @@
                         <option value="debit">{{ __('debit') }}</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12 col-sm-6">
                     <label for="amount">{{ __('amount') }}</label>
                     <input type="number" step="any" name="amount" id="amount" v-model="walletTransaction.amount"
                         v-on:keyup="checkAmount" required class="form-control" :placeholder="__('transfer_amount')"
@@ -63,13 +67,13 @@
                         }}</span>
                     <span v-if="validationErrorAmount" class="error">{{ validationErrorAmount }}</span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12 mb-0">
                     <label for="message">{{ __('message') }}</label>
                     <textarea name="message" id="message" v-model="walletTransaction.message" class="form-control"
                         rows="3" :placeholder="__('message')"></textarea>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -215,4 +219,13 @@ export default {
 
 <style scoped>
 @import "../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+
+/* Selected seller details: compact summary tile */
+.seller-summary {
+    padding: 10px 12px;
+    background: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    font-size: 13px;
+}
 </style>

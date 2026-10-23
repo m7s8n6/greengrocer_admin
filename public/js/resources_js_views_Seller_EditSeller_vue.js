@@ -805,6 +805,82 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -838,6 +914,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       currentPlace: null,
       markers: [],
       place_name: "",
+      osmSellerQuery: "",
+      osmSellerSuggestions: [],
+      osmPickupQuery: "",
+      osmPickupSuggestions: [],
       formatted_address: "",
       infoWindow: {
         position: {
@@ -852,7 +932,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       name: "",
       email: "",
       mobile: "",
-      store_url: "",
       password: "",
       showPassword: false,
       confirm_password: "",
@@ -873,6 +952,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       view_order_otp: 0,
       assign_delivery_boy: 0,
       change_order_status_delivered: 0,
+      delivery_boy_source: 'shared',
       status: 0,
       store_logo: "",
       store_logo_url: "",
@@ -979,9 +1059,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       if (!this.id) this.debouncedSave();
     },
     mobile: function mobile() {
-      if (!this.id) this.debouncedSave();
-    },
-    store_url: function store_url() {
       if (!this.id) this.debouncedSave();
     },
     store_name: function store_name() {
@@ -1152,6 +1229,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
     },
     google: vue2_google_maps__WEBPACK_IMPORTED_MODULE_5__.gmapApi,
+    mapProvider: function mapProvider() {
+      return window.mapProvider === 'osm' ? 'osm' : 'google';
+    },
     // Computed property to safely access $roleSeller
     roleSeller: function roleSeller() {
       return this.$roleSeller !== undefined ? this.$roleSeller : '';
@@ -1216,12 +1296,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var plugins = this.$editorPlugins && Array.isArray(this.$editorPlugins) ? this.$editorPlugins : ["autolink", "lists", "link", "image", "charmap", "anchor", "searchreplace", "visualblocks", "media", "table", "wordcount", "code", "codesample"];
       var toolbar = this.$editorToolbar || "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | charmap | code | removeformat";
       var fontSizes = this.$editorFont_size_formats || '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt';
-      return _objectSpread({
+      return _objectSpread(_objectSpread({
         height: 400,
         plugins: plugins,
         toolbar: toolbar,
         font_size_formats: fontSizes
-      }, this.$tinymceImageUploadOptions());
+      }, window.innerWidth < 576 ? {
+        toolbar_mode: 'wrap'
+      } : {}), this.$tinymceImageUploadOptions());
     },
     fetchActiveLanguages: function fetchActiveLanguages() {
       var _this4 = this;
@@ -1429,6 +1511,58 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     updateCoordinates: function updateCoordinates(location) {
       this.handleMapClick(location);
     },
+    onOsmLocationSelected: function onOsmLocationSelected(payload) {
+      this.latitude = payload.lat;
+      this.longitude = payload.lng;
+      var addressArr = (payload.formatted_address || '').split(",");
+      this.street = addressArr[0] + " " + (addressArr[1] || "");
+      this.place_name = payload.name || addressArr[1] || payload.formatted_address;
+      this.formatted_address = payload.formatted_address;
+    },
+    resolveMapRef: function resolveMapRef(name) {
+      var r = this.$refs[name];
+      return Array.isArray(r) ? r[0] : r;
+    },
+    onOsmSellerQueryInput: function onOsmSellerQueryInput(text) {
+      this.osmSellerQuery = text;
+      var map = this.resolveMapRef('osmSellerMap');
+      if (map) {
+        map.setQueryAndSearch(text);
+      }
+    },
+    selectOsmSellerSuggestion: function selectOsmSellerSuggestion(suggestion) {
+      this.osmSellerQuery = suggestion.placePrediction.text.text;
+      this.osmSellerSuggestions = [];
+      var map = this.resolveMapRef('osmSellerMap');
+      if (map) {
+        map.selectSuggestion(suggestion);
+      }
+    },
+    getOsmCurrentLocation: function getOsmCurrentLocation() {
+      var _this11 = this;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          var map = _this11.resolveMapRef('osmSellerMap');
+          map && map.setView(position.coords.latitude, position.coords.longitude);
+          axios__WEBPACK_IMPORTED_MODULE_2___default().post(_this11.$apiUrl + '/map/geocode', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            source: 'web'
+          }).then(function (response) {
+            var data = response.data && response.data.data ? response.data.data : response.data;
+            var result = data && data.results && data.results[0];
+            _this11.onOsmLocationSelected({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              formatted_address: result ? result.formatted_address : '',
+              name: result ? result.formatted_address : ''
+            });
+          });
+        });
+      } else {
+        this.showError("Geolocation is not supported by this browser.");
+      }
+    },
     setCityId: function setCityId() {
       this.state = this.city.state;
       this.city_id = this.city.id;
@@ -1489,7 +1623,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         name: "",
         email: "",
         mobile: "",
-        store_url: "",
         password: "",
         confirm_password: "",
         store_name: "",
@@ -1508,6 +1641,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         view_order_otp: 0,
         assign_delivery_boy: 0,
         change_order_status_delivered: 0,
+        delivery_boy_source: 'shared',
         status: 0,
         store_logo: "",
         store_logo_url: "",
@@ -1543,7 +1677,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           name: defaultTranslation ? defaultTranslation.name : this.name,
           email: this.email,
           mobile: this.mobile,
-          store_url: this.store_url,
           store_name: defaultTranslation ? defaultTranslation.store_name : this.store_name,
           street: this.street,
           pincode_id: this.pincode_id,
@@ -1562,6 +1695,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           view_order_otp: this.view_order_otp,
           assign_delivery_boy: this.assign_delivery_boy,
           change_order_status_delivered: this.change_order_status_delivered,
+          delivery_boy_source: this.delivery_boy_source,
           status: this.status,
           self_pickup_mode: this.self_pickup_mode,
           door_step_mode: this.door_step_mode,
@@ -1577,7 +1711,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       } catch (e) {}
     },
     restoreCache: function restoreCache() {
-      var _this11 = this;
+      var _this12 = this;
       try {
         var cached = localStorage.getItem('seller_form_cache');
         if (!cached) return;
@@ -1590,16 +1724,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         Object.keys(data).forEach(function (key) {
           if (key === 'timestamp' || key === 'translations') return;
           if (key === 'storeTimings' && data.storeTimings) {
-            _this11.storeTimings = data.storeTimings;
-          } else if (_this11.hasOwnProperty(key)) {
-            _this11[key] = data[key] !== undefined ? data[key] : _this11[key];
+            _this12.storeTimings = data.storeTimings;
+          } else if (_this12.hasOwnProperty(key)) {
+            _this12[key] = data[key] !== undefined ? data[key] : _this12[key];
           }
         });
         // Restore translations after languages have been initialized.
         if (data.translations && this.languages && this.languages.length > 0) {
           this.languages.forEach(function (language) {
             if (data.translations[language.id]) {
-              _this11.$set(_this11.translations, language.id, _objectSpread(_objectSpread({}, _this11.translations[language.id]), data.translations[language.id]));
+              _this12.$set(_this12.translations, language.id, _objectSpread(_objectSpread({}, _this12.translations[language.id]), data.translations[language.id]));
             }
           });
           var defaultLang = this.languages.find(function (lang) {
@@ -1644,10 +1778,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     debouncedSave: function debouncedSave() {
-      var _this12 = this;
+      var _this13 = this;
       if (this.cacheTimer) clearTimeout(this.cacheTimer);
       this.cacheTimer = setTimeout(function () {
-        return _this12.saveCache();
+        return _this13.saveCache();
       }, 500);
     },
     onInputFocus: function onInputFocus() {
@@ -1655,31 +1789,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.isUserTyping = true;
     },
     onInputBlur: function onInputBlur() {
-      var _this13 = this;
+      var _this14 = this;
       // Reset flag when user stops typing (with a small delay)
       setTimeout(function () {
-        _this13.isUserTyping = false;
+        _this14.isUserTyping = false;
       }, 1000);
     },
     getCustomFields: function getCustomFields() {
-      var _this14 = this;
+      var _this15 = this;
       axios__WEBPACK_IMPORTED_MODULE_2___default().get(this.$apiUrl + '/custom_fields/list', {
         params: {
           module: 'seller',
           active_only: 1
         }
       }).then(function (response) {
-        _this14.customFields = response.data.data || [];
-        _this14.applyCustomFieldValues();
+        _this15.customFields = response.data.data || [];
+        _this15.applyCustomFieldValues();
       })["catch"](function () {
-        _this14.customFields = [];
+        _this15.customFields = [];
       });
     },
     applyCustomFieldValues: function applyCustomFieldValues() {
-      var _this15 = this;
+      var _this16 = this;
       var values = {};
       this.customFields.forEach(function (field) {
-        var existing = _this15.customFieldExistingValues[field.id];
+        var existing = _this16.customFieldExistingValues[field.id];
         values[field.id] = field.type !== 'file' && existing !== undefined ? existing : '';
       });
       this.customFieldValues = values;
@@ -1719,36 +1853,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return true;
     },
     getSeller: function getSeller() {
-      var _this16 = this;
+      var _this17 = this;
       // Prevent multiple calls and form refilling
       if (this.isFormLoaded || this.isUserTyping) {
         return;
       }
       axios__WEBPACK_IMPORTED_MODULE_2___default().get(this.$apiUrl + '/sellers/edit/' + this.id).then(function (response) {
-        _this16.isLoading = false;
+        _this17.isLoading = false;
         var data = response.data;
         if (data.status === 1) {
-          var _this16$record$admin$, _this16$record$admin$2;
+          var _this17$record$admin$, _this17$record$admin$2;
           // Set flag to prevent refilling
-          _this16.isFormLoaded = true;
-          _this16.record = data.data;
+          _this17.isFormLoaded = true;
+          _this17.record = data.data;
 
           // Helper: show empty string when value is null, undefined, or string "null"
           var emptyIfNull = function emptyIfNull(val) {
             return val != null && val !== "null" ? val : "";
           };
-          _this16.admin_id = (_this16$record$admin$ = _this16.record.admin.id) !== null && _this16$record$admin$ !== void 0 ? _this16$record$admin$ : _this16.record.admin_id;
-          _this16.email = (_this16$record$admin$2 = _this16.record.admin.email) !== null && _this16$record$admin$2 !== void 0 ? _this16$record$admin$2 : _this16.record.email;
-          _this16.mobile = _this16.record.mobile;
-          _this16.store_url = _this16.record.store_url;
-          _this16.password = "";
-          _this16.confirm_password = "";
+          _this17.admin_id = (_this17$record$admin$ = _this17.record.admin.id) !== null && _this17$record$admin$ !== void 0 ? _this17$record$admin$ : _this17.record.admin_id;
+          _this17.email = (_this17$record$admin$2 = _this17.record.admin.email) !== null && _this17$record$admin$2 !== void 0 ? _this17$record$admin$2 : _this17.record.email;
+          _this17.mobile = _this17.record.mobile;
+          _this17.password = "";
+          _this17.confirm_password = "";
 
           // Load translations from the seller object
-          var updatedTranslations = _objectSpread({}, _this16.translations);
-          if (_this16.record.translations && Array.isArray(_this16.record.translations)) {
+          var updatedTranslations = _objectSpread({}, _this17.translations);
+          if (_this17.record.translations && Array.isArray(_this17.record.translations)) {
             // Convert array of translation objects to object keyed by language_id
-            _this16.record.translations.forEach(function (trans) {
+            _this17.record.translations.forEach(function (trans) {
               var langId = trans.language_id;
               updatedTranslations[langId] = {
                 name: emptyIfNull(trans.name),
@@ -1759,68 +1892,69 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           }
 
           // For languages without translations, use base table data for default language
-          _this16.languages.forEach(function (language) {
+          _this17.languages.forEach(function (language) {
             if (!updatedTranslations[language.id] || !updatedTranslations[language.id].name && !updatedTranslations[language.id].store_name) {
               if (language.is_default) {
                 // Default language: use base table data as fallback
                 updatedTranslations[language.id] = {
-                  name: emptyIfNull(_this16.record.name),
-                  store_name: emptyIfNull(_this16.record.store_name),
-                  store_description: emptyIfNull(_this16.record.store_description)
+                  name: emptyIfNull(_this17.record.name),
+                  store_name: emptyIfNull(_this17.record.store_name),
+                  store_description: emptyIfNull(_this17.record.store_description)
                 };
               }
             }
           });
 
           // Set default language values for backward compatibility
-          var defaultLang = _this16.languages.find(function (lang) {
+          var defaultLang = _this17.languages.find(function (lang) {
             return lang.is_default === 1;
           });
           if (defaultLang && updatedTranslations[defaultLang.id]) {
-            _this16.name = emptyIfNull(updatedTranslations[defaultLang.id].name) || emptyIfNull(_this16.record.name);
-            _this16.store_name = emptyIfNull(updatedTranslations[defaultLang.id].store_name) || emptyIfNull(_this16.record.store_name);
-            _this16.store_description = emptyIfNull(updatedTranslations[defaultLang.id].store_description) || emptyIfNull(_this16.record.store_description);
+            _this17.name = emptyIfNull(updatedTranslations[defaultLang.id].name) || emptyIfNull(_this17.record.name);
+            _this17.store_name = emptyIfNull(updatedTranslations[defaultLang.id].store_name) || emptyIfNull(_this17.record.store_name);
+            _this17.store_description = emptyIfNull(updatedTranslations[defaultLang.id].store_description) || emptyIfNull(_this17.record.store_description);
           } else {
-            _this16.name = emptyIfNull(_this16.record.name);
-            _this16.store_name = emptyIfNull(_this16.record.store_name);
-            _this16.store_description = emptyIfNull(_this16.record.store_description);
+            _this17.name = emptyIfNull(_this17.record.name);
+            _this17.store_name = emptyIfNull(_this17.record.store_name);
+            _this17.store_description = emptyIfNull(_this17.record.store_description);
           }
 
           // Single assignment for reactivity
-          _this16.translations = updatedTranslations;
-          _this16.street = emptyIfNull(_this16.record.street);
-          _this16.pincode_id = "";
-          _this16.city_id = emptyIfNull(_this16.record.city_id) ? _this16.record.city_id.split(",") : [];
-          _this16.categories_ids = emptyIfNull(_this16.record.categories) ? _this16.record.categories.split(",") : [];
-          _this16.state = emptyIfNull(_this16.record.state);
-          _this16.remark = emptyIfNull(_this16.record.remark);
-          _this16.commission = _this16.record.commission;
-          _this16.latitude = _this16.record.latitude;
-          _this16.longitude = _this16.record.longitude;
-          _this16.place_name = emptyIfNull(_this16.record.place_name);
-          _this16.formatted_address = emptyIfNull(_this16.record.formatted_address);
-          _this16.require_products_approval = _this16.record.require_products_approval;
+          _this17.translations = updatedTranslations;
+          _this17.street = emptyIfNull(_this17.record.street);
+          _this17.pincode_id = "";
+          _this17.city_id = emptyIfNull(_this17.record.city_id) ? _this17.record.city_id.split(",") : [];
+          _this17.categories_ids = emptyIfNull(_this17.record.categories) ? _this17.record.categories.split(",") : [];
+          _this17.state = emptyIfNull(_this17.record.state);
+          _this17.remark = emptyIfNull(_this17.record.remark);
+          _this17.commission = _this17.record.commission;
+          _this17.latitude = _this17.record.latitude;
+          _this17.longitude = _this17.record.longitude;
+          _this17.place_name = emptyIfNull(_this17.record.place_name);
+          _this17.formatted_address = emptyIfNull(_this17.record.formatted_address);
+          _this17.require_products_approval = _this17.record.require_products_approval;
           // this.customer_privacy = this.record.customer_privacy;
-          _this16.view_order_otp = _this16.record.view_order_otp;
-          _this16.assign_delivery_boy = _this16.record.assign_delivery_boy;
-          _this16.change_order_status_delivered = _this16.record.change_order_status_delivered;
+          _this17.view_order_otp = _this17.record.view_order_otp;
+          _this17.assign_delivery_boy = _this17.record.assign_delivery_boy;
+          _this17.change_order_status_delivered = _this17.record.change_order_status_delivered;
+          _this17.delivery_boy_source = _this17.record.delivery_boy_source || 'shared';
 
           // Self Pickup fields
-          _this16.self_pickup_mode = _this16.record.self_pickup_mode === null || _this16.record.self_pickup_mode === undefined ? 0 : _this16.record.self_pickup_mode;
-          _this16.door_step_mode = _this16.record.door_step_mode === null || _this16.record.door_step_mode === undefined ? 1 : _this16.record.door_step_mode;
-          _this16.pickup_store_address = emptyIfNull(_this16.record.pickup_store_address);
-          _this16.pickup_latitude = _this16.record.pickup_latitude || "";
-          _this16.pickup_longitude = _this16.record.pickup_longitude || "";
-          _this16.module_id = _this16.record.module_id || "";
+          _this17.self_pickup_mode = _this17.record.self_pickup_mode === null || _this17.record.self_pickup_mode === undefined ? 0 : _this17.record.self_pickup_mode;
+          _this17.door_step_mode = _this17.record.door_step_mode === null || _this17.record.door_step_mode === undefined ? 1 : _this17.record.door_step_mode;
+          _this17.pickup_store_address = emptyIfNull(_this17.record.pickup_store_address);
+          _this17.pickup_latitude = _this17.record.pickup_latitude || "";
+          _this17.pickup_longitude = _this17.record.pickup_longitude || "";
+          _this17.module_id = _this17.record.module_id || "";
 
           // Custom field values
-          _this16.customFieldExistingValues = _this16.record.custom_field_values || {};
-          _this16.applyCustomFieldValues();
+          _this17.customFieldExistingValues = _this17.record.custom_field_values || {};
+          _this17.applyCustomFieldValues();
 
           // Load store timings
-          if (_this16.record.pickup_store_timings) {
+          if (_this17.record.pickup_store_timings) {
             try {
-              var parsedTimings = JSON.parse(_this16.record.pickup_store_timings);
+              var parsedTimings = JSON.parse(_this17.record.pickup_store_timings);
               // Handle both old array format and new object format
               if (Array.isArray(parsedTimings)) {
                 // Convert old format to new format (use first day's timings)
@@ -1828,13 +1962,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   return day.is_open;
                 });
                 if (firstDay) {
-                  _this16.storeTimings = {
+                  _this17.storeTimings = {
                     opening_time: firstDay.opening_time || '09:00',
                     closing_time: firstDay.closing_time || '18:00'
                   };
                 }
               } else {
-                _this16.storeTimings = parsedTimings;
+                _this17.storeTimings = parsedTimings;
               }
             } catch (e) {
               console.log('Error parsing store timings:', e);
@@ -1842,68 +1976,68 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           }
 
           // Set pickup map marker if coordinates exist
-          if (_this16.pickup_latitude && _this16.pickup_longitude) {
-            _this16.pickupCenter = {
-              lat: parseFloat(_this16.pickup_latitude),
-              lng: parseFloat(_this16.pickup_longitude)
+          if (_this17.pickup_latitude && _this17.pickup_longitude) {
+            _this17.pickupCenter = {
+              lat: parseFloat(_this17.pickup_latitude),
+              lng: parseFloat(_this17.pickup_longitude)
             };
-            _this16.pickupMarkers = [{
+            _this17.pickupMarkers = [{
               position: {
-                lat: parseFloat(_this16.pickup_latitude),
-                lng: parseFloat(_this16.pickup_longitude)
+                lat: parseFloat(_this17.pickup_latitude),
+                lng: parseFloat(_this17.pickup_longitude)
               }
             }];
-            _this16.pickupInfoWindow.position = {
-              lat: parseFloat(_this16.pickup_latitude),
-              lng: parseFloat(_this16.pickup_longitude)
+            _this17.pickupInfoWindow.position = {
+              lat: parseFloat(_this17.pickup_latitude),
+              lng: parseFloat(_this17.pickup_longitude)
             };
-            _this16.pickupInfoWindow.template = "<b>Pickup Location</b><br>".concat(_this16.pickup_store_address);
+            _this17.pickupInfoWindow.template = "<b>Pickup Location</b><br>".concat(_this17.pickup_store_address);
           }
-          _this16.status = _this16.record.status;
-          _this16.store_logo = _this16.record.store_logo;
-          _this16.store_logo_url = _this16.$storageUrl + _this16.record.logo;
+          _this17.status = _this17.record.status;
+          _this17.store_logo = _this17.record.store_logo;
+          _this17.store_logo_url = _this17.$storageUrl + _this17.record.logo;
           var marker = {
-            lat: parseFloat(_this16.latitude),
-            lng: parseFloat(_this16.longitude),
+            lat: parseFloat(_this17.latitude),
+            lng: parseFloat(_this17.longitude),
             draggable: true
           };
-          _this16.markers.push({
+          _this17.markers.push({
             position: marker
           });
-          _this16.center = marker;
-          _this16.infoWindow.position = {
-            lat: parseFloat(_this16.latitude),
-            lng: parseFloat(_this16.longitude)
+          _this17.center = marker;
+          _this17.infoWindow.position = {
+            lat: parseFloat(_this17.latitude),
+            lng: parseFloat(_this17.longitude)
           };
-          _this16.infoWindow.template = "<b>".concat(_this16.place_name, "</b><br>").concat(_this16.formatted_address);
-          _this16.infoWindow.open = true;
+          _this17.infoWindow.template = "<b>".concat(_this17.place_name, "</b><br>").concat(_this17.formatted_address);
+          _this17.infoWindow.open = true;
         } else {
-          _this16.showError(data.message);
+          _this17.showError(data.message);
           setTimeout(function () {
-            _this16.$router.back();
+            _this17.$router.back();
           }, 1000);
         }
       })["catch"](function (error) {
         var _error$request3;
-        _this16.isLoading = false;
+        _this17.isLoading = false;
         if (error !== null && error !== void 0 && (_error$request3 = error.request) !== null && _error$request3 !== void 0 && _error$request3.statusText) {
-          _this16.showError(error.request.statusText);
+          _this17.showError(error.request.statusText);
         } else if (error.message) {
-          _this16.showError(error.message);
+          _this17.showError(error.message);
         } else {
-          _this16.showError(__('something_went_wrong'));
+          _this17.showError(__('something_went_wrong'));
         }
       });
     },
     validateDefaultLanguageForTranslation: function validateDefaultLanguageForTranslation() {
-      var _this17 = this;
+      var _this18 = this;
       var form = this.$refs['my-form'];
 
       // Trigger native browser validation UI
       if (form && !form.reportValidity()) {
         // Switch to default language tab so error field is visible
         this.$nextTick(function () {
-          _this17.switchToDefaultLanguageTab();
+          _this18.switchToDefaultLanguageTab();
         });
         return false;
       }
@@ -1912,7 +2046,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return this.validateDefaultLanguage();
     },
     saveRecord: function saveRecord() {
-      var _this18 = this;
+      var _this19 = this;
       // Validate default language fields
       if (!this.validateDefaultLanguage()) {
         return;
@@ -1944,7 +2078,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.languages.forEach(function (language) {
         if (language.is_default) return; // Skip default, already added
 
-        var translation = _this18.translations[language.id];
+        var translation = _this19.translations[language.id];
         var hasData = translation.name && translation.name.trim() !== '' || translation.store_name && translation.store_name.trim() !== '' || translation.store_description && translation.store_description.trim() !== '';
         if (hasData) {
           allTranslations.push({
@@ -1964,14 +2098,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  sellerId = _this18.id; // For edit mode
-                  defaultTranslation = _this18.translations[defaultLang.id];
+                  sellerId = _this19.id; // For edit mode
+                  defaultTranslation = _this19.translations[defaultLang.id];
                   formData = new FormData(); // Determine URL
-                  url = _this18.$apiUrl + '/sellers/save';
+                  url = _this19.$apiUrl + '/sellers/save';
                   if (sellerId) {
-                    url = _this18.$apiUrl + '/sellers/update';
+                    url = _this19.$apiUrl + '/sellers/update';
                     formData.append('id', sellerId);
-                    formData.append('admin_id', _this18.admin_id);
+                    formData.append('admin_id', _this19.admin_id);
                   }
 
                   // Send default language_id for backward compatibility
@@ -1983,65 +2117,65 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   formData.append('store_description', defaultTranslation.store_description || '');
 
                   // All required fields
-                  formData.append('email', _this18.email);
-                  formData.append('mobile', _this18.mobile);
-                  formData.append('store_url', _this18.store_url);
+                  formData.append('email', _this19.email);
+                  formData.append('mobile', _this19.mobile);
 
                   // Password only for new sellers or when changing
                   if (!sellerId) {
-                    formData.append('password', _this18.password);
-                    formData.append('confirm_password', _this18.confirm_password);
-                  } else if (_this18.password) {
-                    formData.append('password', _this18.password);
-                    formData.append('confirm_password', _this18.confirm_password);
+                    formData.append('password', _this19.password);
+                    formData.append('confirm_password', _this19.confirm_password);
+                  } else if (_this19.password) {
+                    formData.append('password', _this19.password);
+                    formData.append('confirm_password', _this19.confirm_password);
                   }
 
                   // Non-translatable fields
-                  formData.append('street', _this18.street);
-                  formData.append('pincode_id', _this18.pincode_id);
-                  formData.append('city_id', _this18.city_id);
-                  formData.append('categories_ids', _this18.categories_ids);
-                  formData.append('state', _this18.state);
-                  formData.append('remark', _this18.remark);
-                  formData.append('commission', _this18.commission);
-                  formData.append('latitude', _this18.latitude);
-                  formData.append('longitude', _this18.longitude);
-                  formData.append('place_name', _this18.place_name);
-                  formData.append('formatted_address', _this18.formatted_address);
-                  formData.append('require_products_approval', _this18.require_products_approval);
-                  formData.append('view_order_otp', _this18.view_order_otp);
-                  formData.append('assign_delivery_boy', _this18.assign_delivery_boy);
-                  formData.append('change_order_status_delivered', _this18.change_order_status_delivered);
-                  formData.append('self_pickup_mode', _this18.self_pickup_mode);
-                  formData.append('door_step_mode', _this18.door_step_mode);
-                  formData.append('module_id', _this18.module_id);
-                  formData.append('pickup_store_address', _this18.pickup_store_address);
-                  formData.append('pickup_latitude', _this18.pickup_latitude);
-                  formData.append('pickup_longitude', _this18.pickup_longitude);
-                  formData.append('pickup_store_timings', JSON.stringify(_this18.storeTimings));
-                  formData.append('status', _this18.status);
+                  formData.append('street', _this19.street);
+                  formData.append('pincode_id', _this19.pincode_id);
+                  formData.append('city_id', _this19.city_id);
+                  formData.append('categories_ids', _this19.categories_ids);
+                  formData.append('state', _this19.state);
+                  formData.append('remark', _this19.remark);
+                  formData.append('commission', _this19.commission);
+                  formData.append('latitude', _this19.latitude);
+                  formData.append('longitude', _this19.longitude);
+                  formData.append('place_name', _this19.place_name);
+                  formData.append('formatted_address', _this19.formatted_address);
+                  formData.append('require_products_approval', _this19.require_products_approval);
+                  formData.append('view_order_otp', _this19.view_order_otp);
+                  formData.append('assign_delivery_boy', _this19.assign_delivery_boy);
+                  formData.append('change_order_status_delivered', _this19.change_order_status_delivered);
+                  formData.append('delivery_boy_source', _this19.delivery_boy_source);
+                  formData.append('self_pickup_mode', _this19.self_pickup_mode);
+                  formData.append('door_step_mode', _this19.door_step_mode);
+                  formData.append('module_id', _this19.module_id);
+                  formData.append('pickup_store_address', _this19.pickup_store_address);
+                  formData.append('pickup_latitude', _this19.pickup_latitude);
+                  formData.append('pickup_longitude', _this19.pickup_longitude);
+                  formData.append('pickup_store_timings', JSON.stringify(_this19.storeTimings));
+                  formData.append('status', _this19.status);
 
                   // Send all translations as JSON array
                   formData.append('translations', JSON.stringify(allTranslations));
 
                   // Files (only for new sellers or when updating)
-                  if (_this18.store_logo) {
-                    formData.append('store_logo', _this18.store_logo);
+                  if (_this19.store_logo) {
+                    formData.append('store_logo', _this19.store_logo);
                   }
-                  if (_this18.customFields.length) {
+                  if (_this19.customFields.length) {
                     textValues = {};
-                    _this18.customFields.forEach(function (field) {
+                    _this19.customFields.forEach(function (field) {
                       if (field.type !== 'file') {
-                        textValues[field.id] = _this18.customFieldValues[field.id] || '';
-                      } else if (_this18.customFieldExistingValues[field.id] && !_this18.customFieldFiles[field.id]) {
+                        textValues[field.id] = _this19.customFieldValues[field.id] || '';
+                      } else if (_this19.customFieldExistingValues[field.id] && !_this19.customFieldFiles[field.id]) {
                         // Keep the previously uploaded file path if a new one wasn't chosen
-                        textValues[field.id] = _this18.customFieldExistingValues[field.id];
+                        textValues[field.id] = _this19.customFieldExistingValues[field.id];
                       }
                     });
                     formData.append('custom_field_values', JSON.stringify(textValues));
-                    _this18.customFields.forEach(function (field) {
-                      if (field.type === 'file' && _this18.customFieldFiles[field.id]) {
-                        formData.append('custom_field_file_' + field.id, _this18.customFieldFiles[field.id]);
+                    _this19.customFields.forEach(function (field) {
+                      if (field.type === 'file' && _this19.customFieldFiles[field.id]) {
+                        formData.append('custom_field_file_' + field.id, _this19.customFieldFiles[field.id]);
                       }
                     });
                   }
@@ -2142,9 +2276,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return true;
     },
     switchToDefaultLanguageTab: function switchToDefaultLanguageTab() {
-      var _this19 = this;
+      var _this20 = this;
       var defaultLangIndex = this.languages.findIndex(function (lang) {
-        return lang.id === _this19.defaultLanguageId;
+        return lang.id === _this20.defaultLanguageId;
       });
       if (defaultLangIndex !== -1) {
         this.activeLanguageTab = defaultLangIndex;
@@ -2200,6 +2334,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       };
       this.pickupInfoWindow.template = "<b>Selected Location</b><br>Lat: ".concat(lat.toFixed(6), ", Lng: ").concat(lng.toFixed(6));
       this.pickupInfoWindow.open = true;
+    },
+    onOsmPickupLocationSelected: function onOsmPickupLocationSelected(payload) {
+      this.pickup_latitude = payload.lat;
+      this.pickup_longitude = payload.lng;
+      this.pickup_store_address = payload.formatted_address;
+    },
+    onOsmPickupQueryInput: function onOsmPickupQueryInput(text) {
+      this.osmPickupQuery = text;
+      var map = this.resolveMapRef('osmPickupMap');
+      if (map) {
+        map.setQueryAndSearch(text);
+      }
+    },
+    selectOsmPickupSuggestion: function selectOsmPickupSuggestion(suggestion) {
+      this.osmPickupQuery = suggestion.placePrediction.text.text;
+      this.osmPickupSuggestions = [];
+      var map = this.resolveMapRef('osmPickupMap');
+      if (map) {
+        map.selectSuggestion(suggestion);
+      }
     },
     ensureAtLeastOneDeliveryMode: function ensureAtLeastOneDeliveryMode(changedField) {
       if (this.door_step_mode == 0 && this.self_pickup_mode == 0) {
@@ -2537,7 +2691,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n/* Compact thumb for logo/identity/address previews - keeps layout aligned when multiple are shown */\n.file-preview-thumb[data-v-0c56d16c] {\n    max-height: 80px;\n    max-width: 80px;\n    width: auto;\n    height: auto;\n    -o-object-fit: contain;\n       object-fit: contain;\n    border: 1px solid #ddd;\n    border-radius: 8px;\n    padding: 4px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.osm-suggestions[data-v-0c56d16c] {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    right: 0;\n    z-index: 1000;\n    max-height: 220px;\n    overflow-y: auto;\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-border-strong);\n    border-top: none;\n}\n\n/* Section cards nested inside the main form card: flat (no second shadow), clear header */\n.card .card[data-v-0c56d16c] {\n    box-shadow: none !important; /* global .card shadow would stack on the outer card */\n    margin-bottom: 20px;\n}\n\n/* Dark mode: --ui-border equals the card surface, so a card inside the form card showed no edge */\nbody.theme-dark .card .card[data-v-0c56d16c] {\n    border-color: var(--ui-border-strong) !important;\n}\n.card > .card-header .card-title[data-v-0c56d16c],\n.card .card > .card-header h4[data-v-0c56d16c] {\n    font-size: 15px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n\n/* Show / hide password: neutral addon button instead of a solid primary block */\n.password-toggle[data-v-0c56d16c] {\n    border: 1px solid var(--ui-border-strong);\n    border-left: 0;\n}\n.password-toggle-icon[data-v-0c56d16c] {\n    width: 20px;\n    height: 20px;\n    opacity: 0.6;\n}\n\n/* The eye SVGs are black: flip them to white on the dark surface so they stay visible */\nbody.theme-dark .password-toggle-icon[data-v-0c56d16c] {\n    filter: invert(1);\n    opacity: 0.8;\n}\n\n/* Upload dropzone + preview */\n.file-input-div label[data-v-0c56d16c] {\n    display: block;\n    margin-bottom: 4px;\n    cursor: pointer;\n}\n.seller-form-actions .btn[data-v-0c56d16c] {\n    min-width: 110px;\n}\n\n/* Compact thumb for logo/identity/address previews - keeps layout aligned when multiple are shown */\n.file-preview-thumb[data-v-0c56d16c] {\n    max-height: 80px;\n    max-width: 80px;\n    width: auto;\n    height: auto;\n    -o-object-fit: contain;\n       object-fit: contain;\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius);\n    padding: 4px;\n}\n\n/* Phones: this form is nested several levels deep (card > tab > row > col > row > col), and each\n   level adds 12-24px of padding, which left the fields a ~180px strip with the status buttons,\n   logo drop zone and editor toolbar cut off. Tighter padding / gutters and full-width controls. */\n@media (max-width: 575.98px) {\n.card-body[data-v-0c56d16c] {\n        padding: 12px;\n}\n.row[data-v-0c56d16c] {\n        --bs-gutter-x: 0.75rem;\n}\n\n    /* Active / Deactive toggle fills the row, each half equal. */\n.seller-status-group[data-v-0c56d16c] {\n        width: 100%;\n}\n.seller-status-group > .btn[data-v-0c56d16c] {\n        flex: 1 1 0;\n        min-width: 0;\n        padding-left: 0.5rem;\n        padding-right: 0.5rem;\n}\n.file-input-div[data-v-0c56d16c] {\n        width: 100%;\n}\n.seller-form-actions .btn[data-v-0c56d16c] {\n        flex: 1 1 0;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2826,39 +2980,49 @@ var render = function () {
               },
               [
                 _c("div", { staticClass: "card" }, [
-                  _c("div", { staticClass: "card-header" }, [
-                    _c("h4", [
-                      _vm._v(_vm._s(_vm.__("seller_information")) + " "),
-                    ]),
-                    _vm._v(" "),
-                    !_vm.isSellerRole
-                      ? _c(
-                          "span",
-                          { staticClass: "pull-right" },
-                          [
-                            _c(
-                              "router-link",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "card-header d-flex align-items-center justify-content-between flex-wrap gap-2",
+                    },
+                    [
+                      _c("h4", { staticClass: "card-title mb-0" }, [
+                        _vm._v(_vm._s(_vm.__("seller_information")) + " "),
+                      ]),
+                      _vm._v(" "),
+                      !_vm.isSellerRole
+                        ? _c(
+                            "span",
+                            [
+                              _c(
+                                "router-link",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass:
+                                    "btn btn-light btn-sm d-inline-flex align-items-center gap-2",
+                                  attrs: {
+                                    to: "/sellers",
+                                    title: "Manage Seller",
                                   },
-                                ],
-                                staticClass: "btn btn-primary",
-                                attrs: {
-                                  to: "/sellers",
-                                  title: "Manage Seller",
                                 },
-                              },
-                              [_vm._v(_vm._s(_vm.__("manage_seller")))]
-                            ),
-                          ],
-                          1
-                        )
-                      : _vm._e(),
-                  ]),
+                                [
+                                  _c("i", { staticClass: "fa fa-list" }),
+                                  _vm._v(" " + _vm._s(_vm.__("manage_seller"))),
+                                ]
+                              ),
+                            ],
+                            1
+                          )
+                        : _vm._e(),
+                    ]
+                  ),
                   _vm._v(" "),
                   _c("div", { staticClass: "card-body" }, [
                     _vm.languages.length > 0
@@ -3042,7 +3206,7 @@ var render = function () {
                                       "div",
                                       { staticClass: "row" },
                                       [
-                                        _c("div", { staticClass: "col-md-4" }, [
+                                        _c("div", { staticClass: "col-md-6" }, [
                                           _c(
                                             "div",
                                             { staticClass: "form-group mb-3" },
@@ -3122,7 +3286,7 @@ var render = function () {
                                           ? [
                                               _c(
                                                 "div",
-                                                { staticClass: "col-md-4" },
+                                                { staticClass: "col-md-6" },
                                                 [
                                                   _c(
                                                     "div",
@@ -3200,7 +3364,7 @@ var render = function () {
                                               _vm._v(" "),
                                               _c(
                                                 "div",
-                                                { staticClass: "col-md-4" },
+                                                { staticClass: "col-md-6" },
                                                 [
                                                   _c(
                                                     "div",
@@ -3299,7 +3463,7 @@ var render = function () {
                                               !_vm.isSellerRole
                                                 ? _c(
                                                     "div",
-                                                    { staticClass: "col-md-4" },
+                                                    { staticClass: "col-md-6" },
                                                     [
                                                       _c(
                                                         "div",
@@ -3536,7 +3700,7 @@ var render = function () {
                                                                 "button",
                                                                 {
                                                                   staticClass:
-                                                                    "btn btn-primary font-bold",
+                                                                    "btn btn-light password-toggle",
                                                                   attrs: {
                                                                     type: "button",
                                                                   },
@@ -3555,15 +3719,8 @@ var render = function () {
                                                                     ? _c(
                                                                         "img",
                                                                         {
-                                                                          staticStyle:
-                                                                            {
-                                                                              filter:
-                                                                                "brightness(0) invert(1)",
-                                                                              width:
-                                                                                "20px",
-                                                                              height:
-                                                                                "20px",
-                                                                            },
+                                                                          staticClass:
+                                                                            "password-toggle-icon",
                                                                           attrs:
                                                                             {
                                                                               src:
@@ -3575,15 +3732,8 @@ var render = function () {
                                                                     : _c(
                                                                         "img",
                                                                         {
-                                                                          staticStyle:
-                                                                            {
-                                                                              filter:
-                                                                                "brightness(0) invert(1)",
-                                                                              width:
-                                                                                "20px",
-                                                                              height:
-                                                                                "20px",
-                                                                            },
+                                                                          staticClass:
+                                                                            "password-toggle-icon",
                                                                           attrs:
                                                                             {
                                                                               src:
@@ -3605,7 +3755,7 @@ var render = function () {
                                               !_vm.isSellerRole
                                                 ? _c(
                                                     "div",
-                                                    { staticClass: "col-md-4" },
+                                                    { staticClass: "col-md-6" },
                                                     [
                                                       _c(
                                                         "div",
@@ -3842,7 +3992,7 @@ var render = function () {
                                                                 "button",
                                                                 {
                                                                   staticClass:
-                                                                    "btn btn-primary font-bold",
+                                                                    "btn btn-light password-toggle",
                                                                   attrs: {
                                                                     type: "button",
                                                                   },
@@ -3861,15 +4011,8 @@ var render = function () {
                                                                     ? _c(
                                                                         "img",
                                                                         {
-                                                                          staticStyle:
-                                                                            {
-                                                                              filter:
-                                                                                "brightness(0) invert(1)",
-                                                                              width:
-                                                                                "20px",
-                                                                              height:
-                                                                                "20px",
-                                                                            },
+                                                                          staticClass:
+                                                                            "password-toggle-icon",
                                                                           attrs:
                                                                             {
                                                                               src:
@@ -3881,15 +4024,8 @@ var render = function () {
                                                                     : _c(
                                                                         "img",
                                                                         {
-                                                                          staticStyle:
-                                                                            {
-                                                                              filter:
-                                                                                "brightness(0) invert(1)",
-                                                                              width:
-                                                                                "20px",
-                                                                              height:
-                                                                                "20px",
-                                                                            },
+                                                                          staticClass:
+                                                                            "password-toggle-icon",
                                                                           attrs:
                                                                             {
                                                                               src:
@@ -3936,7 +4072,7 @@ var render = function () {
                                           [
                                             _c(
                                               "div",
-                                              { staticClass: "col-md-4" },
+                                              { staticClass: "col-md-6" },
                                               [
                                                 _c(
                                                   "div",
@@ -4031,7 +4167,7 @@ var render = function () {
                                               ? [
                                                   _c(
                                                     "div",
-                                                    { staticClass: "col-md-4" },
+                                                    { staticClass: "col-md-6" },
                                                     [
                                                       _c(
                                                         "div",
@@ -4179,7 +4315,7 @@ var render = function () {
                                                   _vm._v(" "),
                                                   _c(
                                                     "div",
-                                                    { staticClass: "col-md-5" },
+                                                    { staticClass: "col-md-6" },
                                                     [
                                                       _c(
                                                         "div",
@@ -4246,7 +4382,7 @@ var render = function () {
                                                   _vm._v(" "),
                                                   _c(
                                                     "div",
-                                                    { staticClass: "col-md-3" },
+                                                    { staticClass: "col-md-6" },
                                                     [
                                                       _c(
                                                         "div",
@@ -4287,11 +4423,7 @@ var render = function () {
                                                                 "div",
                                                                 {
                                                                   staticClass:
-                                                                    "btn-group",
-                                                                  staticStyle: {
-                                                                    height:
-                                                                      "40px",
-                                                                  },
+                                                                    "btn-group btn-group-toggle segmented-toggle seller-status-group",
                                                                   attrs: {
                                                                     id: "status",
                                                                   },
@@ -4301,13 +4433,12 @@ var render = function () {
                                                                     "label",
                                                                     {
                                                                       staticClass:
-                                                                        "btn btn-primary d-inline-flex align-items-center justify-content-center",
-                                                                      attrs: {
-                                                                        "data-toggle-class":
-                                                                          "btn-primary",
-                                                                        "data-toggle-passive-class":
-                                                                          "btn-default",
-                                                                      },
+                                                                        "btn",
+                                                                      class:
+                                                                        _vm.status ==
+                                                                        1
+                                                                          ? "btn-success"
+                                                                          : "btn-outline-secondary",
                                                                     },
                                                                     [
                                                                       _c(
@@ -4325,8 +4456,6 @@ var render = function () {
                                                                                   "status",
                                                                               },
                                                                             ],
-                                                                          staticClass:
-                                                                            "me-2",
                                                                           attrs:
                                                                             {
                                                                               type: "radio",
@@ -4368,13 +4497,12 @@ var render = function () {
                                                                     "label",
                                                                     {
                                                                       staticClass:
-                                                                        "btn btn-danger d-inline-flex align-items-center justify-content-center",
-                                                                      attrs: {
-                                                                        "data-toggle-class":
-                                                                          "btn-danger",
-                                                                        "data-toggle-passive-class":
-                                                                          "btn-default",
-                                                                      },
+                                                                        "btn",
+                                                                      class:
+                                                                        _vm.status ==
+                                                                        3
+                                                                          ? "btn-danger"
+                                                                          : "btn-outline-secondary",
                                                                     },
                                                                     [
                                                                       _c(
@@ -4392,8 +4520,6 @@ var render = function () {
                                                                                   "status",
                                                                               },
                                                                             ],
-                                                                          staticClass:
-                                                                            "me-2",
                                                                           attrs:
                                                                             {
                                                                               type: "radio",
@@ -4439,206 +4565,195 @@ var render = function () {
                                                     ]
                                                   ),
                                                   _vm._v(" "),
-                                                  _c(
-                                                    "div",
-                                                    {
-                                                      staticClass:
-                                                        "row align-items-start",
-                                                    },
-                                                    [
-                                                      !_vm.isSellerRole
-                                                        ? _c(
+                                                  !_vm.isSellerRole
+                                                    ? _c(
+                                                        "div",
+                                                        {
+                                                          staticClass:
+                                                            "form-group col-md-6 mt-0",
+                                                        },
+                                                        [
+                                                          _c(
                                                             "div",
                                                             {
                                                               staticClass:
-                                                                "form-group col-md-4 mt-0",
+                                                                "form-group",
                                                             },
                                                             [
                                                               _c(
-                                                                "div",
+                                                                "label",
                                                                 {
-                                                                  staticClass:
-                                                                    "form-group",
+                                                                  attrs: {
+                                                                    for: "logo",
+                                                                  },
                                                                 },
                                                                 [
-                                                                  _c(
-                                                                    "label",
-                                                                    {
-                                                                      attrs: {
-                                                                        for: "logo",
-                                                                      },
-                                                                    },
-                                                                    [
-                                                                      _vm._v(
-                                                                        " " +
-                                                                          _vm._s(
-                                                                            _vm.__(
-                                                                              "logo"
-                                                                            )
-                                                                          ) +
-                                                                          " "
-                                                                      ),
-                                                                      !_vm.id
-                                                                        ? _c(
-                                                                            "i",
-                                                                            {
-                                                                              staticClass:
-                                                                                "text-danger",
-                                                                            },
-                                                                            [
-                                                                              _vm._v(
-                                                                                "*"
-                                                                              ),
-                                                                            ]
-                                                                          )
-                                                                        : _vm._e(),
-                                                                    ]
+                                                                  _vm._v(
+                                                                    " " +
+                                                                      _vm._s(
+                                                                        _vm.__(
+                                                                          "logo"
+                                                                        )
+                                                                      ) +
+                                                                      " "
                                                                   ),
-                                                                  _vm._v(" "),
-                                                                  _c("input", {
-                                                                    ref: "file_store_logo",
-                                                                    refInFor: true,
-                                                                    staticClass:
-                                                                      "file-input",
-                                                                    attrs: {
-                                                                      type: "file",
-                                                                      accept:
-                                                                        "image/*",
-                                                                      id: "logo",
-                                                                    },
-                                                                    on: {
-                                                                      change:
-                                                                        _vm.handleFileStoreLogo,
-                                                                    },
-                                                                  }),
-                                                                  _vm._v(" "),
-                                                                  _c(
-                                                                    "div",
-                                                                    {
-                                                                      staticClass:
-                                                                        "file-input-div bg-gray-100",
-                                                                      on: {
-                                                                        click:
-                                                                          function (
-                                                                            $event
-                                                                          ) {
-                                                                            return _vm.triggerRefClick(
-                                                                              "file_store_logo"
-                                                                            )
-                                                                          },
-                                                                        drop: _vm.dropFileStoreLogo,
-                                                                        dragover:
-                                                                          _vm.$dragoverFile,
-                                                                        dragleave:
-                                                                          _vm.$dragleaveFile,
-                                                                      },
-                                                                    },
-                                                                    [
-                                                                      _vm.store_logo &&
-                                                                      _vm
-                                                                        .store_logo
-                                                                        .name !==
-                                                                        ""
-                                                                        ? [
-                                                                            _c(
-                                                                              "label",
-                                                                              [
-                                                                                _vm._v(
-                                                                                  _vm._s(
-                                                                                    _vm.__(
-                                                                                      "selected_file_name"
-                                                                                    )
-                                                                                  ) +
-                                                                                    _vm._s(
-                                                                                      _vm
-                                                                                        .store_logo
-                                                                                        .name
-                                                                                    )
-                                                                                ),
-                                                                              ]
-                                                                            ),
-                                                                          ]
-                                                                        : [
-                                                                            _c(
-                                                                              "label",
-                                                                              [
-                                                                                _c(
-                                                                                  "i",
-                                                                                  {
-                                                                                    staticClass:
-                                                                                      "fa fa-cloud-upload-alt fa-2x",
-                                                                                  }
-                                                                                ),
-                                                                              ]
-                                                                            ),
-                                                                            _vm._v(
-                                                                              " "
-                                                                            ),
-                                                                            _c(
-                                                                              "label",
-                                                                              [
-                                                                                _vm._v(
-                                                                                  _vm._s(
-                                                                                    _vm.__(
-                                                                                      "drop_files_here_or_click_to_upload"
-                                                                                    )
-                                                                                  )
-                                                                                ),
-                                                                              ]
-                                                                            ),
-                                                                          ],
-                                                                    ],
-                                                                    2
-                                                                  ),
-                                                                  _vm._v(" "),
-                                                                  _vm.store_logo_url
+                                                                  !_vm.id
                                                                     ? _c(
-                                                                        "div",
+                                                                        "i",
                                                                         {
                                                                           staticClass:
-                                                                            "row mt-2",
+                                                                            "text-danger",
                                                                         },
                                                                         [
-                                                                          _c(
-                                                                            "div",
-                                                                            {
-                                                                              staticClass:
-                                                                                "col-auto",
-                                                                            },
-                                                                            [
-                                                                              _c(
-                                                                                "img",
-                                                                                {
-                                                                                  staticClass:
-                                                                                    "file-preview-thumb",
-                                                                                  attrs:
-                                                                                    {
-                                                                                      src: _vm.store_logo_url,
-                                                                                      title:
-                                                                                        "Store Logo",
-                                                                                      alt: "Store Logo",
-                                                                                    },
-                                                                                }
-                                                                              ),
-                                                                            ]
+                                                                          _vm._v(
+                                                                            "*"
                                                                           ),
                                                                         ]
                                                                       )
                                                                     : _vm._e(),
                                                                 ]
                                                               ),
+                                                              _vm._v(" "),
+                                                              _c("input", {
+                                                                ref: "file_store_logo",
+                                                                refInFor: true,
+                                                                staticClass:
+                                                                  "file-input",
+                                                                attrs: {
+                                                                  type: "file",
+                                                                  accept:
+                                                                    "image/*",
+                                                                  id: "logo",
+                                                                },
+                                                                on: {
+                                                                  change:
+                                                                    _vm.handleFileStoreLogo,
+                                                                },
+                                                              }),
+                                                              _vm._v(" "),
+                                                              _c(
+                                                                "div",
+                                                                {
+                                                                  staticClass:
+                                                                    "file-input-div bg-gray-100",
+                                                                  on: {
+                                                                    click:
+                                                                      function (
+                                                                        $event
+                                                                      ) {
+                                                                        return _vm.triggerRefClick(
+                                                                          "file_store_logo"
+                                                                        )
+                                                                      },
+                                                                    drop: _vm.dropFileStoreLogo,
+                                                                    dragover:
+                                                                      _vm.$dragoverFile,
+                                                                    dragleave:
+                                                                      _vm.$dragleaveFile,
+                                                                  },
+                                                                },
+                                                                [
+                                                                  _vm.store_logo &&
+                                                                  _vm.store_logo
+                                                                    .name !== ""
+                                                                    ? [
+                                                                        _c(
+                                                                          "label",
+                                                                          [
+                                                                            _vm._v(
+                                                                              _vm._s(
+                                                                                _vm.__(
+                                                                                  "selected_file_name"
+                                                                                )
+                                                                              ) +
+                                                                                _vm._s(
+                                                                                  _vm
+                                                                                    .store_logo
+                                                                                    .name
+                                                                                )
+                                                                            ),
+                                                                          ]
+                                                                        ),
+                                                                      ]
+                                                                    : [
+                                                                        _c(
+                                                                          "label",
+                                                                          [
+                                                                            _c(
+                                                                              "i",
+                                                                              {
+                                                                                staticClass:
+                                                                                  "fa fa-cloud-upload-alt fa-2x",
+                                                                              }
+                                                                            ),
+                                                                          ]
+                                                                        ),
+                                                                        _vm._v(
+                                                                          " "
+                                                                        ),
+                                                                        _c(
+                                                                          "label",
+                                                                          [
+                                                                            _vm._v(
+                                                                              _vm._s(
+                                                                                _vm.__(
+                                                                                  "drop_files_here_or_click_to_upload"
+                                                                                )
+                                                                              )
+                                                                            ),
+                                                                          ]
+                                                                        ),
+                                                                      ],
+                                                                ],
+                                                                2
+                                                              ),
+                                                              _vm._v(" "),
+                                                              _vm.store_logo_url
+                                                                ? _c(
+                                                                    "div",
+                                                                    {
+                                                                      staticClass:
+                                                                        "row mt-2",
+                                                                    },
+                                                                    [
+                                                                      _c(
+                                                                        "div",
+                                                                        {
+                                                                          staticClass:
+                                                                            "col-auto",
+                                                                        },
+                                                                        [
+                                                                          _c(
+                                                                            "img",
+                                                                            {
+                                                                              staticClass:
+                                                                                "file-preview-thumb",
+                                                                              attrs:
+                                                                                {
+                                                                                  src: _vm.store_logo_url,
+                                                                                  title:
+                                                                                    "Store Logo",
+                                                                                  alt: "Store Logo",
+                                                                                },
+                                                                            }
+                                                                          ),
+                                                                        ]
+                                                                      ),
+                                                                    ]
+                                                                  )
+                                                                : _vm._e(),
                                                             ]
-                                                          )
-                                                        : _vm._e(),
-                                                    ]
-                                                  ),
+                                                          ),
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
                                                   _vm._v(" "),
                                                   !_vm.isSellerRole
                                                     ? _c(
                                                         "div",
                                                         {
                                                           staticClass:
-                                                            "form-group col-md-4",
+                                                            "form-group col-md-6",
                                                         },
                                                         [
                                                           _c("label", [
@@ -5071,7 +5186,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5145,7 +5260,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5224,7 +5339,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5303,7 +5418,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5333,128 +5448,307 @@ var render = function () {
                                                               ]
                                                             ),
                                                             _vm._v(" "),
-                                                            _c(
-                                                              "div",
-                                                              {
-                                                                staticClass:
-                                                                  "input-group",
-                                                              },
-                                                              [
-                                                                _c(
-                                                                  "GmapAutocomplete",
+                                                            _vm.mapProvider ===
+                                                            "google"
+                                                              ? _c(
+                                                                  "div",
                                                                   {
                                                                     staticClass:
-                                                                      "form-control",
-                                                                    attrs: {
-                                                                      type: "search",
-                                                                      placeholder:
-                                                                        _vm.__(
-                                                                          "search_your_location_on_map"
-                                                                        ),
-                                                                      options: {
-                                                                        fields:
-                                                                          [
-                                                                            "formatted_address",
-                                                                            "geometry",
-                                                                            "name",
-                                                                          ],
-                                                                        strictBounds: false,
-                                                                      },
-                                                                      id: "location",
-                                                                    },
-                                                                    on: {
-                                                                      place_changed:
-                                                                        _vm.setPlace,
-                                                                    },
-                                                                  }
-                                                                ),
-                                                                _vm._v(" "),
-                                                                _c(
-                                                                  "b-button",
-                                                                  {
-                                                                    directives:
-                                                                      [
-                                                                        {
-                                                                          name: "b-tooltip",
-                                                                          rawName:
-                                                                            "v-b-tooltip.hover",
-                                                                          modifiers:
-                                                                            {
-                                                                              hover: true,
-                                                                            },
-                                                                        },
-                                                                      ],
-                                                                    staticClass:
-                                                                      "search_location_btn",
-                                                                    attrs: {
-                                                                      type: "button",
-                                                                      variant:
-                                                                        "primary",
-                                                                      title:
-                                                                        "Add current location",
-                                                                    },
-                                                                    on: {
-                                                                      click:
-                                                                        _vm.getCurrentLocation,
-                                                                    },
+                                                                      "input-group",
                                                                   },
                                                                   [
                                                                     _c(
-                                                                      "svg",
+                                                                      "google-place-search",
                                                                       {
                                                                         attrs: {
-                                                                          xmlns:
-                                                                            "http://www.w3.org/2000/svg",
-                                                                          height:
-                                                                            "48px",
-                                                                          viewBox:
-                                                                            "0 0 24 24",
-                                                                          width:
-                                                                            "48px",
-                                                                          fill: "#FFFFFF",
+                                                                          placeholder:
+                                                                            _vm.__(
+                                                                              "search_your_location_on_map"
+                                                                            ),
+                                                                          "input-id":
+                                                                            "location",
+                                                                        },
+                                                                        on: {
+                                                                          place_changed:
+                                                                            _vm.setPlace,
+                                                                        },
+                                                                      }
+                                                                    ),
+                                                                    _vm._v(" "),
+                                                                    _c(
+                                                                      "b-button",
+                                                                      {
+                                                                        directives:
+                                                                          [
+                                                                            {
+                                                                              name: "b-tooltip",
+                                                                              rawName:
+                                                                                "v-b-tooltip.hover",
+                                                                              modifiers:
+                                                                                {
+                                                                                  hover: true,
+                                                                                },
+                                                                            },
+                                                                          ],
+                                                                        staticClass:
+                                                                          "search_location_btn",
+                                                                        attrs: {
+                                                                          type: "button",
+                                                                          variant:
+                                                                            "primary",
+                                                                          title:
+                                                                            "Add current location",
+                                                                        },
+                                                                        on: {
+                                                                          click:
+                                                                            _vm.getCurrentLocation,
                                                                         },
                                                                       },
                                                                       [
                                                                         _c(
-                                                                          "title",
+                                                                          "svg",
+                                                                          {
+                                                                            attrs:
+                                                                              {
+                                                                                xmlns:
+                                                                                  "http://www.w3.org/2000/svg",
+                                                                                height:
+                                                                                  "48px",
+                                                                                viewBox:
+                                                                                  "0 0 24 24",
+                                                                                width:
+                                                                                  "48px",
+                                                                                fill: "#FFFFFF",
+                                                                              },
+                                                                          },
                                                                           [
+                                                                            _c(
+                                                                              "title",
+                                                                              [
+                                                                                _vm._v(
+                                                                                  "current-location"
+                                                                                ),
+                                                                              ]
+                                                                            ),
                                                                             _vm._v(
-                                                                              "current-location"
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "path",
+                                                                              {
+                                                                                attrs:
+                                                                                  {
+                                                                                    d: "M0 0h24v24H0V0z",
+                                                                                    fill: "none",
+                                                                                  },
+                                                                              }
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "path",
+                                                                              {
+                                                                                attrs:
+                                                                                  {
+                                                                                    d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
+                                                                                  },
+                                                                              }
                                                                             ),
                                                                           ]
                                                                         ),
-                                                                        _vm._v(
-                                                                          " "
-                                                                        ),
+                                                                      ]
+                                                                    ),
+                                                                  ],
+                                                                  1
+                                                                )
+                                                              : _c(
+                                                                  "div",
+                                                                  {
+                                                                    staticClass:
+                                                                      "input-group position-relative",
+                                                                  },
+                                                                  [
+                                                                    _c(
+                                                                      "input",
+                                                                      {
+                                                                        staticClass:
+                                                                          "form-control",
+                                                                        attrs: {
+                                                                          type: "search",
+                                                                          id: "osm_location",
+                                                                          placeholder:
+                                                                            _vm.__(
+                                                                              "search_your_location_on_map"
+                                                                            ),
+                                                                          autocomplete:
+                                                                            "off",
+                                                                        },
+                                                                        domProps:
+                                                                          {
+                                                                            value:
+                                                                              _vm.osmSellerQuery,
+                                                                          },
+                                                                        on: {
+                                                                          input:
+                                                                            function (
+                                                                              $event
+                                                                            ) {
+                                                                              return _vm.onOsmSellerQueryInput(
+                                                                                $event
+                                                                                  .target
+                                                                                  .value
+                                                                              )
+                                                                            },
+                                                                        },
+                                                                      }
+                                                                    ),
+                                                                    _vm._v(" "),
+                                                                    _c(
+                                                                      "b-button",
+                                                                      {
+                                                                        directives:
+                                                                          [
+                                                                            {
+                                                                              name: "b-tooltip",
+                                                                              rawName:
+                                                                                "v-b-tooltip.hover",
+                                                                              modifiers:
+                                                                                {
+                                                                                  hover: true,
+                                                                                },
+                                                                            },
+                                                                          ],
+                                                                        staticClass:
+                                                                          "search_location_btn",
+                                                                        attrs: {
+                                                                          type: "button",
+                                                                          variant:
+                                                                            "primary",
+                                                                          title:
+                                                                            "Add current location",
+                                                                        },
+                                                                        on: {
+                                                                          click:
+                                                                            _vm.getOsmCurrentLocation,
+                                                                        },
+                                                                      },
+                                                                      [
                                                                         _c(
-                                                                          "path",
+                                                                          "svg",
                                                                           {
                                                                             attrs:
                                                                               {
-                                                                                d: "M0 0h24v24H0V0z",
-                                                                                fill: "none",
+                                                                                xmlns:
+                                                                                  "http://www.w3.org/2000/svg",
+                                                                                height:
+                                                                                  "48px",
+                                                                                viewBox:
+                                                                                  "0 0 24 24",
+                                                                                width:
+                                                                                  "48px",
+                                                                                fill: "#FFFFFF",
                                                                               },
-                                                                          }
-                                                                        ),
-                                                                        _vm._v(
-                                                                          " "
-                                                                        ),
-                                                                        _c(
-                                                                          "path",
-                                                                          {
-                                                                            attrs:
+                                                                          },
+                                                                          [
+                                                                            _c(
+                                                                              "title",
+                                                                              [
+                                                                                _vm._v(
+                                                                                  "current-location"
+                                                                                ),
+                                                                              ]
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "path",
                                                                               {
-                                                                                d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
-                                                                              },
-                                                                          }
+                                                                                attrs:
+                                                                                  {
+                                                                                    d: "M0 0h24v24H0V0z",
+                                                                                    fill: "none",
+                                                                                  },
+                                                                              }
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "path",
+                                                                              {
+                                                                                attrs:
+                                                                                  {
+                                                                                    d: "M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z",
+                                                                                  },
+                                                                              }
+                                                                            ),
+                                                                          ]
                                                                         ),
                                                                       ]
                                                                     ),
-                                                                  ]
+                                                                    _vm._v(" "),
+                                                                    _vm
+                                                                      .osmSellerSuggestions
+                                                                      .length
+                                                                      ? _c(
+                                                                          "ul",
+                                                                          {
+                                                                            staticClass:
+                                                                              "list-group osm-suggestions",
+                                                                          },
+                                                                          _vm._l(
+                                                                            _vm.osmSellerSuggestions,
+                                                                            function (
+                                                                              s
+                                                                            ) {
+                                                                              return _c(
+                                                                                "li",
+                                                                                {
+                                                                                  key: s
+                                                                                    .placePrediction
+                                                                                    .placeId,
+                                                                                  staticClass:
+                                                                                    "list-group-item list-group-item-action",
+                                                                                  staticStyle:
+                                                                                    {
+                                                                                      cursor:
+                                                                                        "pointer",
+                                                                                    },
+                                                                                  on: {
+                                                                                    mousedown:
+                                                                                      function (
+                                                                                        $event
+                                                                                      ) {
+                                                                                        $event.preventDefault()
+                                                                                        return _vm.selectOsmSellerSuggestion(
+                                                                                          s
+                                                                                        )
+                                                                                      },
+                                                                                  },
+                                                                                },
+                                                                                [
+                                                                                  _vm._v(
+                                                                                    "\n                                                                            " +
+                                                                                      _vm._s(
+                                                                                        s
+                                                                                          .placePrediction
+                                                                                          .text
+                                                                                          .text
+                                                                                      ) +
+                                                                                      "\n                                                                        "
+                                                                                  ),
+                                                                                ]
+                                                                              )
+                                                                            }
+                                                                          ),
+                                                                          0
+                                                                        )
+                                                                      : _vm._e(),
+                                                                  ],
+                                                                  1
                                                                 ),
-                                                              ],
-                                                              1
-                                                            ),
                                                             _vm._v(" "),
                                                             _c(
                                                               "span",
@@ -5499,7 +5793,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5586,7 +5880,7 @@ var render = function () {
                                                     _c(
                                                       "div",
                                                       {
-                                                        staticClass: "col-md-4",
+                                                        staticClass: "col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5697,121 +5991,166 @@ var render = function () {
                                                             )
                                                           : _vm._e(),
                                                         _vm._v(" "),
-                                                        _c(
-                                                          "div",
-                                                          {
-                                                            staticStyle: {
-                                                              position:
-                                                                "relative",
-                                                              overflow:
-                                                                "hidden",
-                                                            },
-                                                            attrs: {
-                                                              id: "map",
-                                                            },
-                                                          },
-                                                          [
-                                                            _c(
-                                                              "GmapMap",
+                                                        _vm.mapProvider ===
+                                                        "google"
+                                                          ? _c(
+                                                              "div",
                                                               {
-                                                                ref: "mapRef",
-                                                                refInFor: true,
                                                                 staticStyle: {
-                                                                  width: "100%",
-                                                                  height:
-                                                                    "400px",
-                                                                  "margin-top":
-                                                                    "20px",
+                                                                  position:
+                                                                    "relative",
+                                                                  overflow:
+                                                                    "hidden",
                                                                 },
                                                                 attrs: {
-                                                                  center:
-                                                                    _vm.center,
-                                                                  zoom: 13,
-                                                                  mapTypeControl: true,
-                                                                },
-                                                                on: {
-                                                                  click:
-                                                                    _vm.handleMapClick,
+                                                                  id: "map",
                                                                 },
                                                               },
                                                               [
-                                                                _vm._l(
-                                                                  _vm.markers,
-                                                                  function (
-                                                                    m,
-                                                                    index
-                                                                  ) {
-                                                                    return _c(
-                                                                      "GmapMarker",
-                                                                      {
-                                                                        key: index,
-                                                                        attrs: {
-                                                                          position:
-                                                                            m.position,
-                                                                          clickable: true,
-                                                                          draggable: true,
-                                                                        },
-                                                                        on: {
-                                                                          drag: _vm.updateCoordinates,
-                                                                          click:
-                                                                            _vm.updateCoordinates,
-                                                                        },
-                                                                      }
-                                                                    )
-                                                                  }
-                                                                ),
-                                                                _vm._v(" "),
                                                                 _c(
-                                                                  "gmap-info-window",
+                                                                  "GmapMap",
                                                                   {
-                                                                    attrs: {
-                                                                      options: {
-                                                                        maxWidth: 300,
-                                                                        pixelOffset:
-                                                                          {
-                                                                            width: 0,
-                                                                            height:
-                                                                              -35,
-                                                                          },
+                                                                    ref: "mapRef",
+                                                                    refInFor: true,
+                                                                    staticStyle:
+                                                                      {
+                                                                        width:
+                                                                          "100%",
+                                                                        height:
+                                                                          "400px",
+                                                                        "margin-top":
+                                                                          "20px",
                                                                       },
-                                                                      position:
-                                                                        _vm
-                                                                          .infoWindow
-                                                                          .position,
-                                                                      opened:
-                                                                        _vm
-                                                                          .infoWindow
-                                                                          .open,
+                                                                    attrs: {
+                                                                      center:
+                                                                        _vm.center,
+                                                                      zoom: 13,
+                                                                      mapTypeControl: true,
                                                                     },
                                                                     on: {
-                                                                      closeclick:
-                                                                        function (
-                                                                          $event
-                                                                        ) {
-                                                                          _vm.infoWindow.open = false
-                                                                        },
+                                                                      click:
+                                                                        _vm.handleMapClick,
                                                                     },
                                                                   },
                                                                   [
-                                                                    _c("div", {
-                                                                      domProps:
-                                                                        {
-                                                                          innerHTML:
-                                                                            _vm._s(
-                                                                              _vm
-                                                                                .infoWindow
-                                                                                .template
-                                                                            ),
+                                                                    _vm._l(
+                                                                      _vm.markers,
+                                                                      function (
+                                                                        m,
+                                                                        index
+                                                                      ) {
+                                                                        return _c(
+                                                                          "GmapMarker",
+                                                                          {
+                                                                            key: index,
+                                                                            attrs:
+                                                                              {
+                                                                                position:
+                                                                                  m.position,
+                                                                                clickable: true,
+                                                                                draggable: true,
+                                                                              },
+                                                                            on: {
+                                                                              drag: _vm.updateCoordinates,
+                                                                              click:
+                                                                                _vm.updateCoordinates,
+                                                                            },
+                                                                          }
+                                                                        )
+                                                                      }
+                                                                    ),
+                                                                    _vm._v(" "),
+                                                                    _c(
+                                                                      "gmap-info-window",
+                                                                      {
+                                                                        attrs: {
+                                                                          options:
+                                                                            {
+                                                                              maxWidth: 300,
+                                                                              pixelOffset:
+                                                                                {
+                                                                                  width: 0,
+                                                                                  height:
+                                                                                    -35,
+                                                                                },
+                                                                            },
+                                                                          position:
+                                                                            _vm
+                                                                              .infoWindow
+                                                                              .position,
+                                                                          opened:
+                                                                            _vm
+                                                                              .infoWindow
+                                                                              .open,
                                                                         },
-                                                                    }),
-                                                                  ]
+                                                                        on: {
+                                                                          closeclick:
+                                                                            function (
+                                                                              $event
+                                                                            ) {
+                                                                              _vm.infoWindow.open = false
+                                                                            },
+                                                                        },
+                                                                      },
+                                                                      [
+                                                                        _c(
+                                                                          "div",
+                                                                          {
+                                                                            domProps:
+                                                                              {
+                                                                                innerHTML:
+                                                                                  _vm._s(
+                                                                                    _vm
+                                                                                      .infoWindow
+                                                                                      .template
+                                                                                  ),
+                                                                              },
+                                                                          }
+                                                                        ),
+                                                                      ]
+                                                                    ),
+                                                                  ],
+                                                                  2
                                                                 ),
                                                               ],
-                                                              2
+                                                              1
+                                                            )
+                                                          : _c(
+                                                              "div",
+                                                              {
+                                                                attrs: {
+                                                                  id: "osm_map",
+                                                                },
+                                                              },
+                                                              [
+                                                                _c(
+                                                                  "osm-map-picker",
+                                                                  {
+                                                                    ref: "osmSellerMap",
+                                                                    refInFor: true,
+                                                                    attrs: {
+                                                                      lat: _vm.latitude,
+                                                                      lng: _vm.longitude,
+                                                                      height:
+                                                                        "400px",
+                                                                      "show-search-box": false,
+                                                                    },
+                                                                    on: {
+                                                                      "location-selected":
+                                                                        _vm.onOsmLocationSelected,
+                                                                      "suggestions-updated":
+                                                                        function (
+                                                                          $event
+                                                                        ) {
+                                                                          _vm.osmSellerSuggestions =
+                                                                            $event
+                                                                        },
+                                                                    },
+                                                                  }
+                                                                ),
+                                                              ],
+                                                              1
                                                             ),
-                                                          ],
-                                                          1
-                                                        ),
                                                         _vm._v(" "),
                                                         _vm.formatted_address
                                                           ? _c("div", [
@@ -5874,7 +6213,7 @@ var render = function () {
                                                       "div",
                                                       {
                                                         staticClass:
-                                                          "form-group col-md-3",
+                                                          "form-group col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -5951,7 +6290,7 @@ var render = function () {
                                                       "div",
                                                       {
                                                         staticClass:
-                                                          "form-group col-md-3",
+                                                          "form-group col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -6028,7 +6367,7 @@ var render = function () {
                                                       "div",
                                                       {
                                                         staticClass:
-                                                          "form-group col-md-3",
+                                                          "form-group col-md-6",
                                                       },
                                                       [
                                                         _c(
@@ -6100,6 +6439,108 @@ var render = function () {
                                                         ),
                                                       ]
                                                     ),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "div",
+                                                      {
+                                                        staticClass:
+                                                          "form-group col-md-6",
+                                                      },
+                                                      [
+                                                        _c(
+                                                          "div",
+                                                          {
+                                                            staticClass:
+                                                              "form-group",
+                                                          },
+                                                          [
+                                                            _c(
+                                                              "label",
+                                                              {
+                                                                staticClass:
+                                                                  "control-label",
+                                                              },
+                                                              [
+                                                                _vm._v(
+                                                                  "Who Delivers Their Orders"
+                                                                ),
+                                                              ]
+                                                            ),
+                                                            _c("br"),
+                                                            _vm._v(" "),
+                                                            _vm.isSellerRole
+                                                              ? _c("input", {
+                                                                  staticClass:
+                                                                    "form-control",
+                                                                  attrs: {
+                                                                    type: "text",
+                                                                    disabled:
+                                                                      "",
+                                                                  },
+                                                                  domProps: {
+                                                                    value:
+                                                                      _vm.delivery_boy_source ===
+                                                                      "own"
+                                                                        ? "Own Delivery Boys"
+                                                                        : "Admin's Delivery Boys",
+                                                                  },
+                                                                })
+                                                              : _c(
+                                                                  "b-form-radio-group",
+                                                                  {
+                                                                    attrs: {
+                                                                      options: [
+                                                                        {
+                                                                          text: "Admin's Delivery Boys",
+                                                                          value:
+                                                                            "shared",
+                                                                        },
+                                                                        {
+                                                                          text: "Own Delivery Boys",
+                                                                          value:
+                                                                            "own",
+                                                                        },
+                                                                      ],
+                                                                      buttons:
+                                                                        "",
+                                                                      "button-variant":
+                                                                        "outline-primary",
+                                                                      required:
+                                                                        "",
+                                                                    },
+                                                                    model: {
+                                                                      value:
+                                                                        _vm.delivery_boy_source,
+                                                                      callback:
+                                                                        function (
+                                                                          $$v
+                                                                        ) {
+                                                                          _vm.delivery_boy_source =
+                                                                            $$v
+                                                                        },
+                                                                      expression:
+                                                                        "delivery_boy_source",
+                                                                    },
+                                                                  }
+                                                                ),
+                                                            _vm._v(" "),
+                                                            _c(
+                                                              "small",
+                                                              {
+                                                                staticClass:
+                                                                  "text-muted d-block mt-1",
+                                                              },
+                                                              [
+                                                                _vm._v(
+                                                                  "\n                                                                    Only an admin can change this - sellers can't switch it themselves.\n                                                                "
+                                                                ),
+                                                              ]
+                                                            ),
+                                                          ],
+                                                          1
+                                                        ),
+                                                      ]
+                                                    ),
                                                   ]
                                                 ),
                                                 _vm._v(" "),
@@ -6121,7 +6562,7 @@ var render = function () {
                                                               "h5",
                                                               {
                                                                 staticClass:
-                                                                  "text-primary",
+                                                                  "form-subsection-title",
                                                               },
                                                               [
                                                                 _vm._v(
@@ -6164,137 +6605,177 @@ var render = function () {
                                                                           "form-group",
                                                                       },
                                                                       [
-                                                                        _c(
-                                                                          "div",
-                                                                          {
-                                                                            staticStyle:
+                                                                        _vm.mapProvider ===
+                                                                        "google"
+                                                                          ? _c(
+                                                                              "div",
                                                                               {
-                                                                                position:
-                                                                                  "relative",
-                                                                                overflow:
-                                                                                  "hidden",
-                                                                              },
-                                                                            attrs:
-                                                                              {
-                                                                                id: "pickup_map",
-                                                                              },
-                                                                          },
-                                                                          [
-                                                                            _c(
-                                                                              "GmapMap",
-                                                                              {
-                                                                                ref: "pickupMapRef",
-                                                                                refInFor: true,
                                                                                 staticStyle:
                                                                                   {
-                                                                                    width:
-                                                                                      "100%",
-                                                                                    height:
-                                                                                      "400px",
-                                                                                    "margin-top":
-                                                                                      "5px",
+                                                                                    position:
+                                                                                      "relative",
+                                                                                    overflow:
+                                                                                      "hidden",
                                                                                   },
                                                                                 attrs:
                                                                                   {
-                                                                                    zoom: 13,
-                                                                                    center:
-                                                                                      _vm.pickupCenter,
-                                                                                    mapTypeControl: true,
+                                                                                    id: "pickup_map",
                                                                                   },
                                                                               },
                                                                               [
-                                                                                _vm._l(
-                                                                                  _vm.pickupMarkers,
-                                                                                  function (
-                                                                                    m,
-                                                                                    index
-                                                                                  ) {
-                                                                                    return _c(
-                                                                                      "GmapMarker",
+                                                                                _c(
+                                                                                  "GmapMap",
+                                                                                  {
+                                                                                    ref: "pickupMapRef",
+                                                                                    refInFor: true,
+                                                                                    staticStyle:
                                                                                       {
-                                                                                        key: index,
+                                                                                        width:
+                                                                                          "100%",
+                                                                                        height:
+                                                                                          "400px",
+                                                                                        "margin-top":
+                                                                                          "5px",
+                                                                                      },
+                                                                                    attrs:
+                                                                                      {
+                                                                                        zoom: 13,
+                                                                                        center:
+                                                                                          _vm.pickupCenter,
+                                                                                        mapTypeControl: true,
+                                                                                      },
+                                                                                  },
+                                                                                  [
+                                                                                    _vm._l(
+                                                                                      _vm.pickupMarkers,
+                                                                                      function (
+                                                                                        m,
+                                                                                        index
+                                                                                      ) {
+                                                                                        return _c(
+                                                                                          "GmapMarker",
+                                                                                          {
+                                                                                            key: index,
+                                                                                            attrs:
+                                                                                              {
+                                                                                                position:
+                                                                                                  _vm.google &&
+                                                                                                  m.position,
+                                                                                                clickable: true,
+                                                                                                draggable: true,
+                                                                                              },
+                                                                                            on: {
+                                                                                              click:
+                                                                                                function (
+                                                                                                  $event
+                                                                                                ) {
+                                                                                                  _vm.pickupCenter =
+                                                                                                    m.position
+                                                                                                },
+                                                                                              dragend:
+                                                                                                _vm.onPickupMarkerDragEnd,
+                                                                                            },
+                                                                                          }
+                                                                                        )
+                                                                                      }
+                                                                                    ),
+                                                                                    _vm._v(
+                                                                                      " "
+                                                                                    ),
+                                                                                    _c(
+                                                                                      "gmap-info-window",
+                                                                                      {
                                                                                         attrs:
                                                                                           {
+                                                                                            options:
+                                                                                              {
+                                                                                                maxWidth: 300,
+                                                                                                pixelOffset:
+                                                                                                  {
+                                                                                                    width: 0,
+                                                                                                    height:
+                                                                                                      -35,
+                                                                                                  },
+                                                                                              },
                                                                                             position:
-                                                                                              _vm.google &&
-                                                                                              m.position,
-                                                                                            clickable: true,
-                                                                                            draggable: true,
+                                                                                              _vm
+                                                                                                .pickupInfoWindow
+                                                                                                .position,
+                                                                                            opened:
+                                                                                              _vm
+                                                                                                .pickupInfoWindow
+                                                                                                .open,
                                                                                           },
                                                                                         on: {
-                                                                                          click:
+                                                                                          closeclick:
                                                                                             function (
                                                                                               $event
                                                                                             ) {
-                                                                                              _vm.pickupCenter =
-                                                                                                m.position
+                                                                                              _vm.pickupInfoWindow.open = false
                                                                                             },
-                                                                                          dragend:
-                                                                                            _vm.onPickupMarkerDragEnd,
                                                                                         },
-                                                                                      }
-                                                                                    )
-                                                                                  }
+                                                                                      },
+                                                                                      [
+                                                                                        _c(
+                                                                                          "div",
+                                                                                          {
+                                                                                            domProps:
+                                                                                              {
+                                                                                                innerHTML:
+                                                                                                  _vm._s(
+                                                                                                    _vm
+                                                                                                      .pickupInfoWindow
+                                                                                                      .template
+                                                                                                  ),
+                                                                                              },
+                                                                                          }
+                                                                                        ),
+                                                                                      ]
+                                                                                    ),
+                                                                                  ],
+                                                                                  2
                                                                                 ),
-                                                                                _vm._v(
-                                                                                  " "
-                                                                                ),
-                                                                                _c(
-                                                                                  "gmap-info-window",
+                                                                              ],
+                                                                              1
+                                                                            )
+                                                                          : _c(
+                                                                              "div",
+                                                                              {
+                                                                                attrs:
                                                                                   {
+                                                                                    id: "osm_pickup_map",
+                                                                                  },
+                                                                              },
+                                                                              [
+                                                                                _c(
+                                                                                  "osm-map-picker",
+                                                                                  {
+                                                                                    ref: "osmPickupMap",
+                                                                                    refInFor: true,
                                                                                     attrs:
                                                                                       {
-                                                                                        options:
-                                                                                          {
-                                                                                            maxWidth: 300,
-                                                                                            pixelOffset:
-                                                                                              {
-                                                                                                width: 0,
-                                                                                                height:
-                                                                                                  -35,
-                                                                                              },
-                                                                                          },
-                                                                                        position:
-                                                                                          _vm
-                                                                                            .pickupInfoWindow
-                                                                                            .position,
-                                                                                        opened:
-                                                                                          _vm
-                                                                                            .pickupInfoWindow
-                                                                                            .open,
+                                                                                        lat: _vm.pickup_latitude,
+                                                                                        lng: _vm.pickup_longitude,
+                                                                                        height:
+                                                                                          "400px",
+                                                                                        "show-search-box": false,
                                                                                       },
                                                                                     on: {
-                                                                                      closeclick:
+                                                                                      "location-selected":
+                                                                                        _vm.onOsmPickupLocationSelected,
+                                                                                      "suggestions-updated":
                                                                                         function (
                                                                                           $event
                                                                                         ) {
-                                                                                          _vm.pickupInfoWindow.open = false
+                                                                                          _vm.osmPickupSuggestions =
+                                                                                            $event
                                                                                         },
                                                                                     },
-                                                                                  },
-                                                                                  [
-                                                                                    _c(
-                                                                                      "div",
-                                                                                      {
-                                                                                        domProps:
-                                                                                          {
-                                                                                            innerHTML:
-                                                                                              _vm._s(
-                                                                                                _vm
-                                                                                                  .pickupInfoWindow
-                                                                                                  .template
-                                                                                              ),
-                                                                                          },
-                                                                                      }
-                                                                                    ),
-                                                                                  ]
+                                                                                  }
                                                                                 ),
                                                                               ],
-                                                                              2
+                                                                              1
                                                                             ),
-                                                                          ],
-                                                                          1
-                                                                        ),
                                                                       ]
                                                                     ),
                                                                   ]
@@ -6307,90 +6788,220 @@ var render = function () {
                                                                       "col-md-6",
                                                                   },
                                                                   [
-                                                                    _c(
-                                                                      "div",
-                                                                      {
-                                                                        staticClass:
-                                                                          "form-group",
-                                                                      },
-                                                                      [
-                                                                        _c(
-                                                                          "label",
-                                                                          {
-                                                                            attrs:
-                                                                              {
-                                                                                for: "pickup_city_name",
-                                                                              },
-                                                                          },
-                                                                          [
-                                                                            _vm._v(
-                                                                              _vm._s(
-                                                                                _vm.__(
-                                                                                  "search_location"
-                                                                                )
-                                                                              )
-                                                                            ),
-                                                                          ]
-                                                                        ),
-                                                                        _vm._v(
-                                                                          " "
-                                                                        ),
-                                                                        _c(
-                                                                          "GmapAutocomplete",
+                                                                    _vm.mapProvider ===
+                                                                    "google"
+                                                                      ? _c(
+                                                                          "div",
                                                                           {
                                                                             staticClass:
-                                                                              "form-control",
-                                                                            attrs:
+                                                                              "form-group",
+                                                                          },
+                                                                          [
+                                                                            _c(
+                                                                              "label",
                                                                               {
-                                                                                type: "search",
-                                                                                placeholder:
-                                                                                  _vm.__(
-                                                                                    "search_pickup_location_on_map"
-                                                                                  ),
-                                                                                options:
+                                                                                attrs:
                                                                                   {
-                                                                                    fields:
-                                                                                      [
-                                                                                        "address_components",
-                                                                                        "formatted_address",
-                                                                                        "geometry",
-                                                                                        "name",
-                                                                                        "place_id",
-                                                                                        "plus_code",
-                                                                                        "types",
-                                                                                      ],
-                                                                                    strictBounds: false,
+                                                                                    for: "pickup_city_name",
                                                                                   },
-                                                                                id: "pickup_city_name",
                                                                               },
-                                                                            on: {
-                                                                              place_changed:
-                                                                                _vm.setPickupPlace,
-                                                                            },
-                                                                          }
-                                                                        ),
-                                                                        _vm._v(
-                                                                          " "
-                                                                        ),
-                                                                        _c(
-                                                                          "span",
+                                                                              [
+                                                                                _vm._v(
+                                                                                  _vm._s(
+                                                                                    _vm.__(
+                                                                                      "search_location"
+                                                                                    )
+                                                                                  )
+                                                                                ),
+                                                                              ]
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "google-place-search",
+                                                                              {
+                                                                                attrs:
+                                                                                  {
+                                                                                    placeholder:
+                                                                                      _vm.__(
+                                                                                        "search_pickup_location_on_map"
+                                                                                      ),
+                                                                                    "input-id":
+                                                                                      "pickup_city_name",
+                                                                                  },
+                                                                                on: {
+                                                                                  place_changed:
+                                                                                    _vm.setPickupPlace,
+                                                                                },
+                                                                              }
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "span",
+                                                                              {
+                                                                                staticClass:
+                                                                                  "text text-primary",
+                                                                              },
+                                                                              [
+                                                                                _vm._v(
+                                                                                  _vm._s(
+                                                                                    _vm.__(
+                                                                                      "search_your_pickup_location_and_to_find_coordinates"
+                                                                                    )
+                                                                                  )
+                                                                                ),
+                                                                              ]
+                                                                            ),
+                                                                          ],
+                                                                          1
+                                                                        )
+                                                                      : _c(
+                                                                          "div",
                                                                           {
                                                                             staticClass:
-                                                                              "text text-primary",
+                                                                              "form-group position-relative",
                                                                           },
                                                                           [
+                                                                            _c(
+                                                                              "label",
+                                                                              {
+                                                                                attrs:
+                                                                                  {
+                                                                                    for: "osm_pickup_city_name",
+                                                                                  },
+                                                                              },
+                                                                              [
+                                                                                _vm._v(
+                                                                                  _vm._s(
+                                                                                    _vm.__(
+                                                                                      "search_location"
+                                                                                    )
+                                                                                  )
+                                                                                ),
+                                                                              ]
+                                                                            ),
                                                                             _vm._v(
-                                                                              _vm._s(
-                                                                                _vm.__(
-                                                                                  "search_your_pickup_location_and_to_find_coordinates"
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "input",
+                                                                              {
+                                                                                staticClass:
+                                                                                  "form-control",
+                                                                                attrs:
+                                                                                  {
+                                                                                    type: "search",
+                                                                                    id: "osm_pickup_city_name",
+                                                                                    placeholder:
+                                                                                      _vm.__(
+                                                                                        "search_pickup_location_on_map"
+                                                                                      ),
+                                                                                    autocomplete:
+                                                                                      "off",
+                                                                                  },
+                                                                                domProps:
+                                                                                  {
+                                                                                    value:
+                                                                                      _vm.osmPickupQuery,
+                                                                                  },
+                                                                                on: {
+                                                                                  input:
+                                                                                    function (
+                                                                                      $event
+                                                                                    ) {
+                                                                                      return _vm.onOsmPickupQueryInput(
+                                                                                        $event
+                                                                                          .target
+                                                                                          .value
+                                                                                      )
+                                                                                    },
+                                                                                },
+                                                                              }
+                                                                            ),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _vm
+                                                                              .osmPickupSuggestions
+                                                                              .length
+                                                                              ? _c(
+                                                                                  "ul",
+                                                                                  {
+                                                                                    staticClass:
+                                                                                      "list-group osm-suggestions",
+                                                                                  },
+                                                                                  _vm._l(
+                                                                                    _vm.osmPickupSuggestions,
+                                                                                    function (
+                                                                                      s
+                                                                                    ) {
+                                                                                      return _c(
+                                                                                        "li",
+                                                                                        {
+                                                                                          key: s
+                                                                                            .placePrediction
+                                                                                            .placeId,
+                                                                                          staticClass:
+                                                                                            "list-group-item list-group-item-action",
+                                                                                          staticStyle:
+                                                                                            {
+                                                                                              cursor:
+                                                                                                "pointer",
+                                                                                            },
+                                                                                          on: {
+                                                                                            mousedown:
+                                                                                              function (
+                                                                                                $event
+                                                                                              ) {
+                                                                                                $event.preventDefault()
+                                                                                                return _vm.selectOsmPickupSuggestion(
+                                                                                                  s
+                                                                                                )
+                                                                                              },
+                                                                                          },
+                                                                                        },
+                                                                                        [
+                                                                                          _vm._v(
+                                                                                            "\n                                                                                " +
+                                                                                              _vm._s(
+                                                                                                s
+                                                                                                  .placePrediction
+                                                                                                  .text
+                                                                                                  .text
+                                                                                              ) +
+                                                                                              "\n                                                                            "
+                                                                                          ),
+                                                                                        ]
+                                                                                      )
+                                                                                    }
+                                                                                  ),
+                                                                                  0
                                                                                 )
-                                                                              )
+                                                                              : _vm._e(),
+                                                                            _vm._v(
+                                                                              " "
+                                                                            ),
+                                                                            _c(
+                                                                              "span",
+                                                                              {
+                                                                                staticClass:
+                                                                                  "text text-primary",
+                                                                              },
+                                                                              [
+                                                                                _vm._v(
+                                                                                  _vm._s(
+                                                                                    _vm.__(
+                                                                                      "search_your_pickup_location_and_to_find_coordinates"
+                                                                                    )
+                                                                                  )
+                                                                                ),
+                                                                              ]
                                                                             ),
                                                                           ]
                                                                         ),
-                                                                      ],
-                                                                      1
-                                                                    ),
                                                                     _vm._v(" "),
                                                                     _c(
                                                                       "div",
@@ -6941,7 +7552,7 @@ var render = function () {
                                     "div",
                                     {
                                       key: field.id,
-                                      staticClass: "form-group col-md-4",
+                                      staticClass: "form-group col-md-6",
                                     },
                                     [
                                       _c("label", [
@@ -7113,6 +7724,23 @@ var render = function () {
                                                 )
                                               : _vm._e(),
                                           ]
+                                        : field.type === "date"
+                                        ? _c("custom-field-date", {
+                                            attrs: { placeholder: field.name },
+                                            model: {
+                                              value:
+                                                _vm.customFieldValues[field.id],
+                                              callback: function ($$v) {
+                                                _vm.$set(
+                                                  _vm.customFieldValues,
+                                                  field.id,
+                                                  $$v
+                                                )
+                                              },
+                                              expression:
+                                                "customFieldValues[field.id]",
+                                            },
+                                          })
                                         : (field.type === "number"
                                             ? "number"
                                             : "text") === "checkbox"
@@ -7279,7 +7907,10 @@ var render = function () {
                   _vm._v(" "),
                   _c(
                     "div",
-                    { staticClass: "card-footer" },
+                    {
+                      staticClass:
+                        "card-footer d-flex justify-content-end flex-wrap gap-2 seller-form-actions",
+                    },
                     [
                       _vm.id
                         ? [
@@ -7309,6 +7940,25 @@ var render = function () {
                           ]
                         : [
                             _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-outline-secondary",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.clearForm()
+                                  },
+                                },
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(_vm.__("clear"))
+                                ),
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
                               "b-button",
                               {
                                 attrs: {
@@ -7330,25 +7980,6 @@ var render = function () {
                                   : _vm._e(),
                               ],
                               1
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-danger",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.clearForm()
-                                  },
-                                },
-                              },
-                              [
-                                _vm._v(
-                                  "\n                                    " +
-                                    _vm._s(_vm.__("clear"))
-                                ),
-                              ]
                             ),
                           ],
                     ],

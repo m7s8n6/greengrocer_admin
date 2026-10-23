@@ -127,15 +127,7 @@ class ArrayLoader implements LoaderInterface
                 $version = $this->versionParser->normalize($config['version']);
             }
         } else {
-            try {
-                $version = $this->versionParser->normalize($config['version']);
-            } catch (\UnexpectedValueException $e) {
-                throw new \UnexpectedValueException(
-                    'Failed to normalize version for package "'.$config['name'].'": '.$e->getMessage(),
-                    $e->getCode(),
-                    $e
-                );
-            }
+            $version = $this->versionParser->normalize($config['version']);
         }
 
         return new $class($config['name'], $version, $config['version']);
@@ -397,23 +389,12 @@ class ArrayLoader implements LoaderInterface
     private function createLink(string $source, string $sourceVersion, string $description, string $target, string $prettyConstraint): Link
     {
         if (!\is_string($prettyConstraint)) {
-            throw new \UnexpectedValueException('Link constraint in '.$source.' '.$description.' > '.$target.' should be a string, got '.\get_debug_type($prettyConstraint) . ' (' . var_export($prettyConstraint, true) . ')');
+            throw new \UnexpectedValueException('Link constraint in '.$source.' '.$description.' > '.$target.' should be a string, got '.\gettype($prettyConstraint) . ' (' . var_export($prettyConstraint, true) . ')');
         }
-
         if ('self.version' === $prettyConstraint) {
-            $constraint = $sourceVersion;
+            $parsedConstraint = $this->versionParser->parseConstraints($sourceVersion);
         } else {
-            $constraint = $prettyConstraint;
-        }
-
-        try {
-            $parsedConstraint = $this->versionParser->parseConstraints($constraint);
-        } catch (\UnexpectedValueException $e) {
-            throw new \UnexpectedValueException(
-                'Link constraint in '.$source.' '.$description.' > '.$target.' should be a valid version constraint, got "'.$constraint.'"',
-                $e->getCode(),
-                $e
-            );
+            $parsedConstraint = $this->versionParser->parseConstraints($prettyConstraint);
         }
 
         return new Link($source, $target, $parsedConstraint, $description, $prettyConstraint);

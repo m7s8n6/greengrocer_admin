@@ -84,6 +84,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -97,7 +98,6 @@ __webpack_require__.r(__webpack_exports__);
       list: [],
       editable: true,
       isDragging: false,
-      onDragEnd: false,
       delayedDragging: false,
       isLoading: false,
       currentLanguageId: null,
@@ -243,7 +243,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](function (error) {
         _this7.isLoading = false;
-        if (error.request.statusText) {
+        if (error.request && error.request.statusText) {
           _this7.showError(error.request.statusText);
         } else if (error.message) {
           _this7.showError(error.message);
@@ -274,7 +274,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-150fb500] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-150fb500] {\n    transition: transform 0s;\n}\n.ghost[data-v-150fb500] {\n    opacity: 0.5;\n    background: #c8ebfb;\n}\n.list-group[data-v-150fb500] {\n    min-height: 20px;\n}\n.list-group-item[data-v-150fb500] {\n    cursor: move;\n    margin-bottom: 8px;\n    border-radius: 8px !important;\n    transition: background-color 0.2s ease;\n}\n.list-group-item i[data-v-150fb500] {\n    cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-150fb500] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-150fb500] {\n    transition: transform 0s;\n}\n.ghost[data-v-150fb500] {\n    opacity: 0.5;\n    background: var(--theme-info-100);\n}\n.list-group[data-v-150fb500] {\n    min-height: 20px;\n    padding-left: 0;\n    margin-bottom: 0;\n}\n.list-group-item[data-v-150fb500] {\n    cursor: move;\n    margin-bottom: 8px;\n    padding: 10px 14px;\n    border: 1px solid var(--ui-border) !important; /* override bootstrap list-group joined borders */\n    border-radius: var(--ui-radius) !important;\n    background: var(--ui-surface);\n    color: var(--ui-text);\n    font-size: 13px;\n    transition: background-color 0.2s ease, border-color 0.2s ease;\n}\n.list-group-item[data-v-150fb500]:hover {\n    border-color: color-mix(in srgb, var(--theme-primary-500) 40%, transparent) !important;\n    background: var(--ui-primary-soft);\n}\n.category-order-meta[data-v-150fb500] {\n    display: inline-flex !important;\n    align-items: center;\n    gap: 8px;\n    min-width: 84px;\n    margin-inline-end: 14px;\n    font-size: 12px;\n    white-space: nowrap;\n}\n.category-order-pos[data-v-150fb500] {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    min-width: 24px;\n    height: 24px;\n    padding: 0 6px;\n    border-radius: var(--ui-radius-sm);\n    background: var(--ui-surface-muted);\n    color: var(--ui-text);\n    font-weight: 600;\n}\n.category-order-img[data-v-150fb500] {\n    height: 40px;\n    width: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    margin-inline-end: 14px;\n    border-radius: var(--ui-radius-sm);\n    background: var(--ui-surface-muted);\n}\n.category-order-parent-img[data-v-150fb500] {\n    height: 25px;\n    width: 25px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius-sm);\n}\n.category-order-name[data-v-150fb500] {\n    font-weight: 600;\n    color: var(--ui-heading);\n}\n.category-order-handle[data-v-150fb500] {\n    color: var(--ui-text-subtle);\n}\n.category-order-empty[data-v-150fb500] {\n    padding: 40px 0;\n    text-align: center;\n    font-size: 13px;\n    color: var(--ui-text-muted);\n}\n.category-order-empty .fa[data-v-150fb500] {\n    font-size: 28px;\n    color: var(--ui-text-subtle);\n}\n.list-group-item i[data-v-150fb500] {\n    cursor: pointer;\n}\n\n/* Desktop: scroll box up to 600px tall (no blank space when the list is short). */\n.categories-order-scroll[data-v-150fb500] {\n    overflow-y: auto;\n    overflow-x: auto;\n    max-height: 600px;\n}\n\n/* Phones: the list sizes to its content (max 70% of the screen) and never scrolls sideways;\n   the number / thumbnail block gets smaller so the name has room and the drag handle no\n   longer sits on top of it; long names wrap instead of being cut. */\n@media (max-width: 575.98px) {\n.categories-order-scroll[data-v-150fb500] {\n        height: auto;\n        max-height: 70vh;\n        overflow-x: hidden;\n}\n.category-order-main[data-v-150fb500] {\n        min-width: 0;\n}\n.category-order-meta[data-v-150fb500] {\n        min-width: 0;\n        gap: 6px;\n        margin-inline-end: 8px;\n}\n.category-order-img[data-v-150fb500] {\n        height: 36px;\n        width: 36px;\n        margin-inline-end: 8px;\n}\n.category-order-name[data-v-150fb500] {\n        min-width: 0;\n        overflow-wrap: anywhere;\n        word-break: break-word;\n}\n.list-group-item[data-v-150fb500] {\n        padding: 0.5rem 0.75rem;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -416,10 +416,13 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("div", [
     _c("div", { staticClass: "page-heading" }, [
-      _c("div", { staticClass: "page-title mb-2" }, [
+      _c("div", { staticClass: "page-title mb-3" }, [
         _c(
           "div",
-          { staticClass: "d-flex justify-content-between align-items-center" },
+          {
+            staticClass:
+              "d-flex justify-content-between align-items-center flex-wrap gap-1 gap-sm-2",
+          },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("categories_order"))),
@@ -458,100 +461,93 @@ var render = function () {
       ]),
       _vm._v(" "),
       _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card mb-4" }, [
+        _c("div", { staticClass: "card figma-main-section-card mb-4" }, [
           _c(
             "div",
-            { staticClass: "card-body p-4" },
+            {
+              staticClass:
+                "card-header d-flex justify-content-between align-items-center flex-wrap gap-2",
+            },
             [
-              _c("h4", { staticClass: "card-title mb-4" }, [
+              _c("h4", { staticClass: "card-title mb-0" }, [
                 _vm._v(_vm._s(_vm.__("main_categories_order_list"))),
               ]),
               _vm._v(" "),
-              _c(
-                "b-row",
-                { staticClass: "mb-4" },
-                [
-                  _c("b-col", { attrs: { md: "12" } }, [
-                    _c("div", { staticClass: "form-check form-switch mb-0" }, [
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.editable,
-                            expression: "editable",
-                          },
-                        ],
-                        staticClass: "form-check-input",
-                        attrs: { type: "checkbox", id: "enableDragDrop" },
-                        domProps: {
-                          checked: Array.isArray(_vm.editable)
-                            ? _vm._i(_vm.editable, null) > -1
-                            : _vm.editable,
-                        },
-                        on: {
-                          change: function ($event) {
-                            var $$a = _vm.editable,
-                              $$el = $event.target,
-                              $$c = $$el.checked ? true : false
-                            if (Array.isArray($$a)) {
-                              var $$v = null,
-                                $$i = _vm._i($$a, $$v)
-                              if ($$el.checked) {
-                                $$i < 0 && (_vm.editable = $$a.concat([$$v]))
-                              } else {
-                                $$i > -1 &&
-                                  (_vm.editable = $$a
-                                    .slice(0, $$i)
-                                    .concat($$a.slice($$i + 1)))
-                              }
-                            } else {
-                              _vm.editable = $$c
-                            }
-                          },
-                        },
-                      }),
-                      _vm._v(" "),
-                      _c(
-                        "label",
-                        {
-                          staticClass: "form-check-label ms-1",
-                          attrs: { for: "enableDragDrop" },
-                        },
-                        [
-                          _vm._v(
-                            "\n                                    " +
-                              _vm._s(_vm.__("enable_drag_and_drop")) +
-                              "\n                                "
-                          ),
-                        ]
-                      ),
-                    ]),
-                  ]),
-                ],
-                1
-              ),
-              _vm._v(" "),
+              _c("div", { staticClass: "form-check form-switch mb-0" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.editable,
+                      expression: "editable",
+                    },
+                  ],
+                  staticClass: "form-check-input",
+                  attrs: { type: "checkbox", id: "enableDragDrop" },
+                  domProps: {
+                    checked: Array.isArray(_vm.editable)
+                      ? _vm._i(_vm.editable, null) > -1
+                      : _vm.editable,
+                  },
+                  on: {
+                    change: function ($event) {
+                      var $$a = _vm.editable,
+                        $$el = $event.target,
+                        $$c = $$el.checked ? true : false
+                      if (Array.isArray($$a)) {
+                        var $$v = null,
+                          $$i = _vm._i($$a, $$v)
+                        if ($$el.checked) {
+                          $$i < 0 && (_vm.editable = $$a.concat([$$v]))
+                        } else {
+                          $$i > -1 &&
+                            (_vm.editable = $$a
+                              .slice(0, $$i)
+                              .concat($$a.slice($$i + 1)))
+                        }
+                      } else {
+                        _vm.editable = $$c
+                      }
+                    },
+                  },
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "form-check-label ms-1",
+                    attrs: { for: "enableDragDrop" },
+                  },
+                  [
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(_vm.__("enable_drag_and_drop")) +
+                        "\n                        "
+                    ),
+                  ]
+                ),
+              ]),
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            [
               _c(
                 "b-row",
                 [
                   _c(
                     "b-col",
                     {
-                      staticStyle: {
-                        "overflow-y": "scroll",
-                        "overflow-x": "auto",
-                        height: "600px",
-                      },
+                      staticClass: "categories-order-scroll",
                       attrs: { md: "12" },
                     },
                     [
                       _c(
-                        "ul",
-                        {
-                          staticClass: "list-group",
-                          attrs: { id: "sortable-row" },
-                        },
+                        "div",
+                        { attrs: { id: "sortable-row" } },
                         [
                           _c(
                             "draggable",
@@ -598,60 +594,47 @@ var render = function () {
                                   _c(
                                     "div",
                                     {
-                                      staticClass: "d-flex align-items-center",
+                                      staticClass:
+                                        "d-flex align-items-center flex-grow-1 category-order-main",
                                     },
                                     [
                                       _c(
                                         "span",
                                         {
                                           staticClass:
-                                            "text-muted d-inline-block",
-                                          staticStyle: {
-                                            "min-width": "90px",
-                                            "margin-right": "14px",
-                                          },
+                                            "text-muted d-inline-block flex-shrink-0 category-order-meta",
                                         },
                                         [
                                           _c(
                                             "span",
                                             {
-                                              staticClass:
-                                                "d-inline-block text-right",
-                                              staticStyle: { width: "25px" },
+                                              staticClass: "category-order-pos",
                                             },
                                             [_vm._v(_vm._s(category.row_order))]
                                           ),
                                           _vm._v(" "),
-                                          _c("span", { staticClass: "mx-2" }, [
-                                            _vm._v("-"),
-                                          ]),
-                                          _vm._v(" "),
                                           _c(
                                             "span",
                                             {
-                                              staticClass:
-                                                "d-inline-block text-left",
-                                              staticStyle: { width: "25px" },
+                                              staticClass: "category-order-id",
                                             },
-                                            [_vm._v(_vm._s(category.id))]
+                                            [_vm._v("#" + _vm._s(category.id))]
                                           ),
                                         ]
                                       ),
                                       _vm._v(" "),
                                       _c("img", {
-                                        staticClass: "rounded",
-                                        staticStyle: {
-                                          height: "40px",
-                                          width: "40px",
-                                          "object-fit": "cover",
-                                          "margin-right": "14px",
-                                        },
+                                        staticClass:
+                                          "flex-shrink-0 category-order-img",
                                         attrs: { src: category.image_url },
                                       }),
                                       _vm._v(" "),
                                       _c(
                                         "span",
-                                        { staticClass: "font-weight-normal" },
+                                        {
+                                          staticClass:
+                                            "font-weight-normal category-order-name",
+                                        },
                                         [
                                           _vm._v(
                                             _vm._s(
@@ -688,12 +671,7 @@ var render = function () {
                                                     _vm._v(" "),
                                                     _c("img", {
                                                       staticClass:
-                                                        "rounded mr-2",
-                                                      staticStyle: {
-                                                        height: "25px",
-                                                        width: "25px",
-                                                        "object-fit": "cover",
-                                                      },
+                                                        "mr-2 category-order-parent-img",
                                                       attrs: {
                                                         src: parent.image_url,
                                                         title:
@@ -714,11 +692,18 @@ var render = function () {
                                     ]
                                   ),
                                   _vm._v(" "),
-                                  _c("span", [
-                                    _c("i", {
-                                      staticClass: "fas fa-arrows-alt",
-                                    }),
-                                  ]),
+                                  _c(
+                                    "span",
+                                    {
+                                      staticClass:
+                                        "flex-shrink-0 ms-2 category-order-handle",
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass: "fas fa-arrows-alt",
+                                      }),
+                                    ]
+                                  ),
                                 ]
                               )
                             }),
@@ -727,6 +712,19 @@ var render = function () {
                         ],
                         1
                       ),
+                      _vm._v(" "),
+                      !_vm.list.length
+                        ? _c("div", { staticClass: "category-order-empty" }, [
+                            _c("i", {
+                              staticClass: "fa fa-inbox d-block mb-2",
+                            }),
+                            _vm._v(
+                              "\n                                    " +
+                                _vm._s(_vm.__("no_records_to_show")) +
+                                "\n                                "
+                            ),
+                          ])
+                        : _vm._e(),
                     ]
                   ),
                 ],

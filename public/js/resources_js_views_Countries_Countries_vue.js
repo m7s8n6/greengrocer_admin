@@ -189,6 +189,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -201,31 +205,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       fields: [{
         key: 'id',
         label: __('id'),
-        "class": 'text-center',
         sortable: true,
         sortDirection: 'asc'
       }, {
         key: 'name',
         label: __('name'),
-        "class": 'text-center',
         sortable: true,
         sortDirection: 'asc'
       }, {
         key: 'dial_code',
-        label: __('dial_code'),
-        "class": 'text-center'
+        label: __('dial_code')
       }, {
         key: 'code',
-        label: __('code'),
-        "class": 'text-center'
+        label: __('code')
       }, {
         key: 'logo',
-        label: __('logo'),
-        "class": 'text-center'
+        label: __('logo')
       }, {
         key: 'status',
         label: __('status'),
-        "class": 'text-center',
         sortable: true,
         sortDirection: 'asc'
       }, {
@@ -327,6 +325,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.$eventBus.$off('recordSaved', this.recordSavedHandler);
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     fetchGlobalColors: function fetchGlobalColors() {
       var _this3 = this;
       axios__WEBPACK_IMPORTED_MODULE_1___default().get(this.$apiUrl + '/web_settings').then(function (response) {
@@ -408,8 +410,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this7.isLoading = true;
@@ -484,8 +486,6 @@ __webpack_require__.r(__webpack_exports__);
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-//
-//
 //
 //
 //
@@ -1245,6 +1245,29 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.category-color-text[data-v-24621b2a] {\n    flex: 1 1 200px;\n    min-width: 0;\n}\n\n/* Phones: the \"Items Background Colors\" card. The colour text field gets its own full row,\n   the swatch + Transparent button sit on the next one, and the card header is more compact. */\n@media (max-width: 575.98px) {\n.category-color-text[data-v-24621b2a] {\n        flex: 1 1 100%;\n        min-width: 0;\n}\n.category-color-row > input[type=\"color\"][data-v-24621b2a] {\n        flex: 0 0 72px;\n        max-width: 72px !important;\n}\n.card > .card-header[data-v-24621b2a] {\n        padding: 12px 16px !important;\n}\n.card > .card-header .card-title[data-v-24621b2a] {\n        font-size: 1rem;\n        line-height: 1.3;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Edit.vue?vue&type=style&index=0&id=734c5df8&scoped=true&lang=css":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Edit.vue?vue&type=style&index=0&id=734c5df8&scoped=true&lang=css ***!
@@ -1261,10 +1284,39 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image_preview[data-v-734c5df8] {\n    margin-top: 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image_preview[data-v-734c5df8] {\n    margin-top: 5px;\n}\n.logo-status-col[data-v-734c5df8] {\n    flex: 1 1 200px;\n    min-width: 0;\n}\n.color-text-input[data-v-734c5df8] {\n    flex: 1 1 140px;\n    min-width: 0;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_style_index_0_id_24621b2a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_style_index_0_id_24621b2a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_style_index_0_id_24621b2a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -1307,23 +1359,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Countries.vue?vue&type=template&id=24621b2a */ "./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a");
+/* harmony import */ var _Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Countries.vue?vue&type=template&id=24621b2a&scoped=true */ "./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true");
 /* harmony import */ var _Countries_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Countries.vue?vue&type=script&lang=js */ "./resources/js/views/Countries/Countries.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Countries_vue_vue_type_style_index_0_id_24621b2a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css */ "./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Countries_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__.render,
-  _Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "24621b2a",
   null
   
 )
@@ -1405,6 +1459,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css":
+/*!************************************************************************************************************!*\
+  !*** ./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css ***!
+  \************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_style_index_0_id_24621b2a_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=style&index=0&id=24621b2a&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/views/Countries/Edit.vue?vue&type=style&index=0&id=734c5df8&scoped=true&lang=css":
 /*!*******************************************************************************************************!*\
   !*** ./resources/js/views/Countries/Edit.vue?vue&type=style&index=0&id=734c5df8&scoped=true&lang=css ***!
@@ -1417,18 +1483,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a":
-/*!**********************************************************************************!*\
-  !*** ./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a ***!
-  \**********************************************************************************/
+/***/ "./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true":
+/*!**********************************************************************************************!*\
+  !*** ./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true ***!
+  \**********************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Countries.vue?vue&type=template&id=24621b2a */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Countries_vue_vue_type_template_id_24621b2a_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Countries.vue?vue&type=template&id=24621b2a&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true");
 
 
 /***/ }),
@@ -1449,10 +1515,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a":
-/*!*************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a ***!
-  \*************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Countries/Countries.vue?vue&type=template&id=24621b2a&scoped=true ***!
+  \*************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -1468,20 +1534,20 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("manage_countries")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-            _c(
-              "nav",
-              {
-                staticClass: "breadcrumb-header float-start float-lg-end",
-                attrs: { "aria-label": "breadcrumb" },
-              },
-              [
-                _c("ol", { staticClass: "breadcrumb" }, [
+        _c("div", { staticClass: "page-title mb-3" }, [
+          _c(
+            "div",
+            {
+              staticClass:
+                "d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2",
+            },
+            [
+              _c("h3", { staticClass: "mb-0" }, [
+                _vm._v(_vm._s(_vm.__("manage_countries"))),
+              ]),
+              _vm._v(" "),
+              _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+                _c("ol", { staticClass: "breadcrumb mb-0" }, [
                   _c(
                     "li",
                     { staticClass: "breadcrumb-item" },
@@ -1502,187 +1568,170 @@ var render = function () {
                     [_vm._v(_vm._s(_vm.__("manage_countries")))]
                   ),
                 ]),
-              ]
-            ),
-          ]),
+              ]),
+            ]
+          ),
         ]),
         _vm._v(" "),
         _c("section", { staticClass: "section mb-4" }, [
-          _c("div", { staticClass: "figma-main-section-card mb-0" }, [
-            _c(
-              "div",
-              {
-                staticClass:
-                  "card-header d-flex justify-content-between align-items-center",
-              },
-              [
-                _c("h4", { staticClass: "card-title mb-0" }, [
+          _c("div", { staticClass: "card mb-0" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _c(
+                "h4",
+                { staticClass: "card-title mb-0 text-start float-none" },
+                [
                   _vm._v(
                     _vm._s(
                       _vm.__("items_background_colors") ||
                         "Items Background Colors"
                     )
                   ),
-                ]),
-                _vm._v(" "),
-                _c(
-                  "b-button",
-                  {
-                    attrs: {
-                      size: "sm",
-                      variant: "primary",
-                      disabled: _vm.isSavingGlobal,
-                    },
-                    on: { click: _vm.saveGlobalColors },
-                  },
-                  [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm.__("save")) +
-                        "\n                        "
-                    ),
-                    _vm.isSavingGlobal
-                      ? _c("b-spinner", {
-                          staticClass: "ml-1",
-                          attrs: { small: "" },
-                        })
-                      : _vm._e(),
-                  ],
-                  1
+                ]
+              ),
+              _vm._v(" "),
+              _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                _vm._v(
+                  _vm._s(
+                    _vm.tr(
+                      "items_background_colors_desc",
+                      "Background colour used behind country items in the apps, globally or per country."
+                    )
+                  )
                 ),
-              ],
-              1
-            ),
+              ]),
+            ]),
             _vm._v(" "),
-            _c(
-              "div",
-              {
-                staticClass: "card-body",
-                staticStyle: { padding: "24px !important" },
-              },
-              [
-                _c("div", { staticClass: "row mb-3" }, [
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _c("label", { staticClass: "form-label d-block" }, [
-                      _vm._v(
-                        _vm._s(
-                          _vm.__("items_background_color_mode") ||
-                            "Items Background Colour"
-                        )
-                      ),
-                    ]),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "form-check form-check-inline d-inline-block",
-                      },
-                      [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value:
-                                _vm.globalSettings
-                                  .country_background_color_mode,
-                              expression:
-                                "globalSettings.country_background_color_mode",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            type: "radio",
-                            id: "colorModeGlobal",
-                            value: "global",
-                          },
-                          domProps: {
-                            checked: _vm._q(
-                              _vm.globalSettings.country_background_color_mode,
-                              "global"
-                            ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              return _vm.$set(
-                                _vm.globalSettings,
-                                "country_background_color_mode",
-                                "global"
-                              )
-                            },
-                          },
-                        }),
-                        _vm._v(" "),
-                        _c(
-                          "label",
-                          {
-                            staticClass: "form-check-label ms-1",
-                            attrs: { for: "colorModeGlobal" },
-                          },
-                          [_vm._v(_vm._s(_vm.__("global") || "Global"))]
-                        ),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "form-check form-check-inline d-inline-block ms-3",
-                      },
-                      [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value:
-                                _vm.globalSettings
-                                  .country_background_color_mode,
-                              expression:
-                                "globalSettings.country_background_color_mode",
-                            },
-                          ],
-                          staticClass: "form-check-input",
-                          attrs: {
-                            type: "radio",
-                            id: "colorModeItemWise",
-                            value: "item-wise",
-                          },
-                          domProps: {
-                            checked: _vm._q(
-                              _vm.globalSettings.country_background_color_mode,
-                              "item-wise"
-                            ),
-                          },
-                          on: {
-                            change: function ($event) {
-                              return _vm.$set(
-                                _vm.globalSettings,
-                                "country_background_color_mode",
-                                "item-wise"
-                              )
-                            },
-                          },
-                        }),
-                        _vm._v(" "),
-                        _c(
-                          "label",
-                          {
-                            staticClass: "form-check-label ms-1",
-                            attrs: { for: "colorModeItemWise" },
-                          },
-                          [_vm._v(_vm._s(_vm.__("item_wise") || "Item Wise"))]
-                        ),
-                      ]
+            _c("div", { staticClass: "card-body" }, [
+              _c("div", { staticClass: "row mb-3" }, [
+                _c("div", { staticClass: "col-md-12" }, [
+                  _c("label", { staticClass: "form-label d-block" }, [
+                    _vm._v(
+                      _vm._s(
+                        _vm.__("items_background_color_mode") ||
+                          "Items Background Colour"
+                      )
                     ),
                   ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass:
+                        "d-flex flex-wrap align-items-center gap-2 gap-sm-3",
+                    },
+                    [
+                      _c(
+                        "div",
+                        { staticClass: "form-check form-check-inline m-0" },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.globalSettings
+                                    .country_background_color_mode,
+                                expression:
+                                  "globalSettings.country_background_color_mode",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              type: "radio",
+                              id: "colorModeGlobal",
+                              value: "global",
+                            },
+                            domProps: {
+                              checked: _vm._q(
+                                _vm.globalSettings
+                                  .country_background_color_mode,
+                                "global"
+                              ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                return _vm.$set(
+                                  _vm.globalSettings,
+                                  "country_background_color_mode",
+                                  "global"
+                                )
+                              },
+                            },
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "label",
+                            {
+                              staticClass: "form-check-label ms-1",
+                              attrs: { for: "colorModeGlobal" },
+                            },
+                            [_vm._v(_vm._s(_vm.__("global") || "Global"))]
+                          ),
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-check form-check-inline m-0" },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value:
+                                  _vm.globalSettings
+                                    .country_background_color_mode,
+                                expression:
+                                  "globalSettings.country_background_color_mode",
+                              },
+                            ],
+                            staticClass: "form-check-input",
+                            attrs: {
+                              type: "radio",
+                              id: "colorModeItemWise",
+                              value: "item-wise",
+                            },
+                            domProps: {
+                              checked: _vm._q(
+                                _vm.globalSettings
+                                  .country_background_color_mode,
+                                "item-wise"
+                              ),
+                            },
+                            on: {
+                              change: function ($event) {
+                                return _vm.$set(
+                                  _vm.globalSettings,
+                                  "country_background_color_mode",
+                                  "item-wise"
+                                )
+                              },
+                            },
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "label",
+                            {
+                              staticClass: "form-check-label ms-1",
+                              attrs: { for: "colorModeItemWise" },
+                            },
+                            [_vm._v(_vm._s(_vm.__("item_wise") || "Item Wise"))]
+                          ),
+                        ]
+                      ),
+                    ]
+                  ),
                 ]),
-                _vm._v(" "),
-                _vm.globalSettings.country_background_color_mode === "global"
-                  ? _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col-md-6 form-group mb-0" }, [
+              ]),
+              _vm._v(" "),
+              _vm.globalSettings.country_background_color_mode === "global"
+                ? _c("div", { staticClass: "row" }, [
+                    _c(
+                      "div",
+                      { staticClass: "col-md-6 form-group mb-3 mb-md-0" },
+                      [
                         _c("label", [
                           _vm._v(
                             _vm._s(
@@ -1695,11 +1744,8 @@ var render = function () {
                         _c(
                           "div",
                           {
-                            staticClass: "d-flex w-100 mt-1",
-                            staticStyle: {
-                              gap: "10px",
-                              "align-items": "center",
-                            },
+                            staticClass:
+                              "d-flex flex-wrap align-items-center gap-2 w-100 category-color-row",
                           },
                           [
                             _c("input", {
@@ -1714,7 +1760,7 @@ var render = function () {
                                     "globalSettings.country_background_color_light_theme",
                                 },
                               ],
-                              staticClass: "form-control",
+                              staticClass: "form-control category-color-text",
                               attrs: { type: "text" },
                               domProps: {
                                 value:
@@ -1736,8 +1782,8 @@ var render = function () {
                             }),
                             _vm._v(" "),
                             _c("input", {
-                              staticClass: "form-control cursor-pointer",
-                              staticStyle: { "max-width": "100px" },
+                              staticClass:
+                                "form-control cursor-pointer color-swatch-input",
                               attrs: { type: "color" },
                               domProps: {
                                 value:
@@ -1796,127 +1842,159 @@ var render = function () {
                           ],
                           1
                         ),
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6 form-group mb-0" }, [
+                      _c("label", [
+                        _vm._v(
+                          _vm._s(
+                            _vm.__("country_dark_theme_background") ||
+                              "Country Dark Theme Background"
+                          )
+                        ),
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6 form-group mb-0" }, [
-                        _c("label", [
-                          _vm._v(
-                            _vm._s(
-                              _vm.__("country_dark_theme_background") ||
-                                "Country Dark Theme Background"
-                            )
-                          ),
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass: "d-flex w-100 mt-1",
-                            staticStyle: {
-                              gap: "10px",
-                              "align-items": "center",
-                            },
-                          },
-                          [
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value:
-                                    _vm.globalSettings
-                                      .country_background_color_dark_theme,
-                                  expression:
-                                    "globalSettings.country_background_color_dark_theme",
-                                },
-                              ],
-                              staticClass: "form-control",
-                              attrs: { type: "text" },
-                              domProps: {
+                      _c(
+                        "div",
+                        {
+                          staticClass:
+                            "d-flex flex-wrap align-items-center gap-2 w-100 category-color-row",
+                        },
+                        [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
                                 value:
                                   _vm.globalSettings
                                     .country_background_color_dark_theme,
+                                expression:
+                                  "globalSettings.country_background_color_dark_theme",
                               },
-                              on: {
-                                input: function ($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.$set(
-                                    _vm.globalSettings,
-                                    "country_background_color_dark_theme",
-                                    $event.target.value
-                                  )
-                                },
+                            ],
+                            staticClass: "form-control category-color-text",
+                            attrs: { type: "text" },
+                            domProps: {
+                              value:
+                                _vm.globalSettings
+                                  .country_background_color_dark_theme,
+                            },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.globalSettings,
+                                  "country_background_color_dark_theme",
+                                  $event.target.value
+                                )
                               },
-                            }),
-                            _vm._v(" "),
-                            _c("input", {
-                              staticClass: "form-control cursor-pointer",
-                              staticStyle: { "max-width": "100px" },
-                              attrs: { type: "color" },
-                              domProps: {
-                                value:
+                            },
+                          }),
+                          _vm._v(" "),
+                          _c("input", {
+                            staticClass:
+                              "form-control cursor-pointer color-swatch-input",
+                            attrs: { type: "color" },
+                            domProps: {
+                              value:
+                                _vm.globalSettings
+                                  .country_background_color_dark_theme &&
+                                _vm.globalSettings.country_background_color_dark_theme.startsWith(
+                                  "#"
+                                ) &&
+                                (_vm.globalSettings
+                                  .country_background_color_dark_theme
+                                  .length === 4 ||
                                   _vm.globalSettings
-                                    .country_background_color_dark_theme &&
-                                  _vm.globalSettings.country_background_color_dark_theme.startsWith(
-                                    "#"
-                                  ) &&
-                                  (_vm.globalSettings
                                     .country_background_color_dark_theme
-                                    .length === 4 ||
-                                    _vm.globalSettings
-                                      .country_background_color_dark_theme
-                                      .length === 7 ||
-                                    _vm.globalSettings
-                                      .country_background_color_dark_theme
-                                      .length === 9)
-                                    ? _vm.globalSettings.country_background_color_dark_theme.substring(
-                                        0,
-                                        7
-                                      )
-                                    : "#000000",
+                                    .length === 7 ||
+                                  _vm.globalSettings
+                                    .country_background_color_dark_theme
+                                    .length === 9)
+                                  ? _vm.globalSettings.country_background_color_dark_theme.substring(
+                                      0,
+                                      7
+                                    )
+                                  : "#000000",
+                            },
+                            on: {
+                              input: function ($event) {
+                                _vm.globalSettings.country_background_color_dark_theme =
+                                  $event.target.value
+                              },
+                            },
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "b-button",
+                            {
+                              attrs: {
+                                size: "sm",
+                                variant: "outline-secondary",
                               },
                               on: {
-                                input: function ($event) {
+                                click: function ($event) {
                                   _vm.globalSettings.country_background_color_dark_theme =
-                                    $event.target.value
+                                    "#00000000"
                                 },
                               },
-                            }),
-                            _vm._v(" "),
-                            _c(
-                              "b-button",
-                              {
-                                attrs: {
-                                  size: "sm",
-                                  variant: "outline-secondary",
-                                },
-                                on: {
-                                  click: function ($event) {
-                                    _vm.globalSettings.country_background_color_dark_theme =
-                                      "#00000000"
-                                  },
-                                },
-                              },
-                              [
-                                _vm._v(
-                                  "\n                                    " +
-                                    _vm._s(
-                                      _vm.__("transparent") || "Transparent"
-                                    ) +
-                                    "\n                                "
-                                ),
-                              ]
-                            ),
-                          ],
-                          1
-                        ),
-                      ]),
-                    ])
-                  : _vm._e(),
-              ]
-            ),
+                            },
+                            [
+                              _vm._v(
+                                "\n                                    " +
+                                  _vm._s(
+                                    _vm.__("transparent") || "Transparent"
+                                  ) +
+                                  "\n                                "
+                              ),
+                            ]
+                          ),
+                        ],
+                        1
+                      ),
+                    ]),
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "d-flex justify-content-end border-top pt-3 mt-3",
+                },
+                [
+                  _c(
+                    "b-button",
+                    {
+                      attrs: {
+                        variant: "primary",
+                        disabled: _vm.isSavingGlobal,
+                      },
+                      on: { click: _vm.saveGlobalColors },
+                    },
+                    [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(_vm.__("save")) +
+                          "\n                            "
+                      ),
+                      _vm.isSavingGlobal
+                        ? _c("b-spinner", {
+                            staticClass: "ml-1",
+                            attrs: { small: "" },
+                          })
+                        : _vm._e(),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+            ]),
           ]),
         ]),
         _vm._v(" "),
@@ -1938,41 +2016,34 @@ var render = function () {
                           "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
                       },
                       [
-                        _c(
-                          "div",
-                          {
-                            staticClass: "figma-search-container",
-                            staticStyle: { "min-width": "250px" },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-search text-muted" }),
-                            _vm._v(" "),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.filter,
-                                  expression: "filter",
-                                },
-                              ],
-                              staticClass: "figma-search-input",
-                              attrs: {
-                                type: "text",
-                                placeholder: _vm.__("search"),
+                        _c("div", { staticClass: "figma-search-container" }, [
+                          _c("i", { staticClass: "fa fa-search text-muted" }),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.filter,
+                                expression: "filter",
                               },
-                              domProps: { value: _vm.filter },
-                              on: {
-                                input: function ($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.filter = $event.target.value
-                                },
+                            ],
+                            staticClass: "figma-search-input",
+                            attrs: {
+                              type: "text",
+                              placeholder: _vm.__("search"),
+                            },
+                            domProps: { value: _vm.filter },
+                            on: {
+                              input: function ($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.filter = $event.target.value
                               },
-                            }),
-                          ]
-                        ),
+                            },
+                          }),
+                        ]),
                       ]
                     ),
                     _vm._v(" "),
@@ -1983,6 +2054,32 @@ var render = function () {
                           "d-flex gap-2 align-items-center flex-wrap",
                       },
                       [
+                        _c(
+                          "button",
+                          {
+                            directives: [
+                              {
+                                name: "b-tooltip",
+                                rawName: "v-b-tooltip.hover",
+                                modifiers: { hover: true },
+                              },
+                            ],
+                            staticClass:
+                              "btn btn-figma-columns d-flex align-items-center gap-2",
+                            attrs: { title: _vm.__("refresh") },
+                            on: {
+                              click: function ($event) {
+                                return _vm.getRecords()
+                              },
+                            },
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-refresh" }),
+                            _vm._v(" "),
+                            _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
+                          ]
+                        ),
+                        _vm._v(" "),
                         _vm.$can("country_create")
                           ? _c(
                               "router-link",
@@ -2000,32 +2097,6 @@ var render = function () {
                               ]
                             )
                           : _vm._e(),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2",
-                            attrs: { title: _vm.__("refresh") },
-                            on: {
-                              click: function ($event) {
-                                return _vm.getRecords()
-                              },
-                            },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-refresh" }),
-                            _vm._v(" "),
-                            _c("span", [_vm._v(_vm._s(_vm.__("refresh")))]),
-                          ]
-                        ),
                       ],
                       1
                     ),
@@ -2078,7 +2149,7 @@ var render = function () {
                             return [
                               _c(
                                 "div",
-                                { staticClass: "text-center text-black my-2" },
+                                { staticClass: "text-center text-muted my-3" },
                                 [
                                   _c("b-spinner", {
                                     staticClass: "align-middle",
@@ -2093,6 +2164,42 @@ var render = function () {
                             ]
                           },
                           proxy: true,
+                        },
+                        {
+                          key: "empty",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-inbox fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyText)),
+                                ]
+                              ),
+                            ]
+                          },
+                        },
+                        {
+                          key: "emptyfiltered",
+                          fn: function (scope) {
+                            return [
+                              _c(
+                                "div",
+                                { staticClass: "text-center text-muted py-4" },
+                                [
+                                  _c("i", {
+                                    staticClass:
+                                      "fa fa-search fa-2x d-block mb-2",
+                                  }),
+                                  _vm._v(_vm._s(scope.emptyFilteredText)),
+                                ]
+                              ),
+                            ]
+                          },
                         },
                         {
                           key: "cell(id)",
@@ -2110,17 +2217,15 @@ var render = function () {
                           key: "cell(logo)",
                           fn: function (row) {
                             return [
-                              row.item.logo === ""
-                                ? _c("p", { staticClass: "mb-0" }, [
-                                    _vm._v(" " + _vm._s(_vm.__("no_image"))),
-                                  ])
-                                : _c("img", {
-                                    staticClass: "rounded",
-                                    attrs: {
-                                      src: _vm.$storageUrl + row.item.logo,
-                                      height: "40",
-                                    },
-                                  }),
+                              _c("img", {
+                                staticClass: "rounded",
+                                attrs: {
+                                  src: row.item.logo
+                                    ? _vm.$storageUrl + row.item.logo
+                                    : _vm.$placeholderImage,
+                                  height: "40",
+                                },
+                              }),
                             ]
                           },
                         },
@@ -2250,20 +2355,15 @@ var render = function () {
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
+                  { staticClass: "figma-table-footer flex-wrap gap-3" },
                   [
-                    _c("div", { staticClass: "showing-results-text small" }, [
-                      _vm._v(
-                        "\n                                Showing Result : "
-                      ),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.pageEnd)),
-                      ]),
-                      _vm._v(" of "),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.totalRows)),
-                      ]),
-                    ]),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -2291,7 +2391,8 @@ var render = function () {
                       ],
                       1
                     ),
-                  ]
+                  ],
+                  1
                 ),
               ]),
             ]),
@@ -2359,8 +2460,21 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v("\n            " + _vm._s(_vm.__("cancel")) + "\n        ")]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -2380,12 +2494,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v("\n            " + _vm._s(_vm.__("cancel")) + "\n        ")]
           ),
         ],
         1
@@ -2466,7 +2574,7 @@ var render = function () {
                       language.is_default && _vm.languages.length > 1
                         ? _c(
                             "div",
-                            { staticClass: "mb-2" },
+                            { staticClass: "mb-3 d-flex flex-wrap gap-2" },
                             [
                               _c(
                                 "b-button",
@@ -2478,7 +2586,6 @@ var render = function () {
                                       modifiers: { hover: true },
                                     },
                                   ],
-                                  staticClass: "mr-2",
                                   attrs: {
                                     size: "sm",
                                     variant: "outline-primary",
@@ -2550,7 +2657,7 @@ var render = function () {
                                     "div",
                                     {
                                       staticClass:
-                                        "text-success mt-2 font-weight-bold",
+                                        "text-success w-100 font-weight-bold",
                                     },
                                     [
                                       _vm._v(
@@ -2571,13 +2678,14 @@ var render = function () {
                         { staticClass: "row" },
                         [
                           _c("div", { staticClass: "form-group col-md-12" }, [
-                            _c("label", [_vm._v(_vm._s(_vm.__("name")))]),
-                            _vm._v(" "),
-                            language.is_default
-                              ? _c("i", { staticClass: "text-danger" }, [
-                                  _vm._v("*"),
-                                ])
-                              : _vm._e(),
+                            _c("label", [
+                              _vm._v(_vm._s(_vm.__("name")) + " "),
+                              language.is_default
+                                ? _c("span", { staticClass: "text-danger" }, [
+                                    _vm._v("*"),
+                                  ])
+                                : _vm._e(),
+                            ]),
                             _vm._v(" "),
                             _c("input", {
                               directives: [
@@ -2707,8 +2815,8 @@ var render = function () {
                                     _c(
                                       "div",
                                       {
-                                        staticClass: "form-group flex-fill",
-                                        staticStyle: { "min-width": "200px" },
+                                        staticClass:
+                                          "form-group flex-fill logo-status-col",
                                       },
                                       [
                                         _c(
@@ -2814,10 +2922,8 @@ var render = function () {
                                       ? _c(
                                           "div",
                                           {
-                                            staticClass: "form-group flex-fill",
-                                            staticStyle: {
-                                              "min-width": "200px",
-                                            },
+                                            staticClass:
+                                              "form-group flex-fill logo-status-col",
                                           },
                                           [
                                             _c(
@@ -2878,12 +2984,8 @@ var render = function () {
                                         _c(
                                           "div",
                                           {
-                                            staticClass: "d-flex",
-                                            staticStyle: {
-                                              gap: "10px",
-                                              "align-items": "center",
-                                              "max-width": "500px",
-                                            },
+                                            staticClass:
+                                              "d-flex flex-wrap align-items-center gap-2",
                                           },
                                           [
                                             _c("input", {
@@ -2897,7 +2999,8 @@ var render = function () {
                                                     "background_color_for_light_theme",
                                                 },
                                               ],
-                                              staticClass: "form-control",
+                                              staticClass:
+                                                "form-control color-text-input",
                                               attrs: { type: "text" },
                                               domProps: {
                                                 value:
@@ -2916,10 +3019,7 @@ var render = function () {
                                             _vm._v(" "),
                                             _c("input", {
                                               staticClass:
-                                                "form-control cursor-pointer",
-                                              staticStyle: {
-                                                "max-width": "100px",
-                                              },
+                                                "form-control cursor-pointer color-swatch-input",
                                               attrs: { type: "color" },
                                               domProps: {
                                                 value:
@@ -3015,12 +3115,8 @@ var render = function () {
                                         _c(
                                           "div",
                                           {
-                                            staticClass: "d-flex",
-                                            staticStyle: {
-                                              gap: "10px",
-                                              "align-items": "center",
-                                              "max-width": "500px",
-                                            },
+                                            staticClass:
+                                              "d-flex flex-wrap align-items-center gap-2",
                                           },
                                           [
                                             _c("input", {
@@ -3034,7 +3130,8 @@ var render = function () {
                                                     "background_color_for_dark_theme",
                                                 },
                                               ],
-                                              staticClass: "form-control",
+                                              staticClass:
+                                                "form-control color-text-input",
                                               attrs: { type: "text" },
                                               domProps: {
                                                 value:
@@ -3053,10 +3150,7 @@ var render = function () {
                                             _vm._v(" "),
                                             _c("input", {
                                               staticClass:
-                                                "form-control cursor-pointer",
-                                              staticStyle: {
-                                                "max-width": "100px",
-                                              },
+                                                "form-control cursor-pointer color-swatch-input",
                                               attrs: { type: "color" },
                                               domProps: {
                                                 value:
@@ -3143,10 +3237,7 @@ var render = function () {
               )
             : _vm._e(),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ],
         1
       ),

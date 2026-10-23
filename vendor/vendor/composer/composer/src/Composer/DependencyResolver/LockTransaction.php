@@ -14,7 +14,6 @@ namespace Composer\DependencyResolver;
 
 use Composer\Package\AliasPackage;
 use Composer\Package\BasePackage;
-use Composer\Package\Loader\ValidatingArrayLoader;
 use Composer\Package\Package;
 use Composer\Pcre\Preg;
 
@@ -27,9 +26,9 @@ class LockTransaction extends Transaction
     /**
      * packages in current lock file, platform repo or otherwise present
      *
-     * Indexed by spl_object_id
+     * Indexed by spl_object_hash
      *
-     * @var array<int, BasePackage>
+     * @var array<string, BasePackage>
      */
     protected $presentMap;
 
@@ -48,7 +47,7 @@ class LockTransaction extends Transaction
     protected $resultPackages;
 
     /**
-     * @param array<int, BasePackage> $presentMap
+     * @param array<string, BasePackage> $presentMap
      * @param array<int, BasePackage> $unlockableMap
      */
     public function __construct(Pool $pool, array $presentMap, array $unlockableMap, Decisions $decisions)
@@ -70,8 +69,6 @@ class LockTransaction extends Transaction
 
             if ($literal > 0) {
                 $package = $pool->literalToPackage($literal);
-
-                ValidatingArrayLoader::validatePackage($package);
 
                 $this->resultPackages['all'][] = $package;
                 if (!isset($this->unlockableMap[$package->id])) {
@@ -112,7 +109,7 @@ class LockTransaction extends Transaction
             }
 
             // if we're just updating mirrors we need to reset everything to the same as currently "present" packages' references to keep the lock file as-is
-            if ($updateMirrors === true && !array_key_exists(spl_object_id($package), $this->presentMap)) {
+            if ($updateMirrors === true && !array_key_exists(spl_object_hash($package), $this->presentMap)) {
                 $package = $this->updateMirrorAndUrls($package);
             }
 

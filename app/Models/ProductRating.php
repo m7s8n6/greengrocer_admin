@@ -28,7 +28,7 @@ class ProductRating extends Model
         if($this->image){
             $image_url = asset('storage/'.$this->image);
         }else{
-            $image_url = '';
+            $image_url = \App\Helpers\CommonHelper::getPlaceholderImageUrl();
         }
         return $image_url;
     }

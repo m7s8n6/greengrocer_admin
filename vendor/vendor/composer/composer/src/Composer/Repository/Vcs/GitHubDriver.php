@@ -20,7 +20,6 @@ use Composer\IO\IOInterface;
 use Composer\Pcre\Preg;
 use Composer\Util\GitHub;
 use Composer\Util\Http\Response;
-use Composer\Util\Url;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
@@ -47,8 +46,6 @@ class GitHubDriver extends VcsDriver
     private $isArchived = false;
     /** @var array<int, array{type: string, url: string}>|false|null */
     private $fundingInfo;
-    /** @var bool */
-    private $allowGitFallback = true;
 
     /**
      * Git Driver
@@ -63,7 +60,7 @@ class GitHubDriver extends VcsDriver
     public function initialize(): void
     {
         if (!Preg::isMatch('#^(?:(?:https?|git)://([^/]+)/|git@([^:]+):/?)([^/]+)/([^/]+?)(?:\.git|/)?$#', $this->url, $match)) {
-            throw new \InvalidArgumentException(sprintf('The GitHub repository URL %s is invalid.', Url::sanitize($this->url)));
+            throw new \InvalidArgumentException(sprintf('The GitHub repository URL %s is invalid.', $this->url));
         }
 
         $this->owner = $match[3];
@@ -74,10 +71,6 @@ class GitHubDriver extends VcsDriver
         }
         $this->cache = new Cache($this->io, $this->config->get('cache-repo-dir').'/'.$this->originUrl.'/'.$this->owner.'/'.$this->repository);
         $this->cache->setReadOnly($this->config->get('cache-read-only'));
-
-        if (isset($this->repoConfig['allow-git-fallback']) && $this->repoConfig['allow-git-fallback'] === false) {
-            $this->allowGitFallback = false;
-        }
 
         if ($this->config->get('use-github-api') === false || (isset($this->repoConfig['no-api']) && $this->repoConfig['no-api'])) {
             $this->setupGitDriver($this->url);
@@ -173,7 +166,7 @@ class GitHubDriver extends VcsDriver
                 $composer = $this->getBaseComposerInformation($identifier);
 
                 if ($this->shouldCache($identifier)) {
-                    $this->cache->write($identifier, JsonFile::encode($composer, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES));
+                    $this->cache->write($identifier, json_encode($composer));
                 }
             }
 
@@ -438,7 +431,7 @@ class GitHubDriver extends VcsDriver
         }
 
         if (!extension_loaded('openssl')) {
-            $io->writeError('Skipping GitHub driver for '.Url::sanitize($url).' because the OpenSSL PHP extension is missing.', true, IOInterface::VERBOSE);
+            $io->writeError('Skipping GitHub driver for '.$url.' because the OpenSSL PHP extension is missing.', true, IOInterface::VERBOSE);
 
             return false;
         }
@@ -493,7 +486,7 @@ class GitHubDriver extends VcsDriver
                     }
 
                     if (!$this->io->isInteractive()) {
-                        $this->attemptCloneFallback($e);
+                        $this->attemptCloneFallback();
 
                         return new Response(['url' => 'dummy'], 200, [], 'null');
                     }
@@ -512,7 +505,7 @@ class GitHubDriver extends VcsDriver
                     // non-authenticated requests get no scopesNeeded, so ask for credentials
                     // authenticated requests which failed some scopes should ask for new credentials too
                     if (!$headers || !count($scopesNeeded) || count($scopesFailed)) {
-                        $gitHubUtil->authorizeOAuthInteractively($this->originUrl, 'Your GitHub credentials are required to fetch private repository metadata (<info>'.Url::sanitize($this->url).'</info>)');
+                        $gitHubUtil->authorizeOAuthInteractively($this->originUrl, 'Your GitHub credentials are required to fetch private repository metadata (<info>'.$this->url.'</info>)');
                     }
 
                     return parent::getContents($url);
@@ -523,7 +516,7 @@ class GitHubDriver extends VcsDriver
                     }
 
                     if (!$this->io->isInteractive() && $fetchingRepoData) {
-                        $this->attemptCloneFallback($e);
+                        $this->attemptCloneFallback();
 
                         return new Response(['url' => 'dummy'], 200, [], 'null');
                     }
@@ -532,11 +525,11 @@ class GitHubDriver extends VcsDriver
 
                     if (!$this->io->hasAuthentication($this->originUrl)) {
                         if (!$this->io->isInteractive()) {
-                            $this->io->writeError('<error>GitHub API limit exhausted. Failed to get metadata for the '.Url::sanitize($this->url).' repository, try running in interactive mode so that you can enter your GitHub credentials to increase the API limit</error>');
+                            $this->io->writeError('<error>GitHub API limit exhausted. Failed to get metadata for the '.$this->url.' repository, try running in interactive mode so that you can enter your GitHub credentials to increase the API limit</error>');
                             throw $e;
                         }
 
-                        $gitHubUtil->authorizeOAuthInteractively($this->originUrl, 'API limit exhausted. Enter your GitHub credentials to get a larger API limit (<info>'.Url::sanitize($this->url).'</info>)');
+                        $gitHubUtil->authorizeOAuthInteractively($this->originUrl, 'API limit exhausted. Enter your GitHub credentials to get a larger API limit (<info>'.$this->url.'</info>)');
 
                         return parent::getContents($url);
                     }
@@ -575,7 +568,7 @@ class GitHubDriver extends VcsDriver
             $this->repoData = $this->getContents($repoDataUrl, true)->decodeJson();
         } catch (TransportException $e) {
             if ($e->getCode() === 499) {
-                $this->attemptCloneFallback($e);
+                $this->attemptCloneFallback();
             } else {
                 throw $e;
             }
@@ -605,12 +598,8 @@ class GitHubDriver extends VcsDriver
      * @return true
      * @throws \RuntimeException
      */
-    protected function attemptCloneFallback(?\Throwable $e = null): bool
+    protected function attemptCloneFallback(): bool
     {
-        if (!$this->allowGitFallback) {
-            throw new \RuntimeException('Fallback to git driver disabled', 0, $e);
-        }
-
         $this->isPrivate = true;
 
         try {
@@ -631,9 +620,6 @@ class GitHubDriver extends VcsDriver
 
     protected function setupGitDriver(string $url): void
     {
-        if (!$this->allowGitFallback) {
-            throw new \RuntimeException('Fallback to git driver disabled');
-        }
         $this->gitDriver = new GitDriver(
             ['url' => $url],
             $this->io,

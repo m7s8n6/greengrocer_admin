@@ -206,7 +206,7 @@ class Product extends Model
                 ->value('image');
         }
 
-        return $image ? asset('storage/'.$image) : '';
+        return $image ? asset('storage/'.$image) : \App\Helpers\CommonHelper::getPlaceholderImageUrl();
     }
     public function ratings()
     {

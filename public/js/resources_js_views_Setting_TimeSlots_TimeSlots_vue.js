@@ -141,7 +141,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
 
 
 
@@ -591,6 +590,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -676,6 +686,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         time_slot_type: 'fixed'
       },
       timeSlot_settings: {},
+      oneSellerCart: false,
       validationNoOfDaysError: null,
       validationNoOfEstimateDaysError: null,
       currentLanguageId: null,
@@ -754,9 +765,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         this.totalRows = list.length;
         this.currentPage = 1;
       }
+    },
+    perPage: function perPage() {
+      this.currentPage = 1;
     }
   },
   methods: {
+    tr: function tr(key, fallback) {
+      var v = this.__(key);
+      return v && v !== key ? v : fallback;
+    },
     /**
      * List: show store-formatted time from API (*_display). Edit modal still uses raw HH:mm fields on the same row.
      */
@@ -827,8 +845,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: "Cancel",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#37a279",
-        cancelButtonColor: "#d33"
+        confirmButtonColor: "var(--theme-primary-500)",
+        cancelButtonColor: "var(--theme-error-500)"
       }).then(function (result) {
         if (result.value) {
           _this6.isLoading = true;
@@ -849,6 +867,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       axios.get(this.$apiUrl + "/delivery_settings/getTimeSlotsSettings").then(function (response) {
         var data = response.data.data;
         _this7.timeSlot_settingsObject = data.timeSlot_settingsObject;
+        _this7.oneSellerCart = Number(data.one_seller_cart) === 1;
         // Normalize to 1/0 regardless of how it was saved previously (boolean "true"/"false"
         // strings from an old save, or "1"/"0") - every v-if in this form checks == 1.
         var enabledRaw = _this7.timeSlot_settingsObject.time_slots_is_enabled;
@@ -1206,7 +1225,30 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.image_preview[data-v-4973d20f] {\n    margin-top: 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.image_preview[data-v-4973d20f] {\n    margin-top: 5px;\n}\n/* Selected status button: global .btn-outline-primary has no .active state */\n[data-v-4973d20f] .btn-group-toggle > .btn.btn-outline-primary.active {\n    background: var(--theme-primary-500) !important; /* beats global !important outline background */\n    border-color: var(--theme-primary-500) !important;\n    color: var(--theme-neutral-50) !important;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Time slot config card (left) and slot list card (right) */\n.timeslot-refresh-btn {\n  width: 38px;\n  padding: 0 !important; /* global .btn-figma-filter padding is !important */\n}\n\n/* Selected slot type: BootstrapVue marks the checked button with .active (global outline style has no .active state) */\n.slot-type-group > .btn.btn-outline-primary.active {\n  background: var(--theme-primary-500) !important; /* beats global !important outline background */\n  border-color: var(--theme-primary-500) !important;\n  color: var(--theme-neutral-50) !important;\n}\n\n/* Button-style radio group: hide the native radio circles at every width */\n.slot-type-group input[type=\"radio\"] {\n  position: absolute;\n  opacity: 0;\n  pointer-events: none;\n}\n\n/* Unscoped on purpose: the toggle buttons are rendered inside BootstrapVue's b-form-radio-group,\n   outside this component's scope. Phones: slot-type toggle fills the row (two equal halves, no stray radio circles), and the\n   \"Add New Time Slot\" button takes the free width beside a fixed-size refresh button instead\n   of being squeezed into a narrow half-width cell. */\n@media (max-width: 575.98px) {\n.slot-type-group {\n    display: flex;\n    width: 100%;\n}\n.slot-type-group > .btn {\n    flex: 1 1 0;\n    min-width: 0;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    text-align: center;\n}\n.timeslot-list-col .figma-action-bar-row > .timeslot-actions {\n    display: flex !important;\n    flex-wrap: nowrap;\n    gap: 8px !important;\n}\n.timeslot-actions > .timeslot-add-btn {\n    flex: 1 1 auto;\n    width: auto;\n}\n.timeslot-actions > .timeslot-refresh-btn {\n    flex: 0 0 38px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1239,6 +1281,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_4973d20f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TimeSlots_vue_vue_type_style_index_0_id_7ed9bfb3_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TimeSlots_vue_vue_type_style_index_0_id_7ed9bfb3_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TimeSlots_vue_vue_type_style_index_0_id_7ed9bfb3_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -1294,15 +1365,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _TimeSlots_vue_vue_type_template_id_7ed9bfb3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TimeSlots.vue?vue&type=template&id=7ed9bfb3 */ "./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=template&id=7ed9bfb3");
 /* harmony import */ var _TimeSlots_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TimeSlots.vue?vue&type=script&lang=js */ "./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _TimeSlots_vue_vue_type_style_index_0_id_7ed9bfb3_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css */ "./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _TimeSlots_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
   _TimeSlots_vue_vue_type_template_id_7ed9bfb3__WEBPACK_IMPORTED_MODULE_0__.render,
   _TimeSlots_vue_vue_type_template_id_7ed9bfb3__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -1358,6 +1431,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Edit_vue_vue_type_style_index_0_id_4973d20f_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Edit.vue?vue&type=style&index=0&id=4973d20f&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/Edit.vue?vue&type=style&index=0&id=4973d20f&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TimeSlots_vue_vue_type_style_index_0_id_7ed9bfb3_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Setting/TimeSlots/TimeSlots.vue?vue&type=style&index=0&id=7ed9bfb3&lang=css");
 
 
 /***/ }),
@@ -1423,8 +1508,22 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
+          _c(
+            "b-button",
+            {
+              staticClass: "mr-2",
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
           _c(
             "b-button",
             {
@@ -1440,12 +1539,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -1622,7 +1715,7 @@ var render = function () {
                         "div",
                         { staticClass: "row" },
                         [
-                          _c("div", { staticClass: "form-group" }, [
+                          _c("div", { staticClass: "form-group col-12" }, [
                             _c("label", [_vm._v(_vm._s(_vm.__("title")))]),
                             _vm._v(" "),
                             language.is_default
@@ -1669,266 +1762,319 @@ var render = function () {
                           _vm.slot_type === "express"
                             ? [
                                 language.is_default
-                                  ? _c("div", { staticClass: "form-group" }, [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(
-                                            _vm.__("duration_minutes") ||
-                                              "Duration (minutes)"
-                                          )
-                                        ),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model.number",
-                                            value: _vm.duration_minutes,
-                                            expression: "duration_minutes",
-                                            modifiers: { number: true },
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "1",
-                                          required: "",
-                                          placeholder:
-                                            _vm.__("e_g_30") || "e.g. 30",
-                                        },
-                                        domProps: {
-                                          value: _vm.duration_minutes,
-                                        },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.duration_minutes = _vm._n(
-                                              $event.target.value
-                                            )
-                                          },
-                                          blur: function ($event) {
-                                            return _vm.$forceUpdate()
-                                          },
-                                        },
-                                      }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "small",
-                                        { staticClass: "text-muted" },
-                                        [
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group col-md-6" },
+                                      [
+                                        _c("label", [
                                           _vm._v(
                                             _vm._s(
-                                              _vm.__("express_duration_hint") ||
-                                                "Delivered within this many minutes of the order being placed."
+                                              _vm.__("duration_minutes") ||
+                                                "Duration (minutes)"
                                             )
                                           ),
-                                        ]
-                                      ),
-                                    ])
+                                        ]),
+                                        _vm._v(" "),
+                                        _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model.number",
+                                              value: _vm.duration_minutes,
+                                              expression: "duration_minutes",
+                                              modifiers: { number: true },
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            min: "1",
+                                            required: "",
+                                            placeholder:
+                                              _vm.__("e_g_30") || "e.g. 30",
+                                          },
+                                          domProps: {
+                                            value: _vm.duration_minutes,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.duration_minutes = _vm._n(
+                                                $event.target.value
+                                              )
+                                            },
+                                            blur: function ($event) {
+                                              return _vm.$forceUpdate()
+                                            },
+                                          },
+                                        }),
+                                        _vm._v(" "),
+                                        _c(
+                                          "small",
+                                          { staticClass: "text-muted" },
+                                          [
+                                            _vm._v(
+                                              _vm._s(
+                                                _vm.__(
+                                                  "express_duration_hint"
+                                                ) ||
+                                                  "Delivered within this many minutes of the order being placed."
+                                              )
+                                            ),
+                                          ]
+                                        ),
+                                      ]
+                                    )
                                   : _vm._e(),
                                 _vm._v(" "),
                                 language.is_default
-                                  ? _c("div", { staticClass: "form-group" }, [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(_vm.__("last_order_time"))
-                                        ),
-                                        _c("small", [
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group col-md-6" },
+                                      [
+                                        _c("label", [
                                           _vm._v(
-                                            "(" +
-                                              _vm._s(
-                                                _vm.__("24_hours_formate")
-                                              ) +
-                                              ", " +
-                                              _vm._s(
-                                                _vm.__("optional") || "optional"
-                                              ) +
-                                              ")"
+                                            _vm._s(_vm.__("last_order_time")) +
+                                              " "
+                                          ),
+                                          _c(
+                                            "small",
+                                            { staticClass: "text-muted" },
+                                            [
+                                              _vm._v(
+                                                "(" +
+                                                  _vm._s(
+                                                    _vm.__("24_hours_formate")
+                                                  ) +
+                                                  ", " +
+                                                  _vm._s(
+                                                    _vm.__("optional") ||
+                                                      "optional"
+                                                  ) +
+                                                  ")"
+                                              ),
+                                            ]
                                           ),
                                         ]),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.last_order_time,
+                                              expression: "last_order_time",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "time" },
+                                          domProps: {
                                             value: _vm.last_order_time,
-                                            expression: "last_order_time",
                                           },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: { type: "time" },
-                                        domProps: {
-                                          value: _vm.last_order_time,
-                                        },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.last_order_time =
-                                              $event.target.value
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.last_order_time =
+                                                $event.target.value
+                                            },
                                           },
-                                        },
-                                      }),
-                                    ])
+                                        }),
+                                      ]
+                                    )
                                   : _vm._e(),
                               ]
                             : [
                                 language.is_default
-                                  ? _c("div", { staticClass: "form-group" }, [
-                                      _c("label", [
-                                        _vm._v(_vm._s(_vm.__("from_time"))),
-                                        _c("small", [
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group col-md-6" },
+                                      [
+                                        _c("label", [
                                           _vm._v(
-                                            "(" +
-                                              _vm._s(
-                                                _vm.__("24_hours_formate")
-                                              ) +
-                                              ")"
+                                            _vm._s(_vm.__("from_time")) + " "
+                                          ),
+                                          _c(
+                                            "small",
+                                            { staticClass: "text-muted" },
+                                            [
+                                              _vm._v(
+                                                "(" +
+                                                  _vm._s(
+                                                    _vm.__("24_hours_formate")
+                                                  ) +
+                                                  ")"
+                                              ),
+                                            ]
                                           ),
                                         ]),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.from_time,
-                                            expression: "from_time",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: { type: "time", required: "" },
-                                        domProps: { value: _vm.from_time },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.from_time = $event.target.value
-                                          },
-                                        },
-                                      }),
-                                    ])
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                language.is_default
-                                  ? _c("div", { staticClass: "form-group" }, [
-                                      _c("label", [
-                                        _vm._v(" " + _vm._s(_vm.__("to_time"))),
-                                        _c("small", [
-                                          _vm._v(
-                                            "(" +
-                                              _vm._s(
-                                                _vm.__("24_hours_formate")
-                                              ) +
-                                              ")"
-                                          ),
-                                        ]),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.to_time,
-                                            expression: "to_time",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: { type: "time", required: "" },
-                                        domProps: { value: _vm.to_time },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.to_time = $event.target.value
-                                          },
-                                        },
-                                      }),
-                                    ])
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                language.is_default
-                                  ? _c("div", { staticClass: "form-group" }, [
-                                      _c("label", [
-                                        _vm._v(
-                                          " " +
-                                            _vm._s(_vm.__("last_order_time"))
+                                        _vm._v(" "),
+                                        _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
                                         ),
-                                        _c("small", [
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.from_time,
+                                              expression: "from_time",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "time", required: "" },
+                                          domProps: { value: _vm.from_time },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.from_time =
+                                                $event.target.value
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group col-md-6" },
+                                      [
+                                        _c("label", [
                                           _vm._v(
-                                            "(" +
-                                              _vm._s(
-                                                _vm.__("24_hours_formate")
-                                              ) +
-                                              ")"
+                                            _vm._s(_vm.__("to_time")) + " "
+                                          ),
+                                          _c(
+                                            "small",
+                                            { staticClass: "text-muted" },
+                                            [
+                                              _vm._v(
+                                                "(" +
+                                                  _vm._s(
+                                                    _vm.__("24_hours_formate")
+                                                  ) +
+                                                  ")"
+                                              ),
+                                            ]
                                           ),
                                         ]),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("i", { staticClass: "text-danger" }, [
-                                        _vm._v("*"),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
+                                        _vm._v(" "),
+                                        _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.to_time,
+                                              expression: "to_time",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "time", required: "" },
+                                          domProps: { value: _vm.to_time },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.to_time = $event.target.value
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                language.is_default
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "form-group col-md-6" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("last_order_time")) +
+                                              " "
+                                          ),
+                                          _c(
+                                            "small",
+                                            { staticClass: "text-muted" },
+                                            [
+                                              _vm._v(
+                                                "(" +
+                                                  _vm._s(
+                                                    _vm.__("24_hours_formate")
+                                                  ) +
+                                                  ")"
+                                              ),
+                                            ]
+                                          ),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c(
+                                          "i",
+                                          { staticClass: "text-danger" },
+                                          [_vm._v("*")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.last_order_time,
+                                              expression: "last_order_time",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: { type: "time", required: "" },
+                                          domProps: {
                                             value: _vm.last_order_time,
-                                            expression: "last_order_time",
                                           },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: { type: "time", required: "" },
-                                        domProps: {
-                                          value: _vm.last_order_time,
-                                        },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.last_order_time =
-                                              $event.target.value
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.last_order_time =
+                                                $event.target.value
+                                            },
                                           },
-                                        },
-                                      }),
-                                    ])
+                                        }),
+                                      ]
+                                    )
                                   : _vm._e(),
                               ],
                           _vm._v(" "),
                           language.is_default
-                            ? _c("div", { staticClass: "form-group" }, [
-                                _c("label", [
-                                  _vm._v(_vm._s(_vm.__("free_delivery"))),
-                                ]),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "col-md-9 text-left mt-1" },
-                                  [
+                            ? _c(
+                                "div",
+                                { staticClass: "form-group col-md-6" },
+                                [
+                                  _c("label", [
+                                    _vm._v(_vm._s(_vm.__("free_delivery"))),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("div", { staticClass: "mt-1" }, [
                                     _c(
                                       "div",
                                       {
@@ -2089,47 +2235,53 @@ var render = function () {
                                           ]
                                         )
                                       : _vm._e(),
-                                  ]
-                                ),
-                              ])
+                                  ]),
+                                ]
+                              )
                             : _vm._e(),
                           _vm._v(" "),
                           language.is_default
-                            ? _c("div", { staticClass: "form-group" }, [
-                                _c("label", [_vm._v(_vm._s(_vm.__("status")))]),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "col-md-9 text-left mt-1" },
-                                  [
-                                    _c("b-form-radio-group", {
-                                      attrs: {
-                                        options: [
-                                          {
-                                            text: _vm.__("deactivate"),
-                                            value: 0,
-                                          },
-                                          {
-                                            text: _vm.__("activate"),
-                                            value: 1,
-                                          },
-                                        ],
-                                        buttons: "",
-                                        "button-variant": "outline-primary",
-                                        required: "",
-                                      },
-                                      model: {
-                                        value: _vm.status,
-                                        callback: function ($$v) {
-                                          _vm.status = $$v
+                            ? _c(
+                                "div",
+                                { staticClass: "form-group col-md-6" },
+                                [
+                                  _c("label", [
+                                    _vm._v(_vm._s(_vm.__("status"))),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "mt-1" },
+                                    [
+                                      _c("b-form-radio-group", {
+                                        attrs: {
+                                          options: [
+                                            {
+                                              text: _vm.__("deactivate"),
+                                              value: 0,
+                                            },
+                                            {
+                                              text: _vm.__("activate"),
+                                              value: 1,
+                                            },
+                                          ],
+                                          buttons: "",
+                                          "button-variant": "outline-primary",
+                                          required: "",
                                         },
-                                        expression: "status",
-                                      },
-                                    }),
-                                  ],
-                                  1
-                                ),
-                              ])
+                                        model: {
+                                          value: _vm.status,
+                                          callback: function ($$v) {
+                                            _vm.status = $$v
+                                          },
+                                          expression: "status",
+                                        },
+                                      }),
+                                    ],
+                                    1
+                                  ),
+                                ]
+                              )
                             : _vm._e(),
                         ],
                         2
@@ -2138,7 +2290,7 @@ var render = function () {
                       _c("button", {
                         ref: "dummy_submit",
                         refInFor: true,
-                        staticStyle: { display: "none" },
+                        staticClass: "d-none",
                       }),
                     ]
                   )
@@ -2178,76 +2330,108 @@ var render = function () {
     "div",
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("manage_time_slots")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
+        _c("div", { staticClass: "page-title" }, [
+          _c("div", { staticClass: "row" }, [
             _c(
-              "nav",
-              {
-                staticClass: "breadcrumb-header float-start float-lg-end",
-                attrs: { "aria-label": "breadcrumb" },
-              },
+              "div",
+              { staticClass: "col-12 col-md-6 order-md-1 order-last" },
+              [_c("h3", [_vm._v(_vm._s(_vm.__("manage_time_slots")))])]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "col-12 col-md-6 order-md-2 order-first" },
               [
-                _c("ol", { staticClass: "breadcrumb" }, [
-                  _c(
-                    "li",
-                    { staticClass: "breadcrumb-item" },
-                    [
-                      _c("router-link", { attrs: { to: "/dashboard" } }, [
-                        _vm._v(_vm._s(_vm.__("dashboard"))),
-                      ]),
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "li",
-                    {
-                      staticClass: "breadcrumb-item active",
-                      attrs: { "aria-current": "page" },
-                    },
-                    [_vm._v(_vm._s(_vm.__("manage_time_slots")))]
-                  ),
-                ]),
+                _c(
+                  "nav",
+                  {
+                    staticClass: "breadcrumb-header float-start float-lg-end",
+                    attrs: { "aria-label": "breadcrumb" },
+                  },
+                  [
+                    _c("ol", { staticClass: "breadcrumb" }, [
+                      _c(
+                        "li",
+                        { staticClass: "breadcrumb-item" },
+                        [
+                          _c("router-link", { attrs: { to: "/dashboard" } }, [
+                            _vm._v(_vm._s(_vm.__("dashboard"))),
+                          ]),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "li",
+                        { staticClass: "breadcrumb-item" },
+                        [
+                          _c(
+                            "router-link",
+                            { attrs: { to: "/system_settings" } },
+                            [_vm._v(_vm._s(_vm.__("settings")))]
+                          ),
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "li",
+                        {
+                          staticClass: "breadcrumb-item active",
+                          attrs: { "aria-current": "page" },
+                        },
+                        [_vm._v(_vm._s(_vm.__("manage_time_slots")))]
+                      ),
+                    ]),
+                  ]
+                ),
               ]
             ),
           ]),
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
-            _c("div", { staticClass: "figma-main-section-card" }, [
-              _c("div", { staticClass: "card-header" }, [
-                _c("h4", { staticClass: "card-title" }, [
-                  _vm._v(_vm._s(_vm.__("time_slot_config"))),
+          _c(
+            "div",
+            { staticClass: "col-12 col-xl-4 timeslot-config-col mb-3 mb-xl-0" },
+            [
+              _c("div", { staticClass: "card mb-0" }, [
+                _c("div", { staticClass: "card-header" }, [
+                  _c("h4", { staticClass: "card-title float-none" }, [
+                    _vm._v(_vm._s(_vm.__("time_slot_config"))),
+                  ]),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "text-muted small mb-0 mt-1" }, [
+                    _vm._v(
+                      _vm._s(
+                        _vm.tr(
+                          "time_slot_config_desc",
+                          "Turn delivery time slots on or off and choose how customers pick a delivery time."
+                        )
+                      )
+                    ),
+                  ]),
                 ]),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-body p-4" }, [
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-md-4" }, [
-                    _c(
-                      "div",
-                      { staticClass: "box-body" },
-                      [
-                        _c("div", { staticClass: "form-group" }, [
-                          _c(
-                            "label",
-                            { attrs: { for: "time_slots_is_enabled" } },
-                            [
-                              _vm._v(
-                                _vm._s(_vm.__("enable")) +
-                                  " / " +
-                                  _vm._s(_vm.__("disable")) +
-                                  " " +
-                                  _vm._s(_vm.__("time_slots"))
-                              ),
-                            ]
-                          ),
-                          _vm._v(" "),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "card-body" },
+                  [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "time_slots_is_enabled" } }, [
+                        _vm._v(
+                          _vm._s(_vm.__("enable")) +
+                            " / " +
+                            _vm._s(_vm.__("disable")) +
+                            " " +
+                            _vm._s(_vm.__("time_slots"))
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-check form-switch mt-1" },
+                        [
                           _c("input", {
                             directives: [
                               {
@@ -2321,313 +2505,296 @@ var render = function () {
                               },
                             },
                           }),
-                        ]),
-                        _vm._v(" "),
-                        _vm.timeSlot_settingsObject.time_slots_is_enabled == 1
-                          ? [
-                              _c("div", { staticClass: "form-group" }, [
-                                _c("label", [
-                                  _vm._v(
-                                    _vm._s(_vm.__("slot_type") || "Slot Type")
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "mt-1" },
-                                  [
-                                    _c("b-form-radio-group", {
-                                      attrs: {
-                                        options: [
-                                          {
-                                            text:
-                                              _vm.__("fixed_time_window") ||
-                                              "Fixed Time Window",
-                                            value: "fixed",
-                                          },
-                                          {
-                                            text:
-                                              _vm.__("express") ||
-                                              "Quick Delivery",
-                                            value: "express",
-                                          },
-                                        ],
-                                        buttons: "",
-                                        "button-variant": "outline-primary",
-                                      },
-                                      model: {
-                                        value:
-                                          _vm.timeSlot_settingsObject
-                                            .time_slot_type,
-                                        callback: function ($$v) {
-                                          _vm.$set(
-                                            _vm.timeSlot_settingsObject,
-                                            "time_slot_type",
-                                            $$v
-                                          )
-                                        },
-                                        expression:
-                                          "timeSlot_settingsObject.time_slot_type",
-                                      },
-                                    }),
-                                  ],
-                                  1
-                                ),
-                              ]),
-                              _vm._v(" "),
-                              _vm.timeSlot_settingsObject.time_slot_type !==
-                              "express"
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c("label", [
-                                      _vm._v(
-                                        _vm._s(_vm.__("delivery_estimate_days"))
-                                      ),
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value:
-                                            _vm.timeSlot_settingsObject
-                                              .delivery_estimate_days,
-                                          expression:
-                                            "timeSlot_settingsObject.delivery_estimate_days",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "number",
-                                        min: "1",
-                                        required: "",
-                                      },
-                                      domProps: {
-                                        value:
-                                          _vm.timeSlot_settingsObject
-                                            .delivery_estimate_days,
-                                      },
-                                      on: {
-                                        input: [
-                                          function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              _vm.timeSlot_settingsObject,
-                                              "delivery_estimate_days",
-                                              $event.target.value
-                                            )
-                                          },
-                                          _vm.validateNoOfEstimateDays,
-                                        ],
-                                      },
-                                    }),
-                                    _vm._v(" "),
-                                    _vm.validationNoOfEstimateDaysError
-                                      ? _c("span", { staticClass: "error" }, [
-                                          _vm._v(
-                                            _vm._s(
-                                              _vm.validationNoOfEstimateDaysError
-                                            )
-                                          ),
-                                        ])
-                                      : _vm._e(),
-                                  ])
-                                : _vm._e(),
-                              _vm._v(" "),
-                              _vm.timeSlot_settingsObject.time_slot_type !==
-                              "express"
-                                ? _c("div", { staticClass: "form-group" }, [
-                                    _c("label", [
-                                      _vm._v(
-                                        _vm._s(
-                                          _vm.__(
-                                            "how_many_days_you_want_to_allow"
-                                          )
-                                        ) + "?"
-                                      ),
-                                    ]),
-                                    _vm._v(" "),
-                                    _c("input", {
-                                      directives: [
-                                        {
-                                          name: "model",
-                                          rawName: "v-model",
-                                          value:
-                                            _vm.timeSlot_settingsObject
-                                              .time_slots_allowed_days,
-                                          expression:
-                                            "timeSlot_settingsObject.time_slots_allowed_days",
-                                        },
-                                      ],
-                                      staticClass: "form-control",
-                                      attrs: {
-                                        type: "number",
-                                        min: "1",
-                                        required: "",
-                                      },
-                                      domProps: {
-                                        value:
-                                          _vm.timeSlot_settingsObject
-                                            .time_slots_allowed_days,
-                                      },
-                                      on: {
-                                        input: [
-                                          function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              _vm.timeSlot_settingsObject,
-                                              "time_slots_allowed_days",
-                                              $event.target.value
-                                            )
-                                          },
-                                          _vm.validateNoOfDays,
-                                        ],
-                                      },
-                                    }),
-                                    _vm._v(" "),
-                                    _vm.validationNoOfDaysError
-                                      ? _c("span", { staticClass: "error" }, [
-                                          _vm._v(
-                                            _vm._s(_vm.validationNoOfDaysError)
-                                          ),
-                                        ])
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    _c("br"),
-                                  ])
-                                : _vm._e(),
-                            ]
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "box-footer" }, [
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-primary",
-                              attrs: {
-                                type: "submit",
-                                disabled: _vm.isLoading,
-                              },
-                              on: { click: _vm.addTimeSlotsSettings },
-                            },
-                            [
+                        ]
+                      ),
+                    ]),
+                    _vm._v(" "),
+                    _vm.timeSlot_settingsObject.time_slots_is_enabled == 1
+                      ? [
+                          _c("div", { staticClass: "form-group" }, [
+                            _c("label", [
                               _vm._v(
-                                "\n                      " +
-                                  _vm._s(_vm.__("add")) +
-                                  " "
-                              ),
-                              _vm.isLoading
-                                ? _c("b-spinner", {
-                                    attrs: { small: "", label: "Spinning" },
-                                  })
-                                : _vm._e(),
-                            ],
-                            1
-                          ),
-                        ]),
-                      ],
-                      2
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _vm.timeSlot_settingsObject.time_slots_is_enabled == 1
-                    ? _c("div", { staticClass: "col-md-8" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row mb-3",
-                          },
-                          [
-                            _c("div", { staticClass: "flex-grow-1" }, [
-                              _c(
-                                "div",
-                                { staticClass: "figma-search-container" },
-                                [
-                                  _c("i", {
-                                    staticClass: "fa fa-search text-muted",
-                                  }),
-                                  _vm._v(" "),
-                                  _c("input", {
-                                    directives: [
-                                      {
-                                        name: "model",
-                                        rawName: "v-model",
-                                        value: _vm.filter,
-                                        expression: "filter",
-                                      },
-                                    ],
-                                    staticClass: "figma-search-input",
-                                    attrs: {
-                                      type: "text",
-                                      placeholder: _vm.__("search"),
-                                    },
-                                    domProps: { value: _vm.filter },
-                                    on: {
-                                      input: function ($event) {
-                                        if ($event.target.composing) {
-                                          return
-                                        }
-                                        _vm.filter = $event.target.value
-                                      },
-                                    },
-                                  }),
-                                ]
+                                _vm._s(_vm.__("slot_type") || "Slot Type")
                               ),
                             ]),
                             _vm._v(" "),
                             _c(
                               "div",
                               {
-                                staticClass:
-                                  "d-flex gap-2 align-items-center flex-wrap",
+                                directives: [
+                                  {
+                                    name: "b-tooltip",
+                                    rawName: "v-b-tooltip.hover.bottom",
+                                    modifiers: { hover: true, bottom: true },
+                                  },
+                                ],
+                                staticClass: "mt-1 d-inline-block",
+                                attrs: {
+                                  title: _vm.oneSellerCart
+                                    ? ""
+                                    : "Quick Delivery needs One Seller Cart turned on (Settings \u2192 Seller Setting).",
+                                },
                               },
                               [
-                                _vm.$can("time_slot_create")
-                                  ? _c(
-                                      "button",
+                                _c("b-form-radio-group", {
+                                  staticClass: "slot-type-group",
+                                  attrs: {
+                                    options: [
                                       {
-                                        directives: [
-                                          {
-                                            name: "b-tooltip",
-                                            rawName: "v-b-tooltip.hover",
-                                            modifiers: { hover: true },
-                                          },
-                                        ],
-                                        staticClass:
-                                          "btn btn-figma-columns d-flex align-items-center gap-2",
-                                        attrs: {
-                                          disabled: _vm.quickDeliverySlotExists,
-                                          title: _vm.quickDeliverySlotExists
-                                            ? _vm.__(
-                                                "quick_delivery_slot_already_exists"
-                                              ) ||
-                                              "A Quick Delivery slot already exists. Delete it before adding a new one."
-                                            : "",
-                                        },
-                                        on: {
-                                          click: function ($event) {
-                                            _vm.edit_record = true
-                                          },
-                                        },
+                                        text:
+                                          _vm.__("fixed_time_window") ||
+                                          "Fixed Time Window",
+                                        value: "fixed",
                                       },
-                                      [
-                                        _c("i", { staticClass: "fa fa-plus" }),
-                                        _vm._v(" "),
-                                        _c("span", [
-                                          _vm._v(
-                                            _vm._s(_vm.__("add_new_time_slot"))
-                                          ),
-                                        ]),
-                                      ]
-                                    )
+                                      {
+                                        text:
+                                          _vm.__("express") || "Quick Delivery",
+                                        value: "express",
+                                        disabled: !_vm.oneSellerCart,
+                                      },
+                                    ],
+                                    buttons: "",
+                                    "button-variant": "outline-primary",
+                                  },
+                                  model: {
+                                    value:
+                                      _vm.timeSlot_settingsObject
+                                        .time_slot_type,
+                                    callback: function ($$v) {
+                                      _vm.$set(
+                                        _vm.timeSlot_settingsObject,
+                                        "time_slot_type",
+                                        $$v
+                                      )
+                                    },
+                                    expression:
+                                      "timeSlot_settingsObject.time_slot_type",
+                                  },
+                                }),
+                              ],
+                              1
+                            ),
+                          ]),
+                          _vm._v(" "),
+                          _vm.timeSlot_settingsObject.time_slot_type !==
+                          "express"
+                            ? _c("div", { staticClass: "form-group" }, [
+                                _c("label", [
+                                  _vm._v(
+                                    _vm._s(_vm.__("delivery_estimate_days"))
+                                  ),
+                                ]),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value:
+                                        _vm.timeSlot_settingsObject
+                                          .delivery_estimate_days,
+                                      expression:
+                                        "timeSlot_settingsObject.delivery_estimate_days",
+                                    },
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "number",
+                                    min: "1",
+                                    required: "",
+                                  },
+                                  domProps: {
+                                    value:
+                                      _vm.timeSlot_settingsObject
+                                        .delivery_estimate_days,
+                                  },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.timeSlot_settingsObject,
+                                          "delivery_estimate_days",
+                                          $event.target.value
+                                        )
+                                      },
+                                      _vm.validateNoOfEstimateDays,
+                                    ],
+                                  },
+                                }),
+                                _vm._v(" "),
+                                _vm.validationNoOfEstimateDaysError
+                                  ? _c("span", { staticClass: "error" }, [
+                                      _vm._v(
+                                        _vm._s(
+                                          _vm.validationNoOfEstimateDaysError
+                                        )
+                                      ),
+                                    ])
+                                  : _vm._e(),
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.timeSlot_settingsObject.time_slot_type !==
+                          "express"
+                            ? _c("div", { staticClass: "form-group" }, [
+                                _c("label", [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__("how_many_days_you_want_to_allow")
+                                    ) + "?"
+                                  ),
+                                ]),
+                                _vm._v(" "),
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value:
+                                        _vm.timeSlot_settingsObject
+                                          .time_slots_allowed_days,
+                                      expression:
+                                        "timeSlot_settingsObject.time_slots_allowed_days",
+                                    },
+                                  ],
+                                  staticClass: "form-control",
+                                  attrs: {
+                                    type: "number",
+                                    min: "1",
+                                    required: "",
+                                  },
+                                  domProps: {
+                                    value:
+                                      _vm.timeSlot_settingsObject
+                                        .time_slots_allowed_days,
+                                  },
+                                  on: {
+                                    input: [
+                                      function ($event) {
+                                        if ($event.target.composing) {
+                                          return
+                                        }
+                                        _vm.$set(
+                                          _vm.timeSlot_settingsObject,
+                                          "time_slots_allowed_days",
+                                          $event.target.value
+                                        )
+                                      },
+                                      _vm.validateNoOfDays,
+                                    ],
+                                  },
+                                }),
+                                _vm._v(" "),
+                                _vm.validationNoOfDaysError
+                                  ? _c("span", { staticClass: "error" }, [
+                                      _vm._v(
+                                        _vm._s(_vm.validationNoOfDaysError)
+                                      ),
+                                    ])
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _c(
+                                _c("br"),
+                              ])
+                            : _vm._e(),
+                        ]
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "d-flex justify-content-end border-top pt-3 mt-2",
+                      },
+                      [
+                        _vm.$can("delivery_settings")
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: {
+                                  type: "submit",
+                                  disabled: _vm.isLoading,
+                                },
+                                on: { click: _vm.addTimeSlotsSettings },
+                              },
+                              [
+                                _vm._v(
+                                  "\n                      " +
+                                    _vm._s(_vm.__("save")) +
+                                    " "
+                                ),
+                                _vm.isLoading
+                                  ? _c("b-spinner", {
+                                      attrs: { small: "", label: "Spinning" },
+                                    })
+                                  : _vm._e(),
+                              ],
+                              1
+                            )
+                          : _vm._e(),
+                      ]
+                    ),
+                  ],
+                  2
+                ),
+              ]),
+            ]
+          ),
+          _vm._v(" "),
+          _vm.timeSlot_settingsObject.time_slots_is_enabled == 1
+            ? _c("div", { staticClass: "col-12 col-xl-8 timeslot-list-col" }, [
+                _c("div", { staticClass: "card mb-0" }, [
+                  _c("div", { staticClass: "card-body" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row mb-3",
+                      },
+                      [
+                        _c("div", { staticClass: "flex-grow-1" }, [
+                          _c("div", { staticClass: "figma-search-container" }, [
+                            _c("i", { staticClass: "fa fa-search text-muted" }),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.filter,
+                                  expression: "filter",
+                                },
+                              ],
+                              staticClass: "figma-search-input",
+                              attrs: {
+                                type: "text",
+                                placeholder: _vm.__("search"),
+                              },
+                              domProps: { value: _vm.filter },
+                              on: {
+                                input: function ($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.filter = $event.target.value
+                                },
+                              },
+                            }),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            staticClass:
+                              "d-flex gap-2 align-items-center flex-wrap timeslot-actions",
+                          },
+                          [
+                            _vm.$can("time_slot_create")
+                              ? _c(
                                   "button",
                                   {
                                     directives: [
@@ -2638,358 +2805,437 @@ var render = function () {
                                       },
                                     ],
                                     staticClass:
-                                      "btn btn-figma-filter d-flex align-items-center justify-content-center",
-                                    staticStyle: {
-                                      width: "42px",
-                                      height: "42px",
+                                      "btn btn-figma-filter d-flex align-items-center gap-2 timeslot-add-btn",
+                                    attrs: {
+                                      disabled: _vm.quickDeliverySlotExists,
+                                      title: _vm.quickDeliverySlotExists
+                                        ? _vm.__(
+                                            "quick_delivery_slot_already_exists"
+                                          ) ||
+                                          "A Quick Delivery slot already exists. Delete it before adding a new one."
+                                        : "",
                                     },
-                                    attrs: { title: _vm.__("refresh") },
                                     on: {
                                       click: function ($event) {
-                                        return _vm.getTimeSlots()
+                                        _vm.edit_record = true
                                       },
                                     },
                                   },
-                                  [_c("i", { staticClass: "fa fa-refresh" })]
-                                ),
-                              ]
+                                  [
+                                    _c("i", { staticClass: "fa fa-plus" }),
+                                    _vm._v(" "),
+                                    _c("span", [
+                                      _vm._v(
+                                        _vm._s(_vm.__("add_new_time_slot"))
+                                      ),
+                                    ]),
+                                  ]
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                directives: [
+                                  {
+                                    name: "b-tooltip",
+                                    rawName: "v-b-tooltip.hover",
+                                    modifiers: { hover: true },
+                                  },
+                                ],
+                                staticClass:
+                                  "btn btn-figma-filter d-flex align-items-center justify-content-center timeslot-refresh-btn",
+                                attrs: { title: _vm.__("refresh") },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.getTimeSlots()
+                                  },
+                                },
+                              },
+                              [_c("i", { staticClass: "fa fa-refresh" })]
                             ),
                           ]
                         ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "table-responsive" },
-                          [
-                            _c("b-table", {
-                              staticClass: "figma-table mb-0",
-                              attrs: {
-                                items: _vm.translatedTimeSlots,
-                                fields: _vm.visibleFields,
-                                "current-page": _vm.currentPage,
-                                "per-page": _vm.perPage,
-                                filter: _vm.filter,
-                                "filter-included-fields": _vm.filterOn,
-                                "sort-by": _vm.sortBy,
-                                "sort-desc": _vm.sortDesc,
-                                "sort-direction": _vm.sortDirection,
-                                bordered: false,
-                                busy: _vm.isLoading,
-                                stacked: "md",
-                                "show-empty": "",
-                                small: "",
-                                "tbody-tr-class": function () {
-                                  return "figma-tr align-middle"
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "table-responsive" },
+                      [
+                        _c("b-table", {
+                          staticClass: "figma-table mb-0",
+                          attrs: {
+                            items: _vm.translatedTimeSlots,
+                            fields: _vm.visibleFields,
+                            "current-page": _vm.currentPage,
+                            "per-page": _vm.perPage,
+                            filter: _vm.filter,
+                            "filter-included-fields": _vm.filterOn,
+                            "sort-by": _vm.sortBy,
+                            "sort-desc": _vm.sortDesc,
+                            "sort-direction": _vm.sortDirection,
+                            bordered: false,
+                            busy: _vm.isLoading,
+                            stacked: "md",
+                            "show-empty": "",
+                            small: "",
+                            "tbody-tr-class": function () {
+                              return "figma-tr align-middle"
+                            },
+                          },
+                          on: {
+                            "update:sortBy": function ($event) {
+                              _vm.sortBy = $event
+                            },
+                            "update:sort-by": function ($event) {
+                              _vm.sortBy = $event
+                            },
+                            "update:sortDesc": function ($event) {
+                              _vm.sortDesc = $event
+                            },
+                            "update:sort-desc": function ($event) {
+                              _vm.sortDesc = $event
+                            },
+                          },
+                          scopedSlots: _vm._u(
+                            [
+                              {
+                                key: "table-busy",
+                                fn: function () {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted my-2",
+                                      },
+                                      [
+                                        _c("b-spinner", {
+                                          staticClass: "align-middle",
+                                        }),
+                                        _vm._v(" "),
+                                        _c("strong", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("loading")) + "..."
+                                          ),
+                                        ]),
+                                      ],
+                                      1
+                                    ),
+                                  ]
                                 },
+                                proxy: true,
                               },
-                              on: {
-                                "update:sortBy": function ($event) {
-                                  _vm.sortBy = $event
-                                },
-                                "update:sort-by": function ($event) {
-                                  _vm.sortBy = $event
-                                },
-                                "update:sortDesc": function ($event) {
-                                  _vm.sortDesc = $event
-                                },
-                                "update:sort-desc": function ($event) {
-                                  _vm.sortDesc = $event
-                                },
-                              },
-                              scopedSlots: _vm._u(
-                                [
-                                  {
-                                    key: "table-busy",
-                                    fn: function () {
-                                      return [
-                                        _c(
-                                          "div",
-                                          {
-                                            staticClass:
-                                              "text-center text-black my-2",
-                                          },
-                                          [
-                                            _c("b-spinner", {
-                                              staticClass: "align-middle",
-                                            }),
-                                            _vm._v(" "),
-                                            _c("strong", [
-                                              _vm._v(
-                                                _vm._s(_vm.__("loading")) +
-                                                  "..."
-                                              ),
-                                            ]),
-                                          ],
-                                          1
-                                        ),
+                              {
+                                key: "empty",
+                                fn: function (scope) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted py-4",
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "fa fa-clock-o fa-2x d-block mb-2",
+                                        }),
+                                        _vm._v(_vm._s(scope.emptyText)),
                                       ]
-                                    },
-                                    proxy: true,
-                                  },
-                                  {
-                                    key: "cell(status)",
-                                    fn: function (row) {
-                                      return [
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "figma-status-pill",
-                                            class:
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "emptyfiltered",
+                                fn: function (scope) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "text-center text-muted py-4",
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass:
+                                            "fa fa-search fa-2x d-block mb-2",
+                                        }),
+                                        _vm._v(_vm._s(scope.emptyFilteredText)),
+                                      ]
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(status)",
+                                fn: function (row) {
+                                  return [
+                                    _c(
+                                      "span",
+                                      {
+                                        staticClass: "figma-status-pill",
+                                        class:
+                                          row.item.status == 1
+                                            ? "status-delivered"
+                                            : "status-cancelled",
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                        " +
+                                            _vm._s(
                                               row.item.status == 1
-                                                ? "status-delivered"
-                                                : "status-cancelled",
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                        " +
-                                                _vm._s(
-                                                  row.item.status == 1
-                                                    ? _vm.__("active")
-                                                    : _vm.__("deactive")
-                                                ) +
-                                                "\n                      "
-                                            ),
-                                          ]
+                                                ? _vm.__("active")
+                                                : _vm.__("deactive")
+                                            ) +
+                                            "\n                      "
                                         ),
                                       ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(is_free_delivery)",
-                                    fn: function (row) {
-                                      return [
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "figma-status-pill",
-                                            class:
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(is_free_delivery)",
+                                fn: function (row) {
+                                  return [
+                                    _c(
+                                      "span",
+                                      {
+                                        staticClass: "figma-status-pill",
+                                        class:
+                                          row.item.is_free_delivery == 1
+                                            ? "status-delivered"
+                                            : "status-default",
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                        " +
+                                            _vm._s(
                                               row.item.is_free_delivery == 1
-                                                ? "status-delivered"
-                                                : "status-default",
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                        " +
-                                                _vm._s(
-                                                  row.item.is_free_delivery == 1
-                                                    ? _vm.__("yes")
-                                                    : _vm.__("no")
-                                                ) +
-                                                "\n                      "
-                                            ),
-                                          ]
+                                                ? _vm.__("yes")
+                                                : _vm.__("no")
+                                            ) +
+                                            "\n                      "
                                         ),
                                       ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(slot_type)",
-                                    fn: function (row) {
-                                      return [
-                                        _c(
-                                          "span",
-                                          {
-                                            staticClass: "figma-status-pill",
-                                            class:
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(slot_type)",
+                                fn: function (row) {
+                                  return [
+                                    _c(
+                                      "span",
+                                      {
+                                        staticClass: "figma-status-pill",
+                                        class:
+                                          row.item.slot_type === "express"
+                                            ? "status-delivered"
+                                            : "status-default",
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                        " +
+                                            _vm._s(
                                               row.item.slot_type === "express"
-                                                ? "status-delivered"
-                                                : "status-default",
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                        " +
-                                                _vm._s(
-                                                  row.item.slot_type ===
-                                                    "express"
-                                                    ? _vm.__("express") ||
-                                                        "Quick Delivery"
-                                                    : _vm.__("fixed") || "Fixed"
-                                                ) +
-                                                "\n                      "
-                                            ),
-                                          ]
+                                                ? _vm.__("express") ||
+                                                    "Quick Delivery"
+                                                : _vm.__("fixed") || "Fixed"
+                                            ) +
+                                            "\n                      "
                                         ),
                                       ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(from_time)",
-                                    fn: function (row) {
-                                      return [
-                                        row.item.slot_type === "express"
-                                          ? [
-                                              _vm._v(
-                                                "\n                        " +
-                                                  _vm._s(
-                                                    (row.item
-                                                      .duration_minutes ||
-                                                      "—") +
-                                                      " " +
-                                                      (_vm.__("min") || "min")
-                                                  ) +
-                                                  "\n                      "
-                                              ),
-                                            ]
-                                          : [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.timeSlotTimeLabel(
-                                                    row.item,
-                                                    "from_time"
-                                                  )
-                                                )
-                                              ),
-                                            ],
-                                      ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(to_time)",
-                                    fn: function (row) {
-                                      return [
-                                        row.item.slot_type === "express"
-                                          ? [_vm._v("—")]
-                                          : [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.timeSlotTimeLabel(
-                                                    row.item,
-                                                    "to_time"
-                                                  )
-                                                )
-                                              ),
-                                            ],
-                                      ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(last_order_time)",
-                                    fn: function (row) {
-                                      return [
-                                        row.item.slot_type === "express" &&
-                                        !row.item.last_order_time
-                                          ? [_vm._v("—")]
-                                          : [
-                                              _vm._v(
-                                                _vm._s(
-                                                  _vm.timeSlotTimeLabel(
-                                                    row.item,
-                                                    "last_order_time"
-                                                  )
-                                                )
-                                              ),
-                                            ],
-                                      ]
-                                    },
-                                  },
-                                  {
-                                    key: "cell(actions)",
-                                    fn: function (row) {
-                                      return [
-                                        _c(
-                                          "div",
-                                          {
-                                            staticClass:
-                                              "d-flex gap-2 justify-content-center",
-                                          },
-                                          [
-                                            _vm.$can("time_slot_update")
-                                              ? _c(
-                                                  "button",
+                                    ),
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(from_time)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.slot_type === "express"
+                                      ? [
+                                          _vm._v(
+                                            "\n                        " +
+                                              _vm._s(
+                                                (row.item.duration_minutes ||
+                                                  "—") +
+                                                  " " +
+                                                  (_vm.__("min") || "min")
+                                              ) +
+                                              "\n                      "
+                                          ),
+                                        ]
+                                      : [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm.timeSlotTimeLabel(
+                                                row.item,
+                                                "from_time"
+                                              )
+                                            )
+                                          ),
+                                        ],
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(to_time)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.slot_type === "express"
+                                      ? [_vm._v("—")]
+                                      : [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm.timeSlotTimeLabel(
+                                                row.item,
+                                                "to_time"
+                                              )
+                                            )
+                                          ),
+                                        ],
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(last_order_time)",
+                                fn: function (row) {
+                                  return [
+                                    row.item.slot_type === "express" &&
+                                    !row.item.last_order_time
+                                      ? [_vm._v("—")]
+                                      : [
+                                          _vm._v(
+                                            _vm._s(
+                                              _vm.timeSlotTimeLabel(
+                                                row.item,
+                                                "last_order_time"
+                                              )
+                                            )
+                                          ),
+                                        ],
+                                  ]
+                                },
+                              },
+                              {
+                                key: "cell(actions)",
+                                fn: function (row) {
+                                  return [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "d-flex gap-2 justify-content-center",
+                                      },
+                                      [
+                                        _vm.$can("time_slot_update")
+                                          ? _c(
+                                              "button",
+                                              {
+                                                directives: [
                                                   {
-                                                    directives: [
-                                                      {
-                                                        name: "b-tooltip",
-                                                        rawName:
-                                                          "v-b-tooltip.hover",
-                                                        modifiers: {
-                                                          hover: true,
-                                                        },
-                                                      },
-                                                    ],
-                                                    staticClass:
-                                                      "figma-action-btn",
-                                                    attrs: {
-                                                      title: _vm.__("edit"),
-                                                    },
-                                                    on: {
-                                                      click: function ($event) {
-                                                        _vm.edit_record =
-                                                          row.item
-                                                      },
+                                                    name: "b-tooltip",
+                                                    rawName:
+                                                      "v-b-tooltip.hover.top.viewport.noninteractive",
+                                                    modifiers: {
+                                                      hover: true,
+                                                      top: true,
+                                                      viewport: true,
+                                                      noninteractive: true,
                                                     },
                                                   },
-                                                  [
-                                                    _c("base-icon", {
-                                                      attrs: {
-                                                        name: "edit icon",
-                                                        hoverName: "edit Hover",
-                                                        width: "24",
-                                                        height: "24",
-                                                      },
-                                                    }),
-                                                  ],
-                                                  1
-                                                )
-                                              : _vm._e(),
-                                            _vm._v(" "),
-                                            _vm.$can("time_slot_delete")
-                                              ? _c(
-                                                  "button",
+                                                ],
+                                                staticClass: "figma-action-btn",
+                                                attrs: {
+                                                  title: _vm.__("edit"),
+                                                },
+                                                on: {
+                                                  click: function ($event) {
+                                                    _vm.edit_record = row.item
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                _c("base-icon", {
+                                                  attrs: {
+                                                    name: "edit icon",
+                                                    hoverName: "edit Hover",
+                                                    width: "24",
+                                                    height: "24",
+                                                  },
+                                                }),
+                                              ],
+                                              1
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _vm.$can("time_slot_delete")
+                                          ? _c(
+                                              "button",
+                                              {
+                                                directives: [
                                                   {
-                                                    directives: [
-                                                      {
-                                                        name: "b-tooltip",
-                                                        rawName:
-                                                          "v-b-tooltip.hover",
-                                                        modifiers: {
-                                                          hover: true,
-                                                        },
-                                                      },
-                                                    ],
-                                                    staticClass:
-                                                      "figma-action-btn figma-delete-btn",
-                                                    attrs: {
-                                                      title: _vm.__("delete"),
-                                                    },
-                                                    on: {
-                                                      click: function ($event) {
-                                                        return _vm.deleteTimeSlots(
-                                                          row.index,
-                                                          row.item.id
-                                                        )
-                                                      },
+                                                    name: "b-tooltip",
+                                                    rawName:
+                                                      "v-b-tooltip.hover.top.viewport.noninteractive",
+                                                    modifiers: {
+                                                      hover: true,
+                                                      top: true,
+                                                      viewport: true,
+                                                      noninteractive: true,
                                                     },
                                                   },
-                                                  [
-                                                    _c("base-icon", {
-                                                      attrs: {
-                                                        name: "Type=Default",
-                                                        hoverName: "Type=Hover",
-                                                        width: "24",
-                                                        height: "24",
-                                                      },
-                                                    }),
-                                                  ],
-                                                  1
-                                                )
-                                              : _vm._e(),
-                                          ]
-                                        ),
+                                                ],
+                                                staticClass:
+                                                  "figma-action-btn figma-delete-btn",
+                                                attrs: {
+                                                  title: _vm.__("delete"),
+                                                },
+                                                on: {
+                                                  click: function ($event) {
+                                                    return _vm.deleteTimeSlots(
+                                                      row.index,
+                                                      row.item.id
+                                                    )
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                _c("base-icon", {
+                                                  attrs: {
+                                                    name: "Type=Default",
+                                                    hoverName: "Type=Hover",
+                                                    width: "24",
+                                                    height: "24",
+                                                  },
+                                                }),
+                                              ],
+                                              1
+                                            )
+                                          : _vm._e(),
                                       ]
-                                    },
-                                  },
-                                ],
-                                null,
-                                false,
-                                620153412
-                              ),
-                            }),
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c(
+                                    ),
+                                  ]
+                                },
+                              },
+                            ],
+                            null,
+                            false,
+                            3648039274
+                          ),
+                        }),
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _vm.timeSlot_settingsObject.time_slot_type !== "express"
+                      ? _c(
                           "div",
                           {
                             staticClass:
@@ -2998,21 +3244,40 @@ var render = function () {
                           [
                             _c(
                               "div",
-                              { staticClass: "showing-results-text small" },
+                              {
+                                staticClass: "d-flex align-items-center gap-2",
+                              },
                               [
-                                _vm._v(
-                                  "\n                    " +
-                                    _vm._s(_vm.__("Showing Result")) +
-                                    " : "
+                                _c(
+                                  "label",
+                                  { staticClass: "showing-results-text mb-0" },
+                                  [_vm._v(_vm._s(_vm.__("per_page")))]
                                 ),
-                                _c("span", { staticClass: "showing-bold" }, [
-                                  _vm._v(_vm._s(_vm.showingEnd)),
-                                ]),
-                                _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                                _c("span", { staticClass: "showing-bold" }, [
-                                  _vm._v(_vm._s(_vm.totalRows)),
-                                ]),
-                              ]
+                                _vm._v(" "),
+                                _c("b-form-select", {
+                                  staticClass: "w-auto",
+                                  attrs: {
+                                    options: _vm.pageOptions,
+                                    size: "sm",
+                                  },
+                                  model: {
+                                    value: _vm.perPage,
+                                    callback: function ($$v) {
+                                      _vm.perPage = $$v
+                                    },
+                                    expression: "perPage",
+                                  },
+                                }),
+                                _vm._v(" "),
+                                _c("table-count", {
+                                  attrs: {
+                                    "current-page": _vm.currentPage,
+                                    "per-page": _vm.perPage,
+                                    "total-rows": _vm.totalRows,
+                                  },
+                                }),
+                              ],
+                              1
                             ),
                             _vm._v(" "),
                             _c(
@@ -3044,13 +3309,12 @@ var render = function () {
                               1
                             ),
                           ]
-                        ),
-                      ])
-                    : _vm._e(),
+                        )
+                      : _vm._e(),
+                  ]),
                 ]),
-              ]),
-            ]),
-          ]),
+              ])
+            : _vm._e(),
         ]),
       ]),
       _vm._v(" "),

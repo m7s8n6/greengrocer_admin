@@ -1,33 +1,33 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex flex-wrap justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
                 {{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord" novalidate>
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label for="status" >{{ __('status') }}</label><br>
+                        <label for="status" >{{ __('status') }}</label>
                         <input name="amount" id="amount" type="number" v-model="amount" hidden>
-                        <div id="status" class="form-group btn-group">
-                            <label class="btn btn-warning" data-toggle-class="btn-warning" data-toggle-passive-class="btn-default">
+                        <div id="status" class="form-group wr-status-group">
+                            <label class="wr-status-option wr-status-option--warn" :class="{ 'is-active': status == 0 && status !== '' }" data-toggle-class="btn-warning" data-toggle-passive-class="btn-default">
                                 <input type="radio" v-model="status" value="0" class="form-check-input" > {{ __('pending') }}
                             </label>
-                            <label class="btn btn-success" data-toggle-class="btn-success" data-toggle-passive-class="btn-default">
+                            <label class="wr-status-option wr-status-option--success" :class="{ 'is-active': status == 1 }" data-toggle-class="btn-success" data-toggle-passive-class="btn-default">
                                 <input type="radio" v-model="status" value="1" class="form-check-input"> {{ __('approved') }}
                             </label>
-                            <label class="btn btn-danger" data-toggle-class="btn-danger" data-toggle-passive-class="btn-default">
+                            <label class="wr-status-option wr-status-option--error" :class="{ 'is-active': status == 2 }" data-toggle-class="btn-danger" data-toggle-passive-class="btn-default">
                                 <input type="radio" v-model="status" value="2" class="form-check-input"> {{ __('rejected') }}
                             </label>
                         </div>
                        
                         <div class="form-group" v-if="status == 1">
                             <label>{{ __('upload_receipt_image') }}</label><i class="text-danger">*</i>
-                            <span v-if="error" class="error">{{ error }}</span>
+                            <span v-if="error" class="error text-danger small d-block">{{ error }}</span>
 
                             <input type="file" name="receipt_image" accept="image/*" v-on:change="handleFileUpload" ref="file_image" class="file-input">
                             <div class="file-input-div bg-gray-100" @click="$refs.file_image.click()" @drop="dropFile" @dragover="$dragoverFile" @dragleave="$dragleaveFile">
@@ -43,7 +43,7 @@
                             </div>
                             <div class="row" v-if="image_url">
                                 <div class="col-md-4">
-                                    <img class="custom-image" :src="image_url" title='Receipt Image' alt='Receipt Image'/>
+                                    <img class="custom-image wr-receipt-preview" :src="image_url" title='Receipt Image' alt='Receipt Image'/>
                                 </div>
                             </div>
                 </div>
@@ -55,7 +55,7 @@
                     </div>  
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -178,5 +178,57 @@ export default {
 </script>
 
 <style scoped>
+.wr-status-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
 
+.wr-status-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    margin: 0;
+    padding: 0 14px;
+    border: 1px solid var(--ui-border-strong);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.wr-status-option .form-check-input {
+    position: static;
+    margin: 0;
+}
+
+.wr-status-option--warn.is-active {
+    background: var(--theme-warn-50);
+    border-color: var(--theme-warn-500);
+    color: var(--theme-warn-700);
+}
+
+.wr-status-option--success.is-active {
+    background: var(--theme-success-50);
+    border-color: var(--theme-success-500);
+    color: var(--theme-success-700);
+}
+
+.wr-status-option--error.is-active {
+    background: var(--theme-error-50);
+    border-color: var(--theme-error-500);
+    color: var(--theme-error-700);
+}
+
+.wr-receipt-preview {
+    width: 100%;
+    max-width: 160px;
+    margin-top: 10px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+}
 </style>

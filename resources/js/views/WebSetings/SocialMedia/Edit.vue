@@ -1,20 +1,20 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end">
+            <b-button variant="outline-secondary" class="mr-2" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
                 {{ __('save') }} <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
             <div class="row">
-                <div class="form-group col-12">
+                <div class="form-group col-md-6">
                     <label for="social_media_name">{{ __('name') }}</label>
                     <i class="text-danger">*</i>
                     <input type="text" name="name" id="social_media_name" v-model="socialMedia.name"
                         :placeholder="__('e_g_instagram') || 'e.g. Instagram'" class="form-control" required>
                 </div>
-                <div class="form-group col-12">
+                <div class="form-group col-md-6">
                     <label for="link">{{ __('link') }}</label>
                     <input type="url" name="link" id="link" v-model="socialMedia.link" :placeholder="__('link')" class="form-control" required>
                 </div>
@@ -37,11 +37,11 @@
                     <div v-if="error" class="text-danger mt-1">{{ error }}</div>
 
                     <div v-if="image_url" class="row mt-2 mx-0">
-                        <img :src="image_url" class="custom-image" style="width:48px;height:48px;object-fit:contain;" />
+                        <img :src="image_url" class="custom-image social-icon-preview" />
                     </div>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
@@ -154,5 +154,13 @@ export default {
 </script>
 
 <style scoped>
-
+.social-icon-preview {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    padding: 4px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+}
 </style>

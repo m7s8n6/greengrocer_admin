@@ -10,6 +10,7 @@
                         <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link></li>
+                                <li class="breadcrumb-item"><router-link to="/system_settings">{{ __('settings') }}</router-link></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('theme_settings') }}</li>
                             </ol>
                         </nav>
@@ -17,9 +18,92 @@
                 </div>
             </div>
             <section class="section theme-settings-section">
+                <!-- Admin panel colours: one global choice for every module -->
+                <form @submit.prevent="saveAdminTheme">
+                    <div class="card theme-card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div class="theme-card-header mb-0">
+                                    <span class="color-dot" :style="{ background: admin.use_module_theme ? seeds.light_seed_primary : admin.seed_primary }"></span>
+                                    <div>
+                                        <h4 class="theme-card-title">{{ tr('admin_panel_colors', 'Admin panel colours') }}</h4>
+                                        <p class="theme-card-desc mb-0">{{ tr('admin_panel_colors_desc', "Use each module's theme colours in the admin panel? Applies to every module.") }}</p>
+                                    </div>
+                                </div>
+                                <div class="btn-group btn-group-toggle segmented-toggle" role="radiogroup" :aria-label="tr('admin_panel_colors', 'Admin panel colours')">
+                                    <label class="btn" :class="admin.use_module_theme ? 'btn-primary' : 'btn-outline-secondary'">
+                                        <input type="radio" :value="true" v-model="admin.use_module_theme">
+                                        {{ tr('use_module_colors', 'Yes, module colours') }}
+                                    </label>
+                                    <label class="btn" :class="!admin.use_module_theme ? 'btn-primary' : 'btn-outline-secondary'">
+                                        <input type="radio" :value="false" v-model="admin.use_module_theme">
+                                        {{ tr('use_own_admin_colors', 'No, own colours') }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div v-if="!admin.use_module_theme" class="row mt-4">
+                                <div class="col-12 col-md-6 mb-4 mb-md-0">
+                                    <div class="theme-card-header">
+                                        <span class="color-dot" :style="{ background: admin.seed_primary }"></span>
+                                        <div>
+                                            <h4 class="theme-card-title">{{ tr('admin_primary_color', 'Admin primary colour') }}</h4>
+                                            <p class="theme-card-desc">{{ __('used_for_main_brand_elements_and_actions') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center hex-picker-row">
+                                        <input type="color" v-model="admin.seed_primary" @input="previewAdmin('primary')">
+                                        <input type="text" class="form-control hex-input" maxlength="7"
+                                            v-model="admin.seed_primary" @input="previewAdmin('primary')">
+                                    </div>
+                                    <div class="palette-preview">
+                                        <div v-for="(hex, stop) in admin.primary" :key="stop"
+                                            class="swatch" :style="{ background: hex }" :title="stop + ': ' + hex"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="theme-card-header">
+                                        <span class="color-dot" :style="{ background: admin.seed_neutral }"></span>
+                                        <div>
+                                            <h4 class="theme-card-title">{{ tr('admin_neutral_color', 'Admin neutral colour') }}</h4>
+                                            <p class="theme-card-desc">{{ __('used_for_text_backgrounds_borders_and_neutral_elements') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center hex-picker-row">
+                                        <input type="color" v-model="admin.seed_neutral" @input="previewAdmin('neutral')">
+                                        <input type="text" class="form-control hex-input" maxlength="7"
+                                            v-model="admin.seed_neutral" @input="previewAdmin('neutral')">
+                                    </div>
+                                    <div class="palette-preview">
+                                        <div v-for="(hex, stop) in admin.neutral" :key="stop"
+                                            class="swatch" :style="{ background: hex }" :title="stop + ': ' + hex"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-end" v-if="$can('manage_store_settings')">
+                            <b-button v-if="$can('theme_settings')" type="submit" variant="primary" class="theme-save-btn" :disabled="adminSaving">
+                                {{ __('save') }}
+                                <b-spinner v-if="adminSaving" small label="Spinning"></b-spinner>
+                            </b-button>
+                        </div>
+                    </div>
+                </form>
+
+                <div v-if="!admin.use_module_theme && adminLoaded" class="alert alert-info d-flex align-items-center gap-2 mb-4" role="status">
+                    <i class="bi bi-info-circle"></i>
+                    <span>{{ tr('module_colors_used_by_web_apps', 'The admin panel uses its own colours. The module colours below still apply to the website and the apps.') }}</span>
+                </div>
+
                 <form @submit.prevent="saveTheme">
                     <div class="card theme-card mb-4">
                         <div class="card-body">
+                            <div v-if="usesDefaultColors" class="alert alert-info d-flex align-items-center gap-2 mb-4" role="status">
+                                <i class="bi bi-info-circle"></i>
+                                <span>{{ __('theme_uses_default_module_colors') === 'theme_uses_default_module_colors'
+                                    ? "This module uses the default module's colours. Change them and save to give it its own."
+                                    : __('theme_uses_default_module_colors') }}</span>
+                            </div>
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-4 mb-md-0">
                                     <div class="theme-card-header">
@@ -59,8 +143,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer" v-if="$can('manage_store_settings')">
-                            <b-button type="submit" variant="primary" class="theme-save-btn" :disabled="isLoading">
+                        <div class="card-footer d-flex justify-content-end" v-if="$can('manage_store_settings')">
+                            <b-button v-if="$can('theme_settings')" type="submit" variant="primary" class="theme-save-btn" :disabled="isLoading">
                                 {{ __('save') }}
                                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
                             </b-button>
@@ -99,7 +183,7 @@
                             <div class="card-footer d-flex justify-content-between" v-if="$can('manage_store_settings')">
                                 <button type="button" class="btn btn-outline-secondary theme-reset-btn" :disabled="statusLoading[type]"
                                     @click="resetStatusColor(type)">{{ __('reset_to_default') }}</button>
-                                <button type="button" class="btn btn-primary theme-save-btn" :disabled="statusLoading[type]"
+                                <button v-if="$can('theme_settings')" type="button" class="btn btn-primary theme-save-btn" :disabled="statusLoading[type]"
                                     @click="saveStatusColor(type)">{{ __('save') }}</button>
                             </div>
                         </div>
@@ -129,7 +213,7 @@
                                 <div class="d-flex justify-content-between mt-3" v-if="$can('manage_store_settings')">
                                     <button type="button" class="btn btn-outline-secondary theme-reset-btn" :disabled="statusLoading[type]"
                                         @click="resetStatusColor(type)">{{ __('reset_to_default') }}</button>
-                                    <button type="button" class="btn btn-primary theme-save-btn" :disabled="statusLoading[type]"
+                                    <button v-if="$can('theme_settings')" type="button" class="btn btn-primary theme-save-btn" :disabled="statusLoading[type]"
                                         @click="saveStatusColor(type)">{{ __('save') }}</button>
                                 </div>
                             </div>
@@ -144,6 +228,7 @@
 
 <script>
 import axios from "axios";
+import { loadTheme } from "../../ThemePalette";
 
 const STOPS = { '50': .95, '100': .90, '200': .80, '300': .70, '400': .60, '500': .50, '600': .40, '700': .30, '800': .20, '900': .10, '950': .05 };
 
@@ -229,10 +314,16 @@ export default {
             isLoading: false,
             isDefaultModule: true,
             statusTypes: ['success', 'error', 'warn', 'info'],
+            // Shown only until /api/theme answers; same defaults as ThemeService (neutral must not be white).
             seeds: {
                 light_seed_primary: '#FF9900',
-                light_seed_neutral: '#FFFFFF',
+                light_seed_neutral: '#9E9E9E',
             },
+            usesDefaultColors: false,
+            // Admin panel colours (global): follow module themes, or own primary / neutral
+            admin: { use_module_theme: true, seed_primary: '#FF9900', seed_neutral: '#9E9E9E', primary: {}, neutral: {} },
+            adminLoaded: false,
+            adminSaving: false,
             statusSeeds: { success: '#20B364', error: '#D63031', warn: '#F79E1B', info: '#2196F3' },
             statusLoading: { success: false, error: false, warn: false, info: false },
             theme: { success: {}, error: {}, warn: {}, info: {} },
@@ -242,16 +333,66 @@ export default {
         };
     },
     created: function () {
+        // Palette bars show straight away (built-in defaults), then the saved colors replace them.
+        this.previewPalette('light', 'primary');
+        this.previewPalette('light', 'neutral');
         this.getTheme();
+        this.getAdminTheme();
     },
     methods: {
+        tr(key, fallback) { const v = this.__(key); return v && v !== key ? v : fallback; },
+        getAdminTheme() {
+            axios.get(this.$apiUrl + '/theme/admin').then((response) => {
+                const d = response.data && response.data.data;
+                if (d) this.admin = { use_module_theme: !!d.use_module_theme, seed_primary: d.seed_primary, seed_neutral: d.seed_neutral, primary: d.primary || {}, neutral: d.neutral || {} };
+                this.adminLoaded = true;
+            }).catch(() => { this.adminLoaded = true; });
+        },
+        previewAdmin(role) {
+            const seed = role === 'neutral' ? this.admin.seed_neutral : this.admin.seed_primary;
+            if (!/^#[0-9A-Fa-f]{6}$/.test(seed || '')) return;
+            this.admin[role] = role === 'neutral' ? generateNeutralPalette(seed) : generatePalette(seed);
+        },
+        saveAdminTheme() {
+            if (!this.admin.use_module_theme && this.isNeutralTooLight(this.admin.seed_neutral)) {
+                const translated = __('neutral_color_too_light_warning');
+                this.showError((translated && translated !== 'neutral_color_too_light_warning') ? translated
+                    : 'Neutral too light — borders and dividers will be invisible in the app. Pick a colour with some depth (around #9E9E9E or darker).');
+                return;
+            }
+            this.adminSaving = true;
+            const formData = new FormData();
+            formData.append('use_module_theme', this.admin.use_module_theme ? '1' : '0');
+            if (!this.admin.use_module_theme) {
+                formData.append('seed_primary', this.admin.seed_primary);
+                formData.append('seed_neutral', this.admin.seed_neutral);
+            }
+            axios.post(this.$apiUrl + '/theme/admin/save', formData).then(res => {
+                this.adminSaving = false;
+                const data = res.data;
+                if (data.status === 1) {
+                    this.showMessage('success', data.message);
+                    loadTheme(this.$baseUrl); // repaint the panel with the new choice right away
+                } else {
+                    this.showError(data.message);
+                }
+            }).catch(error => {
+                this.adminSaving = false;
+                this.showError(error.message || __('something_went_wrong'));
+            });
+        },
         getTheme() {
             axios.get(this.$apiUrl + '/theme').then((response) => {
-                const all = response.data.data;
-                const activeModuleId = Number(localStorage.getItem('active_module_id')) || 1;
-                const data = all && all[activeModuleId];
+                const all = response.data.data || {};
+                const modules = Object.values(all);
+                const defaultModule = modules.find(m => m && m.module_is_default) || modules[0];
+                const activeModuleId = Number(localStorage.getItem('active_module_id')) || (defaultModule && defaultModule.module_id);
+                // A module without its own colors comes back with the default module's colors
+                // (uses_default_colors); Save stores them as its own.
+                const data = all[activeModuleId] || defaultModule;
                 if (!data) return;
                 this.theme = data;
+                this.usesDefaultColors = !!data.uses_default_colors;
                 this.isDefaultModule = !!data.module_is_default;
                 this.seeds.light_seed_primary = data.seed_primary;
                 this.seeds.light_seed_neutral = data.seed_neutral;
@@ -281,7 +422,7 @@ export default {
             if (this.isNeutralTooLight(this.seeds.light_seed_neutral)) {
                 const fallbackWarning = 'Neutral too light — borders and dividers will be invisible in the app. Pick a colour with some depth (around #9E9E9E or darker).';
                 const translated = __('neutral_color_too_light_warning');
-                this.showWarning((translated && translated !== 'neutral_color_too_light_warning') ? translated : fallbackWarning);
+                this.showError((translated && translated !== 'neutral_color_too_light_warning') ? translated : fallbackWarning);
                 return;
             }
             this.isLoading = true;
@@ -293,6 +434,7 @@ export default {
                 this.isLoading = false;
                 if (data.status === 1) {
                     this.theme = data.data;
+                    loadTheme(this.$baseUrl);
                     this.showMessage("success", data.message);
                 } else {
                     this.showError(data.message);
@@ -312,6 +454,7 @@ export default {
                 this.statusLoading[type] = false;
                 if (data.status === 1) {
                     this.theme = data.data;
+                    loadTheme(this.$baseUrl);
                     this.showMessage("success", data.message);
                 } else {
                     this.showError(data.message);
@@ -329,6 +472,7 @@ export default {
                 if (data.status === 1) {
                     this.theme = data.data;
                     this.statusSeeds[type] = data.data[type]['500'];
+                    loadTheme(this.$baseUrl);
                     this.showMessage("success", data.message);
                 } else {
                     this.showError(data.message);
@@ -347,8 +491,8 @@ export default {
     border-bottom: none;
 }
 .theme-settings-section .theme-card {
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
 }
 .theme-card-header {
     display: flex;
@@ -365,28 +509,32 @@ export default {
 }
 .theme-card-title {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-heading);
 }
 .theme-card-desc {
     margin: 2px 0 0;
-    font-size: 0.8rem;
-    color: #8592a3;
+    font-size: 12px;
+    color: var(--ui-text-muted);
 }
 .hex-picker-row input[type="color"] {
     flex-shrink: 0;
 }
 .hex-input {
     width: 110px;
-    margin-left: 10px;
+    margin-inline-start: 10px;
+    direction: ltr; /* keep "#F69609" in order on RTL pages */
     text-transform: uppercase;
-    font-family: monospace;
+    font-family: var(--ui-font);
+    font-variant-numeric: tabular-nums;
 }
 .palette-preview {
     display: flex;
     margin-top: 12px;
-    border-radius: 6px;
+    border-radius: var(--ui-radius-sm);
     overflow: hidden;
+    border: 1px solid var(--ui-border);
 }
 .swatch {
     flex: 1;
@@ -395,27 +543,28 @@ export default {
 .status-colors-title {
     margin-top: 8px;
     margin-bottom: 2px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
 }
 .status-colors-desc {
-    font-size: 0.85rem;
-    color: #8592a3;
+    font-size: 13px;
+    color: var(--ui-text-muted);
     margin-bottom: 16px;
 }
 .theme-save-btn {
-    border-radius: 6px;
+    border-radius: var(--ui-radius);
 }
 .theme-reset-btn {
-    border-radius: 6px;
+    border-radius: var(--ui-radius);
 }
 .status-mobile-card {
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
     overflow: hidden;
 }
 .status-mobile-row {
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--ui-border);
 }
 .status-mobile-row:last-child {
     border-bottom: none;
@@ -428,16 +577,19 @@ export default {
     cursor: pointer;
 }
 .status-mobile-title {
+    font-size: 13px;
     font-weight: 600;
+    color: var(--ui-heading);
     flex: 1;
 }
 .status-mobile-hex {
-    font-family: monospace;
-    color: #8592a3;
-    font-size: 0.85rem;
+    font-family: var(--ui-font);
+    font-variant-numeric: tabular-nums;
+    color: var(--ui-text-muted);
+    font-size: 12px;
 }
 .status-mobile-chevron {
-    color: #8592a3;
+    color: var(--ui-text-muted);
     transition: transform 0.2s ease;
 }
 .status-mobile-summary:not(.collapsed) .status-mobile-chevron {
@@ -452,7 +604,7 @@ export default {
         row-gap: 8px;
     }
     .hex-input {
-        margin-left: 10px;
+        margin-inline-start: 10px;
     }
     .card-footer.d-flex {
         flex-wrap: wrap;

@@ -132,6 +132,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -349,8 +353,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         params: param
       }).then(function (response) {
         _this5.isLoading = false;
-        _this5.ratings = response.data.data.rating_list;
+        var data = response.data && response.data.data;
+        _this5.ratings = data && data.rating_list || [];
         _this5.totalRows = _this5.ratings.length;
+      })["catch"](function () {
+        _this5.isLoading = false;
+        _this5.ratings = [];
+        _this5.totalRows = 0;
       });
     },
     getProducts: function getProducts() {
@@ -381,7 +390,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-e2ee2fb4] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-e2ee2fb4] {\n    transition: transform 0s;\n}\n.ghost[data-v-e2ee2fb4] {\n    opacity: 0.5;\n    background: #c8ebfb;\n}\n.list-group[data-v-e2ee2fb4] {\n    min-height: 20px;\n}\n.list-group-item[data-v-e2ee2fb4] {\n    cursor: move;\n}\n.list-group-item i[data-v-e2ee2fb4] {\n    cursor: pointer;\n}\n.review-cell-text[data-v-e2ee2fb4] {\n    white-space: normal;\n    word-break: break-word;\n    max-width: 320px;\n    text-align: left;\n}\n.figma-warning-text[data-v-e2ee2fb4] {\n    color: #EF4444;\n    font-size: 14px;\n    font-weight: 600;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 16px;\n    background: rgba(239, 68, 68, 0.08);\n    border-radius: 8px;\n    border: 1px solid rgba(239, 68, 68, 0.15);\n}\n\n/* Dark theme support */\nbody.theme-dark .figma-warning-text[data-v-e2ee2fb4] {\n    background: rgba(239, 68, 68, 0.15);\n    color: #F87171;\n    border-color: rgba(239, 68, 68, 0.3);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flip-list-move[data-v-e2ee2fb4] {\n    transition: transform 0.5s;\n}\n.no-move[data-v-e2ee2fb4] {\n    transition: transform 0s;\n}\n.ghost[data-v-e2ee2fb4] {\n    opacity: 0.5;\n    background: var(--theme-info-100);\n}\n.list-group[data-v-e2ee2fb4] {\n    min-height: 20px;\n}\n.list-group-item[data-v-e2ee2fb4] {\n    cursor: move;\n}\n.list-group-item i[data-v-e2ee2fb4] {\n    cursor: pointer;\n}\n.review-cell-text[data-v-e2ee2fb4] {\n    white-space: normal;\n    word-break: break-word;\n    max-width: 320px;\n    text-align: start;\n}\n.figma-warning-text[data-v-e2ee2fb4] {\n    color: var(--theme-warn-700);\n    font-size: 13px;\n    font-weight: 600;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    background: var(--theme-warn-50);\n    border-radius: var(--ui-radius);\n    border: 1px solid color-mix(in srgb, var(--theme-warn-500) 30%, transparent);\n}\n\n/* Dark theme support */\nbody.theme-dark .figma-warning-text[data-v-e2ee2fb4] {\n    background: color-mix(in srgb, var(--theme-warn-500) 15%, transparent);\n    color: var(--theme-warn-300);\n    border-color: color-mix(in srgb, var(--theme-warn-500) 30%, transparent);\n}\n.ratings-product-select[data-v-e2ee2fb4] {\n    width: 250px;\n    max-width: 100%;\n    height: 38px;\n    padding: 0 32px 0 12px;\n    line-height: 36px;\n    font-size: 13px;\n    color: var(--ui-text);\n    border-color: var(--ui-border-strong);\n    border-radius: var(--ui-radius);\n}\n@media (max-width: 575.98px) {\n.ratings-product-select[data-v-e2ee2fb4] {\n        width: 100%;\n}\n}\n.ratings-page[data-v-e2ee2fb4]  .rating-thumb-link {\n    display: inline-block;\n    margin: 0 4px 4px 0;\n    cursor: pointer;\n}\n.ratings-page[data-v-e2ee2fb4]  .rating-thumb {\n    width: 40px;\n    height: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n}\n\n/* !important: legacy global .figma-action-btn forces 40px with !important */\n.ratings-page[data-v-e2ee2fb4]  .rating-row-actions .figma-action-btn {\n    width: 32px !important;\n    height: 32px !important;\n    min-width: 32px;\n    padding: 0 !important;\n    font-size: 14px;\n}\n@media (max-width: 575.98px) {\n.ratings-product-select[data-v-e2ee2fb4] {\n        min-width: 0;\n        width: 100% !important;\n}\n.figma-warning-text[data-v-e2ee2fb4] {\n        width: 100%;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -405,7 +414,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Add some basic styling to the lightbox */\n#lightbox {\n    display: none;\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(0, 0, 0, 0.7);\n    justify-content: center;\n    align-items: center;\n    overflow: hidden;\n    z-index: 999;\n}\n#lightbox-content {\n    position: relative;\n    max-width: 80%;\n    max-height: 80%;\n}\n.close {\n    position: absolute;\n    top: 15px;\n    right: 15px;\n    font-size: 30px;\n    color: #fff;\n    cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Add some basic styling to the lightbox */\n#lightbox {\n    display: none;\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background-color: color-mix(in srgb, var(--theme-neutral-950) 70%, transparent);\n    justify-content: center;\n    align-items: center;\n    overflow: hidden;\n    z-index: 999;\n}\n#lightbox-content {\n    position: relative;\n    max-width: 80%;\n    max-height: 80%;\n}\n.close {\n    position: absolute;\n    top: 15px;\n    right: 15px;\n    font-size: 30px;\n    color: #fff;\n    cursor: pointer;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -592,13 +601,14 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "ratings-page" },
     [
       _c("div", { staticClass: "page-heading" }, [
         _c(
           "div",
           {
             staticClass:
-              "page-heading d-flex justify-content-between align-items-center mb-4",
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
           },
           [
             _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -638,411 +648,427 @@ var render = function () {
         _vm._v(" "),
         _c("section", { staticClass: "section" }, [
           _c("div", { staticClass: "figma-main-section-card" }, [
-            _c(
-              "div",
-              { staticClass: "card-body p-0" },
-              [
-                _c(
-                  "div",
-                  {
-                    staticClass:
-                      "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row",
-                  },
-                  [
-                    _vm.product_id
-                      ? _c("div", { staticClass: "flex-grow-1" }, [
-                          _c("div", { staticClass: "figma-search-container" }, [
-                            _c("i", { staticClass: "fa fa-search text-muted" }),
-                            _vm._v(" "),
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.filter,
-                                  expression: "filter",
-                                },
-                              ],
-                              staticClass: "figma-search-input",
-                              attrs: {
-                                type: "text",
-                                placeholder: _vm.__("search") || "Search...",
-                              },
-                              domProps: { value: _vm.filter },
-                              on: {
-                                input: [
-                                  function ($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.filter = $event.target.value
-                                  },
-                                  function ($event) {
-                                    return _vm.getRecords()
-                                  },
-                                ],
-                              },
-                            }),
-                          ]),
-                        ])
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "d-flex gap-2 ms-auto align-items-center flex-wrap",
-                      },
-                      [
-                        !_vm.product_id
-                          ? _c(
-                              "div",
-                              { staticClass: "figma-warning-text me-2" },
-                              [
-                                _c("span", [
-                                  _vm._v(
-                                    _vm._s(
-                                      _vm.__(
-                                        "please_select_product_first_to_show_the_rating"
-                                      ) ||
-                                        "Please select product first to show the rating"
-                                    )
-                                  ),
-                                ]),
-                              ]
-                            )
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _c(
-                          "select",
-                          {
+            _c("div", { staticClass: "card-body p-0" }, [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row p-3",
+                },
+                [
+                  _vm.product_id
+                    ? _c("div", { staticClass: "flex-grow-1" }, [
+                        _c("div", { staticClass: "figma-search-container" }, [
+                          _c("i", { staticClass: "fa fa-search text-muted" }),
+                          _vm._v(" "),
+                          _c("input", {
                             directives: [
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.product_id,
-                                expression: "product_id",
+                                value: _vm.filter,
+                                expression: "filter",
                               },
                             ],
-                            staticClass:
-                              "form-control form-select modern-select",
-                            staticStyle: { "min-width": "250px" },
+                            staticClass: "figma-search-input",
+                            attrs: {
+                              type: "text",
+                              placeholder: _vm.__("search") || "Search...",
+                            },
+                            domProps: { value: _vm.filter },
                             on: {
-                              change: [
+                              input: [
                                 function ($event) {
-                                  var $$selectedVal = Array.prototype.filter
-                                    .call($event.target.options, function (o) {
-                                      return o.selected
-                                    })
-                                    .map(function (o) {
-                                      var val =
-                                        "_value" in o ? o._value : o.value
-                                      return val
-                                    })
-                                  _vm.product_id = $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.filter = $event.target.value
                                 },
                                 function ($event) {
                                   return _vm.getRecords()
                                 },
                               ],
                             },
-                          },
-                          [
-                            _c("option", { attrs: { value: "" } }, [
-                              _vm._v(_vm._s(_vm.__("select_product"))),
-                            ]),
-                            _vm._v(" "),
-                            _vm._l(_vm.translatedProducts, function (product) {
-                              return _c(
-                                "option",
-                                { domProps: { value: product.id } },
-                                [
-                                  _vm._v(
-                                    "\n                                    " +
-                                      _vm._s(product.name) +
-                                      "\n                                "
-                                  ),
-                                ]
-                              )
-                            }),
-                          ],
-                          2
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            directives: [
-                              {
-                                name: "b-tooltip",
-                                rawName: "v-b-tooltip.hover",
-                                modifiers: { hover: true },
-                              },
-                            ],
-                            staticClass:
-                              "btn btn-figma-filter d-flex align-items-center gap-2",
-                            attrs: { title: _vm.__("refresh") },
-                            on: {
-                              click: function ($event) {
-                                return _vm.getRecords()
-                              },
-                            },
-                          },
-                          [
-                            _c("i", { staticClass: "fa fa-refresh" }),
-                            _vm._v(" "),
-                            _c("span", [
-                              _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
-                            ]),
-                          ]
-                        ),
-                      ]
-                    ),
-                  ]
-                ),
-                _vm._v(" "),
-                _c("b-table", {
-                  staticClass: "figma-order-table mb-0",
-                  attrs: {
-                    items: _vm.ratings,
-                    fields: _vm.fields,
-                    "current-page": _vm.currentPage,
-                    "per-page": _vm.perPage,
-                    filter: _vm.filter,
-                    "filter-included-fields": _vm.filterOn,
-                    "sort-by": _vm.sortBy,
-                    "sort-desc": _vm.sortDesc,
-                    "sort-direction": _vm.sortDirection,
-                    bordered: false,
-                    busy: _vm.isLoading,
-                    stacked: "md",
-                    "show-empty": "",
-                    "tbody-tr-class": function () {
-                      return "figma-tr align-middle"
-                    },
-                    small: "",
-                  },
-                  on: {
-                    "update:sortBy": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sort-by": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sortDesc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                    "update:sort-desc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                  },
-                  scopedSlots: _vm._u([
+                          }),
+                        ]),
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "div",
                     {
-                      key: "cell(rate)",
-                      fn: function (row) {
-                        return [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(_vm.renderStarRating(row.item.rate)) +
-                              "\n                        "
-                          ),
-                        ]
-                      },
+                      staticClass:
+                        "d-flex gap-2 ms-auto align-items-center flex-wrap",
                     },
-                    {
-                      key: "cell(review)",
-                      fn: function (row) {
-                        return [
-                          _c("div", { staticClass: "review-cell-text" }, [
-                            _vm._v(_vm._s(row.item.review)),
-                          ]),
-                        ]
-                      },
-                    },
-                    {
-                      key: "table-busy",
-                      fn: function () {
-                        return [
-                          _c(
+                    [
+                      !_vm.product_id
+                        ? _c(
                             "div",
-                            { staticClass: "text-center text-black my-2" },
+                            { staticClass: "figma-warning-text me-2" },
                             [
-                              _c("b-spinner", { staticClass: "align-middle" }),
-                              _vm._v(" "),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                              _c("span", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.__(
+                                      "please_select_product_first_to_show_the_rating"
+                                    ) ||
+                                      "Please select product first to show the rating"
+                                  )
+                                ),
                               ]),
-                            ],
-                            1
-                          ),
-                        ]
-                      },
-                      proxy: true,
-                    },
-                    {
-                      key: "cell(updated_at)",
-                      fn: function (row) {
-                        return [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(
-                                new Date(row.item.updated_at).toLocaleString()
-                              ) +
-                              "\n                        "
-                          ),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(images)",
-                      fn: function (row) {
-                        return _vm._l(row.item.images, function (image, index) {
-                          return _c(
-                            "a",
-                            {
-                              key: index,
-                              staticStyle: { cursor: "pointer" },
-                              on: {
-                                click: function ($event) {
-                                  return _vm.openLightbox(image.image_url)
-                                },
-                              },
-                            },
-                            [
-                              _c("img", {
-                                staticClass: "images_border",
-                                attrs: {
-                                  src: image.image_url,
-                                  alt: "Image",
-                                  height: "50",
-                                },
-                              }),
                             ]
                           )
-                        })
-                      },
-                    },
-                    {
-                      key: "cell(status)",
-                      fn: function (row) {
-                        return [
-                          row.item.status == 1
-                            ? _c("span", { staticClass: "badge bg-success" }, [
-                                _vm._v(_vm._s(_vm.__("activate"))),
-                              ])
-                            : _vm._e(),
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.product_id,
+                              expression: "product_id",
+                            },
+                          ],
+                          staticClass: "form-select ratings-product-select",
+                          on: {
+                            change: [
+                              function ($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function (o) {
+                                    return o.selected
+                                  })
+                                  .map(function (o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.product_id = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              },
+                              function ($event) {
+                                return _vm.getRecords()
+                              },
+                            ],
+                          },
+                        },
+                        [
+                          _c("option", { attrs: { value: "" } }, [
+                            _vm._v(_vm._s(_vm.__("select_product"))),
+                          ]),
                           _vm._v(" "),
-                          row.item.status == 0
-                            ? _c("span", { staticClass: "badge bg-danger" }, [
-                                _vm._v(_vm._s(_vm.__("deactivate"))),
-                              ])
-                            : _vm._e(),
-                        ]
-                      },
-                    },
-                    {
-                      key: "cell(actions)",
-                      fn: function (row) {
-                        return [
-                          _c("div", { staticClass: "d-flex gap-2" }, [
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
-                                ],
-                                staticClass: "figma-action-btn",
-                                attrs: { title: _vm.__("edit") },
-                                on: {
-                                  click: function ($event) {
-                                    _vm.edit_record = row.item
-                                  },
-                                },
-                              },
+                          _vm._l(_vm.translatedProducts, function (product) {
+                            return _c(
+                              "option",
+                              { domProps: { value: product.id } },
                               [
-                                _c("base-icon", {
-                                  attrs: {
-                                    name: "edit icon",
-                                    hoverName: "edit Hover",
-                                    width: "24",
-                                    height: "24",
-                                  },
-                                }),
-                              ],
-                              1
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
-                                  },
-                                ],
-                                staticClass: "figma-action-btn",
-                                attrs: { title: _vm.__("delete") },
-                                on: {
-                                  click: function ($event) {
-                                    return _vm.deleteDietary(
-                                      row.index,
-                                      row.item.id
-                                    )
-                                  },
-                                },
-                              },
-                              [
-                                _c("base-icon", {
-                                  attrs: {
-                                    name: "Type=Default",
-                                    hoverName: "Type=Hover",
-                                    width: "24",
-                                    height: "24",
-                                  },
-                                }),
-                              ],
-                              1
-                            ),
+                                _vm._v(
+                                  "\n                                    " +
+                                    _vm._s(product.name) +
+                                    "\n                                "
+                                ),
+                              ]
+                            )
+                          }),
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          directives: [
+                            {
+                              name: "b-tooltip",
+                              rawName: "v-b-tooltip.hover",
+                              modifiers: { hover: true },
+                            },
+                          ],
+                          staticClass:
+                            "btn btn-figma-filter d-flex align-items-center gap-2",
+                          attrs: { title: _vm.__("refresh") },
+                          on: {
+                            click: function ($event) {
+                              return _vm.getRecords()
+                            },
+                          },
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-refresh" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("refresh") || "Refresh")),
                           ]),
                         ]
+                      ),
+                    ]
+                  ),
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "table-responsive mb-0" },
+                [
+                  _c("b-table", {
+                    staticClass: "figma-order-table mb-0",
+                    attrs: {
+                      items: _vm.ratings,
+                      fields: _vm.fields,
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      filter: _vm.filter,
+                      "filter-included-fields": _vm.filterOn,
+                      "sort-by": _vm.sortBy,
+                      "sort-desc": _vm.sortDesc,
+                      "sort-direction": _vm.sortDirection,
+                      bordered: false,
+                      busy: _vm.isLoading,
+                      stacked: "md",
+                      "show-empty": "",
+                      "tbody-tr-class": function () {
+                        return "figma-tr align-middle"
+                      },
+                      small: "",
+                    },
+                    on: {
+                      "update:sortBy": function ($event) {
+                        _vm.sortBy = $event
+                      },
+                      "update:sort-by": function ($event) {
+                        _vm.sortBy = $event
+                      },
+                      "update:sortDesc": function ($event) {
+                        _vm.sortDesc = $event
+                      },
+                      "update:sort-desc": function ($event) {
+                        _vm.sortDesc = $event
                       },
                     },
-                  ]),
-                }),
-              ],
-              1
-            ),
+                    scopedSlots: _vm._u([
+                      {
+                        key: "empty",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyText)),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "emptyfiltered",
+                        fn: function (scope) {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted py-4" },
+                              [
+                                _c("i", {
+                                  staticClass:
+                                    "fa fa-search fa-2x d-block mb-2",
+                                }),
+                                _vm._v(_vm._s(scope.emptyFilteredText)),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "cell(rate)",
+                        fn: function (row) {
+                          return [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(_vm.renderStarRating(row.item.rate)) +
+                                "\n                        "
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "cell(review)",
+                        fn: function (row) {
+                          return [
+                            _c("div", { staticClass: "review-cell-text" }, [
+                              _vm._v(_vm._s(row.item.review)),
+                            ]),
+                          ]
+                        },
+                      },
+                      {
+                        key: "table-busy",
+                        fn: function () {
+                          return [
+                            _c(
+                              "div",
+                              { staticClass: "text-center text-muted my-3" },
+                              [
+                                _c("b-spinner", {
+                                  staticClass: "align-middle",
+                                }),
+                                _vm._v(" "),
+                                _c("strong", [
+                                  _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                ]),
+                              ],
+                              1
+                            ),
+                          ]
+                        },
+                        proxy: true,
+                      },
+                      {
+                        key: "cell(updated_at)",
+                        fn: function (row) {
+                          return [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(
+                                  new Date(row.item.updated_at).toLocaleString()
+                                ) +
+                                "\n                        "
+                            ),
+                          ]
+                        },
+                      },
+                      {
+                        key: "cell(images)",
+                        fn: function (row) {
+                          return _vm._l(
+                            row.item.images,
+                            function (image, index) {
+                              return _c(
+                                "a",
+                                {
+                                  key: index,
+                                  staticClass: "rating-thumb-link",
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.openLightbox(image.image_url)
+                                    },
+                                  },
+                                },
+                                [
+                                  _c("img", {
+                                    staticClass: "images_border rating-thumb",
+                                    attrs: {
+                                      src: image.image_url,
+                                      alt: "Image",
+                                    },
+                                  }),
+                                ]
+                              )
+                            }
+                          )
+                        },
+                      },
+                      {
+                        key: "cell(status)",
+                        fn: function (row) {
+                          return [
+                            row.item.status == 1
+                              ? _c(
+                                  "span",
+                                  { staticClass: "badge bg-success" },
+                                  [_vm._v(_vm._s(_vm.__("activate")))]
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            row.item.status == 0
+                              ? _c("span", { staticClass: "badge bg-danger" }, [
+                                  _vm._v(_vm._s(_vm.__("deactivate"))),
+                                ])
+                              : _vm._e(),
+                          ]
+                        },
+                      },
+                      {
+                        key: "cell(actions)",
+                        fn: function (row) {
+                          return [
+                            _c(
+                              "div",
+                              {
+                                staticClass: "d-flex gap-1 rating-row-actions",
+                              },
+                              [
+                                _c(
+                                  "button",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "b-tooltip",
+                                        rawName: "v-b-tooltip.hover",
+                                        modifiers: { hover: true },
+                                      },
+                                    ],
+                                    staticClass: "figma-action-btn",
+                                    attrs: { title: _vm.__("edit") },
+                                    on: {
+                                      click: function ($event) {
+                                        _vm.edit_record = row.item
+                                      },
+                                    },
+                                  },
+                                  [_c("i", { staticClass: "bi bi-pencil" })]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "button",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "b-tooltip",
+                                        rawName: "v-b-tooltip.hover",
+                                        modifiers: { hover: true },
+                                      },
+                                    ],
+                                    staticClass:
+                                      "figma-action-btn figma-delete-btn",
+                                    attrs: { title: _vm.__("delete") },
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.deleteDietary(
+                                          row.index,
+                                          row.item.id
+                                        )
+                                      },
+                                    },
+                                  },
+                                  [_c("i", { staticClass: "bi bi-trash" })]
+                                ),
+                              ]
+                            ),
+                          ]
+                        },
+                      },
+                    ]),
+                  }),
+                ],
+                1
+              ),
+            ]),
             _vm._v(" "),
             _c(
               "div",
-              { staticClass: "figma-table-footer" },
+              { staticClass: "figma-table-footer flex-wrap gap-3" },
               [
-                _c("div", { staticClass: "showing-results-text" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("total_ratings")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                  _vm._v(
-                    " , " +
-                      _vm._s(_vm.__("average_rating")) +
-                      " :\n                        "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.calculateAverageRating().toFixed(2))),
-                  ]),
-                ]),
+                _c("table-count", {
+                  attrs: {
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "total-rows": _vm.totalRows,
+                  },
+                }),
                 _vm._v(" "),
                 _c("b-pagination", {
                   staticClass: "figma-pagination mb-0",

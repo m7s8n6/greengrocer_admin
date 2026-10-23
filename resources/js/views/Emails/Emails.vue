@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+        <div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
             <h3 class="modern-page-title mb-0">{{ __('send_email') }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -23,15 +23,15 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
+                            <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getEmails()"
+                                v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') }}</span>
+                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="create_new = true" v-if="$can('send_email')">
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('send_email') }}</span>
-                            </button>
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getEmails()"
-                                v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
-                                <span>{{ __('refresh') }}</span>
                             </button>
                         </div>
                     </div>
@@ -43,15 +43,21 @@
                             small class="figma-order-table mb-0">
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-3">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
                             </template>
 
+                            <template #empty="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                            </template>
+                            <template #emptyfiltered="scope">
+                                <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                            </template>
+
                             <template #cell(image)="row">
-                                <p v-if="row.item.image === ''">{{ __('no_image') }}</p>
-                                <img :src="$storageUrl + row.item.image" height="50" v-else />
+                                <img :src="row.item.image ? ($storageUrl + row.item.image) : $placeholderImage" height="40" />
                             </template>
 
                             <template #cell(actions)="row">
@@ -66,20 +72,19 @@
 
                             <template #cell(message)="row">
                                 <div>
-                                    <small class="d-inline-flex mb-3 px-2 py-1 text-muted bg-secondary bg-opacity-10 border border-secondary border-opacity-10 rounded-2"
-                                        v-b-tooltip.hover="{ html: true, title: row.item.message, boundary: 'window' }">
-                                        <i class="fa fa-info-circle"></i>
-                                    </small>
+                                    <span :id="'bonus' + row.item.id" class="figma-action-btn" tabindex="0" :aria-label="__('message')">
+                                        <i class="fa fa-eye"></i>
+                                    </span>
+                                    <b-popover :target="'bonus' + row.item.id" triggers="hover focus" placement="left">
+                                        <div v-html="row.item.message"></div>
+                                    </b-popover>
                                 </div>
                             </template>
                         </b-table>
                     </div>
 
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                            'of' }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -104,11 +109,11 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'title', label: __('title'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('messgae'), sortable: true, class: 'text-center' },
-                { key: 'type', label: __('type'), class: 'text-center' },
-                { key: 'type_id', label: __('id'), class: 'text-center' },
-                { key: 'image', label: __('image'), class: 'text-center' },
+                { key: 'title', label: __('title'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'type', label: __('type') },
+                { key: 'type_id', label: __('type_id') },
+                { key: 'image', label: __('image') },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,
@@ -188,8 +193,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true

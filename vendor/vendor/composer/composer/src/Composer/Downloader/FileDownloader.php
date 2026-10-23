@@ -26,7 +26,6 @@ use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PostFileDownloadEvent;
 use Composer\Plugin\PreFileDownloadEvent;
 use Composer\EventDispatcher\EventDispatcher;
-use Composer\Installer\BinaryInstaller;
 use Composer\Util\Filesystem;
 use Composer\Util\Http\Response;
 use Composer\Util\Platform;
@@ -206,12 +205,12 @@ class FileDownloader implements DownloaderInterface, ChangeReportInterface
                 }
 
                 if (!file_exists($fileName)) {
-                    throw new \UnexpectedValueException(UrlUtil::sanitize($url['base']).' could not be saved to '.$fileName.', make sure the'
+                    throw new \UnexpectedValueException($url['base'].' could not be saved to '.$fileName.', make sure the'
                         .' directory is writable and you have internet connectivity');
                 }
 
                 if ($checksum !== null && $checksum !== '' && hash_file('sha1', $fileName) !== $checksum) {
-                    throw new \UnexpectedValueException('The checksum verification of the file failed (downloaded from '.UrlUtil::sanitize($url['base']).')');
+                    throw new \UnexpectedValueException('The checksum verification of the file failed (downloaded from '.$url['base'].')');
                 }
 
                 if ($this->eventDispatcher !== null) {
@@ -365,16 +364,9 @@ class FileDownloader implements DownloaderInterface, ChangeReportInterface
         // Single files can not have a mode set like files in archives
         // so we make sure if the file is a binary that it is executable
         foreach ($package->getBinaries() as $bin) {
-            $binPath = $path . '/' . $bin;
-            if (!file_exists($binPath) || is_executable($binPath)) {
-                continue;
+            if (file_exists($path . '/' . $bin) && !is_executable($path . '/' . $bin)) {
+                Silencer::call('chmod', $path . '/' . $bin, 0777 & ~umask());
             }
-            // a bin resolving outside of the package would let it chmod an arbitrary host file, this
-            // is reported by BinaryInstaller later in the same install (GHSA-96h3-5x6v-m776)
-            if (!BinaryInstaller::isBinPathInsidePackage($path, $binPath)) {
-                continue;
-            }
-            Silencer::call('chmod', $binPath, 0777 & ~umask());
         }
 
         return \React\Promise\resolve(null);
@@ -456,7 +448,7 @@ class FileDownloader implements DownloaderInterface, ChangeReportInterface
             $extension = $package->getDistType();
         }
 
-        return rtrim($this->config->get('vendor-dir') . '/composer/tmp-' . hash('md5', $package . spl_object_id($package)) . '.' . $extension, '.');
+        return rtrim($this->config->get('vendor-dir') . '/composer/tmp-' . hash('md5', $package . spl_object_hash($package)) . '.' . $extension, '.');
     }
 
     /**
@@ -511,7 +503,7 @@ class FileDownloader implements DownloaderInterface, ChangeReportInterface
             }
 
             $promise = $this->download($package, $targetDir.'_compare', null, false);
-            $promise->then(null, static function ($ex) use (&$e) {
+            $promise->then(null, function ($ex) use (&$e) {
                 $e = $ex;
             });
             $this->httpDownloader->wait();
@@ -519,7 +511,7 @@ class FileDownloader implements DownloaderInterface, ChangeReportInterface
                 throw $e;
             }
             $promise = $this->install($package, $targetDir.'_compare', false);
-            $promise->then(null, static function ($ex) use (&$e) {
+            $promise->then(null, function ($ex) use (&$e) {
                 $e = $ex;
             });
             $this->process->wait();

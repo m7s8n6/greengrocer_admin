@@ -152,13 +152,22 @@ class SellerController extends BaseController
         $year = date("Y");
         $curdate = date('Y-m-d');
 
-        $data['weekly_sales'] = Order::select(DB::raw('ROUND(SUM(order_items.sub_total), 2) AS total_sale'), DB::raw('DATE(orders.created_at) AS order_date'))
-            ->leftJoin('order_items', 'order_items.order_id', '=', 'orders.id')
-            ->where('order_items.seller_id', $seller_id)
-            ->where(DB::raw('YEAR(orders.created_at)'), '=', $year)
-            ->where(DB::raw('DATE(orders.created_at)'), '<=', $curdate)
-            ->groupBy(DB::raw('DATE(orders.created_at)'))
-            ->orderBy(DB::raw('DATE(orders.created_at)'), 'DESC')
+        $data['weekly_sales'] = DB::table(function ($query) use ($seller_id, $year, $curdate) {
+            $query->select('orders.id', 'orders.remaining_final', 'orders.created_at')
+                ->from('orders')
+                ->whereExists(function ($q) use ($seller_id) {
+                    $q->select(DB::raw(1))
+                        ->from('order_items')
+                        ->whereColumn('order_items.order_id', 'orders.id')
+                        ->where('order_items.seller_id', $seller_id);
+                })
+                ->where('orders.active_status', '!=', OrderStatusList::$cancelled)
+                ->where(DB::raw('YEAR(orders.created_at)'), '=', $year)
+                ->where(DB::raw('DATE(orders.created_at)'), '<=', $curdate);
+        }, 'seller_orders')
+            ->select(DB::raw('ROUND(SUM(seller_orders.remaining_final), 2) AS total_sale'), DB::raw('DATE(seller_orders.created_at) AS order_date'))
+            ->groupBy(DB::raw('DATE(seller_orders.created_at)'))
+            ->orderBy(DB::raw('DATE(seller_orders.created_at)'), 'DESC')
             ->limit(7)->get();
 
         $orderIdsString = '0';
@@ -1171,7 +1180,9 @@ class SellerController extends BaseController
         $settings["assign_delivery_boy"] = Seller::select('assign_delivery_boy')->where('admin_id', auth()->user()->id)->first()->assign_delivery_boy;
         $settings["view_order_otp"] = Seller::select('view_order_otp')->where('admin_id', auth()->user()->id)->first()->view_order_otp;
         $settings["change_order_status_delivered"] = Seller::select('change_order_status_delivered')->where('admin_id', auth()->user()->id)->first()->change_order_status_delivered;
+        $settings["map_provider"] = CommonHelper::activeMapProvider(); // 'google' or 'osm'
         $settings["demo_mode"] = env('DEMO_MODE', 0);
+        $settings["is_demo_mode_on"] = isDemoModeOn();
         $settings = json_encode($settings);
         $settings = base64_encode($settings);
         if (!empty($settings)) {
@@ -1230,21 +1241,30 @@ class SellerController extends BaseController
         $limit = ($request->limit) ?? 10;
         $offset = ($request->offset) ?? 0;
 
-        $city_id = auth()->user()->seller->city_id;
+        $seller = auth()->user()->seller;
+        // sellers.city_id is a comma-separated list of the seller's cities.
+        $cityIds = array_values(array_filter(array_map('intval', explode(',', (string) $seller->city_id))));
 
         if ($request->order_id) {
             $order = Order::find($request->order_id);
             if ($order && $order->address_id) {
                 $address = UserAddress::find($order->address_id);
                 if ($address && $address->city_id) {
-                    $city_id = $address->city_id;
+                    $cityIds = [(int) $address->city_id];
                 }
             }
         }
 
+        // Separate fleets: a seller running their own fleet sees only their own drivers, otherwise
+        // the admin's shared pool - never another seller's drivers.
         $deliveryBoys = DeliveryBoy::select('id', 'name', 'custom_field_values')
-            ->where('city_id', $city_id)
-            ->where('status', 1);
+            ->servingAnyCity($cityIds)
+            ->where('status', 1)
+            ->when(
+                $seller->usesOwnFleet(),
+                fn ($q) => $q->where('seller_id', $seller->id),
+                fn ($q) => $q->whereNull('seller_id')
+            );
 
         $totalDeliveryBoys = clone $deliveryBoys;
         $totalDeliveryBoys = $totalDeliveryBoys->count();

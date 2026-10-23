@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+        <div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
             <h3 class="modern-page-title mb-0">{{ __('send_notification') }}</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -25,15 +25,15 @@
                             </div>
                         </div>
                         <div class="d-flex gap-2">
+                            <button class="btn btn-figma-columns d-flex align-items-center gap-2"
+                                @click="getNotifications()" v-b-tooltip.hover :title="__('refresh')">
+                                <i class="fa fa-refresh"></i>
+                                <span>{{ __('refresh') }}</span>
+                            </button>
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="create_new = true" v-if="$can('send_notification')">
                                 <i class="fa fa-plus"></i>
                                 <span>{{ __('send_notification') }}</span>
-                            </button>
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                @click="getNotifications()" v-b-tooltip.hover :title="__('refresh')">
-                                <i class="fa fa-refresh"></i>
-                                <span>{{ __('refresh') }}</span>
                             </button>
                         </div>
                     </div>
@@ -46,21 +46,38 @@
                             small class="figma-order-table mb-0">
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-2">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
                             </template>
 
+                            <template #cell(message)="row">
+                                <span class="notif-message" :title="row.item.message">{{ row.item.message }}</span>
+                            </template>
+
+                            <template #cell(type)="row">
+                                <span class="text-capitalize">{{ row.item.type }}</span>
+                            </template>
+
+                            <template #cell(type_id)="row">
+                                <span v-if="row.item.type_id">{{ row.item.type_id }}</span>
+                                <span v-else class="text-muted">&mdash;</span>
+                            </template>
+
+                            <template #cell(type_link)="row">
+                                <span v-if="row.item.type_link" class="notif-message" :title="row.item.type_link">{{ row.item.type_link }}</span>
+                                <span v-else class="text-muted">&mdash;</span>
+                            </template>
+
                             <template #cell(image)="row">
-                                <p v-if="row.item.image === ''">{{ __('no_image') }}</p>
-                                <img :src="$storageUrl + row.item.image" height="50" v-else />
+                                <img :src="row.item.image ? ($storageUrl + row.item.image) : $placeholderImage" class="notif-thumb" alt="" />
                             </template>
 
                             <template #cell(actions)="row">
                                 <div class="d-flex gap-2">
                                     <button class="figma-action-btn figma-delete-btn"
-                                        @click="deleteNotification(row.index, row.item.id)"
+                                        @click="deleteNotification(row.item.id)"
                                         v-if="$can('notification_delete')" v-b-tooltip.hover :title="__('delete')">
                                         <base-icon name="Type=Default" hoverName="Type=Hover" width="24" height="24" />
                                     </button>
@@ -69,11 +86,8 @@
                         </b-table>
                     </div>
 
-                    <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                            'of' }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                    <div class="figma-table-footer flex-wrap gap-3">
+                        <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -98,12 +112,12 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'title', label: __('title'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('messgae'), sortable: true, class: 'text-center' },
-                { key: 'type', label: __('type'), class: 'text-center' },
-                { key: 'type_id', label: __('id'), class: 'text-center' },
-                { key: 'type_link', label: __('link'), class: 'text-center' },
-                { key: 'image', label: __('image'), class: 'text-center' },
+                { key: 'title', label: __('title'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'type', label: __('type') },
+                { key: 'type_id', label: __('type_id') },
+                { key: 'type_link', label: __('link') },
+                { key: 'image', label: __('image') },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,
@@ -186,7 +200,7 @@ export default {
                     this.totalRows = this.notifications.length
                 });
         },
-        deleteNotification(index, id) {
+        deleteNotification(id) {
             this.$swal.fire({
                 title: __('are_you_sure'),
                 text: __('you_want_be_able_to_revert_this'),
@@ -194,8 +208,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -205,7 +219,9 @@ export default {
                     axios.post(this.$apiUrl + '/notifications/delete', postData)
                         .then((response) => {
                             this.isLoading = false
-                            this.notifications.splice(index, 1)
+                            const index = this.notifications.findIndex(n => n.id === id);
+                            if (index > -1) this.notifications.splice(index, 1);
+                            this.totalRows = this.notifications.length;
                             this.showMessage("success", response.data.message);
                         });
                 }
@@ -225,3 +241,21 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+.notif-message {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.notif-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+}
+</style>

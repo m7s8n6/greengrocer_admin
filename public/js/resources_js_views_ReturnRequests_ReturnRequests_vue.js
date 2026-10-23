@@ -313,8 +313,6 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 //
 //
 //
-//
-//
 
 
 
@@ -585,6 +583,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -657,6 +662,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       totalRows: 1,
       currentPage: 1,
       perPage: this.$perPage,
+      pageOptions: this.$pageOptions,
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
@@ -773,8 +779,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this3.isLoading = true;
@@ -818,7 +824,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.status-card[data-v-69073a76] {\n    cursor: pointer !important;\n    transition: all 0.2s ease-in-out !important;\n    border: 1px solid #EDEDED !important;\n}\n.status-card[data-v-69073a76]:hover {\n    transform: translateY(-2px) !important;\n    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;\n}\n\n/* Active status overrides to combat .card !important rules in global CSS */\n.status-card.bg-warning[data-v-69073a76] {\n    background-color: rgba(255, 193, 7, 0.15) !important;\n    border: 2px solid #ffc107 !important;\n    color: #856404 !important;\n}\n.status-card.bg-info[data-v-69073a76] {\n    background-color: rgba(13, 202, 240, 0.15) !important;\n    border: 2px solid #0dcaf0 !important;\n    color: #087990 !important;\n}\n.status-card.bg-success[data-v-69073a76] {\n    background-color: rgba(25, 135, 84, 0.15) !important;\n    border: 2px solid #198754 !important;\n    color: #0f5132 !important;\n}\n.status-card.bg-danger[data-v-69073a76] {\n    background-color: rgba(220, 53, 69, 0.15) !important;\n    border: 2px solid #dc3545 !important;\n    color: #842029 !important;\n}\n.status-card.bg-primary[data-v-69073a76] {\n    background-color: rgba(55, 162, 121, 0.15) !important;\n    border: 2px solid var(--figma-primary, #37a279) !important;\n    color: var(--figma-primary, #37a279) !important;\n}\n.status-card.bg-secondary[data-v-69073a76] {\n    background-color: rgba(108, 117, 125, 0.15) !important;\n    border: 2px solid #6c757d !important;\n    color: #495057 !important;\n}\n.status-card.bg-dark[data-v-69073a76] {\n    background-color: rgba(33, 37, 41, 0.15) !important;\n    border: 2px solid #212529 !important;\n    color: #212529 !important;\n}\n\n/* Inactive states / fallback border-light styling */\n.status-card.border-light[data-v-69073a76] {\n    border: 1px solid #EDEDED !important;\n    background-color: #FFFFFF !important;\n    color: #333333 !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Section blocks (same look as order detail cards) */\n.rr-section[data-v-69073a76] {\n    padding: 14px 16px;\n    background: var(--ui-surface-muted);\n    border: 1px solid var(--ui-border);\n    border-radius: var(--ui-radius-lg);\n    font-size: 13px;\n}\n.rr-section-title[data-v-69073a76] {\n    display: flex;\n    align-items: center;\n    margin-bottom: 10px;\n    font-family: var(--ui-font);\n    font-weight: 700;\n    font-size: 14px;\n    color: var(--ui-heading);\n}\n.rr-label[data-v-69073a76] {\n    font-family: var(--ui-font);\n    font-weight: 600;\n    font-size: 13px;\n    color: var(--ui-heading);\n}\n.rr-btn[data-v-69073a76] {\n    height: 38px;\n    padding: 0 16px;\n    font-size: 13px;\n    font-weight: 600;\n    border-radius: var(--ui-radius);\n}\n.status-card[data-v-69073a76] {\n    cursor: pointer !important;\n    transition: all 0.2s ease-in-out !important;\n    border: 1px solid var(--ui-border) !important;\n    border-radius: var(--ui-radius) !important;\n}\n.status-card[data-v-69073a76]:hover {\n    transform: translateY(-1px) !important;\n    box-shadow: var(--ui-shadow) !important;\n}\n.rr-status-body[data-v-69073a76] {\n    padding: 10px 8px;\n    gap: 4px;\n}\n.rr-status-icon[data-v-69073a76] {\n    font-size: 18px;\n    line-height: 1;\n}\n.rr-status-body .small[data-v-69073a76] {\n    font-size: 12px;\n    line-height: 16px;\n}\n\n/* Active status overrides to combat .card !important rules in global CSS */\n.status-card.bg-warning[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-warn-500) 15%, transparent) !important;\n    border: 2px solid var(--theme-warn-500) !important;\n    color: var(--theme-warn-800) !important;\n}\n.status-card.bg-info[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-info-400) 15%, transparent) !important;\n    border: 2px solid var(--theme-info-500) !important;\n    color: var(--theme-info-700) !important;\n}\n.status-card.bg-success[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-success-500) 15%, transparent) !important;\n    border: 2px solid var(--theme-success-500) !important;\n    color: var(--theme-success-800) !important;\n}\n.status-card.bg-danger[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-error-500) 15%, transparent) !important;\n    border: 2px solid var(--theme-error-500) !important;\n    color: var(--theme-error-800) !important;\n}\n.status-card.bg-primary[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-primary-500) 15%, transparent) !important;\n    border: 2px solid var(--theme-primary-500) !important;\n    color: var(--theme-primary-700) !important;\n}\n.status-card.bg-secondary[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-neutral-500) 15%, transparent) !important;\n    border: 2px solid var(--theme-neutral-500) !important;\n    color: var(--theme-neutral-700) !important;\n}\n.status-card.bg-dark[data-v-69073a76] {\n    background-color: color-mix(in srgb, var(--theme-neutral-900) 15%, transparent) !important;\n    border: 2px solid var(--theme-neutral-900) !important;\n    color: var(--theme-neutral-900) !important;\n}\n\n/* Inactive states / fallback border-light styling */\n.status-card.border-light[data-v-69073a76] {\n    border: 1px solid var(--ui-border) !important;\n    background-color: var(--ui-surface) !important;\n    color: var(--ui-text) !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -841,7 +847,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.reason-cell-text[data-v-763d8f80] {\n    white-space: normal;\n    word-break: break-word;\n    max-width: 320px;\n    text-align: left;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.reason-cell-text[data-v-763d8f80] {\n    white-space: normal;\n    word-break: break-word;\n    max-width: 320px;\n    text-align: start;\n    font-size: 13px;\n}\n\n/* Neutral statuses (received from customer / return to seller) as soft pills */\n.badge.bg-secondary[data-v-763d8f80],\n.badge.bg-dark[data-v-763d8f80] {\n    background: var(--ui-surface-muted) !important;\n    color: var(--ui-text) !important;\n    border-color: var(--ui-border) !important;\n}\n.figma-table-footer[data-v-763d8f80] {\n    display: flex;\n    flex-wrap: wrap;\n    justify-content: space-between;\n    align-items: center;\n    gap: 12px;\n    padding: 14px 20px !important;\n    border-top: 1px solid var(--ui-border);\n    background: var(--ui-surface);\n}\n@media (max-width: 767.98px) {\n.figma-table-footer[data-v-763d8f80] {\n        justify-content: center;\n        padding: 12px 16px !important;\n}\n.reason-cell-text[data-v-763d8f80] {\n        max-width: none;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1101,11 +1107,26 @@ var render = function () {
     [
       _c(
         "div",
-        { attrs: { slot: "modal-footer" }, slot: "modal-footer" },
+        {
+          staticClass: "d-flex justify-content-end gap-2 w-100",
+          attrs: { slot: "modal-footer" },
+          slot: "modal-footer",
+        },
         [
           _c(
             "b-button",
             {
+              staticClass: "rr-btn",
+              attrs: { variant: "outline-secondary" },
+              on: { click: _vm.hideModal },
+            },
+            [_vm._v(_vm._s(_vm.__("cancel")))]
+          ),
+          _vm._v(" "),
+          _c(
+            "b-button",
+            {
+              staticClass: "rr-btn",
               attrs: { variant: "primary", disabled: _vm.isLoading },
               on: {
                 click: function ($event) {
@@ -1120,12 +1141,6 @@ var render = function () {
                 : _vm._e(),
             ],
             1
-          ),
-          _vm._v(" "),
-          _c(
-            "b-button",
-            { attrs: { variant: "secondary" }, on: { click: _vm.hideModal } },
-            [_vm._v(_vm._s(_vm.__("cancel")))]
           ),
         ],
         1
@@ -1146,226 +1161,204 @@ var render = function () {
           _c("div", { staticClass: "row" }, [
             _c("div", { staticClass: "col-md-12" }, [
               _c("div", { staticClass: "form-group" }, [
-                _c("label", { staticClass: "form-label fw-bold mb-3" }, [
+                _vm.login_user.role_id == 4 && _vm.order_details
+                  ? _c("div", { staticClass: "rr-section mb-3" }, [
+                      _c("h6", { staticClass: "rr-section-title" }, [
+                        _c(
+                          "svg",
+                          {
+                            staticClass:
+                              "me-2 text-primary d-inline-block align-middle",
+                            attrs: {
+                              width: "20",
+                              height: "20",
+                              viewBox: "0 0 24 24",
+                              fill: "none",
+                              xmlns: "http://www.w3.org/2000/svg",
+                            },
+                          },
+                          [
+                            _c("path", {
+                              attrs: {
+                                d: "M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21",
+                                stroke: "currentColor",
+                                "stroke-width": "2",
+                                "stroke-linecap": "round",
+                                "stroke-linejoin": "round",
+                              },
+                            }),
+                            _vm._v(" "),
+                            _c("circle", {
+                              attrs: {
+                                cx: "12",
+                                cy: "7",
+                                r: "4",
+                                stroke: "currentColor",
+                                "stroke-width": "2",
+                                "stroke-linecap": "round",
+                                "stroke-linejoin": "round",
+                              },
+                            }),
+                          ]
+                        ),
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(
+                              _vm.__("customer_details") || "Customer Details"
+                            ) +
+                            "\n                        "
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-md-6 mb-2" }, [
+                          _c(
+                            "span",
+                            { staticClass: "small text-muted d-block" },
+                            [_vm._v(_vm._s(_vm.__("name")))]
+                          ),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "fw-bold small" }, [
+                            _vm._v(
+                              _vm._s(
+                                _vm.record.customer_name || _vm.record.name
+                              )
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6 mb-2" }, [
+                          _c(
+                            "span",
+                            { staticClass: "small text-muted d-block" },
+                            [_vm._v(_vm._s(_vm.__("mobile")))]
+                          ),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "fw-bold small" }, [
+                            _vm._v(
+                              _vm._s(
+                                _vm.record.customer_mobile ||
+                                  _vm.order_details.order_mobile
+                              )
+                            ),
+                          ]),
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-12" }, [
+                          _c(
+                            "span",
+                            { staticClass: "small text-muted d-block" },
+                            [_vm._v(_vm._s(_vm.__("address")))]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "span",
+                            { staticClass: "fw-bold small text-wrap d-block" },
+                            [_vm._v(_vm._s(_vm.order_details.order_address))]
+                          ),
+                        ]),
+                      ]),
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("div", { staticClass: "rr-section mb-3" }, [
+                  _c("h6", { staticClass: "rr-section-title" }, [
+                    _c(
+                      "svg",
+                      {
+                        staticClass:
+                          "me-2 text-primary d-inline-block align-middle",
+                        attrs: {
+                          width: "20",
+                          height: "20",
+                          viewBox: "0 0 24 24",
+                          fill: "none",
+                          xmlns: "http://www.w3.org/2000/svg",
+                        },
+                      },
+                      [
+                        _c("path", {
+                          attrs: {
+                            d: "M12 2L2 7L12 12L22 7L12 2Z",
+                            stroke: "currentColor",
+                            "stroke-width": "2",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                          },
+                        }),
+                        _vm._v(" "),
+                        _c("path", {
+                          attrs: {
+                            d: "M2 17L12 22L22 17",
+                            stroke: "currentColor",
+                            "stroke-width": "2",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                          },
+                        }),
+                        _vm._v(" "),
+                        _c("path", {
+                          attrs: {
+                            d: "M2 12L12 17L22 12",
+                            stroke: "currentColor",
+                            "stroke-width": "2",
+                            "stroke-linecap": "round",
+                            "stroke-linejoin": "round",
+                          },
+                        }),
+                      ]
+                    ),
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(_vm.__("return_item") || "Return Item") +
+                        "\n                        "
+                    ),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "d-flex align-items-center" }, [
+                    _c("div", { staticClass: "flex-grow-1" }, [
+                      _c(
+                        "div",
+                        { staticClass: "fw-bold small text-dark mb-1" },
+                        [_vm._v(_vm._s(_vm.record.product_name))]
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "small text-muted" }, [
+                        _vm._v(
+                          _vm._s(_vm.record.variant_name) +
+                            " | " +
+                            _vm._s(_vm.__("quantity")) +
+                            ": " +
+                            _vm._s(_vm.record.quantity)
+                        ),
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "small text-primary fw-bold mt-1" },
+                        [
+                          _vm._v(
+                            _vm._s(_vm.$currency) +
+                              " " +
+                              _vm._s(_vm.record.sub_total) +
+                              "\n                                "
+                          ),
+                        ]
+                      ),
+                    ]),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c("label", { staticClass: "form-label rr-label mb-2" }, [
                   _vm._v(_vm._s(_vm.__("status")) + " "),
                   _c("span", { staticClass: "text-danger" }, [_vm._v("*")]),
                 ]),
-                _vm._v(" "),
-                _vm.login_user.role_id == 4 && _vm.order_details
-                  ? _c(
-                      "div",
-                      {
-                        staticClass:
-                          "mb-4 p-3 rounded-3 bg-light border border-secondary border-opacity-10",
-                      },
-                      [
-                        _c("h6", { staticClass: "fw-bold mb-3" }, [
-                          _c(
-                            "svg",
-                            {
-                              staticClass: "me-2 text-primary",
-                              staticStyle: {
-                                display: "inline-block",
-                                "vertical-align": "middle",
-                              },
-                              attrs: {
-                                width: "20",
-                                height: "20",
-                                viewBox: "0 0 24 24",
-                                fill: "none",
-                                xmlns: "http://www.w3.org/2000/svg",
-                              },
-                            },
-                            [
-                              _c("path", {
-                                attrs: {
-                                  d: "M20 21C20 16.5817 16.4183 13 12 13C7.58172 13 4 16.5817 4 21",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round",
-                                },
-                              }),
-                              _vm._v(" "),
-                              _c("circle", {
-                                attrs: {
-                                  cx: "12",
-                                  cy: "7",
-                                  r: "4",
-                                  stroke: "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round",
-                                },
-                              }),
-                            ]
-                          ),
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(
-                                _vm.__("customer_details") || "Customer Details"
-                              ) +
-                              "\n                        "
-                          ),
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "row" }, [
-                          _c("div", { staticClass: "col-md-6 mb-2" }, [
-                            _c(
-                              "span",
-                              { staticClass: "small text-muted d-block" },
-                              [_vm._v(_vm._s(_vm.__("name")))]
-                            ),
-                            _vm._v(" "),
-                            _c("span", { staticClass: "fw-bold small" }, [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.record.customer_name || _vm.record.name
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-6 mb-2" }, [
-                            _c(
-                              "span",
-                              { staticClass: "small text-muted d-block" },
-                              [_vm._v(_vm._s(_vm.__("mobile")))]
-                            ),
-                            _vm._v(" "),
-                            _c("span", { staticClass: "fw-bold small" }, [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.record.customer_mobile ||
-                                    _vm.order_details.order_mobile
-                                )
-                              ),
-                            ]),
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-12" }, [
-                            _c(
-                              "span",
-                              { staticClass: "small text-muted d-block" },
-                              [_vm._v(_vm._s(_vm.__("address")))]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "span",
-                              {
-                                staticClass: "fw-bold small text-wrap d-block",
-                              },
-                              [_vm._v(_vm._s(_vm.order_details.order_address))]
-                            ),
-                          ]),
-                        ]),
-                      ]
-                    )
-                  : _vm._e(),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    staticClass:
-                      "mb-4 p-3 rounded-3 bg-light border border-secondary border-opacity-10",
-                  },
-                  [
-                    _c("h6", { staticClass: "fw-bold mb-3" }, [
-                      _c(
-                        "svg",
-                        {
-                          staticClass: "me-2 text-primary",
-                          staticStyle: {
-                            display: "inline-block",
-                            "vertical-align": "middle",
-                          },
-                          attrs: {
-                            width: "20",
-                            height: "20",
-                            viewBox: "0 0 24 24",
-                            fill: "none",
-                            xmlns: "http://www.w3.org/2000/svg",
-                          },
-                        },
-                        [
-                          _c("path", {
-                            attrs: {
-                              d: "M12 2L2 7L12 12L22 7L12 2Z",
-                              stroke: "currentColor",
-                              "stroke-width": "2",
-                              "stroke-linecap": "round",
-                              "stroke-linejoin": "round",
-                            },
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d: "M2 17L12 22L22 17",
-                              stroke: "currentColor",
-                              "stroke-width": "2",
-                              "stroke-linecap": "round",
-                              "stroke-linejoin": "round",
-                            },
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d: "M2 12L12 17L22 12",
-                              stroke: "currentColor",
-                              "stroke-width": "2",
-                              "stroke-linecap": "round",
-                              "stroke-linejoin": "round",
-                            },
-                          }),
-                        ]
-                      ),
-                      _vm._v(
-                        "\n                            " +
-                          _vm._s(_vm.__("return_item") || "Return Item") +
-                          "\n                        "
-                      ),
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "d-flex align-items-center" }, [
-                      _c("div", { staticClass: "flex-grow-1" }, [
-                        _c(
-                          "div",
-                          { staticClass: "fw-bold small text-dark mb-1" },
-                          [_vm._v(_vm._s(_vm.record.product_name))]
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "small text-muted" }, [
-                          _vm._v(
-                            _vm._s(_vm.record.variant_name) +
-                              " | " +
-                              _vm._s(_vm.__("quantity")) +
-                              ": " +
-                              _vm._s(_vm.record.quantity)
-                          ),
-                        ]),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "small text-primary fw-bold mt-1" },
-                          [
-                            _vm._v(
-                              _vm._s(_vm.$currency) +
-                                " " +
-                                _vm._s(_vm.record.sub_total) +
-                                "\n                                "
-                            ),
-                          ]
-                        ),
-                      ]),
-                    ]),
-                  ]
-                ),
                 _vm._v(" "),
                 _vm.login_user.role_id == 3
                   ? _c("div", { staticClass: "row g-2" }, [
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1386,12 +1379,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("↻"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-arrow-repeat rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("pending"))),
@@ -1405,7 +1399,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1426,12 +1420,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("👤"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-person rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(
@@ -1447,7 +1441,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1468,12 +1462,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("✅"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-check-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("approve"))),
@@ -1487,7 +1482,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1508,12 +1503,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("❌"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-x-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("reject"))),
@@ -1529,7 +1525,7 @@ var render = function () {
                   ? _c("div", { staticClass: "row g-2" }, [
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1550,12 +1546,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🚚"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-truck rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("out_for_pickup"))),
@@ -1569,7 +1565,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1590,12 +1586,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("📦"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-box-seam rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(
@@ -1611,7 +1608,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1632,12 +1629,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🏬"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-shop rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("return_to_seller"))),
@@ -1651,7 +1648,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1672,12 +1669,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🚫"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-slash-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("cancelled"))),
@@ -1692,7 +1690,7 @@ var render = function () {
                   : _c("div", { staticClass: "row g-2" }, [
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1713,12 +1711,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("↻"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-arrow-repeat rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("pending"))),
@@ -1732,7 +1731,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1753,12 +1752,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("👤"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-person rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(
@@ -1774,7 +1773,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1795,12 +1794,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🚚"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-truck rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("out_for_pickup"))),
@@ -1814,7 +1813,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1835,12 +1834,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("📦"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-box-seam rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(
@@ -1856,7 +1856,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1877,12 +1877,12 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🏬"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass: "bi bi-shop rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("return_to_seller"))),
@@ -1896,7 +1896,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1917,12 +1917,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("✅"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-check-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("approve"))),
@@ -1936,7 +1937,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1957,12 +1958,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("❌"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-x-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("reject"))),
@@ -1976,7 +1978,7 @@ var render = function () {
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "col-lg-3 col-md-4 col-sm-6 mb-2" },
+                        { staticClass: "col-lg-3 col-md-4 col-6 mb-2" },
                         [
                           _c(
                             "div",
@@ -1997,12 +1999,13 @@ var render = function () {
                                 "div",
                                 {
                                   staticClass:
-                                    "card-body text-center d-flex flex-column justify-content-center align-items-center p-3",
+                                    "card-body text-center d-flex flex-column justify-content-center align-items-center rr-status-body",
                                 },
                                 [
-                                  _c("div", { staticClass: "mb-2 fs-4" }, [
-                                    _vm._v("🚫"),
-                                  ]),
+                                  _c("i", {
+                                    staticClass:
+                                      "bi bi-slash-circle rr-status-icon",
+                                  }),
                                   _vm._v(" "),
                                   _c("div", { staticClass: "fw-bold small" }, [
                                     _vm._v(_vm._s(_vm.__("cancelled"))),
@@ -2042,7 +2045,7 @@ var render = function () {
                     _c(
                       "label",
                       {
-                        staticClass: "form-label fw-bold",
+                        staticClass: "form-label rr-label",
                         attrs: { for: "delivery_boy_id" },
                       },
                       [
@@ -2113,7 +2116,7 @@ var render = function () {
                     _c(
                       "label",
                       {
-                        staticClass: "form-label fw-bold",
+                        staticClass: "form-label rr-label",
                         attrs: { for: "cancellation_reason" },
                       },
                       [
@@ -2169,7 +2172,7 @@ var render = function () {
                 _c(
                   "label",
                   {
-                    staticClass: "form-label fw-bold",
+                    staticClass: "form-label rr-label",
                     attrs: { for: "remark" },
                   },
                   [_vm._v(_vm._s(_vm.__("remark")))]
@@ -2205,10 +2208,7 @@ var render = function () {
             ]),
           ]),
           _vm._v(" "),
-          _c("button", {
-            ref: "dummy_submit",
-            staticStyle: { display: "none" },
-          }),
+          _c("button", { ref: "dummy_submit", staticClass: "d-none" }),
         ]
       ),
     ]
@@ -2243,7 +2243,7 @@ var render = function () {
         "div",
         {
           staticClass:
-            "page-heading d-flex justify-content-between align-items-center mb-4",
+            "page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4",
         },
         [
           _c("h3", { staticClass: "modern-page-title mb-0" }, [
@@ -2377,6 +2377,40 @@ var render = function () {
                     small: "",
                   },
                   scopedSlots: _vm._u([
+                    {
+                      key: "empty",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-inbox fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
+                    {
+                      key: "emptyfiltered",
+                      fn: function (scope) {
+                        return [
+                          _c(
+                            "div",
+                            { staticClass: "text-center text-muted py-4" },
+                            [
+                              _c("i", {
+                                staticClass: "fa fa-search fa-2x d-block mb-2",
+                              }),
+                              _vm._v(_vm._s(scope.emptyFilteredText)),
+                            ]
+                          ),
+                        ]
+                      },
+                    },
                     {
                       key: "table-busy",
                       fn: function () {
@@ -2553,17 +2587,7 @@ var render = function () {
                                       },
                                     },
                                   },
-                                  [
-                                    _c("base-icon", {
-                                      attrs: {
-                                        name: "edit icon",
-                                        hoverName: "edit Hover",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    }),
-                                  ],
-                                  1
+                                  [_c("i", { staticClass: "bi bi-pencil" })]
                                 )
                               : _vm._e(),
                             _vm._v(" "),
@@ -2590,17 +2614,7 @@ var render = function () {
                                       },
                                     },
                                   },
-                                  [
-                                    _c("base-icon", {
-                                      attrs: {
-                                        name: "Type=Default",
-                                        hoverName: "Type=Hover",
-                                        width: "24",
-                                        height: "24",
-                                      },
-                                    }),
-                                  ],
-                                  1
+                                  [_c("i", { staticClass: "bi bi-trash" })]
                                 )
                               : _vm._e(),
                           ]),
@@ -2613,53 +2627,65 @@ var render = function () {
               1
             ),
             _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
-              [
-                _c("div", { staticClass: "showing-results-text small" }, [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
+            _c("div", { staticClass: "figma-table-footer flex-wrap gap-3" }, [
+              _c(
+                "div",
+                { staticClass: "d-flex align-items-center gap-2" },
+                [
+                  _c("label", { staticClass: "showing-results-text mb-0" }, [
+                    _vm._v(_vm._s(_vm.__("per_page"))),
                   ]),
-                  _vm._v(" " + _vm._s(_vm.__("of") || "of") + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-flex align-items-center gap-3" },
-                  [
-                    _c("b-pagination", {
-                      staticClass: "figma-pagination mb-0",
-                      attrs: {
-                        "total-rows": _vm.totalRows,
-                        "per-page": _vm.perPage,
-                        align: "right",
-                        "hide-goto-end-buttons": "",
-                        "hide-ellipsis": "",
-                        "prev-text": "<",
-                        "next-text": ">",
+                  _vm._v(" "),
+                  _c("b-form-select", {
+                    staticStyle: { width: "auto" },
+                    attrs: { options: _vm.pageOptions, size: "sm" },
+                    model: {
+                      value: _vm.perPage,
+                      callback: function ($$v) {
+                        _vm.perPage = $$v
                       },
-                      model: {
-                        value: _vm.currentPage,
-                        callback: function ($$v) {
-                          _vm.currentPage = $$v
-                        },
-                        expression: "currentPage",
+                      expression: "perPage",
+                    },
+                  }),
+                  _vm._v(" "),
+                  _c("table-count", {
+                    attrs: {
+                      "current-page": _vm.currentPage,
+                      "per-page": _vm.perPage,
+                      "total-rows": _vm.totalRows,
+                    },
+                  }),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "d-flex align-items-center gap-3" },
+                [
+                  _c("b-pagination", {
+                    staticClass: "figma-pagination mb-0",
+                    attrs: {
+                      "total-rows": _vm.totalRows,
+                      "per-page": _vm.perPage,
+                      align: "right",
+                      "hide-goto-end-buttons": "",
+                      "hide-ellipsis": "",
+                      "prev-text": "<",
+                      "next-text": ">",
+                    },
+                    model: {
+                      value: _vm.currentPage,
+                      callback: function ($$v) {
+                        _vm.currentPage = $$v
                       },
-                    }),
-                  ],
-                  1
-                ),
-              ]
-            ),
+                      expression: "currentPage",
+                    },
+                  }),
+                ],
+                1
+              ),
+            ]),
           ]),
         ]),
       ]),

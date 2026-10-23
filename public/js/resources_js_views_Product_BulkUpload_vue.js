@@ -210,6 +210,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -510,6 +519,58 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.bulk-card > .card-header[data-v-2705d0d2] {\n    padding: 14px 20px !important;\n    border-bottom: 1px solid var(--ui-border);\n    background: transparent;\n}\n.bulk-card > .card-header .card-title[data-v-2705d0d2] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.bulk-subtitle[data-v-2705d0d2] {\n    font-size: 14px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.bulk-form-actions[data-v-2705d0d2] {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 12px;\n    margin-top: 20px;\n    padding-top: 16px;\n    border-top: 1px solid var(--ui-border);\n}\n.bulk-form-actions .btn[data-v-2705d0d2] {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* !important: legacy global .figma-action-btn forces 40px with !important */\n.bulk-copy-btn[data-v-2705d0d2] {\n    width: 32px !important;\n    height: 32px !important;\n    padding: 0 !important;\n    font-size: 14px;\n}\n.bulk-combo-table code[data-v-2705d0d2] {\n    font-size: 12px;\n    color: var(--theme-primary-700);\n    background: var(--ui-primary-soft);\n    padding: 2px 6px;\n    border-radius: var(--ui-radius-sm);\n}\n@media (max-width: 575.98px) {\n.bulk-form-actions > .d-flex[data-v-2705d0d2] {\n        width: 100%;\n}\n.bulk-form-actions > .d-flex > .btn[data-v-2705d0d2] {\n        flex: 1 1 auto;\n        justify-content: center;\n}\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_style_index_0_id_2705d0d2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_style_index_0_id_2705d0d2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_style_index_0_id_2705d0d2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./resources/js/views/Product/BulkUpload.vue":
 /*!***************************************************!*\
   !*** ./resources/js/views/Product/BulkUpload.vue ***!
@@ -520,23 +581,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BulkUpload.vue?vue&type=template&id=2705d0d2 */ "./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2");
+/* harmony import */ var _BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true */ "./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true");
 /* harmony import */ var _BulkUpload_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BulkUpload.vue?vue&type=script&lang=js */ "./resources/js/views/Product/BulkUpload.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _BulkUpload_vue_vue_type_style_index_0_id_2705d0d2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css */ "./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _BulkUpload_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-  _BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__.render,
-  _BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render,
+  _BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "2705d0d2",
   null
   
 )
@@ -563,26 +626,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2":
-/*!*********************************************************************************!*\
-  !*** ./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2 ***!
-  \*********************************************************************************/
+/***/ "./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css ***!
+  \***********************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
-/* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BulkUpload.vue?vue&type=template&id=2705d0d2 */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_style_index_0_id_2705d0d2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=style&index=0&id=2705d0d2&scoped=true&lang=css");
 
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2":
-/*!************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2 ***!
-  \************************************************************************************************************************************************************************************************************************/
+/***/ "./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   staticRenderFns: () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BulkUpload_vue_vue_type_template_id_2705d0d2_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true");
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/views/Product/BulkUpload.vue?vue&type=template&id=2705d0d2&scoped=true ***!
+  \************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -658,375 +733,52 @@ var render = function () {
         ),
       ]),
       _vm._v(" "),
-      _c("section", { staticClass: "section" }, [
-        _c("div", { staticClass: "figma-main-section-card mb-4" }, [
-          _c("div", { staticClass: "card-body p-4" }, [
-            _c("h4", { staticClass: "card-title mb-4" }, [
+      _c("section", { staticClass: "section bulk-page" }, [
+        _c("div", { staticClass: "figma-main-section-card bulk-card mb-4" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h4", { staticClass: "card-title mb-0" }, [
               _vm._v(_vm._s(_vm.__("product_bulk_upload_form"))),
             ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "alert alert-info border-0 rounded-3 p-3 mb-4" },
-              [
-                _c("div", { staticClass: "d-flex flex-column gap-2" }, [
-                  _c("p", { staticClass: "mb-0 fw-bold" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.__(
-                          "always_download_and_use_new_sample_file_if_you_did_updated_admin_panel_version"
-                        )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "card-body p-3 p-md-4" }, [
+            _c("div", { staticClass: "alert alert-info mb-4" }, [
+              _c("div", { staticClass: "d-flex flex-column gap-2" }, [
+                _c("p", { staticClass: "mb-0 fw-bold" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.__(
+                        "always_download_and_use_new_sample_file_if_you_did_updated_admin_panel_version"
                       )
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "mb-0" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.__(
-                          "read_and_follow_instructions_carefully_before_proceed"
-                        )
-                      )
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "mb-0" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.__(
-                          "before_uploading_the_file_please_check_all_the_data_fields_are_correct"
-                        )
-                      )
-                    ),
-                  ]),
+                    )
+                  ),
                 ]),
-              ]
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "figma-main-section-card mb-4 border" }, [
-              _c(
-                "div",
-                { staticClass: "card-body p-4" },
-                [
-                  _c("h5", { staticClass: "mb-1" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.__("variant_combo_generator") ||
-                          "Variant Combo Generator"
+                _vm._v(" "),
+                _c("p", { staticClass: "mb-0" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.__(
+                        "read_and_follow_instructions_carefully_before_proceed"
                       )
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("p", { staticClass: "text-muted mb-3" }, [
-                    _vm._v(
-                      _vm._s(
-                        _vm.__("variant_combo_generator_hint") ||
-                          "Pick a category, choose attribute values, generate every combo, then copy the Attribute Value IDs column straight into your sheet."
+                    )
+                  ),
+                ]),
+                _vm._v(" "),
+                _c("p", { staticClass: "mb-0" }, [
+                  _vm._v(
+                    _vm._s(
+                      _vm.__(
+                        "before_uploading_the_file_please_check_all_the_data_fields_are_correct"
                       )
-                    ),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group mb-3" }, [
-                    _c("label", { staticClass: "form-label" }, [
-                      _vm._v(_vm._s(_vm.__("category"))),
-                    ]),
-                    _vm._v(" "),
-                    _c("select", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.comboCategoryId,
-                          expression: "comboCategoryId",
-                        },
-                      ],
-                      staticClass: "form-control form-select",
-                      domProps: { innerHTML: _vm._s(_vm.comboCategoryOptions) },
-                      on: {
-                        change: [
-                          function ($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function (o) {
-                                return o.selected
-                              })
-                              .map(function (o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.comboCategoryId = $event.target.multiple
-                              ? $$selectedVal
-                              : $$selectedVal[0]
-                          },
-                          _vm.loadComboAttributes,
-                        ],
-                      },
-                    }),
-                  ]),
-                  _vm._v(" "),
-                  _vm.comboAttributes.length
-                    ? [
-                        _vm._l(_vm.comboAttributes, function (attribute) {
-                          return _c(
-                            "div",
-                            {
-                              key: attribute.id,
-                              staticClass: "form-group mb-3",
-                            },
-                            [
-                              _c(
-                                "label",
-                                { staticClass: "form-label fw-bold" },
-                                [_vm._v(_vm._s(attribute.name))]
-                              ),
-                              _vm._v(" "),
-                              _c(
-                                "div",
-                                { staticClass: "d-flex flex-wrap gap-2" },
-                                _vm._l(attribute.values, function (value) {
-                                  return _c(
-                                    "label",
-                                    {
-                                      key: value.id,
-                                      staticClass: "btn btn-sm",
-                                      class: _vm.isComboValueChecked(
-                                        attribute.id,
-                                        value.id
-                                      )
-                                        ? "btn-success"
-                                        : "btn-outline-success",
-                                    },
-                                    [
-                                      _c("input", {
-                                        staticClass: "d-none",
-                                        attrs: { type: "checkbox" },
-                                        domProps: {
-                                          checked: _vm.isComboValueChecked(
-                                            attribute.id,
-                                            value.id
-                                          ),
-                                        },
-                                        on: {
-                                          change: function ($event) {
-                                            return _vm.toggleComboValue(
-                                              attribute.id,
-                                              value.id
-                                            )
-                                          },
-                                        },
-                                      }),
-                                      _vm._v(
-                                        "\n                                            " +
-                                          _vm._s(value.value) +
-                                          "\n                                        "
-                                      ),
-                                    ]
-                                  )
-                                }),
-                                0
-                              ),
-                            ]
-                          )
-                        }),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "alert alert-info d-flex justify-content-between align-items-center",
-                          },
-                          [
-                            _c("span", [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.__("total_variants_to_be_generated") ||
-                                    "Total variants to be generated"
-                                ) + ": "
-                              ),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.comboRows.length)),
-                              ]),
-                            ]),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-success",
-                                attrs: { type: "button" },
-                                on: { click: _vm.selectAllComboValues },
-                              },
-                              [
-                                _c("i", { staticClass: "fa fa-bolt" }),
-                                _vm._v(
-                                  " " +
-                                    _vm._s(
-                                      _vm.__("generate_all_variants") ||
-                                        "Generate All Variants"
-                                    ) +
-                                    "\n                                    "
-                                ),
-                              ]
-                            ),
-                          ]
-                        ),
-                      ]
-                    : _vm.comboCategoryId && _vm.comboCategoryId !== "0"
-                    ? _c("p", { staticClass: "text-muted" }, [
-                        _vm._v(
-                          _vm._s(
-                            _vm.__("no_attributes_assigned_to_this_category") ||
-                              "No attributes are assigned to this category."
-                          )
-                        ),
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.comboRows.length
-                    ? _c("div", { staticClass: "mt-3" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "d-flex justify-content-between align-items-center mb-2",
-                          },
-                          [
-                            _c("h6", { staticClass: "mb-0" }, [
-                              _vm._v(
-                                _vm._s(
-                                  _vm.__("generated_combos") ||
-                                    "Generated Combos"
-                                )
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-sm btn-outline-primary",
-                                attrs: { type: "button" },
-                                on: { click: _vm.copyAllCombos },
-                              },
-                              [
-                                _c("img", {
-                                  attrs: {
-                                    src:
-                                      _vm.$baseUrl + "/images/icons/copy.svg",
-                                    width: "14",
-                                    height: "14",
-                                    alt: "",
-                                  },
-                                }),
-                                _vm._v(
-                                  "\n                                        " +
-                                    _vm._s(
-                                      _vm.__("copy_all_attribute_value_ids") ||
-                                        "Copy All (one per line)"
-                                    ) +
-                                    "\n                                    "
-                                ),
-                              ]
-                            ),
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "table-responsive" }, [
-                          _c(
-                            "table",
-                            {
-                              staticClass:
-                                "table table-sm figma-order-table mb-0",
-                            },
-                            [
-                              _c("thead", [
-                                _c("tr", [
-                                  _c("th", [
-                                    _vm._v(_vm._s(_vm.__("combo") || "Combo")),
-                                  ]),
-                                  _vm._v(" "),
-                                  _c(
-                                    "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "160px" },
-                                    },
-                                    [
-                                      _vm._v(
-                                        _vm._s(
-                                          _vm.__("attribute_value_ids") ||
-                                            "Attribute Value IDs"
-                                        )
-                                      ),
-                                    ]
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "th",
-                                    {
-                                      staticClass: "text-center",
-                                      staticStyle: { width: "90px" },
-                                    },
-                                    [_vm._v(_vm._s(_vm.__("action")))]
-                                  ),
-                                ]),
-                              ]),
-                              _vm._v(" "),
-                              _c(
-                                "tbody",
-                                _vm._l(_vm.comboRows, function (row) {
-                                  return _c(
-                                    "tr",
-                                    { key: row.ids, staticClass: "figma-tr" },
-                                    [
-                                      _c("td", [_vm._v(_vm._s(row.label))]),
-                                      _vm._v(" "),
-                                      _c("td", { staticClass: "text-center" }, [
-                                        _c("code", [_vm._v(_vm._s(row.ids))]),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("td", { staticClass: "text-center" }, [
-                                        _c(
-                                          "button",
-                                          {
-                                            staticClass:
-                                              "btn btn-sm btn-outline-secondary",
-                                            attrs: { type: "button" },
-                                            on: {
-                                              click: function ($event) {
-                                                return _vm.copyText(row.ids)
-                                              },
-                                            },
-                                          },
-                                          [
-                                            _c("img", {
-                                              attrs: {
-                                                src:
-                                                  _vm.$baseUrl +
-                                                  "/images/icons/copy.svg",
-                                                width: "14",
-                                                height: "14",
-                                                alt: "",
-                                              },
-                                            }),
-                                          ]
-                                        ),
-                                      ]),
-                                    ]
-                                  )
-                                }),
-                                0
-                              ),
-                            ]
-                          ),
-                        ]),
-                      ])
-                    : _vm._e(),
-                ],
-                2
-              ),
+                    )
+                  ),
+                ]),
+              ]),
             ]),
             _vm._v(" "),
             _vm.rowErrors.length
-              ? _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-12" }, [
+              ? _c("div", [
+                  _c("div", [
                     _c(
                       "div",
                       {
@@ -1104,98 +856,160 @@ var render = function () {
                 ])
               : _vm._e(),
             _vm._v(" "),
-            _c("div", { staticClass: "row" }, [
-              _c(
-                "form",
-                {
-                  ref: "my-form",
-                  attrs: { method: "post", enctype: "multipart/form-data" },
-                  on: {
-                    submit: function ($event) {
-                      $event.preventDefault()
-                      return _vm.saveRecord.apply(null, arguments)
-                    },
+            _c(
+              "form",
+              {
+                ref: "my-form",
+                attrs: { method: "post", enctype: "multipart/form-data" },
+                on: {
+                  submit: function ($event) {
+                    $event.preventDefault()
+                    return _vm.saveRecord.apply(null, arguments)
                   },
                 },
-                [
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _c("div", { staticClass: "form-group" }, [
-                      _c("label", { attrs: { for: "upload_file" } }, [
-                        _vm._v(
-                          _vm._s(_vm.__("upload_file")) +
-                            " " +
-                            _vm._s(_vm.__("excel_file"))
-                        ),
-                      ]),
-                      _vm._v(" "),
-                      _c("p", { staticClass: "text-muted mb-1" }, [
-                        _vm._v(
-                          "\n                                        " +
-                            _vm._s(_vm.__("supported_formats")) +
-                            ": XLSX, XLS\n                                    "
-                        ),
-                      ]),
-                      _vm._v(" "),
-                      _vm.fileError
-                        ? _c("span", { staticClass: "error" }, [
-                            _vm._v(_vm._s(_vm.fileError)),
-                          ])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("input", {
-                        ref: "file_csv",
-                        staticClass: "file-input",
-                        attrs: {
-                          type: "file",
-                          name: "upload_file",
-                          id: "upload_file",
-                          accept: ".xlsx,.xls",
+              },
+              [
+                _c("div", [
+                  _c("div", { staticClass: "form-group mb-0" }, [
+                    _c("label", { attrs: { for: "upload_file" } }, [
+                      _vm._v(
+                        _vm._s(_vm.__("upload_file")) +
+                          " " +
+                          _vm._s(_vm.__("excel_file"))
+                      ),
+                    ]),
+                    _vm._v(" "),
+                    _c("p", { staticClass: "text-muted small mb-2" }, [
+                      _vm._v(
+                        "\n                                        " +
+                          _vm._s(_vm.__("supported_formats")) +
+                          ": XLSX, XLS\n                                    "
+                      ),
+                    ]),
+                    _vm._v(" "),
+                    _vm.fileError
+                      ? _c("span", { staticClass: "error" }, [
+                          _vm._v(_vm._s(_vm.fileError)),
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("input", {
+                      ref: "file_csv",
+                      staticClass: "file-input",
+                      attrs: {
+                        type: "file",
+                        name: "upload_file",
+                        id: "upload_file",
+                        accept: ".xlsx,.xls",
+                      },
+                      on: { change: _vm.handleFileUpload },
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass: "file-input-div bg-gray-100",
+                        on: {
+                          click: _vm.triggerFileClick,
+                          drop: _vm.dropFile,
+                          dragover: _vm.$dragoverFile,
+                          dragleave: _vm.$dragleaveFile,
                         },
-                        on: { change: _vm.handleFileUpload },
-                      }),
+                      },
+                      [
+                        _vm.file && _vm.file.name
+                          ? [
+                              _c("label", [
+                                _vm._v(
+                                  _vm._s(_vm.__("selected_file_name")) +
+                                    " " +
+                                    _vm._s(_vm.file.name)
+                                ),
+                              ]),
+                            ]
+                          : [
+                              _vm._m(0),
+                              _vm._v(" "),
+                              _c("label", [
+                                _vm._v(
+                                  _vm._s(
+                                    _vm.__("drop_files_here_or_click_to_upload")
+                                  )
+                                ),
+                              ]),
+                            ],
+                      ],
+                      2
+                    ),
+                  ]),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "bulk-form-actions" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "d-flex flex-wrap align-items-center gap-2",
+                    },
+                    [
+                      _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2",
+                          attrs: { type: "button" },
+                          on: { click: _vm.downloadProductDataExcel },
+                        },
+                        [
+                          _c("em", { staticClass: "fa fa-download" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("download_sample_file"))),
+                          ]),
+                        ]
+                      ),
                       _vm._v(" "),
                       _c(
-                        "div",
+                        "a",
                         {
-                          staticClass: "file-input-div bg-gray-100",
-                          on: {
-                            click: _vm.triggerFileClick,
-                            drop: _vm.dropFile,
-                            dragover: _vm.$dragoverFile,
-                            dragleave: _vm.$dragleaveFile,
+                          staticClass:
+                            "btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2",
+                          attrs: {
+                            href: _vm.instructionsFileurl,
+                            download: "",
                           },
                         },
                         [
-                          _vm.file && _vm.file.name
-                            ? [
-                                _c("label", [
-                                  _vm._v(
-                                    _vm._s(_vm.__("selected_file_name")) +
-                                      " " +
-                                      _vm._s(_vm.file.name)
-                                  ),
-                                ]),
-                              ]
-                            : [
-                                _vm._m(0),
-                                _vm._v(" "),
-                                _c("label", [
-                                  _vm._v(
-                                    _vm._s(
-                                      _vm.__(
-                                        "drop_files_here_or_click_to_upload"
-                                      )
-                                    )
-                                  ),
-                                ]),
-                              ],
-                        ],
-                        2
+                          _c("em", { staticClass: "fa fa-download" }),
+                          _vm._v(" "),
+                          _c("span", [
+                            _vm._v(_vm._s(_vm.__("download_instructions"))),
+                          ]),
+                        ]
                       ),
-                    ]),
-                  ]),
+                    ]
+                  ),
                   _vm._v(" "),
-                  _c("div", { staticClass: "col-md-12" }, [
+                  _c("div", { staticClass: "d-flex flex-wrap gap-2" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-secondary",
+                        attrs: { type: "button" },
+                        on: { click: _vm.clearForm },
+                      },
+                      [
+                        _c("i", {
+                          staticClass: "fa fa-undo",
+                          attrs: { "aria-hidden": "true" },
+                        }),
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.__("clear")) +
+                            "\n                                    "
+                        ),
+                      ]
+                    ),
+                    _vm._v(" "),
                     _c(
                       "button",
                       {
@@ -1214,7 +1028,7 @@ var render = function () {
                         _vm._v(
                           " " +
                             _vm._s(_vm.__("upload")) +
-                            "\n                                    "
+                            "\n                                        "
                         ),
                         _vm.isLoading
                           ? _c("b-spinner", {
@@ -1224,62 +1038,306 @@ var render = function () {
                       ],
                       1
                     ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn btn-secondary",
-                        attrs: { type: "button" },
-                        on: { click: _vm.clearForm },
-                      },
-                      [
-                        _c("i", {
-                          staticClass: "fa fa-undo",
-                          attrs: { "aria-hidden": "true" },
-                        }),
-                        _vm._v(
-                          " " +
-                            _vm._s(_vm.__("clear")) +
-                            "\n                                "
-                        ),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-info",
-                        attrs: { type: "button" },
-                        on: { click: _vm.downloadProductDataExcel },
-                      },
-                      [
-                        _c("em", { staticClass: "fa fa-download" }),
-                        _vm._v(
-                          "\n                                    " +
-                            _vm._s(_vm.__("download_sample_file"))
-                        ),
-                      ]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "a",
-                      {
-                        staticClass: "btn btn-warning",
-                        attrs: { href: _vm.instructionsFileurl, download: "" },
-                      },
-                      [
-                        _c("em", { staticClass: "fa fa-download" }),
-                        _vm._v(
-                          "\n                                    " +
-                            _vm._s(_vm.__("download_instructions"))
-                        ),
-                      ]
-                    ),
                   ]),
-                ]
+                ]),
+              ]
+            ),
+          ]),
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "figma-main-section-card bulk-card mb-4" }, [
+          _c("div", { staticClass: "card-header" }, [
+            _c("h4", { staticClass: "card-title mb-0" }, [
+              _vm._v(
+                _vm._s(
+                  _vm.__("variant_combo_generator") || "Variant Combo Generator"
+                )
               ),
             ]),
           ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "card-body p-3 p-md-4" },
+            [
+              _c("p", { staticClass: "text-muted small mb-3" }, [
+                _vm._v(
+                  _vm._s(
+                    _vm.__("variant_combo_generator_hint") ||
+                      "Pick a category, choose attribute values, generate every combo, then copy the Attribute Value IDs column straight into your sheet."
+                  )
+                ),
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group mb-3" }, [
+                _c("label", { staticClass: "form-label" }, [
+                  _vm._v(_vm._s(_vm.__("category"))),
+                ]),
+                _vm._v(" "),
+                _c("select", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.comboCategoryId,
+                      expression: "comboCategoryId",
+                    },
+                  ],
+                  staticClass: "form-control form-select",
+                  domProps: { innerHTML: _vm._s(_vm.comboCategoryOptions) },
+                  on: {
+                    change: [
+                      function ($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function (o) {
+                            return o.selected
+                          })
+                          .map(function (o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.comboCategoryId = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      },
+                      _vm.loadComboAttributes,
+                    ],
+                  },
+                }),
+              ]),
+              _vm._v(" "),
+              _vm.comboAttributes.length
+                ? [
+                    _vm._l(_vm.comboAttributes, function (attribute) {
+                      return _c(
+                        "div",
+                        { key: attribute.id, staticClass: "form-group mb-3" },
+                        [
+                          _c("label", { staticClass: "form-label fw-bold" }, [
+                            _vm._v(_vm._s(attribute.name)),
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "div",
+                            { staticClass: "d-flex flex-wrap gap-2" },
+                            _vm._l(attribute.values, function (value) {
+                              return _c(
+                                "label",
+                                {
+                                  key: value.id,
+                                  staticClass: "btn btn-sm",
+                                  class: _vm.isComboValueChecked(
+                                    attribute.id,
+                                    value.id
+                                  )
+                                    ? "btn-primary"
+                                    : "btn-outline-primary",
+                                },
+                                [
+                                  _c("input", {
+                                    staticClass: "d-none",
+                                    attrs: { type: "checkbox" },
+                                    domProps: {
+                                      checked: _vm.isComboValueChecked(
+                                        attribute.id,
+                                        value.id
+                                      ),
+                                    },
+                                    on: {
+                                      change: function ($event) {
+                                        return _vm.toggleComboValue(
+                                          attribute.id,
+                                          value.id
+                                        )
+                                      },
+                                    },
+                                  }),
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(value.value) +
+                                      "\n                                "
+                                  ),
+                                ]
+                              )
+                            }),
+                            0
+                          ),
+                        ]
+                      )
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "alert alert-info d-flex justify-content-between align-items-center flex-wrap gap-2",
+                      },
+                      [
+                        _c("span", [
+                          _vm._v(
+                            _vm._s(
+                              _vm.__("total_variants_to_be_generated") ||
+                                "Total variants to be generated"
+                            ) + ": "
+                          ),
+                          _c("strong", [_vm._v(_vm._s(_vm.comboRows.length))]),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-sm btn-primary",
+                            attrs: { type: "button" },
+                            on: { click: _vm.selectAllComboValues },
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-bolt" }),
+                            _vm._v(
+                              " " +
+                                _vm._s(
+                                  _vm.__("generate_all_variants") ||
+                                    "Generate All Variants"
+                                ) +
+                                "\n                            "
+                            ),
+                          ]
+                        ),
+                      ]
+                    ),
+                  ]
+                : _vm.comboCategoryId && _vm.comboCategoryId !== "0"
+                ? _c("p", { staticClass: "text-muted" }, [
+                    _vm._v(
+                      _vm._s(
+                        _vm.__("no_attributes_assigned_to_this_category") ||
+                          "No attributes are assigned to this category."
+                      )
+                    ),
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.comboRows.length
+                ? _c("div", { staticClass: "mt-3" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2",
+                      },
+                      [
+                        _c("h6", { staticClass: "mb-0 bulk-subtitle" }, [
+                          _vm._v(
+                            _vm._s(
+                              _vm.__("generated_combos") || "Generated Combos"
+                            )
+                          ),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-sm btn-outline-primary",
+                            attrs: { type: "button" },
+                            on: { click: _vm.copyAllCombos },
+                          },
+                          [
+                            _c("i", { staticClass: "bi bi-files" }),
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.__("copy_all_attribute_value_ids") ||
+                                    "Copy All (one per line)"
+                                ) +
+                                "\n                            "
+                            ),
+                          ]
+                        ),
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "table-responsive" }, [
+                      _c(
+                        "table",
+                        {
+                          staticClass:
+                            "table table-sm figma-order-table mb-0 bulk-combo-table",
+                        },
+                        [
+                          _c("thead", [
+                            _c("tr", [
+                              _c("th", [
+                                _vm._v(_vm._s(_vm.__("combo") || "Combo")),
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "th",
+                                {
+                                  staticClass: "text-center",
+                                  staticStyle: { width: "160px" },
+                                },
+                                [
+                                  _vm._v(
+                                    _vm._s(
+                                      _vm.__("attribute_value_ids") ||
+                                        "Attribute Value IDs"
+                                    )
+                                  ),
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "th",
+                                {
+                                  staticClass: "text-center",
+                                  staticStyle: { width: "90px" },
+                                },
+                                [_vm._v(_vm._s(_vm.__("action")))]
+                              ),
+                            ]),
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "tbody",
+                            _vm._l(_vm.comboRows, function (row) {
+                              return _c(
+                                "tr",
+                                { key: row.ids, staticClass: "figma-tr" },
+                                [
+                                  _c("td", [_vm._v(_vm._s(row.label))]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-center" }, [
+                                    _c("code", [_vm._v(_vm._s(row.ids))]),
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", { staticClass: "text-center" }, [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass:
+                                          "figma-action-btn bulk-copy-btn",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.copyText(row.ids)
+                                          },
+                                        },
+                                      },
+                                      [_c("i", { staticClass: "bi bi-files" })]
+                                    ),
+                                  ]),
+                                ]
+                              )
+                            }),
+                            0
+                          ),
+                        ]
+                      ),
+                    ]),
+                  ])
+                : _vm._e(),
+            ],
+            2
+          ),
         ]),
       ]),
     ]),

@@ -24,14 +24,14 @@
                         </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-figma-filter d-flex align-items-center gap-2"
-                                @click="create_new = true" v-if="$can('fund_transfers_create')">
-                                <i class="fa fa-plus"></i>
-                                <span>{{ __('add_fund_transfers') }}</span>
-                            </button>
-                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
                                 @click="getFundTransfers()" v-b-tooltip.hover :title="__('refresh')">
                                 <i class="fa fa-refresh"></i>
                                 <span>{{ __('refresh') }}</span>
+                            </button>
+                            <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                @click="create_new = true" v-if="$can('fund_transfers_create')">
+                                <i class="fa fa-plus"></i>
+                                <span>{{ __('add_fund_transfers') }}</span>
                             </button>
                         </div>
                     </div>
@@ -41,9 +41,16 @@
                             :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                             :busy="isLoading" stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'"
                             small class="figma-order-table mb-0">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
 
                             <template #table-busy>
-                                <div class="text-center text-black my-2">
+                                <div class="text-center text-muted my-2">
                                     <b-spinner class="align-middle"></b-spinner>
                                     <strong>{{ __('loading') }}...</strong>
                                 </div>
@@ -81,10 +88,13 @@
                     </div>
 
                     <div class="figma-table-footer">
-                        <div class="showing-results-text">
-                            {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') ||
-                            'of' }} <span class="showing-bold">{{ totalRows }}</span>
-                        </div>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                         <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
                             class="figma-pagination mb-0"></b-pagination>
                     </div>
@@ -108,17 +118,17 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'delivery_boy_id', label: __('d_boy_id'), sortable: true, class: 'text-center' },
-                { key: 'name', label: __('name'), sortable: true, class: 'text-center' },
-                { key: 'mobile', label: __('mobile'), sortable: true, class: 'text-center' },
-                { key: 'address', label: __('address'), sortable: true, class: 'text-center' },
-                { key: 'opening_balance', label: __('opening_balance'), sortable: true, class: 'text-center' },
-                { key: 'closing_balance', label: __('closing_balance'), sortable: true, class: 'text-center' },
-                { key: 'amount', label: __('amount'), sortable: true, class: 'text-center' },
-                { key: 'type', label: __('type'), sortable: true, class: 'text-center' },
-                { key: 'message', label: __('message'), sortable: true, class: 'text-center' },
-                { key: 'status', label: __('status'), sortable: true, class: 'text-center' },
-                { key: 'created_at', label: __('date_created'), sortable: true, class: 'text-center' }
+                { key: 'delivery_boy_id', label: __('d_boy_id'), sortable: true },
+                { key: 'name', label: __('name'), sortable: true },
+                { key: 'mobile', label: __('mobile'), sortable: true },
+                { key: 'address', label: __('address'), sortable: true },
+                { key: 'opening_balance', label: __('opening_balance'), sortable: true },
+                { key: 'closing_balance', label: __('closing_balance'), sortable: true },
+                { key: 'amount', label: __('amount'), sortable: true },
+                { key: 'type', label: __('type'), sortable: true },
+                { key: 'message', label: __('message'), sortable: true },
+                { key: 'status', label: __('status'), sortable: true },
+                { key: 'created_at', label: __('date_created'), sortable: true }
             ],
             totalRows: 1,
             currentPage: 1,

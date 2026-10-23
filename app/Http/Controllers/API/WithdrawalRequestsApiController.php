@@ -44,6 +44,11 @@ class WithdrawalRequestsApiController extends Controller
                 });
             })
 
+            // Requests from a seller's own drivers are handled by that seller, not the admin.
+            ->where(function ($q) {
+                $q->where('withdrawal_requests.type', '!=', WithdrawalRequest::$typeDeliveryBoy)
+                    ->orWhereNull('delivery_boys.seller_id');
+            })
             ->orderBy('withdrawal_requests.id', 'DESC')
             ->get()->toArray();
 
@@ -99,6 +104,10 @@ class WithdrawalRequestsApiController extends Controller
             try {
 
                 $withdrawalRequest = WithdrawalRequest::find($request->id);
+                if (strtolower($withdrawalRequest->origional_type) == WithdrawalRequest::$typeDeliveryBoy
+                    && DeliveryBoy::where('id', $withdrawalRequest->type_id)->whereNotNull('seller_id')->exists()) {
+                    return CommonHelper::responseError('not_authorized');
+                }
                 if ($withdrawalRequest->status != WithdrawalRequest::$statusApproved) {
                     if ($request->status == $withdrawalRequest->status) {
                         return CommonHelper::responseError('this_record_have_same_status');

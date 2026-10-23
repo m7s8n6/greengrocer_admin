@@ -1,9 +1,7 @@
 <template>
     <div>
-        <!-- Added Figma Typography and Layout properties here -->
-        <div class="page-heading d-flex justify-content-between align-items-center mb-4 view_order">
-            <h3 class="modern-page-title mb-0"
-                style="font-weight: 500; font-size: 24px; line-height: 32px; letter-spacing: 0%; color: #000000;">
+        <div class="page-heading d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 view_order">
+            <h3 class="modern-page-title mb-0">
                 {{ __('order_details') }}
             </h3>
             <nav aria-label="breadcrumb">
@@ -15,159 +13,188 @@
             </nav>
         </div>
 
-        <div v-if="order" class="order-details-wrapper">
-            <!-- Order Header Card -->
-            <div class="mb-4 order-header-card"
-                style="width: 100%; padding: 24px; gap: 16px; opacity: 1; border-radius: 16px; border: 1px solid #EDEDED; display: flex; flex-direction: column; transform: rotate(0deg);">
-                <!-- Top Row -->
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                    <div class="d-flex flex-wrap align-items-center gap-3">
-                        <h2 class="figma-text-xl-semibold mb-0"
-                            style="font-weight: 700; font-size: 30px; line-height: 36px; letter-spacing: 0%; color: var(--Colors-Shades-Neutral-N---950, #000000);">
+        <div v-if="order" class="order-details-wrapper od-page">
+            <!-- 1. Order header strip: ID + status pills + meta + actions -->
+            <div class="mb-4 order-header-card">
+                <div class="od-header-top">
+                    <div class="d-flex flex-wrap align-items-center gap-2 od-head-title">
+                        <h2 class="figma-text-xl-semibold od-order-id mb-0">
                             {{ __('Order') || 'Order' }} #{{ order.id }}</h2>
-                        <div class="d-flex flex-wrap gap-2">
-                            <span class="figma-status-pill" :class="getStatusBadgeClass(order.active_status)">
-                                {{ getStatusLabelById(order.active_status) }}
-                            </span>
-                            <span v-if="order.wallet_balance > 0" class="figma-status-pill status-wallet"
-                                style="background-color: #F1F5F9; color: #475569;">
-                                {{ __('paid_via_wallet') || 'Paid via Wallet' }}
-                            </span>
-                        </div>
+                        <span class="figma-status-pill" :class="getStatusBadgeClass(order.active_status)">
+                            {{ getStatusLabelById(order.active_status) }}
+                        </span>
+                        <span v-if="order.wallet_balance > 0" class="figma-status-pill status-wallet od-wallet-pill">
+                            {{ __('paid_via_wallet') || 'Paid via Wallet' }}
+                        </span>
                     </div>
-                    <button @click="downloadInvoice"
-                        class="btn btn-dark rounded-3 px-4 py-2 d-flex align-items-center gap-2"
-                        style="font-weight: 500;">
-                        <i class="fa fa-print"></i> {{ __('Print Order') || 'Print Order' }}
-                    </button>
+                    <div class="od-head-actions">
+                        <button @click="downloadInvoice" class="btn btn-outline-primary od-print-btn">
+                            <i class="fa fa-print"></i> {{ __('Print Order') || 'Print Order' }}
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Bottom Row (Date & Seller) -->
+                <!-- Meta (Date, Seller, Payment method, Order type) -->
                 <div class="order-meta-bar">
                     <div class="order-meta-date">
-                        <i class="far fa-calendar-alt text-secondary" style="font-size: 16px;"></i>
-                        <span class="text-dark"
-                            style="font-weight: 500; font-size: 16px; line-height: 24px; letter-spacing: 0%; color: var(--Colors-Shades-Neutral-N---950, #000000);">{{
-                                __('date') }} :</span>
-                        <span class="text-dark"
-                            style="font-weight: 500; font-size: 16px; line-height: 24px; letter-spacing: 0%; color: var(--Colors-Shades-Neutral-N---950, #000000);">{{
-                                order.orders_created_at }}</span>
+                        <i class="far fa-calendar-alt"></i>
+                        <span class="od-meta-label">{{ __('date') }} :</span>
+                        <span class="od-meta-value">{{ order.orders_created_at }}</span>
                     </div>
                     <div class="order-meta-seller" v-if="order_items && order_items.length > 0">
-                        <i class="fas fa-store text-secondary" style="font-size: 15px;"></i>
-                        <span class="text-dark"
-                            style="font-weight: 500; font-size: 16px; line-height: 24px; letter-spacing: 0%; color: var(--Colors-Shades-Neutral-N---950, #000000);">{{
-                                __('seller') }} :</span>
+                        <i class="fas fa-store"></i>
+                        <span class="od-meta-label">{{ __('seller') }} :</span>
                         <template v-if="login_user.role.name === 'Admin' || login_user.role.name === 'Super Admin'">
-                            <router-link
-                                :to="{ name: 'EditSeller', params: { id: order_items[0].seller_id || order.seller_id } }"
-                                style="font-weight: 600; font-size: 16px; line-height: 24px; letter-spacing: 0%; text-decoration: underline; color: var(--Colors-Primary, #55AE7B) !important; display: inline-flex; align-items: center; gap: 4px;">
+                            <router-link class="od-seller-link"
+                                :to="{ name: 'EditSeller', params: { id: order_items[0].seller_id || order.seller_id } }">
                                 {{ order_items[0].seller_name }}
-                                <i class="fa fa-external-link-alt"
-                                    style="font-size: 14px; color: var(--Colors-Primary, #55AE7B);"></i>
+                                <i class="fa fa-external-link-alt"></i>
                             </router-link>
                         </template>
                         <template v-else>
-                            <span
-                                :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-seller-name' : 'normal-seller-name'"
-                                style="font-weight: 600; font-size: 16px; line-height: 24px; letter-spacing: 0%;">
+                            <span class="od-meta-value"
+                                :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-seller-name' : 'normal-seller-name'">
                                 {{ order_items[0].seller_name }}
                             </span>
                         </template>
+                    </div>
+                    <div class="order-meta-date" v-if="paymentMethodLabel">
+                        <i class="far fa-credit-card"></i>
+                        <span class="od-meta-label">{{ __('payment_method') }} :</span>
+                        <span class="od-meta-value">{{ paymentMethodLabel }}</span>
+                    </div>
+                    <div class="order-meta-date" v-if="orderTypeLabel">
+                        <i class="fas fa-truck"></i>
+                        <span class="od-meta-label">{{ tr('delivery_type', 'Delivery Type') }} :</span>
+                        <span class="od-meta-value">{{ orderTypeLabel }}</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 2. Order progress tracker -->
+            <div class="card od-card od-track-card" v-if="trackerSteps.length">
+                <div class="od-card-header justify-content-between">
+                    <h5 class="od-card-title">
+                        <i class="fas fa-route me-2 text-primary od-title-fa"></i>
+                        {{ tr('order_progress', 'Order Progress') }}
+                    </h5>
+                </div>
+                <div class="card-body od-card-body">
+                    <ol class="od-track">
+                        <li v-for="step in trackerSteps" :key="step.key" class="od-track-step" :class="'is-' + step.state">
+                            <span class="od-track-dot" aria-hidden="true"><i :class="step.state === 'done' ? 'fas fa-check' : step.icon"></i></span>
+                            <span class="od-track-text">
+                                <span class="od-track-label">{{ step.label }}</span>
+                                <span v-if="step.time" class="od-track-time">{{ step.time }}</span>
+                            </span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- 3. Summary strip -->
+            <div class="row g-3 od-tiles">
+                <div class="col-6 col-md-3">
+                    <div class="figma-kpi-card-v2 od-tile">
+                        <div class="figma-kpi-icon-v2 bg-stat-blue od-tile-icon"><i class="fas fa-shopping-basket"></i></div>
+                        <div class="od-tile-body">
+                            <span class="od-tile-label">{{ __('Items') || 'Items' }}</span>
+                            <span class="od-tile-value">{{ order_items.length }}</span>
+                            <span class="od-tile-sub">{{ __('quantity') }}: {{ totalQuantity }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="figma-kpi-card-v2 od-tile">
+                        <div class="figma-kpi-icon-v2 bg-stat-green od-tile-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="od-tile-body">
+                            <span class="od-tile-label">{{ __('payment_method') }}</span>
+                            <span class="od-tile-value od-tile-value--text">{{ paymentMethodLabel || 'N/A' }}</span>
+                            <span v-if="order.wallet_balance > 0" class="od-tile-sub">{{ __('Wallet Used') || 'Wallet Used' }}: {{ $currency }}{{ order.wallet_balance }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="figma-kpi-card-v2 od-tile">
+                        <div class="figma-kpi-icon-v2 bg-stat-orange od-tile-icon"><i :class="order.order_type === 'selfpickup' ? 'fas fa-store' : 'fas fa-truck'"></i></div>
+                        <div class="od-tile-body">
+                            <span class="od-tile-label">{{ hasDeliveryTime ? (__('Delivery Time & Date') || 'Delivery Time & Date') : tr('delivery_type', 'Delivery Type') }}</span>
+                            <span class="od-tile-value od-tile-value--text">{{ hasDeliveryTime ? order.delivery_time : (orderTypeLabel || 'N/A') }}</span>
+                            <span v-if="hasDeliveryTime && orderTypeLabel" class="od-tile-sub">{{ orderTypeLabel }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="figma-kpi-card-v2 od-tile">
+                        <div class="figma-kpi-icon-v2 bg-stat-purple od-tile-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="od-tile-body">
+                            <span class="od-tile-label">{{ __('Payable Total') || 'Payable Total' }}</span>
+                            <span class="od-tile-value">{{ $currency }}{{ order.remaining_final }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Two columns -->
             <div class="row g-4">
-                <!-- Left Column (7) -->
-                <div class="col-lg-7">
+                <!-- Left Column (8) -->
+                <div class="col-lg-8">
                     <!-- Items Ordered Section -->
-                    <div class="card rounded-4 mb-4 overflow-hidden">
-                        <div class="card-header bg-white d-flex justify-content-between align-items-center"
-                            style="height: 68px; padding: 16px 24px; border-bottom: 1px solid #EDEDED !important;">
-                            <h5 class="mb-0"
-                                style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000; display: flex; align-items: center;">
-                                <base-icon name="Package" width="20" height="20" class="me-2 text-primary" />
+                    <div class="card od-card">
+                        <div class="od-card-header justify-content-between">
+                            <h5 class="od-card-title">
+                                <base-icon name="Package" width="18" height="18" class="me-2 text-primary" />
                                 {{ __('Items Ordered') }}
                             </h5>
                             <span class="item-count-badge">{{ order_items.length }} {{ __('Items') || 'Items' }}</span>
                         </div>
                         <div class="card-body p-0">
-                            <div class="table-responsive"
-                                style="border-radius: 0px !important; border: none !important; margin-bottom: 0 !important;">
-                                <table class="table align-middle mb-0"
-                                    style="border-collapse: collapse !important; border-radius: 0 !important; overflow: hidden;">
-                                    <thead
-                                        style="background-color: #F7F7F7 !important; border-top: 1px solid #EDEDED !important; border-bottom: 1px solid #EDEDED !important; border-left: none !important; border-right: none !important; border-radius: 0px !important;">
-                                        <tr style="height: 52px;">
-                                            <th class="ps-4"
-                                                style="padding: 16px 0 16px 24px; border: none !important; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #555555; vertical-align: middle;">
-                                                {{ __('product_name') }}</th>
-                                            <th class="text-center"
-                                                style="padding: 16px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #555555; vertical-align: middle;">
-                                                {{ __('price') }}</th>
-                                            <th class="text-center"
-                                                style="padding: 16px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #555555; vertical-align: middle;">
-                                                {{ __('quantity') }}</th>
-                                            <th class="text-end pe-4"
-                                                style="padding: 16px 24px 16px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #555555; vertical-align: middle;">
-                                                {{ __('total') }}</th>
+                            <div class="table-responsive od-table-wrap">
+                                <table class="table align-middle mb-0 od-items-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-start">{{ __('product_name') }}</th>
+                                            <th class="text-center">{{ __('price') }}</th>
+                                            <th class="text-center">{{ __('quantity') }}</th>
+                                            <th class="text-end">{{ __('total') }}</th>
                                             <th v-if="login_user && (login_user.role.name === 'Admin' || login_user.role.name === 'Super Admin')"
-                                                class="text-center"
-                                                style="padding: 16px 24px; border: none !important; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #555555; vertical-align: middle;">
+                                                class="text-center">
                                                 {{ __('Action') || 'Action' }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="item in order_items" :key="item.id"
-                                            style="height: 96px; border-bottom: 1px solid #EDEDED !important;">
-                                            <td class="ps-4"
-                                                style="padding: 24px 0 24px 24px; border: none !important; vertical-align: middle; text-align: left !important;">
-                                                <div class="d-flex align-items-center py-2"
-                                                    style="gap: 8px !important; text-align: left !important;">
-                                                    <img :src="item.image" class="rounded-3 border"
-                                                        style="width: 48px; height: 48px; object-fit: cover;">
-                                                    <div style="text-align: left !important;">
-                                                        <div
-                                                            style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #555555; text-align: left !important;">
-                                                            {{ item.product_name }}</div>
-                                                        <div
-                                                            style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 12px; line-height: 16px; color: #71717A; text-align: left !important;">
+                                        <tr v-for="item in order_items" :key="item.id" :class="{ 'od-row-cancelled': Number(item.active_status) === 7 }">
+                                            <td class="text-start od-td-product">
+                                                <div class="od-product">
+                                                    <img :src="item.image" class="od-product-img">
+                                                    <div class="od-product-info">
+                                                        <div class="od-product-name">{{ item.product_name }}</div>
+                                                        <div class="od-product-sub">
                                                             {{ __('Variant') || 'Variant' }}: {{ item.variant_name }}</div>
-                                                        <div v-if="item.selected_addons && item.selected_addons.length > 0"
-                                                            style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 12px; line-height: 16px; color: #71717A; text-align: left !important;">
+                                                        <div v-if="item.selected_addons && item.selected_addons.length > 0" class="od-product-sub">
                                                             {{ __('addons') || 'Addons' }}:
                                                             {{ item.selected_addons.map(a => a.name).join(', ') }}
                                                             ({{ $currency }}{{ item.addon_price }})</div>
                                                         <div v-if="item.prescriptions && item.prescriptions.length > 0" class="d-flex flex-wrap gap-1 mt-2">
-                                                            <div v-for="(pUrl, pIdx) in item.prescriptions" :key="pIdx" class="position-relative border rounded p-1" style="width: 40px; height: 40px; cursor: pointer;" @click="showPrescription(pUrl)">
+                                                            <div v-for="(pUrl, pIdx) in item.prescriptions" :key="pIdx" class="od-prescription-thumb position-relative border rounded p-1" @click="showPrescription(pUrl)">
                                                                 <img :src="pUrl" class="w-100 h-100 object-fit-cover rounded" />
                                                             </div>
                                                         </div>
-                                                        <div v-if="item.cancellation_reason"
-                                                            style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: var(--Colors-Status-Error, #D63031); text-align: left !important; margin-top: 4px;">
+                                                        <div v-if="item.cancellation_reason" class="od-product-cancel">
                                                             {{ item.cancellation_reason.toLowerCase().includes('cancelled by') ? item.cancellation_reason : (__('cancelled_by_user') || 'Cancelled by user') + ': ' + item.cancellation_reason }}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-center"
-                                                style="padding: 24px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 24px; color: #000000; vertical-align: middle;">
-                                                {{ $currency }}{{ item.price }}</td>
-                                            <td class="text-center"
-                                                style="padding: 24px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 24px; color: #000000; vertical-align: middle;">
-                                                {{ item.quantity }}</td>
-                                            <td class="text-end pe-4"
-                                                style="padding: 24px 24px 24px 0; border: none !important; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 24px; color: #000000; vertical-align: middle;">
-                                                {{ $currency }}{{ item.sub_total }}</td>
+                                            <td class="text-center od-td-num" :data-label="__('price')">{{ $currency }}{{ item.price }}</td>
+                                            <td class="text-center od-td-num" :data-label="__('quantity')">{{ item.quantity }}</td>
+                                            <td class="text-end od-cell-strong od-td-num" :data-label="__('total')">{{ $currency }}{{ item.sub_total }}</td>
                                             <td v-if="login_user && (login_user.role.name === 'Admin' || login_user.role.name === 'Super Admin')"
-                                                class="text-center"
-                                                style="padding: 24px 24px; border: none !important; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 24px; color: #000000; vertical-align: middle;">
-                                                <span v-if="Number(item.active_status) === 7"
-                                                    style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; line-height: 20px; letter-spacing: 0%; text-align: center; vertical-align: middle; color: var(--Colors-Status-Error, #D63031); display: inline-block;">
+                                                class="text-center od-td-action">
+                                                <span v-if="Number(item.active_status) === 7" class="od-item-cancelled">
                                                     {{ __('cancelled') || 'Cancelled' }}
                                                 </span>
-                                                <button v-else-if="canCancelItem(item)" @click="cancelOrderItem(item)" class="btn p-0 border-0 d-inline-flex align-items-center justify-content-center cancel-item-btn" v-b-tooltip.hover :title="__('cancel_item') || 'Cancel Item'" style="width: 28px; height: 28px; border-radius: 8px; background: var(--Colors-Status-Shades-E---50, #FBEAEA); padding: 4px; transition: all 0.2s; outline: none; margin: 0 auto;">
-                                                    <base-icon name="order cancel" width="12.5" height="12.5" useCurrentColor style="color: var(--Colors-Status-Error, #D63031);" />
+                                                <button v-else-if="canCancelItem(item)" @click="cancelOrderItem(item)" class="btn p-0 d-inline-flex align-items-center justify-content-center cancel-item-btn" :aria-label="__('cancel_item') || 'Cancel Item'">
+                                                    <base-icon name="order cancel" width="12.5" height="12.5" useCurrentColor class="od-cancel-icon" />
                                                 </button>
                                             </td>
                                         </tr>
@@ -177,314 +204,228 @@
                         </div>
                     </div>
 
-                    <!-- Assignment & Status Row -->
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-6" v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
-                            <div class="card border mb-4"
-                                style="max-width: 436px; width: 100%; height: 140px; border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                                <!-- Top Half: Header -->
-                                <div
-                                    style="height: 68px; padding: 16px 24px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                                    <base-icon name="Vector (1)" width="20" height="20" class="me-2" />
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                            __('assign_delivery_partner') || 'Assign Delivery Partner' }}</span>
-                                </div>
-                                <!-- Bottom Half: Form -->
-                                <div style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 12px;">
-                                    <form @submit.prevent="assignDeliveryBoy"
-                                        class="d-flex align-items-center gap-2 w-100">
-                                        <select class="form-select" v-model="delivery_boy_id"
-                                            style="width: 300px; height: 40px; border-radius: 8px; border: 1px solid #EDEDED; padding: 8px 16px; font-size: 14px;">
-                                            <option value="">{{ __('select_delivery_boy') }}</option>
-                                            <option v-for="boy in deliveryBoys" :value='boy.id'>
-                                                {{ getDisplayName(boy.name) }} ({{ boy.pending_order_count }})
-                                            </option>
-                                        </select>
-                                        <button type="submit" class="btn btn-primary p-0"
-                                            :disabled="delivery_boy_id === '' || isLoadingDboy"
-                                            style="width: 88px; height: 40px; border-radius: 8px; font-weight: 600; background-color: var(--figma-primary, #FF9900) !important; border-color: var(--figma-primary, #FF9900) !important; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #FFFFFF !important;">
-                                            {{ __('assign') || 'Assign' }}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                    <!-- Billing Summary -->
+                    <div class="card od-card">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <base-icon name="Receipt" width="18" height="18" class="me-2" />
+                                {{ __('Billing Summary') }}
+                            </h5>
                         </div>
-                        <div class="col-md-6" id="assign_partner_section">
-                            <div class="card border mb-4"
-                                style="max-width: 436px; width: 100%; height: 140px; border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                                <!-- Top Half: Header -->
-                                <div
-                                    style="height: 68px; padding: 16px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                                    <base-icon name="CheckCircle" width="20" height="20" class="me-2" />
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                            __('order_status') || 'Order Status' }}</span>
+                        <div class="card-body od-card-body">
+                            <div class="billing-list">
+                                <div class="od-sum-row od-sum-row--sub">
+                                    <span>{{ __('Subtotal') || 'Subtotal' }}
+                                        ({{ activeOrderItems.length }} {{ __('items') || 'items' }})</span>
+                                    <span>{{ $currency }}{{ activeSubtotal.toFixed(2) }}</span>
                                 </div>
-                                <!-- Bottom Half: Form -->
-                                <div style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 12px;">
-                                    <form @submit.prevent="updateStatus" class="d-flex align-items-center gap-2 w-100">
-                                        <select class="form-select" v-model="order_status_id"
-                                            style="width: 300px; height: 40px; border-radius: 8px; border: 1px solid #EDEDED; padding: 8px 16px; font-size: 14px;">
-                                            <option value="">{{ __('choose_status') || 'Choose Status' }}</option>
-                                            <option v-for="status in statuses" :value='status.id'>{{
-                                                getStatusDisplayName(status) }}
-                                            </option>
-                                        </select>
-                                        <button type="submit" class="btn btn-primary p-0"
-                                            :disabled="order_status_id === '' || isLoadingUstatus"
-                                            style="width: 88px; height: 40px; border-radius: 8px; font-weight: 600; background-color: var(--figma-primary, #FF9900) !important; border-color: var(--figma-primary, #FF9900) !important; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #FFFFFF !important;">
-                                            {{ __('update') || 'Update' }}
-                                        </button>
-                                    </form>
+                                <div class="od-sum-row" v-if="activeAddonTotal > 0">
+                                    <span>{{ __('addons') || 'Addons' }}</span>
+                                    <span class="od-sum-val">{{ $currency }}{{ activeAddonTotal.toFixed(2) }}</span>
+                                </div>
+                                <div class="od-sum-row od-sum-row--error" v-if="order.discount > 0">
+                                    <span>{{ __('Discount') || 'Discount' }} ({{ order.discount }}%)</span>
+                                    <span class="od-sum-val">-{{ $currency }}{{ discount_in_rupees }}</span>
+                                </div>
+                                <div class="od-sum-row">
+                                    <span>{{ __('Delivery Charges') || 'Delivery Charges' }}</span>
+                                    <span class="od-sum-val" v-if="order.delivery_charge == 0">{{ __('Free') || 'Free' }}</span>
+                                    <span class="od-sum-val" v-else>{{ $currency }}{{ order.delivery_charge }}</span>
+                                </div>
+                                <div class="od-sum-row" v-if="getAdditionalChargesTotal(order.additional_charges) > 0">
+                                    <span>{{ __('Additional Charges') || 'Additional Charges' }}</span>
+                                    <span class="od-sum-val">{{ $currency }}{{ getAdditionalChargesTotal(order.additional_charges) }}</span>
+                                </div>
+                                <div class="od-sum-row" v-if="order.promo_discount > 0">
+                                    <span>{{ __('Promo Code') || 'Promo Code' }}</span>
+                                    <span class="od-sum-val">{{ order.promo_code }}</span>
+                                </div>
+                                <div class="od-sum-row" v-if="order.promo_discount > 0">
+                                    <span>{{ __('Promo Discount') || 'Promo Discount' }}</span>
+                                    <span class="od-sum-val">-{{ $currency }}{{ order.promo_discount }}</span>
+                                </div>
+                                <div class="od-sum-row od-sum-row--success" v-if="order.wallet_balance > 0">
+                                    <span>{{ __('Wallet Used') || 'Wallet Used' }}</span>
+                                    <span class="od-sum-val">-{{ $currency }}{{ order.wallet_balance }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center payable-total-box">
+                                    <span>{{ __('Payable Total') || 'Payable Total' }}</span>
+                                    <span>{{ $currency }}{{ order.remaining_final }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Customer Order Notes Section -->
-                    <div class="card border mb-4 order-notes-card" v-if="order.order_note"
-                        style="width: 100%; border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                        <!-- Header -->
-                        <div
-                            style="height: 68px; padding: 16px 24px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                            <i class="far fa-calendar-check me-2 text-dark" style="font-size: 20px;"></i>
-                            <span class="order-notes-title"
-                                style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">
-                                {{ __('Customer Order Notes') || 'Customer Order Notes' }}
-                            </span>
-                        </div>
-                        <!-- Content -->
-                        <div class="card-body p-4">
-                            <div class="order-notes-box" style="background-color: #EBF5FF; border-left: 4px solid #3B82F6; border-radius: 12px; padding: 16px 20px; text-align: left !important;">
-                                <p class="mb-0 order-notes-text" style="font-family: 'Inter', sans-serif; font-size: 14px; line-height: 22px; font-weight: 500; color: #1E293B;">
-                                    {{ order.order_note }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Delivery Partner Details (Conditional) -->
-                    <div class="card border mb-4"
-                        v-if="order.delivery_boy_name || getDisplayName(order.delivery_boy_name_translation)"
-                        style="max-width: 436px; width: 100%; height: 140px; border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                        <!-- Top Half: Header -->
-                        <div
-                            style="height: 68px; padding: 16px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center; justify-content: space-between;">
-                            <div class="d-flex align-items-center">
-                                <base-icon name="Vector (1)" width="20" height="20"
-                                    :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-truck-icon' : 'normal-truck-icon'"
-                                    class="me-2" :use-current-color="true" />
-                                <span
-                                    :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-delivery-title' : 'normal-delivery-title'"
-                                    style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px;">{{
-                                        __('delivery_partner_details') || 'Delivery Partner Details' }}</span>
-                            </div>
-                            <!-- <a href="javascript:void(0)" @click="$scrollTo('#assign_partner_section')" style="width: 59px; height: 20px; color: #D63031; font-family: 'Inter', sans-serif; font-weight: 400; font-size: 14px; line-height: 20px; text-decoration: underline; display: inline-block; cursor: pointer;">Change?</a> -->
-                        </div>
-                        <!-- Bottom Half: Details -->
-                        <div style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 24px;">
-                            <div class="avatar-box bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold text-primary"
-                                style="width: 48px; height: 48px; font-size: 18px; flex-shrink: 0;">
-                                {{ order.delivery_boy_name ? order.delivery_boy_name.charAt(0).toUpperCase() : 'D' }}
-                            </div>
-                            <div>
-                                <div class="fw-bold text-dark mb-1" style="font-size: 16px;">{{
-                                    getDisplayName(order.delivery_boy_name_translation) || order.delivery_boy_name }}
-                                </div>
-                                <div class="text-muted" style="font-size: 14px;">+{{ order.delivery_boy_mobile }}</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Live map for the delivery boy while this order is Out For Delivery -->
+                    <rider-live-map v-if="isDeliveryBoyRole && Number(order.active_status) === 5 && order.id"
+                        :order-id="order.id"></rider-live-map>
                 </div>
 
-                <!-- Right Column (5) -->
-                <div class="col-lg-5">
-
+                <!-- Right Column (4) -->
+                <div class="col-lg-4">
+                    <!-- Actions: Order Status + Assign Delivery Partner -->
+                    <div class="card od-card od-actions-card">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <i class="fas fa-sliders-h me-2 text-primary od-title-fa"></i>
+                                {{ __('actions') }}
+                            </h5>
+                        </div>
+                        <div class="card-body od-card-body">
+                            <div class="od-action-block" id="assign_partner_section">
+                                <label class="od-action-label">
+                                    <base-icon name="CheckCircle" width="16" height="16" class="me-2" />
+                                    {{ __('order_status') || 'Order Status' }}
+                                </label>
+                                <form @submit.prevent="updateStatus" class="od-inline-form od-stack-form">
+                                    <select class="form-select" v-model="order_status_id">
+                                        <option value="">{{ __('choose_status') || 'Choose Status' }}</option>
+                                        <option v-for="status in statuses" :value='status.id'>{{
+                                            getStatusDisplayName(status) }}
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary od-form-btn"
+                                        :disabled="order_status_id === '' || isLoadingUstatus">
+                                        {{ __('update') || 'Update' }}
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="od-action-block" v-if="this.$roleDeliveryBoy !== this.login_user.role.name">
+                                <label class="od-action-label">
+                                    <base-icon name="Vector (1)" width="16" height="16" class="me-2" />
+                                    {{ __('assign_delivery_partner') || 'Assign Delivery Partner' }}
+                                </label>
+                                <form @submit.prevent="assignDeliveryBoy" class="od-inline-form od-stack-form">
+                                    <select class="form-select" v-model="delivery_boy_id">
+                                        <option value="">{{ __('select_delivery_boy') }}</option>
+                                        <option v-for="boy in deliveryBoys" :value='boy.id'>
+                                            {{ getDisplayName(boy.name) }} ({{ boy.pending_order_count }})
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary od-form-btn"
+                                        :disabled="delivery_boy_id === '' || isLoadingDboy">
+                                        {{ Number(order.delivery_boy_id) > 0 ? (__('change') || 'Change') : (__('assign') || 'Assign') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Customer Details -->
-                    <div class="card border mb-4"
-                        style="border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                        <!-- Top Half: Header -->
-                        <div
-                            style="height: 68px; padding: 16px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                            <base-icon name="User" width="20" height="20" class="me-2" />
-                            <span
-                                style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                    __('customer_details') || 'Customer Details' }}</span>
+                    <div class="card od-card">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <base-icon name="User" width="18" height="18" class="me-2" />
+                                {{ __('customer_details') || 'Customer Details' }}
+                            </h5>
                         </div>
-                        <!-- Bottom Half: Content -->
-                        <div class="card-body p-4" style="text-align: left !important;">
-                            <div class="d-flex align-items-center mb-4" style="gap: 12px; text-align: left !important;">
-                                <div class="avatar-box bg-light d-flex align-items-center justify-content-center fw-bold text-primary overflow-hidden"
-                                    style="width: 48px; height: 48px; font-size: 18px; flex-shrink: 0; border-radius: 8px;">
+                        <div class="card-body od-card-body text-start">
+                            <div class="od-person">
+                                <div class="avatar-box bg-light od-avatar">
                                     {{ order.user_name ? order.user_name.charAt(0).toUpperCase() : 'U' }}
                                 </div>
-                                <div style="text-align: left !important;">
-                                    <div class="text-dark mb-1"
-                                        style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 16px; line-height: 24px; text-align: left !important;">
-                                        {{ order.user_name }}</div>
-                                    <div class="text-muted small" style="text-align: left !important;">{{ __('Customer Joined') || 'Customer Joined' }}:
-                                        <span class="fw-bold text-dark">{{ formatDate(order.user_created_at) || 'N/A'
+                                <div class="text-start od-person-text">
+                                    <div class="od-person-name">{{ order.user_name }}</div>
+                                    <div class="od-person-sub">{{ __('Customer Joined') || 'Customer Joined' }}:
+                                        <span class="od-person-strong">{{ formatDate(order.user_created_at) || 'N/A'
                                         }}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div style="border-top: 1px solid #EDEDED; margin-bottom: 24px;"></div>
-                            <div class="mb-4">
-                                <div class="d-flex align-items-center mb-1">
-                                    <base-icon name="Envelope" width="20" height="20" style="margin-right: 12px;" />
-                                    <div
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 14px; line-height: 20px; color: #333333;">
-                                        {{ __('Email Address') || 'Email Address' }}</div>
+                            <div class="od-divider"></div>
+                            <div class="od-info-row">
+                                <div class="od-info-label">
+                                    <base-icon name="Envelope" width="16" height="16" class="me-2" />
+                                    {{ __('Email Address') || 'Email Address' }}</div>
+                                <div class="od-info-value">
+                                    <a v-if="order.user_email" class="od-contact-link" :href="'mailto:' + order.user_email">{{ order.user_email }}</a>
                                 </div>
-                                <div
-                                    style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000; margin-left: 32px;">
-                                    {{ order.user_email }}</div>
                             </div>
-                            <div class="mb-2">
-                                <div class="d-flex align-items-center mb-1">
-                                    <base-icon name="Phone" width="20" height="20" style="margin-right: 12px;" />
-                                    <div
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 14px; line-height: 20px; color: #333333;">
-                                        {{ __('Phone Number') || 'Phone Number' }}</div>
+                            <div class="od-info-row mb-0">
+                                <div class="od-info-label">
+                                    <base-icon name="Phone" width="16" height="16" class="me-2" />
+                                    {{ __('Phone Number') || 'Phone Number' }}</div>
+                                <div class="od-info-value">
+                                    <a v-if="order.user_mobile" class="od-contact-link" :href="customerTel">{{ order.user_mobile }}</a>
                                 </div>
-                                <div
-                                    style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000; margin-left: 32px;">
-                                    {{ order.user_mobile }}</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Shipping Address -->
-                    <div class="card border mb-4"
-                        style="border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                        <!-- Top Half: Header -->
-                        <div
-                            style="height: 68px; padding: 16px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                            <base-icon name="MapPinLine" width="20" height="20" class="me-2" />
-                            <span
-                                style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                    __('shipping_address') || 'Shipping Address' }}</span>
+                    <div class="card od-card">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <base-icon name="MapPinLine" width="18" height="18" class="me-2" />
+                                {{ __('shipping_address') || 'Shipping Address' }}
+                            </h5>
                         </div>
-                        <!-- Bottom Half: Content -->
-                        <div class="card-body p-4">
-                            <div class="mb-4">
-                                <div class="d-flex align-items-center mb-2" style="gap: 8px;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;">{{ __('Home Address') || 'Home Address' }}</span>
-                                    <span style="color: #555555; font-size: 14px;">-</span>
-                                    <div class="figma-default-badge">
-                                        <span>{{ __('Default') || 'Default' }}</span>
-                                    </div>
+                        <div class="card-body od-card-body">
+                            <div class="d-flex align-items-center flex-wrap mb-2 gap-2">
+                                <span class="od-address-type">{{ __('Home Address') || 'Home Address' }}</span>
+                                <div class="figma-default-badge">
+                                    <span>{{ __('Default') || 'Default' }}</span>
                                 </div>
-                                <p class="text-muted mb-0"
-                                    style="font-size: 14px; line-height: 1.5; color: #555555 !important;">
-                                    {{ order.order_address }}
-                                </p>
                             </div>
-                            <div class="d-flex flex-column justify-content-center p-3 delivery-time-box" v-if="order.delivery_time && !order.delivery_time.includes('1970') && order.delivery_time.trim() !== '' && order.delivery_time !== 'N/A'">
-                                <div
-                                    style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; line-height: 20px; color: #D63031; margin-bottom: 4px;">
+                            <p class="od-address-text mb-0">
+                                {{ order.order_address }}
+                            </p>
+                            <a v-if="mapsUrl" :href="mapsUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary od-map-btn mt-3">
+                                <i class="fas fa-map-marked-alt"></i> {{ tr('open_in_maps', 'Open in Maps') }}
+                            </a>
+                            <div class="delivery-time-box mt-3" v-if="hasDeliveryTime">
+                                <div class="od-delivery-time-label">
                                     {{ __('Delivery Time & Date') || 'Delivery Time & Date' }}</div>
-                                <div class="text-dark fw-bold" style="font-size: 16px; line-height: 24px;">{{
+                                <div class="text-dark od-delivery-time-value">{{
                                     order.delivery_time }}
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Billing Summary -->
-                    <div class="card border mb-4"
-                        style="border-radius: 16px; border: 1px solid #EDEDED !important; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
-                        <!-- Top Half: Header -->
-                        <div
-                            style="height: 68px; padding: 16px; border-bottom: 1px solid #EDEDED; display: flex; align-items: center;">
-                            <base-icon name="Receipt" width="20" height="20" class="me-2" />
-                            <span
-                                style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                    __('Billing Summary') }}</span>
+                    <!-- Delivery Partner Details (Conditional) -->
+                    <div class="card od-card"
+                        v-if="order.delivery_boy_name || getDisplayName(order.delivery_boy_name_translation)">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <base-icon name="Vector (1)" width="18" height="18"
+                                    :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-truck-icon' : 'normal-truck-icon'"
+                                    class="me-2" :use-current-color="true" />
+                                <span :class="login_user.role.name === 'Delivery Boy' ? 'db-panel-delivery-title' : 'normal-delivery-title'">{{
+                                    __('delivery_partner_details') || 'Delivery Partner Details' }}</span>
+                            </h5>
                         </div>
-                        <!-- Bottom Half: Content -->
-                        <div class="card-body p-4">
-                            <div class="billing-list">
-                                <div class="d-flex justify-content-between mb-4">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{ __('Subtotal') || 'Subtotal' }}
-                                        ({{ activeOrderItems.length }} {{ __('items') || 'items' }})</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; color: #000000;">{{
-                                            $currency }}{{ activeSubtotal.toFixed(2) }}</span>
+                        <div class="card-body od-card-body">
+                            <div class="od-person">
+                                <div class="avatar-box bg-light od-avatar rounded-circle">
+                                    {{ order.delivery_boy_name ? order.delivery_boy_name.charAt(0).toUpperCase() : 'D' }}
                                 </div>
-                                <div style="border-top: 1px solid #EDEDED; margin-bottom: 24px;"></div>
-                                <div class="d-flex justify-content-between mb-4" v-if="activeAddonTotal > 0"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 16px; line-height: 24px; color: #000000;">{{ __('addons') || 'Addons' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;">{{
-                                            $currency }}{{ activeAddonTotal.toFixed(2) }}</span>
+                                <div class="text-start od-person-text">
+                                    <div class="od-person-name">{{
+                                        getDisplayName(order.delivery_boy_name_translation) || order.delivery_boy_name }}
+                                    </div>
+                                    <div class="od-person-sub">
+                                        <a v-if="order.delivery_boy_mobile" class="od-contact-link od-contact-link--sub" :href="'tel:+' + order.delivery_boy_mobile">+{{ order.delivery_boy_mobile }}</a>
+                                        <template v-else>+{{ order.delivery_boy_mobile }}</template>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-between mb-4" v-if="order.discount > 0"
-                                    style="height: 20px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; line-height: 20px; color: #D63031;">{{ __('Discount') || 'Discount' }}
-                                        ({{ order.discount }}%)</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; line-height: 20px; color: #D63031;">-{{
-                                            $currency }}{{ discount_in_rupees }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 16px; line-height: 24px; color: #000000;">{{ __('Delivery Charges') || 'Delivery Charges' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;"
-                                        v-if="order.delivery_charge == 0">{{ __('Free') || 'Free' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;"
-                                        v-else>{{ $currency }}{{ order.delivery_charge }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4"
-                                    v-if="getAdditionalChargesTotal(order.additional_charges) > 0"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 16px; line-height: 24px; color: #000000;">{{ __('Additional Charges') || 'Additional Charges' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;">{{
-                                            $currency }}{{ getAdditionalChargesTotal(order.additional_charges) }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4" v-if="order.promo_discount > 0"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 16px; line-height: 24px; color: #000000;">{{ __('Promo Code') || 'Promo Code' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;">{{
-                                            order.promo_code }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4" v-if="order.promo_discount > 0"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 400; font-size: 16px; line-height: 24px; color: #000000;">{{ __('Promo Discount') || 'Promo Discount' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #000000;">-{{
-                                            $currency }}{{ order.promo_discount }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4" v-if="order.wallet_balance > 0"
-                                    style="height: 24px; align-items: center;">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; line-height: 20px; color: #20B364;">{{ __('Wallet Used') || 'Wallet Used' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 14px; line-height: 20px; color: #20B364;">-{{
-                                            $currency }}{{ order.wallet_balance }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center p-3 payable-total-box">
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 20px; line-height: 28px; color: #000000;">{{ __('Payable Total') || 'Payable Total' }}</span>
-                                    <span
-                                        style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 20px; line-height: 28px; color: #000000;">{{
-                                            $currency }}{{ order.remaining_final }}</span>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Order Notes Section -->
+                    <div class="card od-card order-notes-card" v-if="order.order_note">
+                        <div class="od-card-header">
+                            <h5 class="od-card-title">
+                                <i class="far fa-calendar-check me-2"></i>
+                                <span class="order-notes-title">{{ __('Customer Order Notes') || 'Customer Order Notes' }}</span>
+                            </h5>
+                        </div>
+                        <div class="card-body od-card-body">
+                            <div class="order-notes-box">
+                                <p class="mb-0 order-notes-text">
+                                    {{ order.order_note }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -505,8 +446,8 @@
                         <li class="list-group-item">
                             <span><b>{{ __('product_id') }} :- </b>{{ item.product_id }}</span>
                             <router-link v-if="item.product_id" :to="viewProductRoute" v-b-tooltip.hover title="View"
-                                class="btn btn-primary btn-sm pull-right border-0 bg-transparent p-0">
-                                <base-icon name="Eye" hoverName="Type=Hover (1)" width="32" height="32" />
+                                class="figma-action-btn float-end">
+                                <i class="bi bi-eye"></i>
                             </router-link>
                         </li>
                         <li class="list-group-item"
@@ -548,14 +489,14 @@
                         <span class="figma-cancel-title">{{ __('cancel') === 'cancel' ? 'Cancel' : __('cancel') }}</span>
                     </div>
                     <button type="button" class="figma-close-modal-btn" @click="closeCancelModal">
-                        <base-icon name="order cancel" width="14" height="14" useCurrentColor style="color: #64748B;" />
+                        <base-icon name="order cancel" width="14" height="14" useCurrentColor />
                     </button>
                 </div>
                 
                 <!-- Body -->
                 <div class="figma-cancel-modal-body text-center">
                     <div class="figma-warning-icon-wrapper d-flex align-items-center justify-content-center mx-auto">
-                        <base-icon name="warning" width="24" height="24" useCurrentColor style="color: #D63031;" />
+                        <base-icon name="warning" width="24" height="24" useCurrentColor />
                     </div>
                     
                     <div class="figma-cancel-info-block">
@@ -572,10 +513,10 @@
                 
                 <!-- Footer -->
                 <div class="figma-cancel-modal-footer">
-                    <button type="button" class="btn btn-figma-keep w-50" @click="closeCancelModal" :disabled="isLoadingCancel">
+                    <button type="button" class="btn btn-figma-keep" @click="closeCancelModal" :disabled="isLoadingCancel">
                         {{ __('keep_item') === 'keep_item' ? 'Keep Item' : __('keep_item') }}
                     </button>
-                    <button type="button" class="btn btn-figma-confirm w-50" @click="confirmCancelOrderItem" :disabled="isLoadingCancel">
+                    <button type="button" class="btn btn-figma-confirm" @click="confirmCancelOrderItem" :disabled="isLoadingCancel">
                         <span v-if="!isLoadingCancel">{{ __('confirm_cancel') === 'confirm_cancel' ? 'Confirm Cancel' : __('confirm_cancel') }}</span>
                         <b-spinner v-else small variant="light"></b-spinner>
                     </button>
@@ -599,8 +540,10 @@
 <script>
 import axios from "axios";
 import Auth from '../../Auth.js';
+import RiderLiveMap from '../../components/RiderLiveMap.vue';
 
 export default {
+    components: { RiderLiveMap },
     data: function () {
         return {
             login_user: Auth.user,
@@ -649,6 +592,9 @@ export default {
         isSellerRoute() {
             // Use this.$route to access the current route
             return this.$route.path.startsWith('/seller/');
+        },
+        isDeliveryBoyRole() {
+            return this.login_user && this.login_user.role && this.login_user.role.name === this.$roleDeliveryBoy;
         },
         isDeliveryBoyRoute() {
             // Use this.$route to access the current route
@@ -733,6 +679,90 @@ export default {
 
             return routeConfig;
         },
+        // ----- Presentation helpers for the redesigned layout (no data/API changes) -----
+        hasDeliveryTime() {
+            const t = this.order && this.order.delivery_time;
+            return !!(t && typeof t === 'string' && !t.includes('1970') && t.trim() !== '' && t !== 'N/A');
+        },
+        totalQuantity() {
+            return (this.order_items || []).reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 0), 0);
+        },
+        paymentMethodLabel() {
+            const pm = this.order && this.order.payment_method;
+            if (!pm || typeof pm !== 'string') return '';
+            const key = 'txn_type_' + pm.toLowerCase();
+            const translated = this.__(key);
+            if (translated && translated !== key) return translated;
+            return pm.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        },
+        orderTypeLabel() {
+            const o = this.order || {};
+            if (o.order_type === 'selfpickup') return this.__('self_pickup');
+            if (o.slot_type === 'express') return this.__('express');
+            if (o.order_type === 'doorstep') return this.tr('doorstep_delivery', 'Doorstep Delivery');
+            return '';
+        },
+        customerTel() {
+            const o = this.order || {};
+            if (!o.user_mobile) return '';
+            const cc = o.user_country_code ? String(o.user_country_code).replace(/[^0-9]/g, '') : '';
+            return 'tel:' + (cc ? '+' + cc : '') + String(o.user_mobile).replace(/\s+/g, '');
+        },
+        mapsUrl() {
+            const o = this.order || {};
+            const lat = parseFloat(o.latitude);
+            const lng = parseFloat(o.longitude);
+            let query = '';
+            if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+                query = lat + ',' + lng;
+            } else if (o.order_address && String(o.order_address).trim() !== '') {
+                query = String(o.order_address).trim();
+            }
+            return query ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query) : '';
+        },
+        // Order lifecycle stepper. Built only from the current active_status (the order view API
+        // returns no per-status history), plus the order date under the first step.
+        trackerSteps() {
+            const o = this.order || {};
+            const current = Number(o.active_status) || 0;
+            if (!current) return [];
+            const isPickup = o.order_type === 'selfpickup' || [9, 10, 11].includes(current);
+            let flow = isPickup ? [9, 10, 11] : [2, 3, 4, 5, 6];
+            if (!isPickup && current === 1) flow = [1].concat(flow);
+            const icons = {
+                1: 'fas fa-wallet', 2: 'fas fa-clipboard-check', 3: 'fas fa-box', 4: 'fas fa-box-open',
+                5: 'fas fa-shipping-fast', 6: 'fas fa-home', 9: 'fas fa-clock', 10: 'fas fa-store', 11: 'fas fa-hand-holding',
+            };
+            const finalIds = [6, 11];
+            let currentIdx = flow.indexOf(current);
+            if (current === 8) currentIdx = flow.length; // returned => the delivery flow was completed
+            const steps = flow.map((id, i) => {
+                let state = 'upcoming';
+                if (current !== 7 && currentIdx > -1) {
+                    if (i < currentIdx) state = 'done';
+                    else if (i === currentIdx) state = finalIds.includes(id) ? 'done' : 'current';
+                }
+                return {
+                    key: 's' + id,
+                    id,
+                    label: this.getStatusLabelById(id),
+                    icon: icons[id] || 'fas fa-circle',
+                    state,
+                    time: (i === 0 && state !== 'upcoming') ? (o.orders_created_at || '') : '',
+                };
+            });
+            if (current === 7 || current === 8) {
+                steps.push({
+                    key: 's' + current,
+                    id: current,
+                    label: this.getStatusLabelById(current),
+                    icon: current === 7 ? 'fas fa-times' : 'fas fa-undo',
+                    state: current === 7 ? 'error' : 'warn',
+                    time: '',
+                });
+            }
+            return steps;
+        },
     },
     created: function () {
         this.id = this.$route.params.id;
@@ -752,6 +782,11 @@ export default {
         this.stopLiveTracking();
     },
     methods: {
+        // Translate with an English fallback when the key is missing (window.__ returns the key itself).
+        tr(key, fallback) {
+            const v = this.__(key);
+            return (v && v !== key) ? v : fallback;
+        },
         showPrescription(url) {
             this.selectedPrescriptionUrl = url;
             this.prescriptionModalShow = true;
@@ -857,7 +892,7 @@ export default {
                 });
         },
 
-        // Live tracking: the delivery boy's mobile app pushes GPS via manage_live_tracking while
+        // Live tracking: the delivery boy's mobile app pushes GPS via update_location while
         // an order is Out For Delivery - the web panel never did, so customers never got live
         // tracking data for orders worked from here. Mirrors that same behavior in the browser
         // via watchPosition, only while this delivery boy has this order open and it's Out For
@@ -891,13 +926,13 @@ export default {
             if (now - this.liveTrackingLastSentAt < 15000) return;
             this.liveTrackingLastSentAt = now;
 
+            // update_location needs only the position: the server saves it for every order this
+            // rider has Out For Delivery.
             const formData = new FormData();
-            formData.append('order_id', this.id);
-            formData.append('order_status', this.order.active_status);
             formData.append('latitude', position.coords.latitude);
             formData.append('longitude', position.coords.longitude);
 
-            axios.post(this.$deliveryBoyApiUrl + '/manage_live_tracking', formData)
+            axios.post(this.$deliveryBoyApiUrl + '/update_location', formData)
                 .catch(error => {
                     console.error('Failed to send live tracking update:', error);
                 });
@@ -921,8 +956,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoadingUstatus = true
@@ -1044,8 +1079,8 @@ export default {
                     cancelButtonText: __('cancel'),
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#37a279',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: 'var(--theme-primary-500)',
+                    cancelButtonColor: 'var(--theme-error-500)',
                 }).then(result => {
                     if (result.value) {
                         let ids = uniqueSelectedItems.toString();
@@ -1166,61 +1201,47 @@ export default {
 <style scoped>
 ::v-deep .cancel-item-btn svg path,
 ::v-deep .cancel-item-btn:hover svg path {
-    fill: #D63031 !important;
+    fill: var(--theme-error-500) !important;
 }
 
-/* Base Theme-Aware Variables for this component */
+/* ===== Order detail (SnapBuy layout) ===== */
+.modern-page-title {
+    font-family: var(--ui-font);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 28px;
+    color: var(--ui-heading);
+}
+
 .order-meta-bar {
     width: 100%;
-    border-radius: 8px;
-    border: 1px solid #DCEFE4;
-    background-color: #EEF7F2;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 16px;
-    gap: 12px;
-}
-
-body.theme-dark .order-meta-bar {
-    background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%) !important;
-    border-color: #334155 !important;
-}
-
-.order-meta-date {
-    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 8px 24px;
+    padding-top: 12px;
+    border-top: 1px solid var(--ui-border);
+    font-family: var(--ui-font);
+    font-size: 13px;
+    line-height: 20px;
 }
 
+.order-meta-date,
 .order-meta-seller {
     display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-@media (min-width: 768px) {
-    .order-meta-bar {
-        flex-direction: row;
-        align-items: center;
-        padding: 8px 16px;
-        gap: 0;
-    }
-
-    .order-meta-date {
-        padding-right: 24px;
-        border-right: 1px solid rgba(85, 174, 123, 0.25);
-    }
-
-    .order-meta-seller {
-        padding-left: 24px;
-    }
+.order-meta-bar i {
+    color: var(--ui-text-muted);
+    font-size: 13px;
 }
-
 
 .card {
-    border: 1px solid #EDEDED !important;
-    border-radius: 12px !important;
+    border: 1px solid var(--ui-border) !important;
+    border-radius: var(--ui-radius-lg) !important;
     overflow: hidden;
     margin-bottom: 24px;
 }
@@ -1228,59 +1249,92 @@ body.theme-dark .order-meta-bar {
 .item-count-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    height: 36px;
-    padding: 8px 12px;
-    gap: 4px;
-    border-radius: 8px;
-    background-color: #EDEDED;
-    border: 1px solid #D9D9D9;
-    color: #000000;
-    font-weight: 500;
-    font-size: 14px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: var(--ui-radius-sm);
+    background-color: var(--ui-surface-muted);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-text);
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 body.theme-dark .item-count-badge {
-    background-color: #334155 !important;
-    border-color: #475569 !important;
-    color: #f1f5f9 !important;
+    background-color: var(--theme-neutral-700) !important;
+    border-color: var(--theme-neutral-600) !important;
+    color: var(--theme-neutral-100) !important;
+}
+
+.cancel-item-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ui-radius);
+    border: 1px solid color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
+    background: var(--theme-error-50);
+    color: var(--theme-error-500);
+}
+
+.cancel-item-btn:hover {
+    background: color-mix(in srgb, var(--theme-error-500) 18%, transparent);
 }
 
 .delivery-time-box {
-    min-height: 76px;
-    background: #FBEAEA;
-    border: 1px solid #EFAEAF;
-    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--theme-error-50);
+    border: 1px solid var(--theme-error-200);
+    border-radius: var(--ui-radius);
 }
 
 body.theme-dark .delivery-time-box {
-    background: rgba(214, 48, 49, 0.15) !important;
-    border-color: rgba(214, 48, 49, 0.3) !important;
+    background: color-mix(in srgb, var(--theme-error-500) 15%, transparent) !important;
+    border-color: color-mix(in srgb, var(--theme-error-500) 30%, transparent) !important;
 }
 
-.payable-total-box {
-    min-height: 52px;
-    background: #F7F7F7;
-    border: 1px solid #EDEDED;
-    border-radius: 8px;
+.order-notes-box {
+    background-color: var(--theme-info-50);
+    border-inline-start: 3px solid var(--theme-info-500);
+    border-radius: var(--ui-radius);
+    padding: 12px 14px;
+    text-align: start;
 }
 
-body.theme-dark .payable-total-box {
-    background: #1e293b !important;
-    border-color: #334155 !important;
+.order-notes-text {
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--ui-text);
+}
+
+@media (max-width: 575.98px) {
+    .order-header-card {
+        padding: 14px 16px;
+    }
+
+    .od-print-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .od-card-body {
+        padding: 16px;
+    }
+
+    .od-card-header {
+        padding: 12px 16px;
+    }
 }
 
 /* order-notes-box/title/text use hardcoded light inline colors (light-blue bg, near-black
    text) that stay light-only - the broad dark-mode span/div text-color override further down
    then forces near-white text onto that unchanged light-blue background, making it unreadable. */
 body.theme-dark .order-notes-box {
-    background-color: rgba(59, 130, 246, 0.15) !important;
-    border-left-color: #3B82F6 !important;
+    background-color: color-mix(in srgb, var(--theme-info-500) 15%, transparent) !important;
+    border-left-color: var(--theme-info-500) !important;
 }
 
 body.theme-dark .order-notes-title,
 body.theme-dark .order-notes-text {
-    color: #F1F5F9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 /* Base text color fixes for dark mode in this component */
@@ -1295,515 +1349,771 @@ body.theme-dark span,
 body.theme-dark th,
 body.theme-dark td,
 body.theme-dark div:not(.figma-status-pill) {
-    color: #f1f5f9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 body.theme-dark .text-secondary,
 body.theme-dark .text-muted {
-    color: #94a3b8 !important;
+    color: var(--theme-neutral-400) !important;
 }
 
 body.theme-dark .card-header,
 body.theme-dark .table thead,
 body.theme-dark .table thead th {
-    background-color: #1e293b !important;
-    border-top-color: #334155 !important;
-    border-bottom-color: #334155 !important;
+    background-color: var(--theme-neutral-800) !important;
+    border-top-color: var(--theme-neutral-700) !important;
+    border-bottom-color: var(--theme-neutral-700) !important;
 }
 
 body.theme-dark .table tbody tr td {
-    background-color: #1e293b !important;
-    border-bottom: 1px solid #334155 !important;
+    background-color: var(--theme-neutral-800) !important;
+    border-bottom: 1px solid var(--theme-neutral-700) !important;
 }
 
 body.theme-dark table.table tbody tr:hover td {
-    background-color: #2d3748 !important;
+    background-color: var(--theme-neutral-800) !important;
 }
 
 body.theme-dark .card {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+    background-color: var(--theme-neutral-800) !important;
+    border-color: var(--theme-neutral-700) !important;
 }
 
 body.theme-dark .form-select,
 body.theme-dark .form-control {
-    background-color: #0f172a !important;
-    border-color: #334155 !important;
-    color: #f1f5f9 !important;
+    background-color: var(--theme-neutral-900) !important;
+    border-color: var(--theme-neutral-700) !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 body.theme-dark .order-details-wrapper>div:first-child {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-    border: 1px solid #334155 !important;
+    background: linear-gradient(180deg, var(--theme-neutral-800) 0%, var(--theme-neutral-900) 100%) !important;
+    border: 1px solid var(--theme-neutral-700) !important;
 }
 
 body.theme-dark .delivery-time-box div {
-    color: #ff8080 !important;
+    color: var(--theme-error-400) !important;
 }
 
 body.theme-dark .delivery-time-box .text-dark {
-    color: #f1f5f9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 /* Print Order button contrast */
 body.theme-dark .btn-dark {
-    background-color: #334155 !important;
-    border-color: #475569 !important;
+    background-color: var(--theme-neutral-700) !important;
+    border-color: var(--theme-neutral-600) !important;
 }
 
 body.theme-dark .avatar-box.bg-light {
-    background-color: #334155 !important;
-    color: #61b795 !important;
+    background-color: var(--theme-neutral-700) !important;
+    color: var(--theme-success-500) !important;
 }
 
 .figma-default-badge {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 58px !important;
-    height: 24px !important;
-    background: #EEF7F2 !important;
+    height: 22px !important;
+    padding: 0 8px !important;
+    background: var(--theme-success-50) !important;
     border-radius: 8px !important;
 }
 
 .figma-default-badge span {
-    font-family: 'Inter', sans-serif !important;
+    font-family: var(--ui-font) !important;
     font-weight: 600 !important;
     font-size: 12px !important;
     line-height: 16px !important;
-    color: #55AE7B !important;
+    color: var(--theme-success-500) !important;
     text-align: center !important;
 }
 
 body.theme-dark .figma-default-badge {
-    background: rgba(85, 174, 123, 0.15) !important;
+    background: color-mix(in srgb, var(--theme-success-500) 15%, transparent) !important;
 }
 
 body.theme-dark .figma-default-badge span {
-    color: #55AE7B !important;
+    color: var(--theme-success-500) !important;
 }
 
 .normal-seller-name {
-    color: var(--Colors-Shades-Neutral-N---950, #000000) !important;
+    color: var(--Colors-Shades-Neutral-N---950, var(--theme-neutral-950)) !important;
 }
 
 body.theme-dark .normal-seller-name {
-    color: #f1f5f9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 .db-panel-seller-name {
-    color: var(--Colors-Shades-Neutral-N---950, #000000) !important;
+    color: var(--Colors-Shades-Neutral-N---950, var(--theme-neutral-950)) !important;
 }
 
 body.theme-dark .db-panel-seller-name {
-    color: #ffffff !important;
+    color: var(--theme-neutral-50) !important;
 }
 
 .normal-truck-icon {
-    color: #000000 !important;
+    color: var(--theme-neutral-950) !important;
 }
 
 body.theme-dark .normal-truck-icon {
-    color: #f1f5f9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 .db-panel-truck-icon {
-    color: #000000 !important;
+    color: var(--theme-neutral-950) !important;
 }
 
 body.theme-dark .db-panel-truck-icon {
-    color: #ffffff !important;
+    color: var(--theme-neutral-50) !important;
 }
 
 .normal-delivery-title {
-    color: #000000 !important;
+    color: var(--theme-neutral-950) !important;
 }
 
 body.theme-dark .normal-delivery-title {
-    color: #f1f5f9 !important;
+    color: var(--theme-neutral-100) !important;
 }
 
 .db-panel-delivery-title {
-    color: #000000 !important;
+    color: var(--theme-neutral-950) !important;
 }
 
 body.theme-dark .db-panel-delivery-title {
-    color: #ffffff !important;
+    color: var(--theme-neutral-50) !important;
 }
 
-/* Figma-styled Cancel Order Item Modal */
-
+/* Cancel order item modal (tidy header / body / footer) */
 .figma-cancel-modal-content {
-    width: 540px !important;
-    height: 652px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--ui-font);
 }
-
-
 
 .figma-cancel-modal-header {
-    width: 540px !important;
-    height: 100px !important;
-    padding: 24px !important;
-    gap: 16px !important;
-    border-bottom: 1px solid #F1F5F9 !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    opacity: 1 !important;
-}
-
-body.theme-dark .figma-cancel-modal-header {
-    border-bottom-color: #334155 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--ui-border);
 }
 
 .figma-cancel-modal-body {
-    width: 540px !important;
-    height: 468px !important;
-    padding: 24px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 32px !important;
-    opacity: 1 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
 }
 
 .figma-cancel-modal-footer {
-    width: 540px !important;
-    height: 84px !important;
-    opacity: 1 !important;
-    gap: 24px !important;
-    border-top: 1px solid var(--Colors-Shades-Neutral-N---200, #EDEDED) !important;
-    padding-top: 16px !important;
-    padding-right: 24px !important;
-    padding-bottom: 16px !important;
-    padding-left: 24px !important;
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;
-    border-bottom-right-radius: 16px !important;
-    border-bottom-left-radius: 16px !important;
-    background: var(--Colors-Shades-Neutral-N---50, #FFFFFF) !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-}
-
-body.theme-dark .figma-cancel-modal-footer {
-    background: #1E293B !important;
-    border-top-color: #334155 !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--ui-border);
+    background: var(--ui-surface);
 }
 
 .figma-cancel-title {
-    color: var(--Foreground-Primary, #0D0D0D);
-    font-family: var(--Font-Family-Body, 'Inter', sans-serif);
-    font-size: var(--Font-Size-text-xl, 20px);
-    font-style: normal;
-    font-weight: var(--Font-Weight-font-semibold, 600);
-    line-height: var(--Font-Line-Height-xl, 28px);
-}
-
-body.theme-dark .figma-cancel-title {
-    color: #F1F5F9;
-}
-
-.figma-cancel-subtitle {
-    font-size: 13px;
-    color: #64748B;
-    font-family: 'Inter', sans-serif;
-    margin-top: 2px;
-}
-
-body.theme-dark .figma-cancel-subtitle {
-    color: #94A3B8;
+    color: var(--ui-heading);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
 }
 
 .figma-close-modal-btn {
-    background: #F8FAFC !important;
-    border: 1px solid #EDEDED !important;
-    outline: none !important;
-    color: #64748B !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 8px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-}
-
-body.theme-dark .figma-close-modal-btn {
-    background-color: #334155 !important;
-    border-color: #475569 !important;
-    color: #CBD5E1 !important;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+    color: var(--ui-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .figma-close-modal-btn:hover {
-    color: #0F172A !important;
-    background-color: #E2E8F0 !important;
-    border-color: #CBD5E1 !important;
-}
-
-body.theme-dark .figma-close-modal-btn:hover {
-    color: #FFFFFF;
-    background-color: #475569;
+    background: var(--ui-surface-muted);
+    color: var(--ui-heading);
 }
 
 .figma-warning-icon-wrapper {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #FBEAEA;
-    margin-bottom: 0px !important;
-}
-
-.figma-warning-icon-wrapper .base-icon,
-.figma-warning-icon-wrapper .base-icon * {
-    color: #D63031 !important;
-    fill: #D63031 !important;
+    background: var(--theme-error-50);
+    color: var(--theme-error-500);
 }
 
 .figma-cancel-heading {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
-    line-height: 28px;
-    color: #0F172A;
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 8px !important;
-}
-
-body.theme-dark .figma-cancel-heading {
-    color: #F1F5F9;
+    line-height: 24px;
+    color: var(--ui-heading);
+    margin-bottom: 4px;
 }
 
 .figma-cancel-description {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 16px !important;
-    line-height: 24px !important;
-    letter-spacing: 0% !important;
-    text-align: center !important;
-    vertical-align: middle !important;
-    color: var(--Colors-Shades-Neutral-N---700, #555555) !important;
-    margin-bottom: 0px !important;
-    max-width: 420px !important;
-    opacity: 1 !important;
-}
-
-body.theme-dark .figma-cancel-description {
-    color: #CBD5E1 !important;
-}
-
-.figma-cancel-input-group {
-    margin-bottom: 12px;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--ui-text-muted);
+    margin: 0 auto;
+    max-width: 400px;
 }
 
 .figma-cancel-input-label {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 20px !important;
-    letter-spacing: 0% !important;
-    color: var(--Colors-Shades-Neutral-N---950, #000000) !important;
-    margin-bottom: 8px !important;
-    display: block !important;
-}
-
-body.theme-dark .figma-cancel-input-label {
-    color: #FFFFFF !important;
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+    margin-bottom: 6px;
 }
 
 .figma-cancel-textarea {
-    width: 492px !important;
-    height: 172px !important;
-    opacity: 1 !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--Colors-Shades-Neutral-N---700, #555555) !important;
-    padding-top: 12px !important;
-    padding-right: 16px !important;
-    padding-bottom: 12px !important;
-    padding-left: 16px !important;
-    background: var(--Colors-Shades-Neutral-N---50, #FFFFFF) !important;
-    color: #0F172A !important;
-    font-size: 14px !important;
-    font-family: 'Inter', sans-serif !important;
-    transition: all 0.2s ease-in-out !important;
-    resize: none !important;
-    box-sizing: border-box !important;
-}
-
-body.theme-dark .figma-cancel-textarea {
-    border-color: #475569 !important;
-    background: #0F172A !important;
-    color: #F1F5F9 !important;
+    width: 100%;
+    min-height: 110px;
+    border-radius: var(--ui-radius);
+    border: 1px solid var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-size: 13px;
+    padding: 10px 12px;
+    resize: vertical;
 }
 
 .figma-cancel-textarea:focus {
-    border-color: #D63031 !important;
-    outline: none !important;
-    box-shadow: 0px 0px 0px 3px rgba(214, 48, 49, 0.15) !important;
+    border-color: var(--theme-error-500);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-error-500) 15%, transparent);
+}
+
+.btn-figma-keep,
+.btn-figma-confirm {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: var(--ui-radius);
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-figma-keep {
-    width: 234px !important;
-    height: 52px !important;
-    gap: 8px !important;
-    opacity: 1 !important;
-    padding-top: 12px !important;
-    padding-right: 24px !important;
-    padding-bottom: 12px !important;
-    padding-left: 24px !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--Colors-Shades-Neutral-N---950, #000000) !important;
-    background: #FFFFFF !important;
-    color: var(--Colors-Shades-Neutral-N---950, #000000) !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 16px !important;
-    line-height: 24px !important;
-    letter-spacing: 0% !important;
-    transition: all 0.2s !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-}
-
-body.theme-dark .btn-figma-keep {
-    border-color: #475569 !important;
-    background: #1E293B !important;
-    color: #FFFFFF !important;
+    border: 1px solid var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text);
 }
 
 .btn-figma-keep:hover {
-    background: #F8FAFC !important;
-    color: #0F172A !important;
-}
-
-body.theme-dark .btn-figma-keep:hover {
-    background: #334155 !important;
-    color: #FFFFFF !important;
+    background: var(--ui-surface-muted);
+    color: var(--ui-heading);
 }
 
 .btn-figma-confirm {
-    width: 234px !important;
-    height: 52px !important;
-    gap: 8px !important;
-    opacity: 1 !important;
-    padding-top: 12px !important;
-    padding-right: 24px !important;
-    padding-bottom: 12px !important;
-    padding-left: 24px !important;
-    border-radius: 8px !important;
-    border: none !important;
-    background: var(--Colors-Status-Error, #D63031) !important;
-    color: var(--Colors-Shades-Neutral-N---50, #FFFFFF) !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 16px !important;
-    line-height: 24px !important;
-    letter-spacing: 0% !important;
-    transition: all 0.2s !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
+    border: 1px solid var(--theme-error-500);
+    background: var(--theme-error-500);
+    color: var(--theme-neutral-50);
 }
 
 .btn-figma-confirm:hover {
-    background: #B32424 !important;
+    background: var(--theme-error-600);
+    border-color: var(--theme-error-600);
+    color: var(--theme-neutral-50);
+}
+/* ===== Redesign: header actions, progress tracker, summary tiles, actions card ===== */
+.od-head-title {
+    min-width: 0;
+}
+
+.od-head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.od-title-fa {
+    font-size: 15px;
+    width: 18px;
+    text-align: center;
+}
+
+/* Progress tracker (horizontal on >= 576px, vertical on phones) */
+.od-track-card .od-card-body {
+    padding: 20px 20px 18px;
+}
+
+.od-track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: flex-start;
+    font-family: var(--ui-font);
+}
+
+.od-track-step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 0 4px;
+}
+
+/* connector from this step to the next one; coloured once this step is complete */
+.od-track-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 17px;
+    inset-inline-start: calc(50% + 24px);
+    inset-inline-end: calc(-50% + 24px);
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ui-border-strong);
+}
+
+.od-track-step.is-done:not(:last-child)::after {
+    background: var(--theme-primary-500);
+}
+
+.od-track-dot {
+    position: relative;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--ui-border-strong);
+    background: var(--ui-surface);
+    color: var(--ui-text-subtle);
+    font-size: 14px;
+    transition: all .2s ease;
+}
+
+.od-track-step.is-done .od-track-dot {
+    background: var(--theme-primary-500);
+    border-color: var(--theme-primary-500);
+    color: #fff;
+}
+
+.od-track-step.is-current .od-track-dot {
+    background: var(--ui-primary-soft);
+    border: 2px solid var(--theme-primary-500);
+    color: var(--theme-primary-600);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-primary-500) 15%, transparent);
+}
+
+.od-track-step.is-error .od-track-dot {
+    background: var(--theme-error-500);
+    border-color: var(--theme-error-500);
+    color: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-error-500) 15%, transparent);
+}
+
+.od-track-step.is-warn .od-track-dot {
+    background: var(--theme-warn-500);
+    border-color: var(--theme-warn-500);
+    color: #fff;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-warn-500) 15%, transparent);
+}
+
+.od-track-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.od-track-label {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+    overflow-wrap: anywhere;
+}
+
+.od-track-step.is-done .od-track-label {
+    color: var(--ui-heading);
+}
+
+.od-track-step.is-current .od-track-label {
+    color: var(--theme-primary-600);
+    font-weight: 700;
+}
+
+.od-track-step.is-error .od-track-label {
+    color: var(--theme-error-600);
+    font-weight: 700;
+}
+
+.od-track-step.is-warn .od-track-label {
+    color: var(--theme-warn-700);
+    font-weight: 700;
+}
+
+.od-track-time {
+    font-size: 11px;
+    line-height: 15px;
+    color: var(--ui-text-subtle);
+}
+
+/* Summary tiles */
+.od-tiles {
+    margin-bottom: 24px;
+    justify-content: flex-start;
+}
+
+.od-tile {
+    height: 100% !important; /* equal-height tiles; global .figma-kpi-card-v2 sets height:auto !important */
+    min-height: 76px;
+    gap: 12px;
+    padding: 14px 16px !important; /* global .figma-kpi-card-v2 padding uses !important */
+    box-shadow: var(--ui-shadow);
+}
+
+.od-tile-icon {
+    width: 42px !important; /* global .figma-kpi-icon-v2 size uses !important */
+    height: 42px !important;
+    border-radius: 10px !important;
+}
+
+.od-tile-icon i {
+    font-size: 17px !important;
+}
+
+.od-tile-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    font-family: var(--ui-font);
+}
+
+.od-tile-label {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+}
+
+.od-tile-value {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+    color: var(--ui-heading);
+    overflow-wrap: anywhere;
+}
+
+.od-tile-value--text {
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.od-tile-sub {
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--ui-text-subtle);
+    overflow-wrap: anywhere;
+}
+
+/* Actions card (Order Status + Assign Delivery Partner, stacked) */
+.od-action-block + .od-action-block {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ui-border);
+}
+
+.od-action-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+
+.od-stack-form {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.od-stack-form .form-select {
+    width: 100%;
+    height: 40px;
+}
+
+.od-stack-form .od-form-btn {
+    width: 100%;
+    height: 40px;
+}
+
+/* Contacts / maps */
+.od-person-text {
+    min-width: 0;
+}
+
+.od-contact-link {
+    color: var(--ui-heading);
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.od-contact-link:hover {
+    color: var(--theme-primary-600);
+    text-decoration: underline;
+}
+
+.od-contact-link--sub {
+    color: var(--ui-text-muted);
+    font-weight: 400;
+}
+
+.od-map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--ui-radius);
+}
+
+/* Items table: cancelled rows are dimmed */
+.od-row-cancelled .od-product-img {
+    opacity: .55;
+}
+
+.od-row-cancelled .od-td-num {
+    color: var(--ui-text-subtle);
+    text-decoration: line-through;
+}
+
+@media (max-width: 991.98px) {
+    .od-tile-value {
+        font-size: 16px;
+    }
+}
+
+/* Phones: vertical tracker + items as compact rows */
+@media (max-width: 575.98px) {
+    .od-head-actions {
+        width: 100%;
+    }
+
+    .od-track {
+        flex-direction: column;
+    }
+
+    .od-track-step {
+        flex-direction: row;
+        align-items: flex-start;
+        text-align: start;
+        gap: 12px;
+        padding: 0 0 18px;
+        width: 100%;
+    }
+
+    .od-track-step:last-child {
+        padding-bottom: 0;
+    }
+
+    .od-track-step:not(:last-child)::after {
+        top: 38px;
+        bottom: 2px;
+        inset-inline-start: 17px;
+        inset-inline-end: auto;
+        width: 2px;
+        height: auto;
+    }
+
+    .od-track-text {
+        padding-top: 8px;
+    }
+
+    .od-tile {
+        flex-direction: column;
+        align-items: flex-start !important; /* global kpi card centres items */
+        gap: 8px;
+        padding: 12px !important;
+    }
+
+    .od-tile-icon {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    .od-tile-icon i {
+        font-size: 14px !important;
+    }
+
+    .od-items-table {
+        min-width: 0;
+    }
+
+    .od-items-table thead {
+        display: none;
+    }
+
+    .od-items-table tbody tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--ui-border);
+    }
+
+    .od-items-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .od-items-table tbody td {
+        display: block;
+        padding: 0 !important; /* overrides global .od-items-table first/last-child padding */
+        border: none;
+        text-align: start !important; /* table cells switch to stacked row layout */
+    }
+
+    .od-items-table tbody td.od-td-product {
+        flex: 1 1 100%;
+    }
+
+    .od-items-table tbody td.od-td-num {
+        flex: 1 1 0;
+        font-size: 13px;
+    }
+
+    .od-items-table tbody td.od-td-num::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 11px;
+        line-height: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--ui-text-subtle);
+    }
+
+    .od-items-table tbody td.od-td-action {
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+
+    /* Summary tiles: two per row (a broader phone rule elsewhere stretched them to full width) */
+    #main .od-tiles > [class*="col"] {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+
+    /* Item rows: the shared #main table rule re-adds cell padding, which pushed the cancel button
+       onto its own line; keep price / qty / total / action on one row */
+    #main .od-items-table tbody td {
+        padding: 0 !important;
+        border: 0 !important;
+    }
+
+    #main .od-items-table tbody td.od-td-num {
+        min-width: 0;
+    }
+}
+
+/* Dark mode: the broad span/div text override above would flatten the tracker/tile text
+   hierarchy, so re-apply the token colours (needs !important to beat that rule). */
+body.theme-dark .od-track-label,
+body.theme-dark .od-tile-label {
+    color: var(--theme-neutral-300) !important;
+}
+
+body.theme-dark .od-track-time,
+body.theme-dark .od-tile-sub {
+    color: var(--theme-neutral-400) !important;
+}
+
+body.theme-dark .od-track-step.is-done .od-track-label,
+body.theme-dark .od-tile-value {
+    color: var(--theme-neutral-100) !important;
+}
+
+body.theme-dark .od-track-step.is-current .od-track-label {
+    color: var(--theme-primary-400) !important;
+}
+
+body.theme-dark .od-track-step.is-error .od-track-label {
+    color: var(--theme-error-400) !important;
+}
+
+body.theme-dark .od-track-step.is-warn .od-track-label {
+    color: var(--theme-warn-400) !important;
+}
+
+body.theme-dark .od-track-dot {
+    background: var(--theme-neutral-800);
+    border-color: var(--theme-neutral-600);
+    color: var(--theme-neutral-400) !important; /* dot is a span: beats the broad span override */
+}
+
+body.theme-dark .od-track-step.is-current .od-track-dot {
+    background: color-mix(in srgb, var(--theme-primary-500) 20%, transparent);
+    color: var(--theme-primary-400) !important;
+}
+
+body.theme-dark .od-track-step.is-done .od-track-dot,
+body.theme-dark .od-track-step.is-error .od-track-dot,
+body.theme-dark .od-track-step.is-warn .od-track-dot {
+    color: #fff !important;
+}
+
+body.theme-dark .od-track-step:not(:last-child)::after {
+    background: var(--theme-neutral-600);
+}
+
+body.theme-dark .od-track-step.is-done:not(:last-child)::after {
+    background: var(--theme-primary-500);
+}
+
+body.theme-dark .od-tile {
+    background: var(--theme-neutral-800) !important; /* global kpi card bg uses !important */
+    border-color: var(--theme-neutral-700) !important;
+}
+
+body.theme-dark .od-action-label,
+body.theme-dark .od-contact-link {
+    color: var(--theme-neutral-100) !important;
 }
 </style>
 
 <style>
-/* Global styles for cancel item modal (outside Vue scoped DOM) */
+/* Cancel item modal shell (b-modal renders outside the scoped DOM) */
 #cancel-item-modal .modal-dialog {
-    max-width: 540px !important;
-    width: 540px !important;
+    max-width: 480px;
 }
 
 #cancel-item-modal .modal-content {
-    width: 540px !important;
-    height: 652px !important;
-    opacity: 1 !important;
-    border-radius: 16px !important;
-    border: 1px solid #EDEDED !important;
-    background: #FFFFFF !important;
-    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.08) !important;
-    overflow: hidden !important;
-    padding: 0px !important;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface);
+    box-shadow: var(--ui-shadow-lg);
+    overflow: hidden;
 }
 
 #cancel-item-modal .modal-body {
-    padding: 0px !important;
-    margin: 0px !important;
-}
-
-body.theme-dark #cancel-item-modal .modal-content {
-    background: #1E293B !important;
-    border-color: #334155 !important;
-    box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.4) !important;
-}
-
-#cancel-item-modal .figma-cancel-modal-header {
-    width: 540px !important;
-    height: 100px !important;
-    padding: 24px !important;
-    gap: 16px !important;
-    border-bottom: 1px solid #F1F5F9 !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    opacity: 1 !important;
-}
-
-body.theme-dark #cancel-item-modal .figma-cancel-modal-header {
-    border-bottom-color: #334155 !important;
-}
-
-#cancel-item-modal .figma-cancel-modal-body {
-    width: 540px !important;
-    height: 468px !important;
-    padding: 24px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 32px !important;
-    opacity: 1 !important;
-}
-
-#cancel-item-modal .figma-cancel-modal-footer {
-    width: 540px !important;
-    height: 84px !important;
-    opacity: 1 !important;
-    gap: 24px !important;
-    border-top: 1px solid var(--Colors-Shades-Neutral-N---200, #EDEDED) !important;
-    padding-top: 16px !important;
-    padding-right: 24px !important;
-    padding-bottom: 16px !important;
-    padding-left: 24px !important;
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;
-    border-bottom-right-radius: 16px !important;
-    border-bottom-left-radius: 16px !important;
-    background: var(--Colors-Shades-Neutral-N---50, #FFFFFF) !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-}
-
-body.theme-dark #cancel-item-modal .figma-cancel-modal-footer {
-    background: #1E293B !important;
-    border-top-color: #334155 !important;
+    padding: 0;
 }
 </style>

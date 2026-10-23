@@ -1,28 +1,24 @@
 <template>
     <div>
         <div class="page-heading">
-            <div class="row">
-                <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>{{ __('blogs') }}</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard') }}</router-link>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('blogs') }}</li>
-                        </ol>
-                    </nav>
-                </div>
+            <div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('blogs') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard') }}</router-link>
+                        </li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{ __('blogs') }}</li>
+                    </ol>
+                </nav>
             </div>
 
             <div class="row">
                 <div class="col-12 col-md-12 order-md-1 order-last">
-                    <div class="figma-main-section-card">
+                    <div class="card figma-main-section-card">
                         <div class="card-body p-0">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                                 <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
-                                    <div class="figma-search-container" style="min-width: 250px;">
+                                    <div class="figma-search-container">
                                         <i class="fa fa-search text-muted"></i>
                                         <input v-model="filter" type="text" class="figma-search-input"
                                             :placeholder="__('search')">
@@ -36,18 +32,64 @@
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
-                                    <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="openAddModal" v-b-tooltip.hover v-if="$can('blog_create')">
-                                        <i class="fa fa-plus"></i>
-                                        <span>{{ __('add_blog') }}</span>
-                                    </button>
-                                    <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getBlogs()" v-b-tooltip.hover :title="__('refresh')">
+                                    <div class="view-toggle" role="group" :aria-label="__('view')">
+                                        <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'grid' }" @click="setViewMode('grid')" v-b-tooltip.hover :title="__('grid_view')"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+                                        <button type="button" class="view-toggle-btn" :class="{ active: viewMode === 'list' }" @click="setViewMode('list')" v-b-tooltip.hover :title="__('list_view')"><i class="bi bi-list-ul"></i></button>
+                                    </div>
+                                    <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getBlogs()" v-b-tooltip.hover :title="__('refresh')">
                                         <i class="fa fa-refresh"></i>
                                         <span>{{ __('refresh') }}</span>
+                                    </button>
+                                    <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="openAddModal" v-if="$can('blog_create')">
+                                        <i class="fa fa-plus"></i>
+                                        <span>{{ __('add_blog') }}</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="table-responsive">
+                            <!-- Grid view (same rows, search, sort and handlers as the list view) -->
+                            <div v-if="viewMode === 'grid'">
+                                <div v-if="isLoading" class="item-grid-state">
+                                    <i class="bi bi-hourglass-split"></i>{{ __('loading') }}...
+                                </div>
+                                <div v-else-if="!gridBlogs.length" class="item-grid-state">
+                                    <template v-if="filter && translatedBlogs && translatedBlogs.length"><i class="bi bi-search"></i>{{ __('no_records_matching_your_request') }}</template>
+                                    <template v-else><i class="bi bi-inbox"></i>{{ __('no_records_to_show') }}</template>
+                                </div>
+                                <div v-else class="item-grid">
+                                    <div v-for="blog in pagedItems(gridBlogs)" :key="blog.id" class="item-card">
+                                        <div class="item-card-media item-card-media--cover">
+                                            <img :src="blog.image_url || $placeholderImage" alt="" />
+                                            <div class="item-card-badges">
+                                                <span class="badge bg-success" v-if="blog.status == 1">{{ __('active') }}</span>
+                                                <span class="badge bg-danger" v-if="blog.status == 0">{{ __('deactive') }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-card-body">
+                                            <div class="item-card-title" :title="blog.title">{{ blog.title }}</div>
+                                            <div v-if="blog.slug" class="item-card-meta" :title="'/' + blog.slug">/{{ blog.slug }}</div>
+                                            <div v-if="blog.category" class="item-card-stats">
+                                                <span class="item-card-chip"><i class="bi bi-folder2"></i>{{ blog.category.name }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-card-footer">
+                                            <span class="item-card-meta">#{{ blog.id }}</span>
+                                            <div class="item-card-actions">
+                                                <button class="figma-action-btn" @click="edit_record = blog"
+                                                    v-if="$can('blog_update')" v-b-tooltip.hover :title="__('edit')">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </button>
+                                                <button class="figma-action-btn figma-delete-btn"
+                                                    @click="deleteBlog(translatedBlogs.indexOf(blog), blog.id)" v-if="$can('blog_delete')"
+                                                    v-b-tooltip.hover :title="__('delete')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-else class="table-responsive">
                                 <b-table :items="translatedBlogs" :fields="fields" :filter="filter"
                                     :filter-included-fields="filterOn" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                                     :sort-direction="sortDirection" :bordered="false" :busy="isLoading" stacked="md"
@@ -62,13 +104,25 @@
                                         </div>
                                     </template>
 
+                                    <template #empty="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                    </template>
+                                    <template #emptyfiltered="scope">
+                                        <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                    </template>
+
                                     <template #cell(image)="row">
-                                        <img v-if="row.item.image_url" :src="row.item.image_url" height="50" />
-                                        <span v-else class="text-muted">{{ __('no_image') }}</span>
+                                        <img :src="row.item.image_url || $placeholderImage" class="blog-thumb" alt="" />
+                                    </template>
+
+                                    <template #cell(title)="row">
+                                        <span class="blog-title">{{ row.item.title }}</span>
+                                        <small v-if="row.item.slug" class="d-block text-muted">/{{ row.item.slug }}</small>
                                     </template>
 
                                     <template #cell(category)="row">
-                                        <span>{{ row.item.category ? row.item.category.name : '-' }}</span>
+                                        <span v-if="row.item.category" class="blog-category-pill">{{ row.item.category.name }}</span>
+                                        <span v-else>-</span>
                                     </template>
 
                                     <template #cell(status)="row">
@@ -94,9 +148,11 @@
                                 </b-table>
                             </div>
 
-                            <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                                <div class="showing-results-text small">
-                                    {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ totalRows }}</span>
+                            <div class="figma-table-footer flex-wrap gap-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                    <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
                                     <b-pagination
@@ -186,7 +242,7 @@
                                     <div class="form-group">
                                         <label for="image">{{ __('image') }} <span class="text-danger"
                                                 v-if="!edit_record.id || !form.image_url">*</span></label>
-                                        <p class="text-muted">
+                                        <p class="text-muted small mb-2">
                                             {{ __('supported_formats') }}: JPG, PNG, GIF ({{ __('max_size') }}: 2MB)
                                         </p>
                                         <span v-if="imageError" class="error">{{ imageError }}</span>
@@ -203,8 +259,8 @@
                                             </template>
                                         </div>
                                         <div class="row mt-2" v-if="form.image_url">
-                                            <div class="col-md-6">
-                                                <img class="img-thumbnail custom-imag" :src="form.image_url"
+                                            <div class="col-12 col-sm-8">
+                                                <img class="custom-imag blog-preview" :src="form.image_url"
                                                     :alt="__('image')" />
                                             </div>
                                         </div>
@@ -240,8 +296,8 @@
                                     <div class="form-group">
                                         <label for="short_description">{{ __('short_description') }} <span
                                                 class="text-danger">*</span></label>
-                                        <div class="d-flex align-items-start">
-                                            <div class="flex-grow-1" style="margin-right: 10px;">
+                                        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start gap-2">
+                                            <div class="flex-grow-1">
                                                 <textarea class="form-control" id="short_description"
                                                     v-model="translations[lang.id].short_description" rows="3"
                                                     :placeholder="__('short_description')" required></textarea>
@@ -272,8 +328,7 @@
                                             @input="updateDescriptionValidation" :init="getEditorConfig()"
                                             :placeholder="__('enter_blog_description')" />
                                         <input type="text" id="description_validation" v-model="descriptionValidation"
-                                            class="form-control"
-                                            style="height: 2px; padding: 0; margin-top: 2px; font-size: 1px; line-height: 2px;"
+                                            class="form-control desc-validation-input"
                                             tabindex="-1" aria-label="Description validation" required />
                                     </div>
                                 </div>
@@ -418,8 +473,8 @@
                     </b-tab>
                 </b-tabs>
 
-                <div class="form-group d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary" @click="create_new = false; resetForm()">{{
+                <div class="d-flex justify-content-end gap-2 pt-3 mt-2 border-top modal-form-actions">
+                    <button type="button" class="btn btn-outline-secondary" @click="create_new = false; resetForm()">{{
                         __('cancel')
                     }}</button>
                     <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
@@ -437,9 +492,10 @@ import Editor from '@tinymce/tinymce-vue'
 import axios from 'axios';
 import Select2 from "v-select2-component";
 import TranslationHelper from '../../mixins/TranslationHelper.js';
+import ViewModeMixin from '../../mixins/ViewModeMixin';
 
 export default {
-    mixins: [TranslationHelper],
+    mixins: [TranslationHelper, ViewModeMixin],
     name: 'Blogs',
     components: {
         Editor
@@ -495,6 +551,8 @@ export default {
             ],
             perPage: 10,
             currentPage: 1,
+            // getBlogs() loads one page from the API (limit/page), so the grid shows the array as is
+            serverPagination: true,
             totalRows: 0,
             pageOptions: [5, 10, 15, 20, 25, 50, 100],
             descriptionValidation: '',
@@ -540,6 +598,10 @@ export default {
             });
         },
 
+        // Grid view rows: translatedBlogs with the list view's search (title/description) + sort applied
+        gridBlogs() {
+            return this.gridFilterSort(this.translatedBlogs, this.filterOn);
+        },
         translatedBlogs() {
             if (!this.currentLanguageId || !Array.isArray(this.blogs)) {
                 return this.blogs;
@@ -1080,6 +1142,7 @@ export default {
             }
         },
 
+        // Grid view: same client-side search (b-table :filter / :filter-included-fields) and sort as the list view.
         async deleteBlog(index, id) {
             this.$swal.fire({
                 title: __('are_you_sure'),
@@ -1088,8 +1151,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true;
@@ -1317,3 +1380,68 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+/* Invisible input that only carries the description "required" validation */
+.desc-validation-input {
+    height: 2px;
+    min-height: 0 !important; /* global inputs are 40px tall */
+    padding: 0;
+    margin-top: 2px;
+    border: 0;
+    font-size: 1px;
+    line-height: 2px;
+    opacity: 0;
+}
+
+.blog-thumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    aspect-ratio: 16 / 10;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius) !important;
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+    vertical-align: middle;
+}
+
+.blog-thumb-empty {
+    color: var(--ui-text-subtle);
+    font-size: 16px !important;
+}
+
+.blog-title {
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.blog-category-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 11px !important;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--theme-primary-700);
+    background: var(--ui-primary-soft);
+    border: 1px solid color-mix(in srgb, var(--theme-primary-500) 25%, transparent);
+    border-radius: var(--ui-radius-sm);
+}
+
+.blog-preview {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius-lg);
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
+
+.modal-form-actions {
+    border-color: var(--ui-border) !important;
+}
+</style>

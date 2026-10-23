@@ -83,13 +83,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -102,43 +95,35 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         key: 'name',
         label: __('name'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'order_id',
         label: __('order_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'type',
         label: __('type'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'txn_id',
         label: __('txn_id'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'amount',
         label: __('amount'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'message',
         label: __('message'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'transaction_date',
         label: __('transaction_date'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }, {
         key: 'status',
         label: __('status'),
-        sortable: true,
-        "class": 'text-center'
+        sortable: true
       }],
       totalRows: 1,
       currentPage: 1,
@@ -344,41 +329,31 @@ var render = function () {
                       "d-flex align-items-center gap-2 flex-grow-1 flex-wrap",
                   },
                   [
-                    _c(
-                      "div",
-                      {
-                        staticClass: "figma-search-container",
-                        staticStyle: { "min-width": "250px" },
-                      },
-                      [
-                        _c("i", { staticClass: "fa fa-search text-muted" }),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.filter,
-                              expression: "filter",
-                            },
-                          ],
-                          staticClass: "figma-search-input",
-                          attrs: {
-                            type: "text",
-                            placeholder: _vm.__("search"),
+                    _c("div", { staticClass: "figma-search-container" }, [
+                      _c("i", { staticClass: "fa fa-search text-muted" }),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.filter,
+                            expression: "filter",
                           },
-                          domProps: { value: _vm.filter },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.filter = $event.target.value
-                            },
+                        ],
+                        staticClass: "figma-search-input",
+                        attrs: { type: "text", placeholder: _vm.__("search") },
+                        domProps: { value: _vm.filter },
+                        on: {
+                          input: function ($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.filter = $event.target.value
                           },
-                        }),
-                      ]
-                    ),
+                        },
+                      }),
+                    ]),
                   ]
                 ),
                 _vm._v(" "),
@@ -420,26 +395,21 @@ var render = function () {
               "div",
               { staticClass: "table-responsive" },
               [
-                _c("b-table", {
-                  staticClass: "figma-table mb-0",
+                _c("data-table", {
                   attrs: {
                     items: _vm.transactions,
                     fields: _vm.fields,
-                    "current-page": _vm.currentPage,
-                    "per-page": _vm.perPage,
                     filter: _vm.filter,
                     "filter-included-fields": _vm.filterOn,
                     "sort-by": _vm.sortBy,
                     "sort-desc": _vm.sortDesc,
                     "sort-direction": _vm.sortDirection,
-                    bordered: false,
                     busy: _vm.isLoading,
-                    stacked: "md",
-                    "show-empty": "",
-                    small: "",
-                    "tbody-tr-class": function () {
-                      return "figma-tr align-middle"
-                    },
+                    "total-rows": _vm.totalRows,
+                    "current-page": _vm.currentPage,
+                    "per-page": _vm.perPage,
+                    "page-options": _vm.pageOptions,
+                    "local-paging": "",
                   },
                   on: {
                     "update:sortBy": function ($event) {
@@ -454,28 +424,20 @@ var render = function () {
                     "update:sort-desc": function ($event) {
                       _vm.sortDesc = $event
                     },
+                    "update:currentPage": function ($event) {
+                      _vm.currentPage = $event
+                    },
+                    "update:current-page": function ($event) {
+                      _vm.currentPage = $event
+                    },
+                    "update:perPage": function ($event) {
+                      _vm.perPage = $event
+                    },
+                    "update:per-page": function ($event) {
+                      _vm.perPage = $event
+                    },
                   },
                   scopedSlots: _vm._u([
-                    {
-                      key: "table-busy",
-                      fn: function () {
-                        return [
-                          _c(
-                            "div",
-                            { staticClass: "text-center text-black my-2" },
-                            [
-                              _c("b-spinner", { staticClass: "align-middle" }),
-                              _vm._v(" "),
-                              _c("strong", [
-                                _vm._v(_vm._s(_vm.__("loading")) + "..."),
-                              ]),
-                            ],
-                            1
-                          ),
-                        ]
-                      },
-                      proxy: true,
-                    },
                     {
                       key: "head(amount)",
                       fn: function (row) {
@@ -491,14 +453,79 @@ var render = function () {
                       },
                     },
                     {
+                      key: "cell(txn_id)",
+                      fn: function (row) {
+                        return [
+                          _c(
+                            "span",
+                            { staticClass: "small text-muted text-break" },
+                            [_vm._v(_vm._s(row.item.txn_id))]
+                          ),
+                        ]
+                      },
+                    },
+                    {
                       key: "cell(transaction_date)",
                       fn: function (row) {
                         return [
-                          _vm._v(
-                            "\n                                " +
-                              _vm._s(row.item.transaction_date) +
-                              "\n                            "
-                          ),
+                          _c("span", { staticClass: "text-nowrap" }, [
+                            _vm._v(_vm._s(row.item.transaction_date)),
+                          ]),
+                        ]
+                      },
+                    },
+                    {
+                      key: "cell(status)",
+                      fn: function (row) {
+                        return [
+                          row.item.status
+                            ? _c(
+                                "span",
+                                {
+                                  staticClass:
+                                    "figma-status-pill text-capitalize",
+                                  class: [
+                                    "success",
+                                    "settlement",
+                                    "capture",
+                                    "paid",
+                                    "completed",
+                                  ].includes(
+                                    String(row.item.status).toLowerCase()
+                                  )
+                                    ? "bg-success"
+                                    : [
+                                        "pending",
+                                        "awaiting_payment",
+                                        "processing",
+                                      ].includes(
+                                        String(row.item.status).toLowerCase()
+                                      )
+                                    ? "bg-warning"
+                                    : [
+                                        "failed",
+                                        "failure",
+                                        "cancel",
+                                        "cancelled",
+                                        "canceled",
+                                        "deny",
+                                        "expire",
+                                        "refund",
+                                      ].includes(
+                                        String(row.item.status).toLowerCase()
+                                      )
+                                    ? "bg-danger"
+                                    : "bg-info",
+                                },
+                                [
+                                  _vm._v(
+                                    "\n                                    " +
+                                      _vm._s(row.item.status) +
+                                      "\n                                "
+                                  ),
+                                ]
+                              )
+                            : _vm._e(),
                         ]
                       },
                     },
@@ -506,54 +533,6 @@ var render = function () {
                 }),
               ],
               1
-            ),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
-              [
-                _c("div", { staticClass: "showing-results-text small" }, [
-                  _vm._v(
-                    "\n                            " +
-                      _vm._s(_vm.__("Showing Result")) +
-                      " : "
-                  ),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.pageEnd)),
-                  ]),
-                  _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                  _c("span", { staticClass: "showing-bold" }, [
-                    _vm._v(_vm._s(_vm.totalRows)),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-flex align-items-center gap-3" },
-                  [
-                    _c("b-pagination", {
-                      staticClass: "figma-pagination mb-0",
-                      attrs: {
-                        "total-rows": _vm.totalRows,
-                        "per-page": _vm.perPage,
-                        align: "right",
-                        "hide-goto-end-buttons": "",
-                        "hide-ellipsis": "",
-                        "prev-text": "<",
-                        "next-text": ">",
-                      },
-                      model: {
-                        value: _vm.currentPage,
-                        callback: function ($$v) {
-                          _vm.currentPage = $$v
-                        },
-                        expression: "currentPage",
-                      },
-                    }),
-                  ],
-                  1
-                ),
-              ]
             ),
           ]),
         ]),

@@ -23,7 +23,7 @@
                         <div
                             class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
                             <div class="d-flex align-items-center gap-2 flex-grow-1 flex-wrap">
-                                <div class="figma-search-container" style="min-width: 250px;">
+                                <div class="figma-search-container">
                                     <i class="fa fa-search text-muted"></i>
                                     <input v-model="filter" type="text" class="figma-search-input"
                                         :placeholder="__('search')">
@@ -43,15 +43,22 @@
                                 :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false"
                                 :busy="isLoading" stacked="md" show-empty small class="figma-table mb-0"
                                 :tbody-tr-class="() => 'figma-tr align-middle'">
+<template #empty="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+</template>
+<template #emptyfiltered="scope">
+<div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+</template>
+
                                 <template #table-busy>
-                                    <div class="text-center text-black my-2">
+                                    <div class="text-center text-muted my-3">
                                         <b-spinner class="align-middle"></b-spinner>
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
                                 </template>
 
                                 <template #cell(created_at)="row">
-                                    {{ new Date(row.item.created_at).toLocaleString() }}
+                                    <span class="text-nowrap">{{ new Date(row.item.created_at).toLocaleString() }}</span>
                                 </template>
                                 <template #cell(actions)="row">
                                     <div class="d-flex gap-2">
@@ -64,12 +71,14 @@
 
                             </b-table>
                         </div>
-                        <div class="figma-table-footer flex-wrap gap-3 mt-4">
-                            <div class="showing-results-text small">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') }} <span
-                                    class="showing-bold">{{ totalRows
-                                    }}</span>
-                            </div>
+                        <div class="figma-table-footer flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+<div class="d-flex align-items-center gap-2">
+<label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+<b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+</div>
+<table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
+</div>
                             <div class="d-flex align-items-center gap-3">
                                 <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                     align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
@@ -89,9 +98,9 @@ export default {
         return {
             fields: [
                 { key: 'id', label: __('id'), sortable: true, sortDirection: 'desc' },
-                { key: 'product_name', label: __('product'), sortable: true, class: 'text-center' },
-                { key: 'total_qty', label: __('quantity'), sortable: true, class: 'text-center' },
-                { key: 'seller_name', label: __('seller'), sortable: true, class: 'text-center' },
+                { key: 'product_name', label: __('product'), sortable: true },
+                { key: 'total_qty', label: __('quantity'), sortable: true },
+                { key: 'seller_name', label: __('seller'), sortable: true },
                 { key: 'actions', label: __('actions') }
             ],
             totalRows: 1,

@@ -17,9 +17,11 @@
             </div>
 
             <section class="section">
-                <div class="figma-main-section-card mb-4">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4">{{ __('products_order_list') }}</h4>
+                <div class="figma-main-section-card mb-4 product-order-card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">{{ __('products_order_list') }}</h4>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
                         <b-row class="mb-4">
                             <b-col md="6" lg="5">
                                 <div class="figma-filter-group mb-2">
@@ -33,22 +35,16 @@
                                         </option>
                                     </select>
                                 </div>
-                                <span class="text-danger d-block font-size-13 mt-2">{{
+                                <span class="text-muted d-block small mt-1">{{
                                     __('select_a_categories_for_update_products_order_list') }}</span>
                             </b-col>
                         </b-row>
 
-                        <b-row v-if="list.length > 0" class="mb-4">
-                            <b-col md="6">
-                                <div class="d-flex align-items-center gap-4">
-                                    <div class="form-check form-switch mb-0">
-                                        <input type="checkbox" v-model="editable" class="form-check-input"
-                                            id="enableDragDrop">
-                                        <label class="form-check-label ms-1" for="enableDragDrop">
-                                            {{ __('enable_drag_and_drop') }}
-                                        </label>
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-figma-filter px-3" @click="orderList">
+                        <b-row v-if="list.length > 0" class="mb-3">
+                            <b-col lg="8">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <reorder-toggle v-model="editable"></reorder-toggle>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="orderList">
                                         <i class="fa fa-sort me-1"></i>
                                         {{ __('sort_by_original_order') }}
                                     </button>
@@ -58,7 +54,8 @@
 
                         <div v-if="list.length > 0">
                             <b-row>
-                                <b-col md="6" style="overflow-y:scroll;height:300px;">
+                                <b-col lg="8">
+                                    <div class="product-order-scroll">
 
                                     <ul id="sortable-row" class="list-group">
                                         <draggable class="list-group" tag="ul" v-model="list" v-bind="dragOptions"
@@ -66,43 +63,44 @@
                                             @end="isDragging = false" @change="updateList()">
 
                                             <li v-for="product in list" :key="product.row_order"
-                                                class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                                                class="list-group-item product-order-item d-flex justify-content-between align-items-center">
                                                 <div class="d-flex align-items-center flex-grow-1">
-                                                    <span class="order-number text-muted font-weight-bold text-end"
-                                                        style="width: 30px; margin-right: 8px;">{{ product.row_order
+                                                    <span class="order-number">{{ product.row_order
                                                         }}</span>
-                                                    <span class="text-muted" style="margin-right: 8px;">-</span>
-                                                    <span class="product-id text-muted text-end"
-                                                        style="width: 35px; margin-right: 12px;">{{ product.id }}</span>
-                                                    <div class="product-image-container d-flex align-items-center justify-content-center"
-                                                        style="width: 35px; height: 35px; margin-right: 12px; overflow: hidden; background-color: transparent;">
-                                                        <img :src="product.image_url"
-                                                            style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                                    <span class="product-id">#{{ product.id }}</span>
+                                                    <div class="product-image-container">
+                                                        <img :src="product.image_url" alt="">
                                                     </div>
                                                     <span
                                                         class="product-name font-weight-semibold text-start flex-grow-1">{{
                                                         getTranslatedProductName(product) }}</span>
                                                 </div>
-                                                <span class="drag-handle text-muted"><i class="fa fa-arrows"></i></span>
+                                                <span class="drag-handle"><i class="bi bi-grip-vertical"></i></span>
                                             </li>
 
                                         </draggable>
                                     </ul>
+                                    </div>
 
                                 </b-col>
                             </b-row>
-                            <div class="d-flex justify-content-end mt-4">
-                                <button type="button" @click="updateProductsOrder()" class="btn btn-primary px-5"
+                            <b-row>
+                            <b-col lg="8" class="d-flex justify-content-end mt-3">
+                                <button type="button" @click="updateProductsOrder()" class="btn btn-primary"
                                     :disabled="isLoading">
                                     <i class="fa fa-save me-2" v-if="!isLoading"></i>
                                     {{ __('save_order') }}
                                     <b-spinner v-if="isLoading" small label="Spinning" class="ms-2"></b-spinner>
                                 </button>
-                            </div>
+                            </b-col>
+                            </b-row>
                         </div>
 
                         <template v-if="list.length == 0 && category_id > 0">
-                            <span>{{ __('no_products_found') }}</span>
+                            <div class="product-order-empty">
+                                <i class="bi bi-box-seam"></i>
+                                <span>{{ __('no_products_found') }}</span>
+                            </div>
                         </template>
 
                     </div>
@@ -348,7 +346,7 @@ export default {
 
 .ghost {
     opacity: 0.5;
-    background: #c8ebfb;
+    background: var(--theme-info-100);
 }
 
 .list-group {
@@ -361,5 +359,120 @@ export default {
 
 .list-group-item i {
     cursor: pointer;
+}
+
+.product-order-card > .card-header {
+    padding: 14px 20px !important;
+    border-bottom: 1px solid var(--ui-border);
+    background: transparent;
+}
+
+.product-order-card > .card-header .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+/* Sortable list: bordered, scrolls inside its own box */
+.product-order-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-surface);
+}
+
+.product-order-scroll .list-group {
+    margin: 0;
+    padding: 0;
+}
+
+.product-order-scroll ::v-deep .product-order-item {
+    gap: 12px;
+    padding: 10px 14px;
+    border: 0;
+    border-bottom: 1px solid var(--ui-border);
+    border-radius: 0;
+    background: var(--ui-surface);
+    font-size: 13px;
+    color: var(--ui-text);
+}
+
+.product-order-scroll ::v-deep .product-order-item:last-child {
+    border-bottom: 0;
+}
+
+.product-order-scroll ::v-deep .product-order-item:hover {
+    background: var(--ui-primary-soft);
+}
+
+.product-order-scroll ::v-deep .order-number {
+    min-width: 28px;
+    height: 24px;
+    padding: 0 6px;
+    margin-inline-end: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--ui-radius-sm);
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.product-order-scroll ::v-deep .product-id {
+    min-width: 44px;
+    margin-inline-end: 10px;
+    font-size: 12px;
+    color: var(--ui-text-subtle);
+}
+
+.product-order-scroll ::v-deep .product-image-container {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    margin-inline-end: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface-muted);
+}
+
+.product-order-scroll ::v-deep .product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-order-scroll ::v-deep .product-name {
+    font-weight: 600;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.product-order-scroll ::v-deep .drag-handle {
+    color: var(--ui-text-subtle);
+    font-size: 16px;
+    cursor: grab;
+}
+
+.product-order-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 16px;
+    color: var(--ui-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.product-order-empty i {
+    font-size: 28px;
+    color: var(--ui-text-subtle);
 }
 </style>

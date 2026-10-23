@@ -1,17 +1,17 @@
 <template>
     <b-modal ref="modal" :title="modalTitle" @hidden="onModalHidden" no-fade static size="lg">
       <template #modal-footer>
+        <b-button variant="outline-secondary" class="mr-2" @click="hideModal">{{ __('cancel') }}</b-button>
         <b-button variant="primary" @click="saveRecord" :disabled="isLoading">
           {{ __('save') }}
           <b-spinner v-if="isLoading" small></b-spinner>
         </b-button>
-        <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
       </template>
   
       <div v-if="record">
        
         <!-- Clickable placeholders: click to insert at cursor position in title/message -->
-        <div v-if="placeholderKeys.length" class="py-2 mb-2 small">
+        <div v-if="placeholderKeys.length" class="py-2 mb-2 small text-muted">
           <strong>{{ __('placeholders') }}:</strong>
           {{ __('click_to_insert_at_cursor_location') }}
           <div class="mt-1">
@@ -19,7 +19,7 @@
               v-for="key in placeholderKeys"
               :key="key"
               type="button"
-              class="btn btn-sm btn-primary mr-1 mb-1 me-1"
+              class="btn btn-sm btn-outline-primary mr-1 mb-1"
               @click="insertPlaceholder(key)"
               v-text="placeholderSyntax(key)"
             ></button>

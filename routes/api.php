@@ -20,13 +20,16 @@ Route::post('reset-password', [\App\Http\Controllers\API\AdminAuthController::cl
 Route::get('system_languages', [\App\Http\Controllers\API\LanguageApiController::class, 'getSystemLanguages']);
 Route::get('active_languages', [\App\Http\Controllers\API\LanguageApiController::class, 'getActiveLanguages']);
 Route::get('theme', [\App\Http\Controllers\API\ThemeApiController::class, 'index']);
+Route::get('theme/admin', [\App\Http\Controllers\API\ThemeApiController::class, 'adminPanel']);
 
 Route::post('seller/register', [\App\Http\Controllers\API\AdminAuthController::class, 'sellerRegister']);
 Route::get('seller/privacy_policy', [\App\Http\Controllers\SellerController::class, 'getPrivacyPolicy']);
 Route::get('seller/cities', [\App\Http\Controllers\API\CityApiController::class, 'getCities']);
 
+Route::get('custom_fields/date_format', [\App\Http\Controllers\API\CustomFieldApiController::class, 'getDateFormat']);
 Route::get('custom_fields/list', [\App\Http\Controllers\API\CustomFieldApiController::class, 'getCustomFields']);
 
+Route::get('delivery_boy/sellers', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'registrationSellers']);
 Route::post('delivery_boy/register', [\App\Http\Controllers\API\AdminAuthController::class, 'deliveryBoyRegister']);
 
 Route::post('delivery_boy/privacy_policy', [\App\Http\Controllers\DeliveryBoyController::class, 'getPrivacyPolicy']);
@@ -57,11 +60,15 @@ Route::get('policies', [\App\Http\Controllers\SellerController::class, 'getPolic
 
 Route::get('modules', [\App\Http\Controllers\API\ModulesApiController::class, 'index']);
 
+// Public (no token): non-sensitive flags for partner apps before login
+Route::get('settings', [\App\Http\Controllers\Controller::class, 'getPublicSettings']);
+
 Route::middleware('auth:api')->group(function () {
     Route::post('modules/update', [\App\Http\Controllers\API\ModulesApiController::class, 'update'])->name('modules.update');
     Route::post('modules/updateOrder', [\App\Http\Controllers\API\ModulesApiController::class, 'updateModulesOrder'])->name('modules.updateOrder');
     Route::get('admin_settings', [\App\Http\Controllers\Controller::class, 'getAdminSettings']);
     Route::get('dashboard', [\App\Http\Controllers\Controller::class, 'index']);
+    Route::get('pending_counts', [\App\Http\Controllers\API\PendingCountsApiController::class, 'index']);
     Route::get('get_top_notifications', [\App\Http\Controllers\Controller::class, 'getTopNotifications']);
     Route::get('notification_read', [\App\Http\Controllers\Controller::class, 'markAsReadNotifications']);
     Route::get('create_slug/{text}', [\App\Http\Controllers\Controller::class, 'createSlug']);
@@ -257,8 +264,34 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/test_mail', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'testMail']);
     });
 
+    // Admin-panel map picker (City/Seller/SellerDetails location pickers) - dispatches
+    // to Google or OSM/Nominatim per the map_provider setting (StoreSettingsApiController).
+    Route::group(['prefix' => 'map'], function () {
+        Route::post('places_autocomplete', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'placesAutocomplete']);
+        Route::post('places_details', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'placesDetails']);
+        Route::post('geocode', [\App\Http\Controllers\API\StoreSettingsApiController::class, 'mapsGeocoding']);
+    });
+
+    Route::group(['prefix' => 'deeplink_settings'], function () {
+        Route::get('/', [\App\Http\Controllers\API\DeeplinkSettingsApiController::class, 'index']);
+        Route::post('save', [\App\Http\Controllers\API\DeeplinkSettingsApiController::class, 'save'])->name('deeplink_settings.save');
+    });
+
+    Route::group(['prefix' => 'realtime_settings'], function () {
+        Route::get('/', [\App\Http\Controllers\API\RealtimeSettingsApiController::class, 'index']);
+        Route::post('save', [\App\Http\Controllers\API\RealtimeSettingsApiController::class, 'save'])->name('realtime_settings.save');
+    });
+
+    Route::group(['prefix' => 'module_delivery_settings'], function () {
+        Route::get('/', [\App\Http\Controllers\API\ModuleDeliverySettingsApiController::class, 'list']);
+        // Auto-assign settings save disabled (the Seller Delivery Boys toggle below stays active)
+        // Route::post('save', [\App\Http\Controllers\API\ModuleDeliverySettingsApiController::class, 'save'])->name('module_delivery_settings.save');
+        Route::post('save_seller_own_drivers', [\App\Http\Controllers\API\ModuleDeliverySettingsApiController::class, 'saveSellerOwnDrivers'])->name('module_delivery_settings.save_seller_own_drivers');
+    });
+
     Route::group(['prefix' => 'theme'], function () {
         Route::post('save', [\App\Http\Controllers\API\ThemeApiController::class, 'save'])->name('theme.save');
+        Route::post('admin/save', [\App\Http\Controllers\API\ThemeApiController::class, 'saveAdminPanel'])->name('theme.save_admin_panel');
         Route::post('status/{type}', [\App\Http\Controllers\API\ThemeApiController::class, 'saveStatusColor'])->name('theme.save_status_color');
         Route::delete('status/{type}/reset', [\App\Http\Controllers\API\ThemeApiController::class, 'resetStatusColor'])->name('theme.reset_status_color');
     });
@@ -582,6 +615,27 @@ Route::middleware('auth:api')->group(function () {
         Route::get('settings', [\App\Http\Controllers\SellerController::class, 'getSettings']);
         Route::get('delivery_boys', [\App\Http\Controllers\SellerController::class, 'getDeliveryBoys']);
 
+        // Abandoned carts limited to this seller's own products.
+        Route::get('carts', [\App\Http\Controllers\API\CartsApiController::class, 'getSellerCarts']);
+        Route::delete('carts/{id}', [\App\Http\Controllers\API\CartsApiController::class, 'sellerDeleteCart'])->name('seller.carts.delete');
+
+        // Seller's own delivery-boy fleet (docs/auto-assign-delivery-boy-plan.md §2b) -
+        // distinct from the read-only shared-pool listing above.
+        Route::group(['prefix' => 'delivery_fleet'], function () {
+            Route::get('requests', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'requests']);
+            Route::post('respond-request', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'respondRequest'])->name('seller.delivery_fleet.respond_request');
+            Route::get('salary', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'salaries']);
+            Route::post('salary/save', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'saveSalary'])->name('seller.delivery_fleet.salary.save');
+            Route::post('salary/delete', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'deleteSalary'])->name('seller.delivery_fleet.salary.delete');
+            Route::get('status', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'status']);
+            Route::get('cities', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'cities']);
+            Route::get('/', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'list']);
+            Route::post('save', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'save'])->name('seller.delivery_fleet.save');
+            Route::post('update', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'update'])->name('seller.delivery_fleet.update');
+            Route::post('update-status', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'updateStatus'])->name('seller.delivery_fleet.update_status');
+            Route::post('delete', [\App\Http\Controllers\API\SellerDeliveryFleetApiController::class, 'delete'])->name('seller.delivery_fleet.delete');
+        });
+
         Route::get('main_categories', [\App\Http\Controllers\SellerController::class, 'getMainCategories']);
         Route::get('seller_categories', [\App\Http\Controllers\API\CategoryApiController::class, 'getSellerCategories']);
 
@@ -672,6 +726,17 @@ Route::middleware('auth:api')->group(function () {
         Route::get('city', [\App\Http\Controllers\API\Customer\BasicApiController::class, 'getCity']);
         Route::get('my_salary', [\App\Http\Controllers\API\DeliveryBoysApiController::class, 'getMySalary']);
 
+        // Auto-assign delivery boy (docs/auto-assign-delivery-boy-plan.md §1/§6/§7)
+        // Auto-assign delivery boy feature disabled
+        // Route::post('toggle_duty', [\App\Http\Controllers\DeliveryBoyController::class, 'toggleDuty'])->name('delivery_boy.toggle_duty');
+        Route::post('update_location', [\App\Http\Controllers\DeliveryBoyController::class, 'updateLocation'])->name('delivery_boy.update_location');
+        // Route::post('respond_assignment', [\App\Http\Controllers\DeliveryBoyController::class, 'respondAssignment'])->name('delivery_boy.respond_assignment');
+        // Route::get('current_offer', [\App\Http\Controllers\DeliveryBoyController::class, 'currentOffer'])->name('delivery_boy.current_offer');
+
+        // Requested Orders queue: all open offers for this delivery boy, accept / reject each
+        // Route::get('requested_orders', [\App\Http\Controllers\DeliveryBoyController::class, 'requestedOrders'])->name('delivery_boy.requested_orders');
+        // Route::post('requested_orders/respond', [\App\Http\Controllers\DeliveryBoyController::class, 'respondRequestedOrder'])->name('delivery_boy.requested_orders.respond');
+
         Route::group(['prefix' => 'mail_settings'], function () {
             Route::get('/', [\App\Http\Controllers\API\MailSettingsApiController::class, 'index']);
             Route::post('save', [\App\Http\Controllers\API\MailSettingsApiController::class, 'save'])->name('delivery_boy.mail_settings.save');
@@ -686,7 +751,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/return_requests', [\App\Http\Controllers\API\ReturnRequestsApiController::class, 'deliveryBoyIndex']);
         Route::get('return_request_by_id', [\App\Http\Controllers\API\ReturnRequestsApiController::class, 'returnRequestById']);
         Route::post('return_request_status_update', [\App\Http\Controllers\API\ReturnRequestsApiController::class, 'deliveryBoyUpdate'])->name('delivery_boy.return_requests.update');
-        Route::post('manage_live_tracking', [\App\Http\Controllers\DeliveryBoyController::class, 'manageLiveTracking'])->name('delivery_boy.manage_live_tracking');
+        Route::get('order_route', [\App\Http\Controllers\DeliveryBoyController::class, 'getOrderRoute'])->name('delivery_boy.order_route');
+        Route::get('live_tracking_route', [\App\Http\Controllers\DeliveryBoyController::class, 'getLiveTrackingRoute'])->name('delivery_boy.live_tracking_route');
     });
 
     Route::get('set_seller_wallet_transaction', [\App\Http\Controllers\Controller::class, 'setSellerWalletTransaction']);

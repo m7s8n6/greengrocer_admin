@@ -41,6 +41,25 @@ return [
             ],
         ],
 
+        // Overridden at runtime from the admin Realtime Settings page's saved credentials
+        // (see EventServiceProvider::configureBroadcasting()) once they're non-empty. The
+        // 'reverb' driver itself is only registered if the laravel/reverb composer package
+        // is installed - not installed in this app as of this stub, so selecting Reverb in
+        // the settings page without adding that package first will fail broadcasting (safely
+        // caught wherever an event is actually dispatched) rather than crash the request.
+        'reverb' => [
+            'driver' => 'reverb',
+            'key' => env('REVERB_APP_KEY'),
+            'secret' => env('REVERB_APP_SECRET'),
+            'app_id' => env('REVERB_APP_ID'),
+            'options' => [
+                'host' => env('REVERB_HOST', '127.0.0.1'),
+                'port' => env('REVERB_PORT', 8080),
+                'scheme' => env('REVERB_SCHEME', 'http'),
+                'useTLS' => env('REVERB_SCHEME', 'http') === 'https',
+            ],
+        ],
+
         'ably' => [
             'driver' => 'ably',
             'key' => env('ABLY_KEY'),

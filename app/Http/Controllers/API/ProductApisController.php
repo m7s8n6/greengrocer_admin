@@ -367,14 +367,21 @@ class ProductApisController extends Controller
                     $seller_category = Seller::where('slug', $seller_slug)->first(['categories']);
 
                     if (!empty($seller_category)) {
-                        $category = $seller_category['categories'];
-                        $data = explode(",", $category);
-                        $search = (in_array($category_id, $data, TRUE)) ? 1 : 2;
+                        // Sellers only ever have parent categories assigned, but products can be
+                        // filed under a child category - expand to the full descendant tree
+                        // before matching, so a valid child category isn't rejected.
+                        $sellerCategoryIds = array_filter(explode(",", $seller_category['categories']));
+                        $sellerCategoryTree = Category::with('catActiveChilds')
+                            ->where('status', 1)
+                            ->whereIn('id', $sellerCategoryIds)
+                            ->get()
+                            ->toArray();
+                        $sellerCategoryIdsExpanded = array_map('strval', CommonHelper::getCategoryChildIds($sellerCategoryTree));
+                        $search = (in_array((string) $category_id, $sellerCategoryIdsExpanded, TRUE)) ? 1 : 2;
                         if ($search == 2) {
                             return CommonHelper::responseError('no_products_found');
                         } else {
                             $where .= " AND s.`slug` = '$seller_slug' AND p.`category_id` IN (" . $category_id . ") ";
-                            Log::info('Seller Categories:', [$category]);
                         }
                     } else {
                         return CommonHelper::responseError('no_products_found');
@@ -398,24 +405,19 @@ class ProductApisController extends Controller
             if (isset($seller_id) && !empty($seller_id) && is_numeric($seller_id)) {
 
                 if (isset($request['category_id']) && !empty($request['category_id']) && is_numeric($request['category_id'])) {
-                    // dd([
-                    //     'seller_id' => $seller_id,
-                    //     'seller_category' => $seller_category,
-                    //     'categories_raw' => $seller_category->categories ?? null,
-                    // ]);
                     $seller_category = Seller::where('id', $seller_id)->first(['categories']);
                     if (!empty($seller_category)) {
-                        // $category = $seller_category['categories'];
-                        $category = $seller_category['categories'];
-
-                        $categoryArray = explode(',', $category);
-
-                        // dd([
-                        //     'raw_category' => $category,
-                        //     'category_array' => $categoryArray,
-                        // ]);
-                        $data = explode(",", $category);
-                        $search = (in_array($category_id, $data, TRUE)) ? 1 : 2;
+                        // Sellers only ever have parent categories assigned, but products can be
+                        // filed under a child category - expand to the full descendant tree
+                        // before matching, so a valid child category isn't rejected.
+                        $sellerCategoryIds = array_filter(explode(",", $seller_category['categories']));
+                        $sellerCategoryTree = Category::with('catActiveChilds')
+                            ->where('status', 1)
+                            ->whereIn('id', $sellerCategoryIds)
+                            ->get()
+                            ->toArray();
+                        $sellerCategoryIdsExpanded = array_map('strval', CommonHelper::getCategoryChildIds($sellerCategoryTree));
+                        $search = (in_array((string) $category_id, $sellerCategoryIdsExpanded, TRUE)) ? 1 : 2;
                         if ($search == 2) {
                             return CommonHelper::responseError('no_products_found');
                         } else {
@@ -465,7 +467,10 @@ class ProductApisController extends Controller
                 ->where('p.seller_id', $seller_id)
 
                 ->groupBy("p.id");
-            //  Safe category filter
+            //  Safe category filter - sellers only ever have parent categories assigned, but
+            // products can be filed under a child category, so expand to the full descendant
+            // tree before restricting, otherwise a seller's own child-category products would
+            // be excluded from their own product list.
             $seller_category = Seller::where('id', $seller_id)->first(['categories']);
 
             if (!empty($seller_category) && !empty($seller_category->categories)) {
@@ -473,8 +478,25 @@ class ProductApisController extends Controller
                 $categoryArray = array_filter(explode(',', $seller_category->categories));
 
                 if (!empty($categoryArray)) {
+                    $categoryTree = Category::with('catActiveChilds')
+                        ->where('status', 1)
+                        ->whereIn('id', $categoryArray)
+                        ->get()
+                        ->toArray();
+                    $categoryArray = CommonHelper::getCategoryChildIds($categoryTree);
                     $products->whereIn('p.category_id', $categoryArray);
                 }
+            }
+
+            // Narrow down to the specific requested category (already validated above to be
+            // within the seller's own category tree) instead of showing every category.
+            if (isset($request['category_id']) && !empty($request['category_id']) && is_numeric($request['category_id'])) {
+                $requestedCategoryTree = Category::with('catActiveChilds')
+                    ->where('status', 1)
+                    ->whereIn('id', [$category_id])
+                    ->get()
+                    ->toArray();
+                $products->whereIn('p.category_id', CommonHelper::getCategoryChildIds($requestedCategoryTree));
             }
 
             if (isset($request->min_price) && isset($request->max_price) && intval($request->max_price)) {
@@ -577,14 +599,30 @@ class ProductApisController extends Controller
                 DB::raw('MIN((select MIN(if(discounted_price > 0, discounted_price, price)) from product_variants where product_variants.product_id = p.id)) as min_price'),
                 DB::raw('MAX((select MAX(if(discounted_price > 0, discounted_price, price)) from product_variants where product_variants.product_id = p.id)) as max_price')
             )->leftJoin('product_variants as pv', 'pv.product_id', '=', 'p.id')->where('p.seller_id', $seller_id);
-            // ✅ Safe category filter for stats query
+            // Safe category filter for stats query - expand to descendants for the same reason
+            // as the products query above.
             if (!empty($seller_category) && !empty($seller_category->categories)) {
 
                 $categoryArray = array_filter(explode(',', $seller_category->categories));
 
                 if (!empty($categoryArray)) {
+                    $categoryTree = Category::with('catActiveChilds')
+                        ->where('status', 1)
+                        ->whereIn('id', $categoryArray)
+                        ->get()
+                        ->toArray();
+                    $categoryArray = CommonHelper::getCategoryChildIds($categoryTree);
                     $productSql->whereIn('p.category_id', $categoryArray);
                 }
+            }
+
+            if (isset($request['category_id']) && !empty($request['category_id']) && is_numeric($request['category_id'])) {
+                $requestedCategoryTree = Category::with('catActiveChilds')
+                    ->where('status', 1)
+                    ->whereIn('id', [$category_id])
+                    ->get()
+                    ->toArray();
+                $productSql->whereIn('p.category_id', CommonHelper::getCategoryChildIds($requestedCategoryTree));
             }
 
             if (isset($request->min_price) && isset($request->max_price) && intval($request->max_price)) {

@@ -94,8 +94,6 @@ class ProxyManager
      */
     private function getProxyForScheme(string $scheme): ?ProxyItem
     {
-        $scheme = strtolower($scheme);
-
         if ($scheme === 'http') {
             return $this->httpProxy;
         }

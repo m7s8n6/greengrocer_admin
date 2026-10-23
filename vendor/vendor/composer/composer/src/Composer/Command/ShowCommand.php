@@ -27,6 +27,7 @@ use Composer\Package\Version\VersionSelector;
 use Composer\Pcre\Preg;
 use Composer\Plugin\CommandEvent;
 use Composer\Plugin\PluginEvents;
+use Composer\Repository\ArrayRepository;
 use Composer\Repository\InstalledArrayRepository;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
@@ -72,7 +73,10 @@ class ShowCommand extends BaseCommand
     /** @var ?RepositorySet */
     private $repositorySet;
 
-    protected function configure(): void
+    /**
+     * @return void
+     */
+    protected function configure()
     {
         $this
             ->setName('show')
@@ -267,7 +271,7 @@ EOT
 
             if (!$installedRepo->getPackages()) {
                 $hasNonPlatformReqs = static function (array $reqs): bool {
-                    return (bool) array_filter(array_keys($reqs), static function (string $name) {
+                    return (bool) array_filter(array_keys($reqs), function (string $name) {
                         return !PlatformRepository::isPlatformPackage($name);
                     });
                 };
@@ -495,7 +499,7 @@ EOT
                 $hasOutdatedPackages = false;
 
                 if ($input->getOption('sort-by-age')) {
-                    usort($packages[$type], static function ($a, $b) {
+                    usort($packages[$type], function ($a, $b) {
                         if (is_object($a) && is_object($b)) {
                             return $a->getReleaseDate() <=> $b->getReleaseDate();
                         }
@@ -742,33 +746,14 @@ EOT
                 }
             }
             if (isset($package['description']) && $writeDescription) {
-                $description = (string) strtok($package['description'], "\r\n");
-
-                // Compute remaining width available for the description.
+                $description = strtok($package['description'], "\r\n");
                 $remaining = $width - $nameLength - $versionLength - $releaseDateLength - 4;
                 if ($writeLatest) {
                     $remaining -= $latestLength;
                 }
-
-                // If nothing fits, clear the description.
-                if ($remaining <= 0) {
-                    $description = '';
-                } elseif (extension_loaded('mbstring')) {
-                    // Use mb_strwidth/mb_strimwidth to measure and trim by display width
-                    // (CJK characters count as width 2). mb_strimwidth counts the trim
-                    // marker ('...') in the width parameter, so pass $remaining directly.
-                    if (mb_strwidth($description, 'UTF-8') > $remaining) {
-                        $description = mb_strimwidth($description, 0, $remaining, '...', 'UTF-8');
-                    }
-                } else {
-                    // Fallback when mbstring is not available: do a conservative byte-based cut.
-                    // Ensure cut length is non-negative and leave room for the ellipsis.
-                    $cut = max(0, $remaining - 3);
-                    if (strlen($description) > $cut) {
-                        $description = substr($description, 0, $cut) . '...';
-                    }
+                if (strlen($description) > $remaining) {
+                    $description = substr($description, 0, $remaining - 3) . '...';
                 }
-
                 $io->write(' ' . $description, false);
             }
             if (array_key_exists('path', $package)) {
@@ -991,6 +976,8 @@ EOT
 
     /**
      * print link objects
+     *
+     * @param string                   $title
      */
     protected function printLinks(CompletePackageInterface $package, string $linkType, ?string $title = null): void
     {
@@ -1522,7 +1509,6 @@ EOT
                 if (str_starts_with($candidate->getVersion(), 'dev-') || str_starts_with($package->getVersion(), 'dev-')) {
                     return false;
                 }
-
                 return version_compare($candidate->getVersion(), $package->getVersion(), '<=');
             };
         }
@@ -1544,7 +1530,7 @@ EOT
         return $this->repositorySet;
     }
 
-    private function getRelativeTime(DateTimeInterface $releaseDate): string
+    private function getRelativeTime(\DateTimeInterface $releaseDate): string
     {
         if ($releaseDate->format('Ymd') === date('Ymd')) {
             return 'today';

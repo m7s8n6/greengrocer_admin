@@ -57,9 +57,21 @@ class ThemeApiController extends Controller
     {
         $modules = \App\Models\Module::orderBy('id')->get(['id', 'name', 'slug', 'is_default']);
 
+        // A module that never saved its own colors uses the default module's colors instead of
+        // the built-in seeds, so every module looks like the brand out of the box.
+        $defaultModule = $modules->firstWhere('is_default', 1) ?? $modules->first();
+        $defaultPayload = $defaultModule ? $this->theme->buildThemePayload($defaultModule->id, false) : null;
+
         $data = [];
         foreach ($modules as $module) {
             $payload = $this->theme->buildThemePayload($module->id, (bool) $module->is_default);
+            $usesDefault = $defaultPayload && $module->id !== $defaultModule->id && !$this->theme->hasOwnColors($module->id);
+            if ($usesDefault) {
+                foreach (['seed_primary', 'seed_neutral', 'primary', 'neutral'] as $key) {
+                    $payload[$key] = $defaultPayload[$key];
+                }
+            }
+            $payload['uses_default_colors'] = $usesDefault;
             $payload['module_id'] = $module->id;
             $payload['module_name'] = $module->name;
             $payload['module_slug'] = $module->slug;
@@ -68,6 +80,42 @@ class ThemeApiController extends Controller
         }
 
         return CommonHelper::responseWithData($data, count($data));
+    }
+
+    /**
+     * Admin panel colours (global, all modules): whether the admin panel follows each module's
+     * theme, and its own palette when it doesn't. Public like index() — the panel paints its
+     * colours before login. Website and apps keep using index() only.
+     */
+    public function adminPanel()
+    {
+        return CommonHelper::responseWithData($this->theme->getAdminPanelTheme());
+    }
+
+    /**
+     * Admin — save the admin panel colour choice. use_module_theme = 1 follows the module themes;
+     * 0 requires a primary and a neutral seed for the admin panel's own palette.
+     */
+    public function saveAdminPanel(Request $request)
+    {
+        $useModule = filter_var($request->input('use_module_theme', true), FILTER_VALIDATE_BOOLEAN);
+
+        if (!$useModule) {
+            $validator = Validator::make($request->all(), [
+                'seed_primary' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+                'seed_neutral' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            ]);
+            if ($validator->fails()) {
+                return CommonHelper::responseError($validator->errors()->first());
+            }
+            if ($this->isTooLight($request->seed_neutral)) {
+                return CommonHelper::responseError(__('neutral_color_too_light_warning'));
+            }
+        }
+
+        $data = $this->theme->saveAdminPanelTheme($useModule, $request->seed_primary, $request->seed_neutral);
+
+        return CommonHelper::responseSuccessWithData(__('theme_updated_successfully'), $data);
     }
 
     /**

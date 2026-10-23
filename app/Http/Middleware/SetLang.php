@@ -221,6 +221,7 @@ class SetLang
             'theme.save',
             'theme.save_status_color',
             'theme.reset_status_color',
+            'theme.save_admin_panel',
             'addons.save',
             'addons.update',
             'addons.delete',
@@ -244,7 +245,23 @@ class SetLang
             'seller.return_requests.update',
             'seller.return_requests.delete',
             'delivery_boy.return_requests.update',
-            'seller.brands.save'
+            'seller.brands.save',
+            'admin.env.add',
+            'admin.env.update',
+            'admin.env.delete',
+            'admin.env.upload',
+            'deeplink_settings.save',
+            'module_delivery_settings.save',
+            'module_delivery_settings.save_seller_own_drivers',
+            'realtime_settings.save',
+            'seller.delivery_fleet.save',
+            'seller.delivery_fleet.update',
+            'seller.delivery_fleet.update_status',
+            'seller.delivery_fleet.delete',
+            'seller.delivery_fleet.respond_request',
+            'seller.delivery_fleet.salary.save',
+            'seller.delivery_fleet.salary.delete',
+            'seller.carts.delete'   
         );
         $route = Route::getRoutes()->match($request);
         $currentRoute = $route->getName() ?? '';

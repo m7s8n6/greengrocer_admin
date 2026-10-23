@@ -974,6 +974,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 
 // import InputTag from 'vue-input-tag';
@@ -1850,8 +1851,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             cancelButtonText: __('cancel'),
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#37a279',
-            cancelButtonColor: '#d33'
+            confirmButtonColor: 'var(--theme-primary-500)',
+            cancelButtonColor: 'var(--theme-error-500)'
           }).then(function (result) {
             if (result.value) {
               _this21.applyAttributeValueToggle(attributeId, valueId, current, idx);
@@ -2007,8 +2008,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           cancelButtonText: __('cancel'),
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#37a279',
-          cancelButtonColor: '#d33'
+          confirmButtonColor: 'var(--theme-primary-500)',
+          cancelButtonColor: 'var(--theme-error-500)'
         }).then(function (result) {
           if (result.value) {
             var postData = {
@@ -2030,7 +2031,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   text: __('this_was_the_last_variant_the_product_has_been_deleted_please_add_it_as_a_new_product'),
                   icon: 'warning',
                   confirmButtonText: __('ok'),
-                  confirmButtonColor: '#37a279'
+                  confirmButtonColor: 'var(--theme-primary-500)'
                 }).then(function () {
                   var _this24$loggedUser, _this24$loggedUser$ro;
                   _this24.$router.push({
@@ -2985,7 +2986,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
               title: __('some_variants_were_kept') || 'Some variants were kept',
               text: (__('these_variants_have_order_history_and_were_not_removed') || 'These variants are tied to past orders and were not removed') + ': ' + keptVariants.join(', '),
               icon: 'info',
-              confirmButtonColor: '#37a279'
+              confirmButtonColor: 'var(--theme-primary-500)'
             }).then(function () {
               redirectAfterSave();
             });
@@ -3015,8 +3016,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           _this39.deleteImageIds.push(id);
@@ -3155,8 +3156,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.value) {
           if (_this41.$refs['my-form']) _this41.$refs['my-form'].reset();
@@ -3740,7 +3741,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n/* AI Generate Button Styles */\n.ai-generate-btn[data-v-a901b314] {\n    position: relative;\n    min-width: 200px;\n    transition: all 0.3s ease;\n}\n.ai-generate-btn[data-v-a901b314]:disabled {\n    opacity: 0.9;\n    cursor: not-allowed;\n    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);\n    border-color: #667eea;\n    color: white;\n}\n\n/* AI Spinner Animation */\n.ai-spinner[data-v-a901b314] {\n    display: inline-block;\n    width: 16px;\n    height: 16px;\n    border: 2px solid rgba(255, 255, 255, 0.3);\n    border-radius: 50%;\n    border-top-color: #fff;\n    animation: ai-spin-data-v-a901b314 0.8s ease-in-out infinite;\n}\n@keyframes ai-spin-data-v-a901b314 {\nto {\n        transform: rotate(360deg);\n}\n}\n\n/* AI Text Animation - Pulsing effect */\n.ai-text-animate[data-v-a901b314] {\n    animation: ai-pulse-data-v-a901b314 1.5s ease-in-out infinite;\n}\n@keyframes ai-pulse-data-v-a901b314 {\n0%,\n    100% {\n        opacity: 1;\n}\n50% {\n        opacity: 0.6;\n}\n}\n.variant-image-preview-list[data-v-a901b314] {\n    gap: 8px;\n    margin-top: 8px;\n}\n.variant-image-preview-item[data-v-a901b314] {\n    position: relative;\n    width: 90px;\n    cursor: grab;\n}\n.variant-image-preview-item[data-v-a901b314]:active {\n    cursor: grabbing;\n}\n.variant-image-preview-item .custom-image[data-v-a901b314] {\n    width: 90px;\n    height: 90px;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.variant-image-preview-item .btn-remove[data-v-a901b314] {\n    position: absolute;\n    top: -8px;\n    right: -8px;\n    padding: 0;\n    width: 18px;\n    height: 18px;\n    line-height: 1;\n    border: none;\n    background: transparent;\n    color: #dc3545;\n    font-size: 16px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* AI Generate Button Styles */\n.ai-generate-btn[data-v-a901b314] {\n    position: relative;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    transition: all 0.3s ease;\n}\n.ai-generate-btn[data-v-a901b314]:disabled {\n    opacity: 0.9;\n    cursor: not-allowed;\n    background: linear-gradient(90deg, var(--theme-primary-500) 0%, var(--theme-primary-600) 100%);\n    border-color: var(--theme-primary-500);\n    color: var(--theme-neutral-50);\n}\n\n/* AI Spinner Animation */\n.ai-spinner[data-v-a901b314] {\n    display: inline-block;\n    width: 16px;\n    height: 16px;\n    border: 2px solid color-mix(in srgb, var(--theme-neutral-50) 30%, transparent);\n    border-radius: 50%;\n    border-top-color: var(--theme-neutral-50);\n    animation: ai-spin-data-v-a901b314 0.8s ease-in-out infinite;\n}\n@keyframes ai-spin-data-v-a901b314 {\nto {\n        transform: rotate(360deg);\n}\n}\n\n/* AI Text Animation - Pulsing effect */\n.ai-text-animate[data-v-a901b314] {\n    animation: ai-pulse-data-v-a901b314 1.5s ease-in-out infinite;\n}\n@keyframes ai-pulse-data-v-a901b314 {\n0%,\n    100% {\n        opacity: 1;\n}\n50% {\n        opacity: 0.6;\n}\n}\n.variant-image-preview-list[data-v-a901b314] {\n    gap: 8px;\n    margin-top: 8px;\n}\n.variant-image-preview-item[data-v-a901b314] {\n    position: relative;\n    width: 90px;\n    cursor: grab;\n}\n.variant-image-preview-item[data-v-a901b314]:active {\n    cursor: grabbing;\n}\n.variant-image-preview-item .custom-image[data-v-a901b314] {\n    width: 90px;\n    height: 90px;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.variant-image-preview-item .btn-remove[data-v-a901b314] {\n    position: absolute;\n    top: -8px;\n    right: -8px;\n    padding: 0;\n    width: 18px;\n    height: 18px;\n    line-height: 1;\n    border: none;\n    background: transparent;\n    color: var(--theme-error-500);\n    font-size: 16px;\n}\n\n/* ===== Redesign: sectioned form (cards with header, 2-col grid, sticky actions) ===== */\n.product-form-page .card[data-v-a901b314] {\n    margin-bottom: 20px;\n}\n.product-form-page .card > .card-header h4[data-v-a901b314] {\n    font-size: 16px;\n    font-weight: 700;\n    color: var(--ui-heading);\n    margin-bottom: 0;\n}\n.product-form-page .form-group > label[data-v-a901b314],\n.product-form-page .form-group > div > label[data-v-a901b314],\n.product-form-page .form-group label.control-label[data-v-a901b314] {\n    display: inline-block;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ui-text);\n    margin-bottom: 6px;\n}\n\n/* Language tabs: underline style */\n.product-form-page[data-v-a901b314]  .product-lang-tabs .nav-tabs {\n    border-bottom: 1px solid var(--ui-border);\n    flex-wrap: nowrap;\n    overflow-x: auto;\n    overflow-y: hidden;\n}\n.product-form-page[data-v-a901b314]  .product-lang-tabs .nav-tabs .nav-link {\n    white-space: nowrap;\n    font-size: 14px;\n    font-weight: 600;\n    padding: 10px 14px;\n    margin-bottom: -1px;\n}\n.product-form-page[data-v-a901b314]  .product-lang-tabs .nav-tabs .nav-link .text-primary {\n    color: inherit !important;\n}\n.product-form-page[data-v-a901b314]  .product-lang-tabs .nav-tabs .nav-link.active .text-primary,\n.product-form-page[data-v-a901b314]  .product-lang-tabs .nav-tabs .nav-link.active {\n    color: var(--theme-primary-600) !important;\n}\n\n/* Approved / not approved toggle: shared .segmented-toggle (custom-egrocer.scss) */\n\n/* Variants card: sub-sections and the active variant panel */\n.product-form-subsection[data-v-a901b314] {\n    padding-top: 16px;\n    margin-top: 8px;\n    border-top: 1px solid var(--ui-border);\n}\n.product-form-subsection h5[data-v-a901b314] {\n    font-size: 14px;\n    font-weight: 700;\n    color: var(--ui-heading);\n}\n.product-variant-panel[data-v-a901b314] {\n    border: 1px solid var(--ui-border) !important;\n    border-radius: var(--ui-radius-lg) !important;\n    background: var(--ui-surface-muted);\n    padding: 16px;\n}\n.product-variants-body[data-v-a901b314]  .btn-group-toggle .btn,\n.product-form-page[data-v-a901b314]  .btn-group-toggle .btn {\n    font-size: 13px;\n    padding: 8px 14px;\n}\n\n/* Form actions: bottom-right, kept in view while scrolling a long card */\n.product-form-actions[data-v-a901b314] {\n    position: sticky;\n    bottom: 0;\n    z-index: 5;\n    display: flex;\n    justify-content: flex-end;\n    align-items: center;\n    gap: 8px;\n    background: var(--ui-surface) !important;\n    border-radius: 0 0 var(--ui-radius-lg) var(--ui-radius-lg) !important;\n    box-shadow: 0 -6px 16px color-mix(in srgb, var(--theme-neutral-900) 6%, transparent);\n}\n.product-form-actions .btn[data-v-a901b314] {\n    min-width: 96px;\n}\n@media (max-width: 575.98px) {\n.product-form-actions .btn[data-v-a901b314] {\n        flex: 1 1 0;\n        min-width: 0;\n}\n.product-form-header-action .btn[data-v-a901b314] {\n        white-space: nowrap;\n}\n.ai-generate-btn[data-v-a901b314] {\n        width: 100%;\n        justify-content: center;\n        margin-right: 0 !important;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3904,12 +3905,12 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
+  return _c("div", { staticClass: "product-form-page" }, [
     _c(
       "div",
       {
         staticClass:
-          "page-heading d-flex justify-content-between align-items-center mb-4",
+          "page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4",
       },
       [
         _c(
@@ -4065,75 +4066,84 @@ var render = function () {
             },
             [
               _c("div", { staticClass: "card" }, [
-                _c("div", { staticClass: "card-header" }, [
-                  _c(
-                    "h4",
-                    [
-                      _vm.clone
-                        ? [_vm._v(_vm._s(_vm.__("clone")))]
-                        : _vm.id
-                        ? [_vm._v(_vm._s(_vm.__("edit")))]
-                        : [_vm._v(_vm._s(_vm.__("add")))],
-                      _vm._v(" " + _vm._s(_vm.__("product"))),
-                    ],
-                    2
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "span",
-                    { staticClass: "pull-right" },
-                    [
-                      _vm.isSellerRole
-                        ? [
-                            _c(
-                              "router-link",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "card-header d-flex justify-content-between align-items-center flex-wrap gap-2",
+                  },
+                  [
+                    _c(
+                      "h4",
+                      [
+                        _vm.clone
+                          ? [_vm._v(_vm._s(_vm.__("clone")))]
+                          : _vm.id
+                          ? [_vm._v(_vm._s(_vm.__("edit")))]
+                          : [_vm._v(_vm._s(_vm.__("add")))],
+                        _vm._v(" " + _vm._s(_vm.__("product"))),
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "span",
+                      { staticClass: "product-form-header-action" },
+                      [
+                        _vm.isSellerRole
+                          ? [
+                              _c(
+                                "router-link",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass:
+                                    "btn btn-sm btn-outline-secondary",
+                                  attrs: {
+                                    to: "/seller/manage_products",
+                                    title: "Manage Product",
                                   },
-                                ],
-                                staticClass: "btn btn-primary",
-                                attrs: {
-                                  to: "/seller/manage_products",
-                                  title: "Manage Product",
                                 },
-                              },
-                              [_vm._v(_vm._s(_vm.__("manage_products")))]
-                            ),
-                          ]
-                        : [
-                            _c(
-                              "router-link",
-                              {
-                                directives: [
-                                  {
-                                    name: "b-tooltip",
-                                    rawName: "v-b-tooltip.hover",
-                                    modifiers: { hover: true },
+                                [_vm._v(_vm._s(_vm.__("manage_products")))]
+                              ),
+                            ]
+                          : [
+                              _c(
+                                "router-link",
+                                {
+                                  directives: [
+                                    {
+                                      name: "b-tooltip",
+                                      rawName: "v-b-tooltip.hover",
+                                      modifiers: { hover: true },
+                                    },
+                                  ],
+                                  staticClass:
+                                    "btn btn-sm btn-outline-secondary",
+                                  attrs: {
+                                    to: "/manage_products",
+                                    title: "Manage Product",
                                   },
-                                ],
-                                staticClass: "btn btn-primary",
-                                attrs: {
-                                  to: "/manage_products",
-                                  title: "Manage Product",
                                 },
-                              },
-                              [_vm._v(_vm._s(_vm.__("manage_products")))]
-                            ),
-                          ],
-                    ],
-                    2
-                  ),
-                ]),
+                                [_vm._v(_vm._s(_vm.__("manage_products")))]
+                              ),
+                            ],
+                      ],
+                      2
+                    ),
+                  ]
+                ),
                 _vm._v(" "),
                 _c("div", { staticClass: "card-body" }, [
                   _vm.languages.length > 0
                     ? _c(
                         "div",
-                        { staticClass: "col-md-12 mb-3" },
+                        { staticClass: "mb-3 product-lang-tabs" },
                         [
                           _c(
                             "b-tabs",
@@ -4190,7 +4200,10 @@ var render = function () {
                                   _vm.languages.length > 1
                                     ? _c(
                                         "div",
-                                        { staticClass: "mb-3" },
+                                        {
+                                          staticClass:
+                                            "mb-3 d-flex flex-wrap align-items-center gap-2 product-translate-actions",
+                                        },
                                         [
                                           _c(
                                             "b-button",
@@ -4202,7 +4215,6 @@ var render = function () {
                                                   modifiers: { hover: true },
                                                 },
                                               ],
-                                              staticClass: "mr-2",
                                               attrs: {
                                                 size: "sm",
                                                 variant: "outline-primary",
@@ -4286,7 +4298,7 @@ var render = function () {
                                                 "div",
                                                 {
                                                   staticClass:
-                                                    "text-success mt-2 font-weight-bold",
+                                                    "text-success small w-100 font-weight-bold",
                                                 },
                                                 [
                                                   _vm._v(
@@ -5078,7 +5090,7 @@ var render = function () {
                                                             "button",
                                                             {
                                                               staticClass:
-                                                                "btn btn-outline-primary me-3 my-2 ai-generate-btn",
+                                                                "btn btn-sm btn-outline-primary me-3 my-2 ai-generate-btn",
                                                               attrs: {
                                                                 type: "button",
                                                                 disabled:
@@ -5602,7 +5614,7 @@ var render = function () {
                   _vm.languages.length > 0
                     ? _c(
                         "div",
-                        { staticClass: "col-md-12 mb-3" },
+                        { staticClass: "mb-3 product-lang-tabs" },
                         [
                           _c(
                             "b-tabs",
@@ -5972,8 +5984,18 @@ var render = function () {
                 !_vm.languages[_vm.activeLanguageTab].is_default
                   ? _c(
                       "div",
-                      { staticClass: "card-footer" },
+                      { staticClass: "card-footer product-form-actions" },
                       [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-outline-secondary",
+                            attrs: { type: "button" },
+                            on: { click: _vm.clearForm },
+                          },
+                          [_vm._v(_vm._s(_vm.__("clear")))]
+                        ),
+                        _vm._v(" "),
                         _c(
                           "b-button",
                           {
@@ -6014,16 +6036,6 @@ var render = function () {
                           ],
                           1
                         ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger",
-                            attrs: { type: "button" },
-                            on: { click: _vm.clearForm },
-                          },
-                          [_vm._v(_vm._s(_vm.__("clear")))]
-                        ),
                       ],
                       1
                     )
@@ -6040,7 +6052,7 @@ var render = function () {
                     _vm._v(" "),
                     _c("div", { staticClass: "card-body" }, [
                       _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6" }, [
                           _c(
                             "div",
                             { staticClass: "form-group mb-3" },
@@ -6077,7 +6089,7 @@ var render = function () {
                         _vm._v(" "),
                         _c(
                           "div",
-                          { staticClass: "col-md-4" },
+                          { staticClass: "col-md-6" },
                           [
                             _vm.isSellerRole
                               ? [
@@ -6117,14 +6129,19 @@ var render = function () {
                                       _c(
                                         "div",
                                         {
-                                          staticClass: "btn-group",
+                                          staticClass:
+                                            "btn-group btn-group-toggle segmented-toggle product-status-toggle",
                                           attrs: { id: "status" },
                                         },
                                         [
                                           _c(
                                             "label",
                                             {
-                                              staticClass: "btn btn-primary",
+                                              staticClass: "btn",
+                                              class:
+                                                _vm.is_approved == 1
+                                                  ? "btn-success"
+                                                  : "btn-outline-secondary",
                                               attrs: {
                                                 "data-toggle-class":
                                                   "btn-primary",
@@ -6169,7 +6186,11 @@ var render = function () {
                                           _c(
                                             "label",
                                             {
-                                              staticClass: "btn btn-danger",
+                                              staticClass: "btn",
+                                              class:
+                                                _vm.is_approved == 0
+                                                  ? "btn-danger"
+                                                  : "btn-outline-secondary",
                                               attrs: {
                                                 "data-toggle-class":
                                                   "btn-danger",
@@ -6359,7 +6380,7 @@ var render = function () {
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6" }, [
                           _c("div", { staticClass: "form-group mb-3" }, [
                             _c("label", { attrs: { for: "barcode" } }, [
                               _vm._v(_vm._s(_vm.__("barcode"))),
@@ -6397,14 +6418,16 @@ var render = function () {
                             _vm.validationBarcodeMessage
                               ? _c(
                                   "p",
-                                  { staticStyle: { color: "red !important" } },
+                                  {
+                                    staticClass: "small text-danger mt-1 mb-0",
+                                  },
                                   [_vm._v(_vm._s(_vm.validationBarcodeMessage))]
                                 )
                               : _vm.isBarcodeValid
                               ? _c(
                                   "p",
                                   {
-                                    staticStyle: { color: "green !important" },
+                                    staticClass: "small text-success mt-1 mb-0",
                                   },
                                   [
                                     _vm._v(
@@ -6416,7 +6439,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6" }, [
                           _c("div", { staticClass: "form-group mb-3" }, [
                             _c(
                               "label",
@@ -6461,7 +6484,7 @@ var render = function () {
                           ]),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6 col-xl-4" }, [
                           _c(
                             "div",
                             {
@@ -6550,7 +6573,7 @@ var render = function () {
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6 col-xl-4" }, [
                           _c(
                             "div",
                             {
@@ -6687,7 +6710,7 @@ var render = function () {
                           ),
                         ]),
                         _vm._v(" "),
-                        _c("div", { staticClass: "col-md-4" }, [
+                        _c("div", { staticClass: "col-md-6 col-xl-4" }, [
                           _c(
                             "div",
                             { staticClass: "form-group mb-3" },
@@ -6720,7 +6743,7 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         _vm.isPharmacyModule
-                          ? _c("div", { staticClass: "col-md-4" }, [
+                          ? _c("div", { staticClass: "col-md-6 col-xl-4" }, [
                               _c(
                                 "div",
                                 { staticClass: "form-group mb-3" },
@@ -6797,7 +6820,7 @@ var render = function () {
                             "div",
                             {
                               key: field.id,
-                              staticClass: "form-group col-md-4",
+                              staticClass: "form-group mb-3 col-md-6",
                             },
                             [
                               _c("label", [
@@ -6943,6 +6966,21 @@ var render = function () {
                                         )
                                       : _vm._e(),
                                   ]
+                                : field.type === "date"
+                                ? _c("custom-field-date", {
+                                    attrs: { placeholder: field.name },
+                                    model: {
+                                      value: _vm.customFieldValues[field.id],
+                                      callback: function ($$v) {
+                                        _vm.$set(
+                                          _vm.customFieldValues,
+                                          field.id,
+                                          $$v
+                                        )
+                                      },
+                                      expression: "customFieldValues[field.id]",
+                                    },
+                                  })
                                 : (field.type === "number"
                                     ? "number"
                                     : "text") === "checkbox"
@@ -7095,13 +7133,13 @@ var render = function () {
                     _vm._v(" "),
                     _c(
                       "div",
-                      { staticClass: "card-body" },
+                      { staticClass: "card-body product-variants-body" },
                       [
-                        _c("div", { staticClass: "col-md-6" }, [
-                          _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "row" }, [
+                          _c("div", { staticClass: "col-md-6" }, [
                             _c(
                               "div",
-                              { staticClass: "form-group col-md-6" },
+                              { staticClass: "form-group mb-3" },
                               [
                                 _c("label", { staticClass: "control-label" }, [
                                   _vm._v(_vm._s(_vm.__("stock_limit")) + " "),
@@ -7132,42 +7170,42 @@ var render = function () {
                               1
                             ),
                           ]),
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-12" }, [
-                          _c(
-                            "div",
-                            { staticClass: "form-group mb-3" },
-                            [
-                              _c("label", [_vm._v(_vm._s(_vm.__("images")))]),
-                              _c("br"),
-                              _vm._v(" "),
-                              _c("b-form-radio-group", {
-                                attrs: {
-                                  options: [
-                                    {
-                                      text: _vm.__("global_images"),
-                                      value: "global",
-                                    },
-                                    {
-                                      text: _vm.__("variant_wise_images"),
-                                      value: "variant",
-                                    },
-                                  ],
-                                  buttons: "",
-                                  "button-variant": "outline-primary",
-                                },
-                                model: {
-                                  value: _vm.image_mode,
-                                  callback: function ($$v) {
-                                    _vm.image_mode = $$v
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-6" }, [
+                            _c(
+                              "div",
+                              { staticClass: "form-group mb-3" },
+                              [
+                                _c("label", [_vm._v(_vm._s(_vm.__("images")))]),
+                                _c("br"),
+                                _vm._v(" "),
+                                _c("b-form-radio-group", {
+                                  attrs: {
+                                    options: [
+                                      {
+                                        text: _vm.__("global_images"),
+                                        value: "global",
+                                      },
+                                      {
+                                        text: _vm.__("variant_wise_images"),
+                                        value: "variant",
+                                      },
+                                    ],
+                                    buttons: "",
+                                    "button-variant": "outline-primary",
                                   },
-                                  expression: "image_mode",
-                                },
-                              }),
-                            ],
-                            1
-                          ),
+                                  model: {
+                                    value: _vm.image_mode,
+                                    callback: function ($$v) {
+                                      _vm.image_mode = $$v
+                                    },
+                                    expression: "image_mode",
+                                  },
+                                }),
+                              ],
+                              1
+                            ),
+                          ]),
                         ]),
                         _vm._v(" "),
                         _vm.image_mode === "global"
@@ -7543,7 +7581,7 @@ var render = function () {
                         _vm._v(" "),
                         _vm.attributeOptions.length === 0 &&
                         !_vm.isLoadingAttributes
-                          ? _c("div", { staticClass: "col-md-12" }, [
+                          ? _c("div", [
                               _c("p", { staticClass: "text-danger mb-2" }, [
                                 _vm._v(
                                   "\n                                    " +
@@ -7563,7 +7601,7 @@ var render = function () {
                         _vm.attributeOptions.length
                           ? _c(
                               "div",
-                              { staticClass: "col-md-12" },
+                              { staticClass: "product-form-subsection" },
                               [
                                 _c("h5", { staticClass: "mb-1" }, [
                                   _vm._v(_vm._s(_vm.__("variant_matrix"))),
@@ -7616,7 +7654,7 @@ var render = function () {
                                                   style: {
                                                     background:
                                                       value.color_code ||
-                                                      "#ccc",
+                                                      "var(--theme-neutral-300)",
                                                     width: "32px",
                                                     height: "32px",
                                                     cursor: "pointer",
@@ -7625,8 +7663,8 @@ var render = function () {
                                                         attribute.id,
                                                         value.id
                                                       )
-                                                        ? "3px solid #37a279"
-                                                        : "1px solid #ccc",
+                                                        ? "3px solid var(--theme-primary-500)"
+                                                        : "1px solid var(--theme-neutral-300)",
                                                   },
                                                   attrs: { title: value.value },
                                                   on: {
@@ -7667,8 +7705,8 @@ var render = function () {
                                                           attribute.id,
                                                           value.id
                                                         )
-                                                          ? "3px solid #37a279"
-                                                          : "1px solid #ccc",
+                                                          ? "3px solid var(--theme-primary-500)"
+                                                          : "1px solid var(--theme-neutral-300)",
                                                     },
                                                     attrs: {
                                                       title: value.value,
@@ -7848,10 +7886,8 @@ var render = function () {
                         _vm.hasEditableVariants
                           ? _c(
                               "div",
-                              { staticClass: "col-md-12 mb-3" },
+                              { staticClass: "mb-3 product-form-subsection" },
                               [
-                                _c("hr"),
-                                _vm._v(" "),
                                 _c("h5", { staticClass: "mb-2" }, [
                                   _vm._v(_vm._s(_vm.__("product_variants"))),
                                 ]),
@@ -7942,7 +7978,8 @@ var render = function () {
                                 },
                               ],
                               key: k,
-                              staticClass: "list-group-item",
+                              staticClass:
+                                "list-group-item product-variant-panel",
                               attrs: { id: "packate_div" },
                             },
                             [
@@ -8084,335 +8121,371 @@ var render = function () {
                                     )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _c("div", { staticClass: "col-md-4" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "form-group mb-3" },
-                                    [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(_vm.__("price")) +
-                                            " ( " +
-                                            _vm._s(_vm.$currency) +
-                                            " ) "
-                                        ),
-                                        _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: input.packet_price,
-                                            expression: "input.packet_price",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0",
-                                          step: "any",
-                                          placeholder: "0.00",
-                                          required: "",
-                                        },
-                                        domProps: { value: input.packet_price },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              input,
-                                              "packet_price",
-                                              $event.target.value
-                                            )
-                                          },
-                                        },
-                                      }),
-                                    ]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("div", { staticClass: "col-md-4" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "form-group mb-3" },
-                                    [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(_vm.__("purchase_price")) +
-                                            " ( " +
-                                            _vm._s(_vm.$currency) +
-                                            " )\n                                                "
-                                        ),
-                                        _c("i", {
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6 col-xl-4" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "form-group mb-3" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("price")) +
+                                              " ( " +
+                                              _vm._s(_vm.$currency) +
+                                              " ) "
+                                          ),
+                                          _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          ),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("input", {
                                           directives: [
                                             {
-                                              name: "b-tooltip",
-                                              rawName: "v-b-tooltip.hover",
-                                              modifiers: { hover: true },
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: input.packet_price,
+                                              expression: "input.packet_price",
                                             },
                                           ],
-                                          staticClass:
-                                            "fa fa-info-circle text-muted",
+                                          staticClass: "form-control",
                                           attrs: {
-                                            title:
-                                              "This field is used to calculate in your report",
+                                            type: "number",
+                                            min: "0",
+                                            step: "any",
+                                            placeholder: "0.00",
+                                            required: "",
                                           },
-                                        }),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: input.packet_purchase_price,
-                                            expression:
-                                              "input.packet_purchase_price",
+                                          domProps: {
+                                            value: input.packet_price,
                                           },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0",
-                                          step: "any",
-                                          placeholder: "0.00",
-                                        },
-                                        domProps: {
-                                          value: input.packet_purchase_price,
-                                        },
-                                        on: {
-                                          input: function ($event) {
-                                            if ($event.target.composing) {
-                                              return
-                                            }
-                                            _vm.$set(
-                                              input,
-                                              "packet_purchase_price",
-                                              $event.target.value
-                                            )
-                                          },
-                                        },
-                                      }),
-                                    ]
-                                  ),
-                                ]),
-                                _vm._v(" "),
-                                _c("div", { staticClass: "col-md-4" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "form-group mb-3" },
-                                    [
-                                      _c("label", [
-                                        _vm._v(
-                                          _vm._s(_vm.__("discounted_price")) +
-                                            " ( " +
-                                            _vm._s(_vm.$currency) +
-                                            " )"
-                                        ),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: input.discounted_price,
-                                            expression:
-                                              "input.discounted_price",
-                                          },
-                                        ],
-                                        staticClass: "form-control",
-                                        attrs: {
-                                          type: "number",
-                                          min: "0",
-                                          step: "any",
-                                          placeholder: "0.00",
-                                        },
-                                        domProps: {
-                                          value: input.discounted_price,
-                                        },
-                                        on: {
-                                          input: [
-                                            function ($event) {
+                                          on: {
+                                            input: function ($event) {
                                               if ($event.target.composing) {
                                                 return
                                               }
                                               _vm.$set(
                                                 input,
-                                                "discounted_price",
+                                                "packet_price",
                                                 $event.target.value
                                               )
                                             },
-                                            function ($event) {
-                                              return _vm.validateDiscountedPrice(
-                                                input
-                                              )
-                                            },
-                                          ],
-                                        },
-                                      }),
-                                      _vm._v(" "),
-                                      input.validationErrorDiscountedPrice
-                                        ? _c("span", { staticClass: "error" }, [
-                                            _vm._v(
-                                              _vm._s(
-                                                input.validationErrorDiscountedPrice
-                                              )
-                                            ),
-                                          ])
-                                        : _vm._e(),
-                                    ]
-                                  ),
-                                ]),
+                                          },
+                                        }),
+                                      ]
+                                    ),
+                                  ]
+                                ),
                                 _vm._v(" "),
-                                _vm.is_unlimited_stock != 1
-                                  ? _c("div", { staticClass: "col-md-4" }, [
-                                      _c(
-                                        "div",
-                                        { staticClass: "form-group mb-3" },
-                                        [
-                                          _c("label", [
-                                            _vm._v(
-                                              _vm._s(_vm.__("stock")) + " "
-                                            ),
-                                            _c(
-                                              "i",
-                                              { staticClass: "text-danger" },
-                                              [_vm._v("*")]
-                                            ),
-                                          ]),
-                                          _vm._v(" "),
-                                          _c("input", {
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6 col-xl-4" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "form-group mb-3" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("purchase_price")) +
+                                              " ( " +
+                                              _vm._s(_vm.$currency) +
+                                              " )\n                                                "
+                                          ),
+                                          _c("i", {
                                             directives: [
                                               {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value: input.packet_stock,
-                                                expression:
-                                                  "input.packet_stock",
+                                                name: "b-tooltip",
+                                                rawName: "v-b-tooltip.hover",
+                                                modifiers: { hover: true },
                                               },
                                             ],
-                                            staticClass: "form-control",
+                                            staticClass:
+                                              "fa fa-info-circle text-muted",
                                             attrs: {
-                                              type: "number",
-                                              step: "any",
-                                              min: "0",
-                                              placeholder: "0",
-                                              name: "packate_stock[]",
+                                              title:
+                                                "This field is used to calculate in your report",
                                             },
-                                            domProps: {
-                                              value: input.packet_stock,
+                                          }),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value:
+                                                input.packet_purchase_price,
+                                              expression:
+                                                "input.packet_purchase_price",
                                             },
-                                            on: {
-                                              input: function ($event) {
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            min: "0",
+                                            step: "any",
+                                            placeholder: "0.00",
+                                          },
+                                          domProps: {
+                                            value: input.packet_purchase_price,
+                                          },
+                                          on: {
+                                            input: function ($event) {
+                                              if ($event.target.composing) {
+                                                return
+                                              }
+                                              _vm.$set(
+                                                input,
+                                                "packet_purchase_price",
+                                                $event.target.value
+                                              )
+                                            },
+                                          },
+                                        }),
+                                      ]
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6 col-xl-4" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "form-group mb-3" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("discounted_price")) +
+                                              " ( " +
+                                              _vm._s(_vm.$currency) +
+                                              " )"
+                                          ),
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("input", {
+                                          directives: [
+                                            {
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: input.discounted_price,
+                                              expression:
+                                                "input.discounted_price",
+                                            },
+                                          ],
+                                          staticClass: "form-control",
+                                          attrs: {
+                                            type: "number",
+                                            min: "0",
+                                            step: "any",
+                                            placeholder: "0.00",
+                                          },
+                                          domProps: {
+                                            value: input.discounted_price,
+                                          },
+                                          on: {
+                                            input: [
+                                              function ($event) {
                                                 if ($event.target.composing) {
                                                   return
                                                 }
                                                 _vm.$set(
                                                   input,
-                                                  "packet_stock",
+                                                  "discounted_price",
                                                   $event.target.value
                                                 )
                                               },
-                                            },
-                                          }),
-                                        ]
-                                      ),
-                                    ])
+                                              function ($event) {
+                                                return _vm.validateDiscountedPrice(
+                                                  input
+                                                )
+                                              },
+                                            ],
+                                          },
+                                        }),
+                                        _vm._v(" "),
+                                        input.validationErrorDiscountedPrice
+                                          ? _c(
+                                              "span",
+                                              { staticClass: "error" },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    input.validationErrorDiscountedPrice
+                                                  )
+                                                ),
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                      ]
+                                    ),
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _vm.is_unlimited_stock != 1
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "col-md-6 col-xl-4" },
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "form-group mb-3" },
+                                          [
+                                            _c("label", [
+                                              _vm._v(
+                                                _vm._s(_vm.__("stock")) + " "
+                                              ),
+                                              _c(
+                                                "i",
+                                                { staticClass: "text-danger" },
+                                                [_vm._v("*")]
+                                              ),
+                                            ]),
+                                            _vm._v(" "),
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: input.packet_stock,
+                                                  expression:
+                                                    "input.packet_stock",
+                                                },
+                                              ],
+                                              staticClass: "form-control",
+                                              attrs: {
+                                                type: "number",
+                                                step: "any",
+                                                min: "0",
+                                                placeholder: "0",
+                                                name: "packate_stock[]",
+                                              },
+                                              domProps: {
+                                                value: input.packet_stock,
+                                              },
+                                              on: {
+                                                input: function ($event) {
+                                                  if ($event.target.composing) {
+                                                    return
+                                                  }
+                                                  _vm.$set(
+                                                    input,
+                                                    "packet_stock",
+                                                    $event.target.value
+                                                  )
+                                                },
+                                              },
+                                            }),
+                                          ]
+                                        ),
+                                      ]
+                                    )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _c("div", { staticClass: "col-md-4" }, [
-                                  _c(
-                                    "div",
-                                    { staticClass: "form-group mb-3" },
-                                    [
-                                      _c("label", [
-                                        _vm._v(_vm._s(_vm.__("status")) + " "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6 col-xl-4" },
+                                  [
+                                    _c(
+                                      "div",
+                                      { staticClass: "form-group mb-3" },
+                                      [
+                                        _c("label", [
+                                          _vm._v(
+                                            _vm._s(_vm.__("status")) + " "
+                                          ),
+                                          _c(
+                                            "i",
+                                            { staticClass: "text-danger" },
+                                            [_vm._v("*")]
+                                          ),
+                                        ]),
+                                        _vm._v(" "),
                                         _c(
-                                          "i",
-                                          { staticClass: "text-danger" },
-                                          [_vm._v("*")]
-                                        ),
-                                      ]),
-                                      _vm._v(" "),
-                                      _c(
-                                        "select",
-                                        {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: input.packet_status,
-                                              expression: "input.packet_status",
-                                            },
-                                          ],
-                                          staticClass: "form-control",
-                                          attrs: { required: "" },
-                                          on: {
-                                            change: function ($event) {
-                                              var $$selectedVal =
-                                                Array.prototype.filter
-                                                  .call(
-                                                    $event.target.options,
-                                                    function (o) {
-                                                      return o.selected
-                                                    }
-                                                  )
-                                                  .map(function (o) {
-                                                    var val =
-                                                      "_value" in o
-                                                        ? o._value
-                                                        : o.value
-                                                    return val
-                                                  })
-                                              _vm.$set(
-                                                input,
-                                                "packet_status",
-                                                $event.target.multiple
-                                                  ? $$selectedVal
-                                                  : $$selectedVal[0]
-                                              )
+                                          "select",
+                                          {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: input.packet_status,
+                                                expression:
+                                                  "input.packet_status",
+                                              },
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: { required: "" },
+                                            on: {
+                                              change: function ($event) {
+                                                var $$selectedVal =
+                                                  Array.prototype.filter
+                                                    .call(
+                                                      $event.target.options,
+                                                      function (o) {
+                                                        return o.selected
+                                                      }
+                                                    )
+                                                    .map(function (o) {
+                                                      var val =
+                                                        "_value" in o
+                                                          ? o._value
+                                                          : o.value
+                                                      return val
+                                                    })
+                                                _vm.$set(
+                                                  input,
+                                                  "packet_status",
+                                                  $event.target.multiple
+                                                    ? $$selectedVal
+                                                    : $$selectedVal[0]
+                                                )
+                                              },
                                             },
                                           },
-                                        },
-                                        [
-                                          _c(
-                                            "option",
-                                            { attrs: { value: "" } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(_vm.__("select_status"))
-                                              ),
-                                            ]
-                                          ),
-                                          _vm._v(" "),
-                                          _c(
-                                            "option",
-                                            { attrs: { value: "1" } },
-                                            [
-                                              _vm._v(
-                                                _vm._s(_vm.__("available"))
-                                              ),
-                                            ]
-                                          ),
-                                          _vm._v(" "),
-                                          _c(
-                                            "option",
-                                            { attrs: { value: "0" } },
-                                            [_vm._v(_vm._s(_vm.__("sold_out")))]
-                                          ),
-                                        ]
-                                      ),
-                                    ]
-                                  ),
-                                ]),
+                                          [
+                                            _c(
+                                              "option",
+                                              { attrs: { value: "" } },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(
+                                                    _vm.__("select_status")
+                                                  )
+                                                ),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "option",
+                                              { attrs: { value: "1" } },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("available"))
+                                                ),
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "option",
+                                              { attrs: { value: "0" } },
+                                              [
+                                                _vm._v(
+                                                  _vm._s(_vm.__("sold_out"))
+                                                ),
+                                              ]
+                                            ),
+                                          ]
+                                        ),
+                                      ]
+                                    ),
+                                  ]
+                                ),
                                 _vm._v(" "),
                                 _vm.image_mode === "variant"
                                   ? _c("div", { staticClass: "col-md-12" }, [
@@ -8673,8 +8746,18 @@ var render = function () {
                       _vm.languages[_vm.activeLanguageTab].is_default)
                       ? _c(
                           "div",
-                          { staticClass: "card-footer" },
+                          { staticClass: "card-footer product-form-actions" },
                           [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-outline-secondary",
+                                attrs: { type: "button" },
+                                on: { click: _vm.clearForm },
+                              },
+                              [_vm._v(_vm._s(_vm.__("clear")))]
+                            ),
+                            _vm._v(" "),
                             _c(
                               "b-button",
                               {
@@ -8714,16 +8797,6 @@ var render = function () {
                                   : _vm._e(),
                               ],
                               1
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-danger",
-                                attrs: { type: "button" },
-                                on: { click: _vm.clearForm },
-                              },
-                              [_vm._v(_vm._s(_vm.__("clear")))]
                             ),
                           ],
                           1

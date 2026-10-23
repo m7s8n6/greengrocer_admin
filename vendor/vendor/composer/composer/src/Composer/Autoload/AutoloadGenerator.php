@@ -426,10 +426,7 @@ EOF;
             }
 
             if (null === $suffix) {
-                // a lock file with an unresolved merge conflict has its content-hash replaced by a
-                // human readable message, which would end up inside the autoloader class names
-                $contentHash = $locker !== null && $locker->isLocked() ? $locker->getLockData()['content-hash'] : null;
-                $suffix = is_string($contentHash) && Preg::isMatch('{^[a-f0-9]+$}', $contentHash) ? $contentHash : bin2hex(random_bytes(16));
+                $suffix = $locker !== null && $locker->isLocked() ? $locker->getLockData()['content-hash'] : bin2hex(random_bytes(16));
             }
         }
 
@@ -584,11 +581,7 @@ EOF;
      */
     public function parseAutoloads(array $packageMap, PackageInterface $rootPackage, $filteredDevPackages = false)
     {
-        if (isset($packageMap[0][0]) && $packageMap[0][0] instanceof RootPackageInterface) {
-            $rootPackageMap = array_shift($packageMap);
-        } else {
-            $rootPackageMap = null;
-        }
+        $rootPackageMap = array_shift($packageMap);
         if (is_array($filteredDevPackages)) {
             $packageMap = array_filter($packageMap, static function ($item) use ($filteredDevPackages): bool {
                 return !in_array($item[0]->getName(), $filteredDevPackages, true);
@@ -597,9 +590,7 @@ EOF;
             $packageMap = $this->filterPackageMap($packageMap, $rootPackage);
         }
         $sortedPackageMap = $this->sortPackageMap($packageMap);
-        if ($rootPackageMap !== null) {
-            $sortedPackageMap[] = $rootPackageMap;
-        }
+        $sortedPackageMap[] = $rootPackageMap;
         $reverseSortedMap = array_reverse($sortedPackageMap);
 
         // reverse-sorted means root first, then dependents, then their dependents, etc.
@@ -1223,7 +1214,6 @@ HEADER;
                 ]
             );
             $value = ltrim(Preg::replace('/^ */m', '    $0$0', $value));
-            $value = Preg::replace('/ +$/m', '', $value);
 
             $file .= sprintf("    public static $%s = %s;\n\n", $prop, $value);
             if ('files' !== $prop) {

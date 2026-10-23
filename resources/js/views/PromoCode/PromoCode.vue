@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="page-heading">
-      <div class="page-heading d-flex justify-content-between align-items-center mb-4">
+      <div class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
         <h3 class="modern-page-title mb-0">{{ __('manage_promo_code') }}</h3>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-0">
@@ -14,7 +14,7 @@
       </div>
 
       <section class="section">
-        <div class="figma-main-section-card">
+        <div class="card figma-main-section-card">
           <div class="card-body p-0">
             <!-- Modern Filter Action Bar -->
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -26,16 +26,16 @@
                 </div>
               </div>
               <div class="d-flex gap-2">
+                <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getPromoCode()"
+                  v-b-tooltip.hover :title="__('refresh')">
+                  <i class="fa fa-refresh"></i>
+                  <span>{{ __('refresh') }}</span>
+                </button>
+
                 <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="create_new = true"
                   v-if="$can('promo_code_create')">
                   <i class="fa fa-plus"></i>
                   <span>{{ __('add_promo_code') }}</span>
-                </button>
-
-                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getPromoCode()"
-                  v-b-tooltip.hover :title="__('refresh')">
-                  <i class="fa fa-refresh"></i>
-                  <span>{{ __('refresh') }}</span>
                 </button>
               </div>
             </div>
@@ -51,8 +51,14 @@
                       <strong>{{ __('loading') }}...</strong>
                     </div>
                   </template>
+                  <template #empty="scope">
+                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                  </template>
+                  <template #cell(promo_code)="row">
+                    <span class="promo-code-pill">{{ row.item.promo_code }}</span>
+                  </template>
                   <template #cell(image)="row">
-                    <img :src="row.item.image_url" height="50" />
+                    <img :src="row.item.image_url" class="promo-thumb" alt="" />
                   </template>
                   <template #cell(message)="row">
                     {{ getTranslatedMessage(row.item) }}
@@ -89,13 +95,14 @@
               </div>
             </template>
           </div>
-          <div class="figma-table-footer">
-            <div class="showing-results-text">
-              {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of') || 'of'
-              }} <span class="showing-bold">{{ totalRows }}</span>
+          <div class="figma-table-footer flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-2">
+              <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+              <b-form-select v-model="perPage" :options="pageOptions" size="sm" class="w-auto"></b-form-select>
+                                <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
             </div>
             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" align="right"
-              class="figma-pagination mb-0"></b-pagination>
+              class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
           </div>
         </div>
 
@@ -181,6 +188,9 @@ export default {
     },
     filter() {
       this.getPromoCode();
+    },
+    perPage() {
+      this.currentPage = 1;
     }
   },
   created: function () {
@@ -286,8 +296,8 @@ export default {
           cancelButtonText: __('cancel'),
           icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: "#37a279",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "var(--theme-primary-500)",
+          cancelButtonColor: "var(--theme-error-500)",
         })
         .then((result) => {
           if (result.value) {
@@ -324,3 +334,30 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.promo-code-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    font-family: var(--ui-font);
+    font-size: 12px !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--theme-primary-700) !important;
+    background: var(--ui-primary-soft);
+    border: 1px dashed var(--theme-primary-300);
+    border-radius: var(--ui-radius-sm);
+}
+
+.promo-thumb {
+    width: 44px;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--ui-radius) !important;
+    border: 1px solid var(--ui-border);
+    background: var(--ui-surface-muted);
+}
+</style>

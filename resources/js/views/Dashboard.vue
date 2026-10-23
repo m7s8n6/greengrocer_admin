@@ -1,348 +1,404 @@
 <template>
-    <div class="p-2">
-        <!-- Section 1: Welcome Header -->
-        <div class="page-heading mb-4">
-            <h2 class="h4 font-weight-bold text-dark mb-1">{{ __('Welcome') }}, {{ userName }}</h2>
-            <p class="text-muted small mb-0">{{ greetingMessage }} &bull; {{ formattedDate }}</p>
+    <div class="p-2 dash-page">
+        <!-- Section 1: Welcome header + quick actions -->
+        <div class="page-heading mb-3 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+            <div class="min-w-0">
+                <h2 class="h4 font-weight-bold dash-welcome-title mb-0">{{ __('Welcome') }}, {{ userName }}</h2>
+                <p class="text-muted small mb-0">{{ greetingMessage }} &bull; {{ formattedDate }}</p>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2 dash-quick-actions" v-if="$can('product_create') || $can('order_list')">
+                <router-link v-if="$can('order_list')" to="/orders" class="btn-figma-columns text-decoration-none">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span>{{ __('view_orders') }}</span>
+                </router-link>
+                <router-link v-if="$can('product_create')" to="/manage_products/create" class="btn-figma-filter text-decoration-none">
+                    <i class="fa fa-plus"></i>
+                    <span>{{ __('add_product') }}</span>
+                </router-link>
+            </div>
         </div>
 
-        <!-- Section 2: Today's Stats Cards -->
-        <div class="row g-3 mb-4 row-cols-1 row-cols-sm-2 row-cols-md-4">
-            <div class="col" v-for="(stat, index) in todayStats" :key="'today-' + index">
-                <div class="figma-kpi-card-v2 w-100">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="figma-stat-icon-box" :class="stat.iconBgClass">
-                            <base-icon v-if="stat.icon" :name="stat.icon" width="24" height="24" />
-                            <svg v-else-if="stat.iconClass && stat.iconClass.includes('fa-plus')" :class="stat.iconClass.replace('fa fa-plus', '').trim()" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M33 24C33 24.1989 32.921 24.3897 32.7803 24.5303C32.6397 24.671 32.4489 24.75 32.25 24.75H24.75V32.25C24.75 32.4489 24.671 32.6397 24.5303 32.7803C24.3897 32.921 24.1989 33 24 33C23.8011 33 23.6103 32.921 23.4697 32.7803C23.329 32.6397 23.25 32.4489 23.25 32.25V24.75H15.75C15.5511 24.75 15.3603 24.671 15.2197 24.5303C15.079 24.3897 15 24.1989 15 24C15 23.8011 15.079 23.6103 15.2197 23.4697C15.3603 23.329 15.5511 23.25 15.75 23.25H23.25V15.75C23.25 15.5511 23.329 15.3603 23.4697 15.2197C23.6103 15.079 23.8011 15 24 15C24.1989 15 24.3897 15.079 24.5303 15.2197C24.671 15.3603 24.75 15.5511 24.75 15.75V23.25H32.25C32.4489 23.25 32.6397 23.329 32.7803 23.4697C32.921 23.6103 33 23.8011 33 24Z" fill="currentColor"/>
-                            </svg>
+        <!-- Section 2: Today strip (4 slim tiles) -->
+        <div class="row g-3 mb-3">
+            <div class="col-6 col-md-3" v-for="(stat, index) in todayStats" :key="'today-' + index">
+                <div class="figma-kpi-card-v2 dash-tile w-100 h-100">
+                    <div class="d-flex align-items-center gap-2 min-w-0">
+                        <div class="figma-stat-icon-box dash-icon-36" :class="stat.iconBgClass">
+                            <base-icon v-if="stat.icon" :name="stat.icon" width="20" height="20" />
                             <i v-else :class="stat.iconClass"></i>
                         </div>
-                        <div class="d-flex flex-column text-start">
-                            <span class="figma-stat-label mb-0">{{ stat.label }}</span>
-                            <h4 class="figma-stat-value mb-0">{{ stat.value }}</h4>
+                        <div class="d-flex flex-column text-start min-w-0">
+                            <span class="figma-stat-label mb-0 dash-tile-label">{{ stat.label }}</span>
+                            <h4 class="figma-stat-value mb-0 dash-value-wrap">{{ stat.value }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 3: Sales Overview -->
-        <div class="card border rounded-4 mb-3 mt-0 overflow-hidden figma-card">
-            <div
-                class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <h4 class="h6 font-weight-bold text-dark mb-0">{{ __('sales_overview') || 'Sales Overview' }}</h4>
-                <div class="d-flex align-items-center gap-3">
-                    <div class="d-none d-sm-flex align-items-center gap-3 text-muted small">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="dot-sm bg-primary"></span>
-                            <span class="text-capitalize">{{ __('orders') }}</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="dot-sm bg-light-primary"></span>
-                            <span class="text-capitalize">{{ __('revenue') || 'Revenue' }}</span>
+        <!-- Section 3: Sales Overview + Order Status -->
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-xl-8">
+                <div class="card border rounded-4 h-100 mb-0 overflow-hidden figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('sales_overview') }}</h4>
+                        <div class="d-flex align-items-center gap-3 sales-header-controls">
+                            <div class="d-flex align-items-center gap-3 text-muted small sales-legend">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="dot-sm bg-primary"></span>
+                                    <span class="text-capitalize">{{ __('orders') }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="dot-sm bg-light-primary"></span>
+                                    <span class="text-capitalize">{{ __('revenue') }}</span>
+                                </div>
+                            </div>
+                            <select v-model="salesPeriod" @change="updateSalesChart"
+                                class="form-select form-select-sm figma-select-pill">
+                                <option value="yearly">{{ __('yearly') }}</option>
+                                <option value="monthly">{{ __('daily') }}</option>
+                                <option value="weekly">{{ __('weekly') }}</option>
+                            </select>
                         </div>
                     </div>
-                    <select v-model="salesPeriod" @change="updateSalesChart"
-                        class="form-select form-select-sm figma-select-pill">
-                        <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                        <option value="monthly">{{ __('daily') || 'Daily' }}</option>
-                        <option value="weekly">{{ __('weekly') || 'Weekly' }}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="card-body p-4 pt-1">
-                <apexcharts ref="salesChart" width="100%" height="350" type="bar" :options="salesChartOptions"
-                    :series="salesChartSeries"></apexcharts>
-            </div>
-        </div>
+                    <div class="card-body dash-body dash-body--chart">
+                        <!-- Desktop / tablet: the original single chart. -->
+                        <apexcharts v-if="!isPhone" ref="salesChart" width="100%" :height="salesChartHeight" type="bar" :options="salesChartOptions"
+                            :series="salesChartSeries"></apexcharts>
 
-        <!-- Section 4: Summary Stats Cards -->
-        <div class="figma-bg-soft-primary p-3 mb-4 rounded-4">
-            <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-5">
-                <div class="col" v-for="(stat, index) in summaryStats" :key="'sum-' + index">
-                    <div class="card border rounded-4 h-100 figma-card-white p-3">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div v-if="stat.icon" class="figma-stat-icon-box" :class="stat.iconBgClass">
-                                <base-icon :name="stat.icon" width="24" height="24" />
+                        <!-- Phones: the y-axis is its own fixed column (a second, invisible-bars chart that only
+                             draws the rupee scale) so it never moves; only the plot + Jan-Dec scroll sideways.
+                             Both charts share height, data and axis settings so the scale lines up with the grid. -->
+                        <div v-else class="d-flex w-100 overflow-hidden sales-chart-wrapper">
+                            <div class="flex-shrink-0 sales-y-axis" :style="{ width: salesAxisWidth + 'px' }">
+                                <apexcharts :width="salesAxisWidth" :height="salesChartHeight" type="bar" :options="salesAxisChartOptions"
+                                    :series="salesChartSeries"></apexcharts>
                             </div>
-                            <div v-else-if="stat.iconClass && stat.iconClass.includes('fa-plus')">
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M0 8C0 3.58172 3.58172 0 8 0H40C44.4183 0 48 3.58172 48 8V40C48 44.4183 44.4183 48 40 48H8C3.58172 48 0 44.4183 0 40V8Z" fill="#E7F4FE"/>
-                                    <path d="M33 24C33 24.1989 32.921 24.3897 32.7803 24.5303C32.6397 24.671 32.4489 24.75 32.25 24.75H24.75V32.25C24.75 32.4489 24.671 32.6397 24.5303 32.7803C24.3897 32.921 24.1989 33 24 33C23.8011 33 23.6103 32.921 23.4697 32.7803C23.329 32.6397 23.25 32.4489 23.25 32.25V24.75H15.75C15.5511 24.75 15.3603 24.671 15.2197 24.5303C15.079 24.3897 15 24.1989 15 24C15 23.8011 15.079 23.6103 15.2197 23.4697C15.3603 23.329 15.5511 23.25 15.75 23.25H23.25V15.75C23.25 15.5511 23.329 15.3603 23.4697 15.2197C23.6103 15.079 23.8011 15 24 15C24.1989 15 24.3897 15.079 24.5303 15.2197C24.671 15.3603 24.75 15.5511 24.75 15.75V23.25H32.25C32.4489 23.25 32.6397 23.329 32.7803 23.4697C32.921 23.6103 33 23.8011 33 24Z" fill="#2196F3"/>
-                                </svg>
-                            </div>
-                            <div v-else class="figma-stat-icon-box-sm" :class="stat.iconBgClass">
-                                <i :class="[stat.iconClass, stat.iconTextClass]"></i>
-                            </div>
-                            <div class="figma-trend-badge scale-90" :class="stat.trendUp ? 'trend-up' : 'trend-down'">
-                                <base-icon :name="stat.trendUp ? 'TrendUp' : 'TrendDown'" width="18" height="18" />
-                                <span>{{ stat.trendValue }}</span>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-column mt-auto">
-                            <span class="figma-summary-label mb-1 text-capitalize">{{ stat.label }}</span>
-                            <h4 class="figma-stat-value h6 mb-0">{{ stat.value }}</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 5: Top Sales By Category + Order Status -->
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-lg-7">
-                <div class="card border rounded-4 h-100 figma-card">
-                    <div
-                        class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <h4 class="h6 font-weight-bold text-dark mb-0">
-                            {{ __('top_sales_by_category') || 'Top Sales By Category' }}
-                            <span class="text-muted small font-weight-normal ms-1">({{ categoryChartLabels.length }} {{
-                                __('categories') }})</span>
-                        </h4>
-                        <select v-model="categoryPeriod" @change="mockDataRefresh('category')" class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                            <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
-                        </select>
-                    </div>
-                    <div class="card-body p-4 pt-0 d-flex flex-column">
-                        <div v-if="categoryChartSeries.length" class="row align-items-center flex-grow-1" style="min-height: 300px;">
-                            <div class="col-12 col-md-5">
-                                <apexcharts width="100%" height="280" type="donut" :options="categoryDonutOptions"
-                                    :series="categoryChartSeries"></apexcharts>
-                            </div>
-                            <div class="col-12 col-md-7">
-                                <div class="d-flex flex-column gap-3 pe-md-4 mt-4 mt-md-0">
-                                    <div v-for="(item, idx) in categoryChartDataFormatted" :key="'cat-' + idx" class="d-flex align-items-center">
-                                        <div class="rounded-circle me-3 flex-shrink-0" :style="{ width: '12px', height: '12px', backgroundColor: item.color }"></div>
-                                        <div class="text-dark small flex-shrink-0" style="font-weight: 500;">{{ item.name }}</div>
-                                        <div class="flex-grow-1 mx-3" style="border-bottom: 1.5px dashed #E2E8F0;"></div>
-                                        <div class="text-dark small font-weight-bold flex-shrink-0">{{ item.value }}</div>
-                                    </div>
+                            <div class="flex-grow-1 overflow-auto sales-chart-scroll">
+                                <div class="sales-chart-inner" :style="{ minWidth: salesChartMinWidth + 'px' }">
+                                    <apexcharts ref="salesChart" width="100%" :height="salesChartHeight" type="bar" :options="salesChartOptions"
+                                        :series="salesChartSeries"></apexcharts>
                                 </div>
                             </div>
                         </div>
-                        <div v-else class="text-center py-5 text-muted small">{{ __('No data found')
-                        }}</div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-5">
-                <div class="card border rounded-4 h-100 figma-card">
-                    <div
-                        class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
-                        <h4 class="h6 font-weight-bold text-dark mb-0">{{ __('order_status') || 'Order Status' }}</h4>
+            <div class="col-12 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('order_status') }}</h4>
                         <select v-model="orderStatusPeriod" @change="mockDataRefresh('orderStatus')" class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                            <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
                         </select>
                     </div>
-                    <div class="card-body p-4 d-flex flex-column justify-content-center">
-                        <div class="d-flex flex-column gap-3" v-if="orderStatusItems.length">
-                            <div class="d-flex align-items-center gap-3" v-for="(item, idx) in orderStatusItems"
+                    <div class="card-body dash-body d-flex flex-column justify-content-center">
+                        <div class="d-flex flex-column dash-os-list" v-if="orderStatusItems.length">
+                            <div class="d-flex align-items-center gap-2" v-for="(item, idx) in orderStatusItems"
                                 :key="'os-' + idx">
-                                <div class="rounded-3 d-flex align-items-center justify-content-center"
-                                    :style="{ background: item.bgColor, width: '40px', height: '40px', borderRadius: '10px !important' }">
-                                    <base-icon v-if="item.icon" :name="item.icon" width="24" height="24" />
+                                <div class="d-flex align-items-center justify-content-center flex-shrink-0 dash-os-icon"
+                                    :style="{ '--os-color': item.color }">
+                                    <i :class="item.iconClass"></i>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="figma-order-status-label">{{ item.label }}</span>
-                                        <span class="figma-order-status-count mb-0">{{
-                                            item.count
-                                        }}</span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-center dash-row-head">
+                                        <span class="figma-order-status-label dash-row-label text-truncate">{{ item.label }}</span>
+                                        <span class="figma-order-status-count mb-0">{{ item.count }}</span>
                                     </div>
-                                    <div class="rounded-pill overflow-hidden" :style="{ height: '6px', backgroundColor: item.bgColor }">
+                                    <div class="rounded-pill overflow-hidden dash-bar-track" :style="{ backgroundColor: item.bgColor }">
                                         <div class="h-100 rounded-pill transition-all"
                                             :style="{ width: item.percent + '%', backgroundColor: item.color }"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div v-else class="text-center py-5 text-muted small">{{ __('No data found')
-                        }}</div>
+                        <div v-else-if="recordLoading" class="dash-empty"><b-spinner small variant="primary"></b-spinner></div>
+                        <div v-else class="dash-empty">
+                            <i class="fa fa-inbox fa-2x mb-2"></i>
+                            <span>{{ __('No data found') }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 6: Highest Revenue Sellers + Platform Usage -->
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-lg-7">
-                <div class="card border rounded-4 h-100 figma-card">
-                    <div
-                        class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
-                        <h4 class="h6 font-weight-bold text-dark mb-0">
-                            {{ __('highest_revenue_sellers') || 'Highest revenue generating sellers' }}
-                            <span class="text-muted small font-weight-normal ms-1">({{ sellers.length }} {{
-                                __('sellers')
-                            }})</span>
-                        </h4>
-                        <select v-model="sellerPeriod" @change="mockDataRefresh('sellers')" class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                            <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
-                        </select>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="px-4" v-if="paginatedSellers.length">
-                            <div class="py-3 d-flex align-items-center gap-3 border-bottom figma-hover-light"
-                                v-for="(seller, idx) in paginatedSellers" :key="'seller-' + idx">
-                                <div class="figma-avatar-42 overflow-hidden" style="background-color: #EBF3FF;">
-                                    <img v-if="seller.logo_url" :src="seller.logo_url" class="w-100 h-100 object-fit-cover" />
+        <!-- Section 4: Business performance (all-time totals with trend pills), compact horizontal cards -->
+        <div class="mb-3">
+            <h5 class="dash-section-title mb-2">{{ __('business_performance') }}</h5>
+            <div class="row g-3">
+                <div class="col-6 col-md-4 col-xl-2" v-for="(stat, index) in summaryStats" :key="'sum-' + index">
+                    <div class="card border rounded-4 h-100 mb-0 figma-card-white dash-perf-card">
+                        <div class="d-flex align-items-start gap-2 min-w-0 dash-perf-row">
+                            <div class="figma-stat-icon-box dash-icon-32" :class="stat.iconBgClass">
+                                <base-icon v-if="stat.icon" :name="stat.icon" width="18" height="18" />
+                                <i v-else :class="[stat.iconClass, stat.iconTextClass]"></i>
+                            </div>
+                            <div class="d-flex flex-column flex-grow-1 min-w-0">
+                                <span class="dash-perf-label text-capitalize">{{ stat.label }}</span>
+                                <div class="d-flex align-items-center flex-wrap dash-perf-meta">
+                                    <span class="dash-perf-value dash-value-wrap">{{ stat.value }}</span>
+                                    <span v-if="stat.trendValue" class="dash-trend" :class="stat.trendUp ? 'dash-trend--up' : 'dash-trend--down'">
+                                        <base-icon :name="stat.trendUp ? 'TrendUp' : 'TrendDown'" width="12" height="12" />
+                                        <span>{{ stat.trendValue }}</span>
+                                    </span>
                                 </div>
-                                <div class="flex-grow-1 text-dark text-start ms-2">
-                                    <h6 class="text-dark font-weight-bold mb-1 small">{{
-                                        getDisplayName(seller.store_name) ||
-                                        getDisplayName(seller.name) }}</h6>
-                                    <span class="text-muted extra-small">{{ __('orders') }} : {{ seller.order_count ||
-                                        '—'
-                                    }}</span>
-                                </div>
-                                <span class="text-dark font-weight-bold small">{{ $currency }}{{
-                                    formatNumber(seller.total_revenue) }}</span>
                             </div>
                         </div>
-                        <div v-else class="text-center py-5 text-muted small">{{ __('No data found')
-                        }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3 border-top pt-3 bg-light-soft rounded-bottom-4"
-                            v-if="sellers.length > sellerPerPage">
-                            <div class="showing-results-text">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ sellerPageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ sellers.length }}</span>
+        <!-- Section 5: Top sales by category (ranked list) + Catalog & inventory + Customers by platform -->
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">
+                            {{ __('top_sales_by_category') }}
+                            <span class="text-muted small font-weight-normal ms-1">({{ categoryChartLabels.length }} {{ __('categories') }})</span>
+                        </h4>
+                        <select v-model="categoryPeriod" @change="mockDataRefresh('category')" class="form-select form-select-sm figma-select-pill">
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
+                        </select>
+                    </div>
+                    <div class="card-body dash-body d-flex flex-column">
+                        <template v-if="categoryRanked.length">
+                            <div class="d-flex align-items-baseline justify-content-between gap-2 dash-rank-summary">
+                                <span class="figma-stat-label mb-0">{{ __('total_sales') }}</span>
+                                <span class="dash-rank-total">{{ $currency }}{{ formatNumber(categoryTotalSales) }}</span>
                             </div>
-                            <b-pagination v-model="sellerPage" :total-rows="sellers.length" :per-page="sellerPerPage"
-                                align="right" class="figma-pagination mb-0"
+                            <div class="d-flex flex-column dash-rank-list">
+                                <div v-for="item in categoryRanked" :key="'cat-' + item.key" class="d-flex align-items-center gap-2 min-w-0">
+                                    <span class="dash-rank-chip flex-shrink-0" :class="{ 'dash-rank-chip--top': item.rank === 1, 'dash-rank-chip--other': item.isOther }">
+                                        <i v-if="item.isOther" class="fa fa-ellipsis-h"></i>
+                                        <template v-else>{{ item.rank }}</template>
+                                    </span>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <div class="d-flex justify-content-between align-items-center gap-2 dash-row-head">
+                                            <span class="dash-rank-name text-truncate" :class="{ 'text-capitalize': item.isOther }">{{ item.name }}</span>
+                                            <span class="dash-rank-amount flex-shrink-0">{{ item.value }} <span class="dash-rank-share">{{ item.share }}%</span></span>
+                                        </div>
+                                        <div class="rounded-pill overflow-hidden dash-bar-track dash-bar-track--muted">
+                                            <div class="h-100 rounded-pill transition-all"
+                                                :style="{ width: item.share + '%', backgroundColor: item.color }"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <div v-else-if="recordLoading" class="dash-empty"><b-spinner small variant="primary"></b-spinner></div>
+                        <div v-else class="dash-empty">
+                            <i class="fa fa-chart-bar fa-2x mb-2"></i>
+                            <span>{{ __('No data found') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('catalog_inventory') }}</h4>
+                    </div>
+                    <div class="card-body dash-body">
+                        <div class="row dash-cat-grid">
+                            <div class="col-6" v-for="tile in catalogTiles" :key="'cat-tile-' + tile.key">
+                                <component :is="tile.to ? 'router-link' : 'div'" v-bind="tile.to ? { to: tile.to } : {}"
+                                    class="figma-kpi-card-v2 w-100 h-100 text-decoration-none dash-cat-tile"
+                                    :class="[tile.tintClass, { 'dash-cat-tile--link': !!tile.to }]">
+                                    <div class="d-flex align-items-center gap-2 w-100 min-w-0">
+                                        <div class="figma-stat-icon-box figma-kpi-icon-v2 dash-icon-32" :class="tile.iconBgClass">
+                                            <i :class="tile.iconClass"></i>
+                                        </div>
+                                        <div class="d-flex flex-column text-start flex-grow-1 min-w-0">
+                                            <span class="figma-stat-label mb-0 dash-tile-label">{{ tile.label }}</span>
+                                            <h4 class="figma-stat-value mb-0 dash-value-wrap">{{ tile.value }}</h4>
+                                        </div>
+                                        <span v-if="tile.to && tile.showView" class="dash-cat-view flex-shrink-0">
+                                            <span class="dash-cat-view-text">{{ __('view') }}</span>
+                                            <i class="fa fa-chevron-right"></i>
+                                        </span>
+                                        <i v-else-if="tile.to" class="fa fa-chevron-right dash-cat-chevron flex-shrink-0"></i>
+                                    </div>
+                                </component>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('customers_by_platform') }}</h4>
+                        <select v-model="platformPeriod" @change="mockDataRefresh('platform')" class="form-select form-select-sm figma-select-pill">
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
+                        </select>
+                    </div>
+                    <div class="card-body dash-body d-flex flex-column">
+                        <div class="d-flex align-items-baseline justify-content-between gap-2 dash-rank-summary">
+                            <span class="figma-stat-label mb-0">{{ __('Total Users') }}</span>
+                            <span class="dash-platform-total">{{ formatNumber(totalUsers) }}</span>
+                        </div>
+                        <div class="d-flex flex-column dash-os-list">
+                            <div v-for="p in platformItems" :key="'plat-' + p.key" class="d-flex align-items-center gap-2">
+                                <div class="dash-platform-icon flex-shrink-0">
+                                    <i :class="p.iconClass"></i>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-center gap-2 dash-row-head">
+                                        <span class="figma-order-status-label dash-row-label text-truncate">{{ p.label }}</span>
+                                        <span class="dash-platform-count flex-shrink-0">{{ p.count }} <span class="text-muted">&middot; {{ p.percent }}%</span></span>
+                                    </div>
+                                    <div class="rounded-pill overflow-hidden dash-bar-track dash-bar-track--muted">
+                                        <div class="h-100 rounded-pill transition-all"
+                                            :style="{ width: p.percent + '%', backgroundColor: p.color }"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Top Selling Products + Top Rated Products + Highest Revenue Sellers -->
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('top_selling_products') }}</h4>
+                        <select v-model="sellingPeriod" @change="mockDataRefresh('selling')"
+                            class="form-select form-select-sm figma-select-pill">
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
+                        </select>
+                    </div>
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="dash-list" v-if="paginatedSellingProducts.length">
+                            <div class="d-flex align-items-center gap-2 border-bottom figma-hover-light dash-list-row"
+                                v-for="(prod, idx) in paginatedSellingProducts" :key="'selling-' + idx">
+                                <div class="figma-avatar-42 dash-avatar overflow-hidden dash-avatar-soft flex-shrink-0">
+                                    <img v-if="prod.image" :src="prod.image" class="w-100 h-100 object-fit-cover" alt="" />
+                                </div>
+                                <div class="flex-grow-1 text-start min-w-0">
+                                    <h6 class="dash-list-title dash-list-name mb-0 text-truncate">{{ getDisplayName(prod.name) }}</h6>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <img :src="$baseUrl + '/images/icons/sold.svg'" class="dash-sold-icon" alt="" />
+                                        <span class="text-muted extra-small">{{ __('sold') }} : {{ formatNumber(prod.sold_count || 0) }}</span>
+                                    </div>
+                                </div>
+                                <span class="dash-list-title dash-list-amount flex-shrink-0">{{ $currency }}{{ formatNumber(prod.total_revenue || 0) }}</span>
+                            </div>
+                        </div>
+                        <div v-else-if="recordLoading" class="dash-empty"><b-spinner small variant="primary"></b-spinner></div>
+                        <div v-else class="dash-empty">
+                            <i class="fa fa-box-open fa-2x mb-2"></i>
+                            <span>{{ __('No data found') }}</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-auto border-top bg-light-soft rounded-bottom-4 dash-pager dash-pager--compact"
+                            v-if="topSellingProducts.length">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
+                                <b-form-select v-model="sellingPerPage" :options="pageOptions" size="sm"
+                                    class="w-auto" @change="sellingPage = 1"></b-form-select>
+                            </div>
+                            <b-pagination v-model="sellingPage" :total-rows="topSellingProducts.length" :per-page="sellingPerPage"
+                                align="right" class="figma-pagination mb-0" :limit="3"
                                 hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-5">
-                <div class="card border rounded-4 h-100 figma-card">
-                    <div
-                        class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between text-dark">
-                        <h4 class="h6 font-weight-bold mb-0 text-dark">{{ __('platform_usage') || 'Platform Usage' }}
-                        </h4>
-                        <select v-model="platformPeriod" @change="mockDataRefresh('platform')" class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                            <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
-                        </select>
-                    </div>
-                    <div class="card-body p-4 pt-0 d-flex flex-column align-items-center">
-                        <apexcharts width="100%" height="280" type="donut" :options="platformGaugeOptions"
-                            :series="platformGaugeSeries"></apexcharts>
-                        <div class="row g-2 w-100 mt-2 text-center text-dark">
-                            <div class="col-4" v-for="(p, i) in platformItems" :key="'plat-' + i">
-                                <div class="bg-platform-box p-3 rounded-3 border">
-                                    <div class="badge bg-white text-dark px-3 py-2 mb-2 rounded-pill font-weight-bold">{{ p.count }}</div>
-                                    <div class="figma-platform-label">{{ p.label }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 7: Top Rated + Top Selling Products -->
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-lg-6">
-                <div class="card border rounded-4 figma-card">
-                    <div
-                        class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
-                        <h4 class="h6 font-weight-bold text-dark mb-0">{{ __('top_rated_products')
-                        }}
-                        </h4>
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">{{ __('top_rated_products') }}</h4>
                         <select v-model="ratedPeriod" @change="mockDataRefresh('rated')"
                             class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                            <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
                         </select>
                     </div>
-                    <div class="card-body p-0 text-dark">
-                        <div class="px-4" v-if="paginatedRatedProducts.length">
-                            <div class="py-3 d-flex align-items-center gap-3 border-bottom figma-hover-light text-dark"
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="dash-list" v-if="paginatedRatedProducts.length">
+                            <div class="d-flex align-items-center gap-2 border-bottom figma-hover-light dash-list-row"
                                 v-for="(prod, idx) in paginatedRatedProducts" :key="'rated-' + idx">
-                                <div class="figma-avatar-42 overflow-hidden" style="background-color: #EBF3FF;">
-                                    <img v-if="prod.image" :src="prod.image" class="w-100 h-100 object-fit-cover" />
+                                <div class="figma-avatar-42 dash-avatar overflow-hidden dash-avatar-soft flex-shrink-0">
+                                    <img v-if="prod.image" :src="prod.image" class="w-100 h-100 object-fit-cover" alt="" />
                                 </div>
-                                <div class="flex-grow-1 text-dark text-start ms-2">
-                                    <h6 class="text-dark font-weight-bold mb-1 small text-dark">{{
-                                        getDisplayName(prod.name) }}
-                                    </h6>
-                                    <span class="text-muted extra-small">{{ formatNumber(prod.review_count || 0) }} {{
-                                        __('reviews') || 'Reviews' }}</span>
+                                <div class="flex-grow-1 text-start min-w-0">
+                                    <h6 class="dash-list-title dash-list-name mb-0 text-truncate">{{ getDisplayName(prod.name) }}</h6>
+                                    <span class="text-muted extra-small">{{ formatNumber(prod.review_count || 0) }} {{ __('reviews') }}</span>
                                 </div>
-                                <div class="d-flex align-items-center gap-1 text-warning">
+                                <div class="d-flex align-items-center gap-1 dash-rating flex-shrink-0">
                                     <i class="fa fa-star small"></i>
                                     <span class="font-weight-bold small">{{ (prod.rating || 0).toFixed(1) }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div v-else class="text-center py-5 text-muted small">{{ __('No data found')
-                        }}</div>
+                        <div v-else-if="recordLoading" class="dash-empty"><b-spinner small variant="primary"></b-spinner></div>
+                        <div v-else class="dash-empty">
+                            <i class="fa fa-star fa-2x mb-2"></i>
+                            <span>{{ __('No data found') }}</span>
+                        </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3 border-top pt-3 bg-light-soft rounded-bottom-4"
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-auto border-top bg-light-soft rounded-bottom-4 dash-pager dash-pager--compact"
                             v-if="topRatedProducts.length">
                             <div class="d-flex align-items-center gap-2">
                                 <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                                 <b-form-select v-model="ratedPerPage" :options="pageOptions" size="sm"
-                                    style="width: auto;" @change="ratedPage = 1"></b-form-select>
+                                    class="w-auto" @change="ratedPage = 1"></b-form-select>
                             </div>
                             <b-pagination v-model="ratedPage" :total-rows="topRatedProducts.length" :per-page="ratedPerPage"
-                                align="right" class="figma-pagination mb-0"
+                                align="right" class="figma-pagination mb-0" :limit="3"
                                 hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
-                <div class="card border rounded-4 figma-card">
-                    <div
-                        class="card-header bg-white border-0 py-3 px-4 d-flex align-items-center justify-content-between">
-                        <h4 class="h6 font-weight-bold text-dark mb-0">{{ __('top_selling_products')
-
-                        }}</h4>
-                        <select v-model="sellingPeriod" @change="mockDataRefresh('selling')"
-                            class="form-select form-select-sm figma-select-pill">
-                            <option value="yearly">{{ __('yearly') || 'Yearly' }}</option>
-                              <option value="monthly">{{ __('monthly') || 'Monthly' }}</option>
+            <div class="col-12 col-xl-4">
+                <div class="card border rounded-4 h-100 mb-0 figma-card">
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h4 class="h6 mb-0">
+                            {{ __('highest_revenue_sellers') }}
+                            <span class="text-muted small font-weight-normal ms-1">({{ sellers.length }} {{ __('sellers') }})</span>
+                        </h4>
+                        <select v-model="sellerPeriod" @change="mockDataRefresh('sellers')" class="form-select form-select-sm figma-select-pill">
+                            <option value="yearly">{{ __('yearly') }}</option>
+                            <option value="monthly">{{ __('monthly') }}</option>
                         </select>
                     </div>
-                    <div class="card-body p-0 text-dark">
-                        <div class="px-4" v-if="paginatedSellingProducts.length">
-                            <div class="py-3 d-flex align-items-center gap-3 border-bottom figma-hover-light text-dark"
-                                v-for="(prod, idx) in paginatedSellingProducts" :key="'selling-' + idx">
-                                <div class="figma-avatar-42 overflow-hidden" style="background-color: #EBF3FF;">
-                                    <img v-if="prod.image" :src="prod.image" class="w-100 h-100 object-fit-cover" />
+                    <div class="card-body p-0 d-flex flex-column">
+                        <div class="dash-list" v-if="paginatedSellers.length">
+                            <div class="d-flex align-items-center gap-2 border-bottom figma-hover-light dash-list-row"
+                                v-for="(seller, idx) in paginatedSellers" :key="'seller-' + idx">
+                                <div class="figma-avatar-42 dash-avatar overflow-hidden dash-avatar-soft flex-shrink-0">
+                                    <img v-if="seller.logo_url" :src="seller.logo_url" class="w-100 h-100 object-fit-cover" alt="" />
                                 </div>
-                                <div class="flex-grow-1 text-dark text-start ms-2">
-                                    <h6 class="text-dark font-weight-bold mb-1 small text-dark">{{
-                                        getDisplayName(prod.name) }}
-                                    </h6>
-                                    <div class="d-flex align-items-center gap-1">
-                                        <img :src="$baseUrl + '/images/icons/sold.svg'" style="width: 17px; height: 17px;" />
-                                        <span class="text-muted extra-small">{{ __('sold') || 'Sold' }} : {{
-                                            formatNumber(prod.sold_count || 0) }}</span>
-                                    </div>
+                                <div class="flex-grow-1 text-start min-w-0">
+                                    <h6 class="dash-list-title dash-list-name mb-0 text-truncate">{{ getDisplayName(seller.store_name) || getDisplayName(seller.name) }}</h6>
+                                    <span class="text-muted extra-small">{{ __('orders') }} : {{ seller.order_count || '—' }}</span>
                                 </div>
-                                <span class="text-dark font-weight-bold small">{{ $currency }}{{
-                                    formatNumber(prod.total_revenue
-                                        || 0) }}</span>
+                                <span class="dash-list-title dash-list-amount flex-shrink-0">{{ $currency }}{{ formatNumber(seller.total_revenue) }}</span>
                             </div>
                         </div>
-                        <div v-else class="text-center py-5 text-muted small">{{ __('No data found')
-                        }}</div>
+                        <div v-else-if="recordLoading" class="dash-empty"><b-spinner small variant="primary"></b-spinner></div>
+                        <div v-else class="dash-empty">
+                            <i class="fa fa-store fa-2x mb-2"></i>
+                            <span>{{ __('No data found') }}</span>
+                        </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3 border-top pt-3 bg-light-soft rounded-bottom-4"
-                            v-if="topSellingProducts.length">
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
-                                <b-form-select v-model="sellingPerPage" :options="pageOptions" size="sm"
-                                    style="width: auto;" @change="sellingPage = 1"></b-form-select>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-auto border-top bg-light-soft rounded-bottom-4 dash-pager dash-pager--compact"
+                            v-if="sellers.length > sellerPerPage">
+                            <div class="showing-results-text">
+                                {{ __('Showing Result') }} : <span class="showing-bold">{{ sellerPageEnd }}</span> {{ __('of') }} <span class="showing-bold">{{ sellers.length }}</span>
                             </div>
-                            <b-pagination v-model="sellingPage" :total-rows="topSellingProducts.length" :per-page="sellingPerPage"
-                                align="right" class="figma-pagination mb-0"
+                            <b-pagination v-model="sellerPage" :total-rows="sellers.length" :per-page="sellerPerPage"
+                                align="right" class="figma-pagination mb-0" :limit="3"
                                 hide-goto-end-buttons hide-ellipsis prev-text="<" next-text=">"></b-pagination>
                         </div>
                     </div>
@@ -350,24 +406,28 @@
             </div>
         </div>
 
-        <!-- Section 8: Latest Orders -->
-        <div class="card figma-card text-dark mt-4">
-            <div class="card-header">
-                <h4 class="text-dark">{{ __('recent_orders') || 'Recent Orders' }}</h4>
+        <!-- Section 7: Latest Orders -->
+        <div class="card figma-card mb-0">
+            <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h4 class="h6 mb-0">{{ __('recent_orders') }}</h4>
                 <div class="d-flex align-items-center gap-2">
-                    <router-link to="/orders" class="btn btn-dark btn-sm rounded-3 px-3 view-order-btn">
-                        <span class="small font-weight-bold text-white">{{ __('view_orders') || 'View Orders' }}</span>
-                        <i class="fa fa-arrow-right ms-1 text-white extra-small"></i>
+                    <router-link to="/orders" class="btn btn-light btn-sm px-3 view-order-btn">
+                        <span class="small font-weight-bold">{{ __('view_orders') }}</span>
+                        <i class="fa fa-arrow-right ms-1 extra-small"></i>
                     </router-link>
                 </div>
             </div>
             <div class="card-body p-0">
-                <div class="table-responsive">
+                <div class="table-responsive dash-orders-scroll">
                     <b-table :items="orders" :fields="orderFields" :current-page="orderCurrentPage"
                         :per-page="orderPerPage" :filter-included-fields="filterOn" :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc" :sort-direction="sortDirection" :bordered="false" :busy="isLoading"
-                        stacked="md" show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small
-                        class="figma-order-table text-dark">
+                        show-empty :tbody-tr-class="() => 'figma-tr align-middle'" small
+                        class="figma-order-table text-dark mb-0">
+                        <template #empty="scope">
+                            <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                        </template>
+
 
                         <template #cell(id)="row">
                             <div class="figma-link-blue">
@@ -393,7 +453,7 @@
                             <div class="d-flex align-items-center justify-content-center">
                                 <a href="javascript:void(0)" @click="openOrderModal(row.item)" class="figma-link-blue">
                                     {{ row.item.total_items || 0 }} {{ __('items') || 'Items' }}
-                                    <i class="bi bi-box-arrow-up-right" style="font-size: 0.75rem;"></i>
+                                    <i class="bi bi-box-arrow-up-right dash-ext-icon"></i>
                                 </a>
                             </div>
                         </template>
@@ -423,15 +483,15 @@
                         <template #cell(actions)="row">
                             <div class="d-flex gap-2 justify-content-center">
                                 <router-link :to="{ name: 'ViewOrder', params: { id: row.item.id, record: row.item } }"
-                                    class="figma-action-btn">
-                                    <base-icon name="Eye" hoverName="Type=Hover (1)" width="24" height="24" />
+                                    class="dash-view-btn" v-b-tooltip.hover :title="__('view')" :aria-label="__('view')">
+                                    <i class="bi bi-eye"></i>
                                 </router-link>
                             </div>
                         </template>
 
                         <template #table-busy>
                             <div class="text-center py-4">
-                                <b-spinner class="align-middle" variant="dark"></b-spinner>
+                                <b-spinner class="align-middle" variant="primary"></b-spinner>
                             </div>
                         </template>
 
@@ -446,8 +506,7 @@
                                     class="d-flex flex-column gap-2">
                                     <div v-for="(item, index) in row.item.order_items" :key="index"
                                         class="bg-white p-3 rounded-3 d-flex align-items-center gap-3 border">
-                                        <img :src="item.image" class="rounded-3"
-                                            style="width: 44px; height: 44px; object-fit: cover;" />
+                                        <img :src="item.image" class="rounded-3 dash-item-thumb" alt="" />
                                         <div class="flex-grow-1">
                                             <span class="text-dark font-weight-bold d-block small mb-1">{{
                                                 item.product_name }}</span>
@@ -464,18 +523,19 @@
                                     </div>
                                 </div>
                                 <div v-else-if="row.item.itemsLoading" class="text-center p-3">
-                                    <b-spinner small variant="dark"></b-spinner>
+                                    <b-spinner small variant="primary"></b-spinner>
                                 </div>
                             </div>
                         </template>
                     </b-table>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3 border-top pt-3 bg-light-soft rounded-bottom-4" v-if="orderTotalRows">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-top bg-light-soft rounded-bottom-4 dash-pager dash-pager--compact" v-if="orderTotalRows">
                     <div class="d-flex align-items-center gap-2">
                         <label class="showing-results-text mb-0">{{ __('per_page') }}</label>
                         <b-form-select v-model="orderPerPage" :options="pageOptions" size="sm"
-                            style="width: auto;" @change="orderCurrentPage = 1"></b-form-select>
+                            class="w-auto" @change="orderCurrentPage = 1"></b-form-select>
+                        <table-count :current-page="orderCurrentPage" :per-page="orderPerPage" :total-rows="orderTotalRows"></table-count>
                     </div>
                     <b-pagination v-model="orderCurrentPage" :total-rows="orderTotalRows" :per-page="orderPerPage"
                         align="right" class="figma-pagination mb-0"
@@ -499,7 +559,7 @@
                 </div>
             </template>
 
-            <div class="modal-body-content" style="max-height: 500px; overflow-y: auto;">
+            <div class="modal-body-content dash-modal-scroll">
                 <div v-if="isModalLoading" class="text-center py-5">
                     <b-spinner variant="primary"></b-spinner>
                 </div>
@@ -564,6 +624,7 @@ export default {
     data() {
         return {
             record: {},
+            recordLoading: true,
             sellers: [],
             categories: [],
             statusOrderCount: [],
@@ -586,6 +647,9 @@ export default {
             sellingPerPage: 5,
             pageOptions: this.$pageOptions,
 
+            // Viewport width, kept current so charts can switch to their phone sizing
+            viewportWidth: window.innerWidth,
+
             // Chart data
             salesChartCategories: [],
             salesOrdersData: [],
@@ -594,16 +658,12 @@ export default {
             // Category chart
             categoryChartLabels: [],
             categoryChartSeries: [],
-            categoryChartColors: ['#F5A623', '#9B6FD9', '#7BC67E', '#5B93D4', '#4FC5C9'],
 
             // Top products (derived from categories/orders data)
             topRatedProducts: [],
             topSellingProducts: [],
 
-            // Avatar colors
-            avatarColors: ['#D4E4F7', '#E0D4F7', '#D4F7E0', '#F7E4D4', '#D4F0F7', '#F7D4E0'],
-
-            // Platform data (derived from customer_count)
+            // Platform data (from record.platform_usage)
             totalUsers: 0,
             platformUsage: { web: 0, android: 0, ios: 0 },
 
@@ -660,24 +720,47 @@ export default {
             const todayReturns = this.record.today_return_count || 0;
             const todayCancelled = this.record.today_cancelled_count || 0;
             return [
-                { label: this.__('today_order') || 'Today Order', value: this.formatNumber(todayOrders), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-blue', icon: 'Total order' },
-                { label: this.__('today_revenue') || 'Today Revenue', value: this.$currency + this.formatNumber(todayRevenue), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-green', icon: 'total rev' },
-                { label: this.__('today_return_product') || 'Today Return Product', value: this.formatNumber(todayReturns), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-orange', icon: 'total return' },
-                { label: this.__('today_cancelled') || 'Today Cancelled', value: this.formatNumber(todayCancelled), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-red', icon: 'total cancel' },
+                { label: this.__('today_order'), value: this.formatNumber(todayOrders), cardBg: 'var(--ui-surface)', iconBgClass: 'bg-stat-blue', icon: 'Total order' },
+                { label: this.__('today_revenue'), value: this.$currency + this.formatNumber(todayRevenue), cardBg: 'var(--ui-surface)', iconBgClass: 'bg-stat-green', icon: 'total rev' },
+                { label: this.__('today_returns'), value: this.formatNumber(todayReturns), cardBg: 'var(--ui-surface)', iconBgClass: 'bg-stat-orange', icon: 'total return' },
+                { label: this.__('today_cancelled'), value: this.formatNumber(todayCancelled), cardBg: 'var(--ui-surface)', iconBgClass: 'bg-stat-red', icon: 'total cancel' },
             ];
         },
         summaryStats() {
-            const orderCount = this.record.order_count || 0;
-            const revenue = this.record.revenue || 0;
-            const customers = this.record.customer_count || 0;
-            const pendingOrders = this.record.pending_orders || 0;
-            const deliveredOrders = this.record.delivered_orders || 0;
+            const r = this.record || {};
+            const orderCount = Number(r.order_count) || 0;
+            const revenue = Number(r.revenue) || 0;
+            const customers = r.customer_count || 0;
+            const pendingOrders = r.pending_orders || 0;
+            const deliveredOrders = r.delivered_orders || 0;
+            // Average order value: all-time revenue / all-time orders (0 when there are no orders yet)
+            const avgOrderValue = orderCount > 0 ? Math.round((revenue / orderCount) * 100) / 100 : 0;
+            // Trend pills are only shown when the API sends a trend for that stat
+            const trend = (key, defaultUp) => ({
+                trendUp: r[key + '_up'] !== undefined ? r[key + '_up'] : defaultUp,
+                trendValue: r[key] || null,
+            });
             return [
-                { label: this.__('total_orders') , value: this.formatNumber(orderCount), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-blue-light', iconTextClass: 'text-stat-blue', icon: 'total od', trendUp: this.record.total_orders_trend_up !== undefined ? this.record.total_orders_trend_up : true, trendValue: this.record.total_orders_trend || '0%' },
-                { label: this.__('revenue'), value: this.$currency + this.formatNumber(revenue), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-green-light', iconTextClass: 'text-stat-green', icon: 'n_rev', trendUp: this.record.revenue_trend_up !== undefined ? this.record.revenue_trend_up : true, trendValue: this.record.revenue_trend || '0%' },
-                { label: this.__('active_customers') , value: this.formatNumber(customers), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-pink-light', iconTextClass: 'text-stat-pink', icon: 'Active users', trendUp: this.record.customers_trend_up !== undefined ? this.record.customers_trend_up : true, trendValue: this.record.customers_trend || '0%' },
-                { label: this.__('pending_orders'), value: this.formatNumber(pendingOrders), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-red-light', iconTextClass: 'text-stat-red', icon: 'Pending Orders', trendUp: this.record.pending_orders_trend_up !== undefined ? this.record.pending_orders_trend_up : false, trendValue: this.record.pending_orders_trend || '0%' },
-                { label: this.__('delivered_orders') , value: this.formatNumber(deliveredOrders), cardBg: '#FFFFFF', iconBgClass: 'bg-stat-green-light', iconTextClass: 'text-stat-green', icon: 'Delivered Orders', trendUp: this.record.delivered_orders_trend_up !== undefined ? this.record.delivered_orders_trend_up : true, trendValue: this.record.delivered_orders_trend || '0%' },
+                { label: this.__('total_orders'), value: this.formatNumber(orderCount), iconBgClass: 'bg-stat-blue-light', iconTextClass: 'text-stat-blue', iconClass: 'fa fa-shopping-bag', ...trend('total_orders_trend', true) },
+                { label: this.__('revenue'), value: this.$currency + this.formatNumber(revenue), iconBgClass: 'bg-stat-green-light', iconTextClass: 'text-stat-green', iconClass: 'fa fa-wallet', ...trend('revenue_trend', true) },
+                { label: this.__('average_order_value'), value: this.$currency + this.formatNumber(avgOrderValue), iconBgClass: 'bg-stat-purple-light', iconTextClass: 'text-stat-purple', iconClass: 'fa fa-receipt', trendValue: null },
+                { label: this.__('active_customers'), value: this.formatNumber(customers), iconBgClass: 'bg-stat-pink-light', iconTextClass: 'text-stat-pink', iconClass: 'fa fa-users', ...trend('customers_trend', true) },
+                { label: this.__('pending_orders'), value: this.formatNumber(pendingOrders), iconBgClass: 'bg-stat-red-light', iconTextClass: 'text-stat-red', iconClass: 'fa fa-hourglass-half', ...trend('pending_orders_trend', false) },
+                { label: this.__('delivered_orders'), value: this.formatNumber(deliveredOrders), iconBgClass: 'bg-stat-green-light', iconTextClass: 'text-stat-green', iconClass: 'fa fa-truck', ...trend('delivered_orders_trend', true) },
+            ];
+        },
+        // Catalog & inventory tiles: counts the dashboard API already returns. Each tile links to its
+        // list page only when the user may open it (same permissions as the sidebar).
+        catalogTiles() {
+            const r = this.record || {};
+            const link = (perm, to) => (this.$can(perm) ? to : null);
+            return [
+                { key: 'products', label: this.__('products'), value: this.formatNumber(r.product_count || 0), iconClass: 'fa fa-cubes', iconBgClass: 'bg-stat-purple', tintClass: '', to: link('product_list', '/manage_products') },
+                { key: 'sellers', label: this.__('sellers'), value: this.formatNumber(r.seller_count || 0), iconClass: 'fa fa-store', iconBgClass: 'bg-stat-blue', tintClass: '', to: link('seller_list', '/sellers') },
+                { key: 'categories', label: this.__('categories'), value: this.formatNumber(r.category_count || 0), iconClass: 'fa fa-th-large', iconBgClass: 'bg-stat-green', tintClass: '', to: link('category_list', '/manage_categories') },
+                { key: 'brands', label: this.__('brands'), value: this.formatNumber(r.brand_count || 0), iconClass: 'fa fa-tags', iconBgClass: 'bg-stat-pink', tintClass: '', to: link('brands', '/brands') },
+                { key: 'sold_out', label: this.__('sold_out'), value: this.formatNumber(r.sold_out_count || 0), iconClass: 'fa fa-times-circle', iconBgClass: 'bg-stat-red', tintClass: 'card-kpi-out', to: link('stock_management', '/manage_stock'), showView: true },
+                { key: 'low_stock', label: this.__('low_stock'), value: this.formatNumber(r.low_stock_count || 0), iconClass: 'fa fa-exclamation-triangle', iconBgClass: 'bg-stat-orange', tintClass: 'card-kpi-processing', to: link('stock_management', '/manage_stock'), showView: true },
             ];
         },
         orderStatusItems() {
@@ -699,13 +782,13 @@ export default {
             const maxCount = Math.max(...filteredStatuses.map(s => s.order_count || 0), 1);
 
             const statusMap = {
-                'Payment Pending': { color: '#F59E0B', bgColor: '#FEF3C7', label: this.__('payment_pending') || 'Pending', icon: 'Payment Pending' },
-                'Pending': { color: '#F59E0B', bgColor: '#FEF3C7', label: this.__('pending') || 'Pending' },
-                'Received': { color: '#3B82F6', bgColor: '#DBEAFE', label: this.__('received') || 'Received', icon: 'Received' },
-                'Processed': { color: '#10B981', bgColor: '#D1FAE5', label: this.__('processed') || 'Processed', icon: 'Processed' },
-                'Shipped': { color: '#06B6D4', bgColor: '#CFFAFE', label: this.__('shipped') || 'Shipped', icon: 'Shipped' },
-                'Out For Delivery': { color: '#6366F1', bgColor: '#E0E7FF', label: this.__('out_for_delivery') || 'Out for Delivery', icon: 'Out for Delivery' },
-                'Delivered': { color: '#10B981', bgColor: '#D1FAE5', label: this.__('delivered') || 'Delivered', icon: 'Delivered' },
+                'Payment Pending': { color: 'var(--theme-warn-500)', bgColor: 'var(--theme-warn-50)', label: this.__('payment_pending') || 'Pending', iconClass: 'fa fa-credit-card' },
+                'Pending': { color: 'var(--theme-warn-500)', bgColor: 'var(--theme-warn-50)', label: this.__('pending') || 'Pending', iconClass: 'fa fa-clock' },
+                'Received': { color: 'var(--theme-info-500)', bgColor: 'var(--theme-info-50)', label: this.__('received') || 'Received', iconClass: 'fa fa-inbox' },
+                'Processed': { color: 'var(--theme-success-500)', bgColor: 'var(--theme-success-50)', label: this.__('processed') || 'Processed', iconClass: 'fa fa-cog' },
+                'Shipped': { color: 'var(--theme-info-600)', bgColor: 'var(--theme-info-100)', label: this.__('shipped') || 'Shipped', iconClass: 'fa fa-box' },
+                'Out For Delivery': { color: 'var(--theme-primary-500)', bgColor: 'var(--theme-primary-50)', label: this.__('out_for_delivery') || 'Out for Delivery', iconClass: 'fa fa-truck' },
+                'Delivered': { color: 'var(--theme-success-500)', bgColor: 'var(--theme-success-50)', label: this.__('delivered') || 'Delivered', iconClass: 'fa fa-check-circle' },
             };
 
             return filteredStatuses.map(s => {
@@ -715,52 +798,107 @@ export default {
                     count: s.order_count || 0,
                     color: mapped.color,
                     bgColor: mapped.bgColor,
-                    icon: mapped.icon || null,
+                    iconClass: mapped.iconClass,
                     percent: Math.round(((s.order_count || 0) / maxCount) * 100),
                 };
             });
         },
+        isPhone() {
+            return this.viewportWidth < 576;
+        },
+        // Sales Overview chart height: compact on every screen (desktop 260, tablet 220, phone 200).
+        salesChartHeight() {
+            if (this.viewportWidth < 576) return 200;
+            if (this.viewportWidth < 992) return 220;
+            return 260;
+        },
+        // Phone chart width: ~28px per category plus the y-axis, never narrower than 300px.
+        salesChartMinWidth() {
+            return Math.max(300, (this.salesChartCategories || []).length * 28 + 56);
+        },
+        // Phones: width of the fixed y-axis column - grows with the longest rupee label so big
+        // values (e.g. ₹1,234,567) are never cut, and stays at 64px for small ones.
+        salesAxisWidth() {
+            const orders = this.salesOrdersData || [];
+            const revenue = this.salesRevenueData || [];
+            let max = 15000;
+            for (let i = 0; i < Math.max(orders.length, revenue.length); i++) {
+                max = Math.max(max, (parseFloat(orders[i]) || 0) + (parseFloat(revenue[i]) || 0));
+            }
+            const longest = (this.$currency + this.formatNumber(Math.round(max))).length;
+            return Math.max(64, Math.ceil(longest * 6.4) + 18);
+        },
+        // Phones: options for the fixed y-axis column. Same data / scale / label heights as the
+        // scrolling chart, but bars, grid, x labels and tooltip are invisible - only the rupee
+        // labels remain, lined up with the scrolling chart's gridlines.
+        salesAxisChartOptions() {
+            const o = this.salesChartOptions;
+            return {
+                ...o,
+                chart: { ...o.chart, animations: { enabled: false }, zoom: { enabled: false } },
+                colors: ['transparent', 'transparent'],
+                xaxis: {
+                    ...o.xaxis,
+                    labels: { ...o.xaxis.labels, style: { colors: 'transparent', fontSize: '10px' } },
+                    crosshairs: { show: false },
+                    tooltip: { enabled: false }
+                },
+                yaxis: { ...o.yaxis, show: true },
+                grid: { show: false, padding: { left: 0, right: 0 } },
+                tooltip: { enabled: false },
+                legend: { show: false }
+            };
+        },
         salesChartOptions() {
             return {
-                chart: { type: 'bar', stacked: true, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
+                chart: { type: 'bar', stacked: true, toolbar: { show: false }, fontFamily: 'Nunito, sans-serif' },
                 plotOptions: {
                     bar: {
-                        columnWidth: '40%',
-                        borderRadius: 4,
+                        columnWidth: this.isPhone ? '60%' : '40%',
+                        borderRadius: this.isPhone ? 3 : 4,
                     }
                 },
-                colors: ['var(--figma-primary, #FF9900)', 'var(--figma-primary-light, #FEF5E6)'],
+                // revenue uses a lighter shade than orders, but not -100 (near-white in light themes)
+                colors: [this.$themeColor('primary-500'), this.$themeColor('primary-300')],
                 dataLabels: { enabled: false },
                 xaxis: {
                     categories: this.salesChartCategories,
                     axisBorder: { show: false },
                     axisTicks: { show: false },
-                    labels: { style: { colors: '#64748B', fontSize: '12px' } },
+                    // Phones: horizontal 10px labels, all shown - the chart gets enough width
+                    // (see salesChartMinWidth) and scrolls inside its wrapper instead of squeezing.
+                    labels: this.isPhone
+                        ? { rotate: 0, rotateAlways: false, hideOverlappingLabels: false, trim: false, minHeight: 24, maxHeight: 24, style: { colors: this.$themeColor('neutral-500'), fontSize: '10px' } }
+                        : { style: { colors: this.$themeColor('neutral-500'), fontSize: '12px' } },
                     crosshairs: {
                         show: true,
                         fill: {
                             type: 'solid',
-                            color: '#F1F5F9',
+                            color: this.$themeColor('neutral-200'),
                             opacity: 0.8
                         },
                         stroke: {
-                            color: '#F1F5F9',
+                            color: this.$themeColor('neutral-200'),
                             width: 0,
                         }
                     }
                 },
                 yaxis: {
+                    // Phones: the rupee scale lives in the fixed column beside the scrolling plot.
+                    show: !this.isPhone,
                     min: 0,
                     max: (max) => {
                         return max > 15000 ? max : 15000;
                     },
                     tickAmount: 5,
                     labels: {
-                        style: { colors: '#64748B', fontSize: '12px' },
-                        formatter: (val) => this.$currency + this.formatNumber(val)
+                        style: { colors: this.$themeColor('neutral-500'), fontSize: this.isPhone ? '10px' : '12px' },
+                        // Phones: whole rupees only - the axis column is narrow and decimals on the
+                        // scale ticks (e.g. 71,791.96) are noise.
+                        formatter: (val) => this.$currency + this.formatNumber(this.isPhone ? Math.round(val) : val)
                     }
                 },
-                grid: { borderColor: '#F1F5F9', strokeDashArray: 4 },
+                grid: { borderColor: this.$themeColor('neutral-200'), strokeDashArray: 4 },
                 legend: { show: false },
                 states: {
                     hover: {
@@ -784,10 +922,16 @@ export default {
                         const revenue = series[1] ? series[1][dataPointIndex] : 0;
                         const ordersLabel = this.__('orders') || 'Orders';
                         const revenueLabel = this.__('revenue') || 'Revenue';
-                        return '<div style="background:#111827;color:#fff;padding:12px;border-radius:12px;font-size:13px;line-height:1.6;border:none;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)">' +
+                        // Phones: a smaller card (tighter padding / font) that never wraps.
+                        const phone = this.isPhone;
+                        const box = phone
+                            ? 'background:var(--theme-neutral-900);color:var(--theme-neutral-50);padding:8px 10px;border-radius:8px;font-size:11px;line-height:1.5;white-space:nowrap;border:none;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)'
+                            : 'background:var(--theme-neutral-900);color:var(--theme-neutral-50);padding:12px;border-radius:12px;font-size:13px;line-height:1.6;border:none;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1)';
+                        const gap = phone ? 6 : 8;
+                        return '<div style="' + box + '">' +
                             '<div style="margin-bottom:4px;font-weight:700">' + cat + '</div>' +
-                            '<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--figma-primary, #FF9900)"></span> ' + ordersLabel + ' : <span style="font-weight:700">' + orders + '</span></div>' +
-                            '<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--figma-primary-light, #FEF5E6)"></span> ' + revenueLabel + ' : <span style="font-weight:700">' + this.$currency + (revenue || 0).toLocaleString() + '</span></div>' +
+                            '<div style="display:flex;align-items:center;gap:' + gap + 'px"><span style="width:8px;height:8px;border-radius:50%;background:var(--theme-primary-500)"></span> ' + ordersLabel + ' : <span style="font-weight:700">' + orders + '</span></div>' +
+                            '<div style="display:flex;align-items:center;gap:' + gap + 'px"><span style="width:8px;height:8px;border-radius:50%;background:var(--theme-primary-300)"></span> ' + revenueLabel + ' : <span style="font-weight:700">' + this.$currency + (revenue || 0).toLocaleString() + '</span></div>' +
                             '</div>';
                     }
                 },
@@ -799,80 +943,59 @@ export default {
                 { name: 'Revenue', data: this.salesRevenueData },
             ];
         },
-        categoryDonutOptions() {
-            return {
-                chart: { type: 'donut', fontFamily: 'Inter, sans-serif' },
-                labels: this.categoryChartLabels,
-                colors: this.categoryChartColors.slice(0, this.categoryChartLabels.length),
-                legend: { show: false },
-                dataLabels: { enabled: false },
-                plotOptions: { pie: { donut: { size: '75%' } } },
-                stroke: { width: 4, colors: ['#fff'] },
-                tooltip: {
-                    y: { formatter: (val) => this.$currency + (val || 0).toLocaleString() }
-                },
-            };
+        // Top sales by category: total of every category with sales in the selected period.
+        categoryTotalSales() {
+            return (this.categoryChartSeries || []).reduce((sum, v) => sum + (parseFloat(v) || 0), 0);
         },
-        categoryChartDataFormatted() {
-            return this.categoryChartLabels.map((label, index) => ({
-                name: label,
-                value: this.$currency + this.formatNumber(this.categoryChartSeries[index] || 0),
-                color: this.categoryChartColors[index] || '#000'
+        // Top sales by category as a ranked bar list: top 5 by sales, then one "Others" row with
+        // the rest. Bar width = share of the total; #1 uses the strongest primary shade.
+        categoryRanked() {
+            const total = this.categoryTotalSales;
+            if (!total) return [];
+            const shades = ['var(--theme-primary-500)', 'var(--theme-primary-400)', 'var(--theme-primary-300)', 'var(--theme-primary-300)', 'var(--theme-primary-200)'];
+            const share = (v) => {
+                const pct = (v / total) * 100;
+                return pct >= 10 ? Math.round(pct) : Math.round(pct * 10) / 10;
+            };
+            const items = this.categoryChartLabels
+                .map((label, index) => ({ name: label, amount: parseFloat(this.categoryChartSeries[index]) || 0 }))
+                .sort((x, y) => y.amount - x.amount);
+            const rows = items.slice(0, 5).map((item, idx) => ({
+                key: 'r' + idx,
+                rank: idx + 1,
+                name: item.name,
+                value: this.$currency + this.formatNumber(item.amount),
+                share: share(item.amount),
+                color: shades[idx],
+                isOther: false,
             }));
+            const rest = items.slice(5);
+            if (rest.length) {
+                const restTotal = rest.reduce((sum, item) => sum + item.amount, 0);
+                rows.push({
+                    key: 'others',
+                    rank: null,
+                    name: this.__('others') + ' (' + rest.length + ')',
+                    value: this.$currency + this.formatNumber(restTotal),
+                    share: share(restTotal),
+                    color: 'var(--theme-neutral-400)',
+                    isOther: true,
+                });
+            }
+            return rows;
         },
-        platformGaugeOptions() {
-            return {
-                chart: { type: 'donut', fontFamily: 'Inter, sans-serif' },
-                plotOptions: {
-                    pie: {
-                        startAngle: -90,
-                        endAngle: 90,
-                        offsetY: 10,
-                        donut: {
-                            size: '75%',
-                            labels: {
-                                show: true,
-                                name: { show: true, offsetY: 25, fontSize: '13px', color: '#475569', fontWeight: 500 },
-                                value: { show: true, offsetY: -15, fontSize: '24px', fontWeight: 800, color: '#1F2937', formatter: () => this.formatNumber(this.totalUsers) },
-                                total: {
-                                    show: true,
-                                    showAlways: true,
-                                    label: __('Total Users'),
-                                    color: '#475569',
-                                    formatter: () => this.formatNumber(this.totalUsers)
-                                }
-                            }
-                        }
-                    }
-                },
-                grid: { padding: { bottom: -80 } },
-                dataLabels: { enabled: false },
-                stroke: { width: 0 },
-                colors: ['#FBBF24', '#F472B6', '#A78BFA'],
-                labels: [__('Web'), __('Android (App)'), __('iOS (App)')],
-                legend: {
-                    show: true,
-                    position: 'bottom',
-                    horizontalAlign: 'center',
-                    markers: { radius: 100 },
-                    itemMargin: { horizontal: 10, vertical: 0 }
-                }
-            };
-        },
-        platformGaugeSeries() {
-            const web = this.platformUsage?.web || 0;
-            const android = this.platformUsage?.android || 0;
-            const ios = this.platformUsage?.ios || 0;
-            return [web, android, ios];
-        },
+        // Customers by platform: one progress bar per platform with its share of all users.
         platformItems() {
-            const web = this.platformUsage?.web || 0;
-            const android = this.platformUsage?.android || 0;
-            const ios = this.platformUsage?.ios || 0;
+            const u = this.platformUsage || {};
+            const web = Number(u.web) || 0;
+            const android = Number(u.android) || 0;
+            const ios = Number(u.ios) || 0;
+            const total = web + android + ios;
+            const pct = (n) => (total > 0 ? Math.round((n / total) * 100) : 0);
             return [
-                { label: __('Web'), count: this.formatNumber(web) },
-                { label: __('Android (App)'), count: this.formatNumber(android) },
-                { label: __('iOS (App)'), count: this.formatNumber(ios) },
+                { key: 'web', label: this.__('Web'), count: this.formatNumber(web), percent: pct(web), iconClass: 'bi bi-globe', color: 'var(--theme-primary-500)' },
+                { key: 'android', label: this.__('Android (App)'), count: this.formatNumber(android), percent: pct(android), iconClass: 'fab fa-android', color: 'var(--theme-primary-400)' },
+                { key: 'ios', label: this.__('iOS (App)'), count: this.formatNumber(ios), percent: pct(ios), iconClass: 'fab fa-apple', color: 'var(--theme-primary-300)' },
             ];
         },
         // Seller pagination
@@ -904,6 +1027,16 @@ export default {
         sellingPageEnd() { return Math.min(this.sellingPage * this.sellingPerPage, this.topSellingProducts.length); },
         orderPageEnd() { return Math.min(this.orderCurrentPage * this.orderPerPage, this.orderTotalRows); },
     },
+    mounted() {
+        window.addEventListener('resize', this.onViewportResize);
+        // Phones: the tooltip lives inside the scrolling chart, so near the visible edge it gets
+        // cut off. Nudge it back inside after every pointer/touch update.
+        ['mousemove', 'touchstart', 'touchmove', 'click'].forEach(evt => this.$el.addEventListener(evt, this.keepSalesTooltipInView, { passive: true }));
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.onViewportResize);
+        ['mousemove', 'touchstart', 'touchmove', 'click'].forEach(evt => this.$el.removeEventListener(evt, this.keepSalesTooltipInView));
+    },
     created() {
         this.getRecord();
         this.getSalesData();
@@ -912,6 +1045,24 @@ export default {
         this.getLatestOrders();
     },
     methods: {
+        keepSalesTooltipInView(e) {
+            if (!this.isPhone || !e.target.closest || !e.target.closest('.sales-chart-scroll')) return;
+            requestAnimationFrame(() => {
+                const scroller = this.$el.querySelector('.sales-chart-scroll');
+                const tip = scroller && scroller.querySelector('.apexcharts-tooltip');
+                if (!tip) return;
+                tip.style.marginLeft = '0px';
+                const t = tip.getBoundingClientRect();
+                const r = scroller.getBoundingClientRect();
+                let shift = 0;
+                if (t.right > r.right) shift = r.right - t.right - 4;
+                if (t.left + shift < r.left) shift = r.left - t.left + 4;
+                tip.style.marginLeft = shift + 'px';
+            });
+        },
+        onViewportResize() {
+            this.viewportWidth = window.innerWidth;
+        },
         getDisplayName(name) {
             if (name == null) return '';
             if (typeof name === 'string') return name;
@@ -941,8 +1092,9 @@ export default {
                 ratedPeriod: this.ratedPeriod,
                 sellingPeriod: this.sellingPeriod,
             };
+            this.recordLoading = true;
             axios.get(this.$apiUrl + '/dashboard', { params: params }).then(res => {
-                console.log('Total Users:', this.totalUsers);
+                this.recordLoading = false;
                 let data = res.data;
                 if (data.status === 1) {
                     this.record = data.data;
@@ -978,13 +1130,14 @@ export default {
                         this.topRatedProducts = [];
                     }
 
-                    // Populate the category donut chart with real sales from top_categories_sales
+                    // Populate the category ranked list with real sales from top_categories_sales
                     const catSales = data.data.top_categories_sales || [];
                     const filtered = catSales.filter(c => parseFloat(c.total_revenue) > 0);
                     this.categoryChartLabels = filtered.map(c => this.getDisplayName(c.category_name));
                     this.categoryChartSeries = filtered.map(c => parseFloat(c.total_revenue));
                 }
             }).catch(error => {
+                this.recordLoading = false;
                 console.error('Dashboard error:', error);
             });
         },
@@ -1068,7 +1221,7 @@ export default {
             // Each period dropdown must only refresh its own widget - re-running the full
             // getRecord() (as this used to do) reassigns every widget's state at once, which
             // makes ApexCharts re-render cards whose own filter never changed (e.g. changing
-            // the Sellers period visibly "refreshed" the unrelated Category donut too).
+            // the Sellers period visibly "refreshed" the unrelated Category list too).
             let params = {
                 orderStatusPeriod: this.orderStatusPeriod,
                 categoryPeriod: this.categoryPeriod,
@@ -1153,8 +1306,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
                 if (result.value) {
                     this.isLoading = true
@@ -1255,4 +1408,602 @@ export default {
 
 <style scoped>
 /* Modernized styles are now central in global SCSS */
+
+/* Recent orders: view action as a tinted primary tile (same pattern as the Order Status icons) */
+.dash-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ui-radius);
+    color: var(--theme-primary-600);
+    background: color-mix(in srgb, currentColor 12%, transparent);
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.dash-view-btn:hover {
+    color: var(--theme-primary-700);
+    background: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+body.theme-dark .dash-view-btn,
+body.theme-dark .dash-view-btn i {
+    color: var(--theme-primary-400) !important;
+}
+
+/* Page never scrolls sideways: long values wrap / truncate inside their cards */
+.dash-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+.dash-welcome-title {
+    color: var(--ui-heading);
+}
+
+.dash-section-title {
+    font-family: var(--ui-font);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.dash-value-wrap {
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+}
+
+.dash-list-title {
+    color: var(--ui-heading);
+}
+
+.dash-rating {
+    color: var(--theme-warn-500);
+}
+
+.dash-os-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    /* icon in the status colour, tile tinted from it; follows the theme in light and dark mode */
+    color: var(--os-color);
+    background: color-mix(in srgb, var(--os-color) 14%, transparent);
+}
+
+/* the global dark-mode text reset forces div/i colours with !important; keep the status colour */
+body.theme-dark .dash-os-icon,
+body.theme-dark .dash-os-icon i {
+    color: var(--os-color) !important;
+}
+
+.dash-bar-track {
+    height: 6px;
+}
+
+.dash-bar-track--muted {
+    background-color: var(--ui-surface-muted);
+}
+
+/* Empty / loading state inside a card */
+.dash-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1;
+    padding: 24px 16px;
+    font-size: 13px;
+    color: var(--ui-text-muted);
+}
+
+.dash-empty i {
+    color: var(--ui-text-subtle);
+    opacity: 0.6;
+}
+
+
+/* Catalog & inventory tiles */
+.dash-cat-tile {
+    color: inherit;
+    box-shadow: none !important; /* flat tiles inside a card (global KPI tile adds a shadow) */
+}
+
+.dash-cat-tile--link:hover,
+.dash-cat-tile--link:focus {
+    text-decoration: none;
+    border-color: var(--theme-primary-300) !important; /* global tile border is !important */
+}
+
+.dash-cat-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ui-text-muted);
+}
+
+.dash-cat-view i,
+.dash-cat-chevron {
+    font-size: 10px;
+    color: var(--ui-text-subtle);
+}
+
+.dash-cat-tile--link:hover .dash-cat-view,
+.dash-cat-tile--link:hover .dash-cat-view i,
+.dash-cat-tile--link:hover .dash-cat-chevron {
+    color: var(--theme-primary-600);
+}
+
+/* Customers by platform */
+.dash-platform-total {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ui-heading);
+}
+
+.dash-platform-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: var(--ui-primary-soft);
+    color: var(--theme-primary-600);
+}
+
+.dash-platform-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.dash-platform-count .text-muted {
+    font-weight: 400;
+}
+
+@media (max-width: 575.98px) {
+    .dash-quick-actions {
+        width: 100%;
+    }
+
+    .dash-quick-actions > * {
+        flex: 1 1 0;
+        justify-content: center;
+    }
+
+    .dash-platform-total {
+        font-size: 20px;
+    }
+}
+
+/* "View Orders" (secondary action): global hover fills it with primary, keep the label readable */
+.view-order-btn:hover,
+.view-order-btn:hover span,
+.view-order-btn:hover i {
+    color: var(--theme-neutral-50) !important; /* beats .btn-light text colour on the filled hover */
+}
+
+/* Recent orders: the table keeps its columns and scrolls inside the card on narrow screens */
+.dash-orders-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dash-orders-scroll .figma-order-table {
+    min-width: 880px;
+}
+
+.dash-orders-scroll .figma-order-table td,
+.dash-orders-scroll .figma-order-table th {
+    white-space: nowrap;
+}
+
+.dash-avatar-soft {
+    background-color: var(--theme-info-50);
+}
+
+.dash-sold-icon {
+    width: 17px;
+    height: 17px;
+}
+
+.dash-ext-icon {
+    font-size: 12px;
+}
+
+.dash-item-thumb {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+}
+
+.dash-modal-scroll {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Sales Overview on phones (<576px). Desktop and tablet are untouched. */
+@media (max-width: 575.98px) {
+    /* Header: title + period select share the first row, the legend drops to a compact
+       second row. The controls wrapper is flattened so its children can be reordered. */
+    .sales-header-controls {
+        display: contents;
+    }
+
+    .sales-header-controls .figma-select-pill {
+        order: 2;
+        width: auto;
+    }
+
+    .sales-header-controls .sales-legend {
+        order: 3;
+        width: 100%;
+    }
+
+    /* Fixed y-axis column + scrollable plot. The scroll bar belongs to the plot only. */
+    .sales-y-axis {
+        pointer-events: none;
+    }
+
+    .sales-chart-scroll {
+        min-width: 0;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: var(--theme-neutral-300) transparent;
+    }
+
+    .sales-chart-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .sales-chart-scroll::-webkit-scrollbar-thumb {
+        background: var(--theme-neutral-300);
+        border-radius: 999px;
+    }
+}
+
+/* ===== Compact dashboard (second pass) =====
+   Global card / tile rules use "#main ..." + !important, so these overrides are scoped under
+   "#main .dash-page" to win on specificity. */
+.dash-welcome-title {
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+#main .dash-page .figma-card > .card-header {
+    min-height: 0 !important;
+    padding: 12px 16px !important;
+}
+
+#main .dash-page .figma-card > .card-header .figma-select-pill {
+    min-height: 36px !important;
+    height: 36px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 14px !important;
+    padding-right: 34px !important;
+    line-height: normal !important;
+}
+
+#main .dash-page .figma-card > .card-body.dash-body {
+    padding: 14px 16px !important;
+}
+
+#main .dash-page .figma-card > .card-body.dash-body--chart {
+    padding: 4px 12px 8px !important;
+}
+
+/* Today strip: slim 64px tiles with a 36px icon */
+#main .dash-page .figma-kpi-card-v2.dash-tile {
+    min-height: 64px !important;
+    padding: 10px 14px !important;
+}
+
+/* Label wraps (max 2 lines) instead of cutting to "Today ..." on narrow screens */
+#main .dash-page .dash-tile-label {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+    line-height: 1.2;
+}
+
+@media (max-width: 575.98px) {
+    #main .dash-page .figma-kpi-card-v2.dash-tile {
+        padding: 10px !important;
+    }
+}
+
+#main .dash-page .dash-tile .figma-stat-value {
+    font-size: 18px !important;
+    line-height: 1.25;
+}
+
+#main .dash-page .dash-icon-36 {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px;
+    border-radius: 9px !important;
+    font-size: 15px;
+}
+
+#main .dash-page .dash-icon-32 {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    border-radius: 8px !important;
+    font-size: 14px;
+}
+
+/* Rows of label + count + thin bar (order status, platforms, categories) */
+.dash-os-list {
+    gap: 10px;
+}
+
+.dash-row-head {
+    margin-bottom: 4px;
+    line-height: 18px;
+}
+
+#main .dash-page .dash-row-label {
+    font-size: 13px;
+    line-height: 18px;
+}
+
+#main .dash-page .dash-row-head .figma-order-status-count {
+    font-size: 13px !important;
+    line-height: 18px !important;
+}
+
+.dash-section-title {
+    font-size: 15px;
+}
+
+/* Business performance: compact horizontal cards (icon left, label, value + trend pill) */
+#main .dash-page .figma-card-white.dash-perf-card {
+    padding: 10px 12px !important;
+}
+
+.dash-perf-label {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ui-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+/* Phones: icon sits above the text so the label gets the full card width (no mid-word breaks) */
+@media (max-width: 575.98px) {
+    .dash-perf-row {
+        flex-direction: column;
+        gap: 6px !important;
+    }
+
+    .dash-perf-row > .flex-grow-1 {
+        width: 100%;
+    }
+}
+
+.dash-perf-meta {
+    gap: 4px 6px;
+    margin-top: 2px;
+}
+
+/* The trend pill always sits on its own line below the amount, on every card and screen size */
+.dash-perf-meta.d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+}
+
+.dash-perf-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.dash-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dash-trend--up {
+    background: var(--theme-primary-50);
+    color: var(--theme-primary-600);
+}
+
+.dash-trend--down {
+    background: var(--theme-error-50);
+    color: var(--theme-error-500);
+}
+
+/* Top sales by category: ranked bar list */
+.dash-rank-summary {
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed var(--ui-border);
+}
+
+.dash-rank-total {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ui-heading);
+    overflow-wrap: anywhere;
+}
+
+.dash-rank-list {
+    gap: 12px;
+}
+
+.dash-rank-chip {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--theme-primary-50);
+    color: var(--theme-primary-700);
+}
+
+.dash-rank-chip--top {
+    background: var(--theme-primary-500);
+    color: var(--theme-neutral-50);
+}
+
+.dash-rank-chip--other {
+    background: var(--ui-surface-muted);
+    color: var(--ui-text-muted);
+    font-size: 10px;
+}
+
+.dash-rank-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ui-heading);
+}
+
+.dash-rank-amount {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ui-heading);
+}
+
+.dash-rank-share {
+    font-weight: 400;
+    color: var(--ui-text-muted);
+    margin-left: 2px;
+}
+
+/* Catalog & inventory: 6 compact tiles, 2 per row */
+.dash-cat-grid {
+    margin: -5px;
+}
+
+.dash-cat-grid > [class*="col"] {
+    padding: 5px;
+}
+
+#main .dash-page .figma-kpi-card-v2.dash-cat-tile {
+    min-height: 56px !important;
+    padding: 8px 10px !important;
+}
+
+#main .dash-page .dash-cat-tile .figma-stat-value {
+    font-size: 16px !important;
+    line-height: 1.25;
+}
+
+#main .dash-page .dash-cat-tile .figma-stat-label {
+    font-size: 11px !important;
+}
+
+/* Phones: the whole tile is the link, so drop the chevron to give the label room */
+@media (max-width: 575.98px) {
+    .dash-cat-tile .dash-cat-chevron {
+        display: none;
+    }
+}
+
+/* The tile is a link already; the "View" word only shows when the tile is wide enough */
+@media (min-width: 1200px) and (max-width: 1599.98px), (max-width: 400px) {
+    .dash-cat-view-text {
+        display: none;
+    }
+}
+
+/* Product / seller lists */
+.dash-list {
+    padding: 0 16px;
+}
+
+.dash-list-row {
+    padding: 8px 0;
+}
+
+.dash-list-row:last-child {
+    border-bottom: 0 !important;
+}
+
+.dash-avatar.figma-avatar-42 {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+}
+
+.dash-list-name {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+}
+
+.dash-list-amount {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.dash-pager--compact {
+    padding: 8px 12px;
+}
+
+@media (max-width: 575.98px) {
+    #main .dash-page .figma-card > .card-header {
+        padding: 10px 12px !important;
+    }
+
+    #main .dash-page .figma-card > .card-body.dash-body {
+        padding: 12px !important;
+    }
+
+    #main .dash-page .figma-kpi-card-v2.dash-tile {
+        padding: 8px 10px !important;
+        min-height: 58px !important;
+    }
+
+    #main .dash-page .dash-tile .figma-stat-value {
+        font-size: 16px !important;
+    }
+
+    .dash-list {
+        padding: 0 12px;
+    }
+
+    .dash-perf-value {
+        font-size: 15px;
+    }
+
+    .dash-rank-total {
+        font-size: 18px;
+    }
+}
 </style>

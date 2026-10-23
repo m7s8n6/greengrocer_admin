@@ -1,24 +1,24 @@
 <template>
    <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" no-fade static>
-      <div slot="modal-footer">
+      <div slot="modal-footer" class="d-flex justify-content-end">
+         <b-button variant="outline-secondary" class="mr-2" @click="hideModal">{{ __('cancel') }}</b-button>
          <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">
             {{ __('save') }}
             <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
          </b-button>
-         <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
       </div>
       <form ref="my-form" @submit.prevent="saveRecord">
          <div class="row">
-            <div class="form-group">
+            <div class="form-group col-12">
                <label>{{ __('title') }}</label>
                <input type="text" class="form-control" required v-model="title">
             </div>
-            <div class="form-group">
+            <div class="form-group col-12">
                <label>{{ __('message') }}</label>
-               <input type="text" class="form-control" required v-model="message">
+               <textarea class="form-control" rows="4" required v-model="message"></textarea>
             </div>
          </div>
-         <button ref="dummy_submit" style="display:none;"></button>
+         <button ref="dummy_submit" class="d-none"></button>
       </form>
    </b-modal>
 </template>

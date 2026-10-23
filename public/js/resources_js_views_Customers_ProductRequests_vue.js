@@ -15,6 +15,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../mixins/ViewModeMixin */ "./resources/js/mixins/ViewModeMixin.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -251,10 +252,68 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_mixins_ViewModeMixin__WEBPACK_IMPORTED_MODULE_2__["default"]],
   components: {
     Multiselect: (vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default())
   },
@@ -333,6 +392,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         };
       });
     },
+    // Grid view cards: same records, search, order and page slice as the b-table
+    gridRequests: function gridRequests() {
+      return this.pagedItems(this.gridFilterSort(this.filteredRequests));
+    },
     filteredRequests: function filteredRequests() {
       var _this = this;
       if (!this.statusFilter) {
@@ -357,6 +420,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     this.getProducts();
   },
   methods: {
+    // Grid view: same client-side search (b-table :filter over all fields) and sort as the list view.
     getRequests: function getRequests() {
       var _this2 = this;
       this.isLoading = true;
@@ -508,8 +572,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         cancelButtonText: __('cancel'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#37a279',
-        cancelButtonColor: '#d33'
+        confirmButtonColor: 'var(--theme-primary-500)',
+        cancelButtonColor: 'var(--theme-error-500)'
       }).then(function (result) {
         if (result.isConfirmed) {
           _this5.isLoading = true;
@@ -527,6 +591,125 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           });
         }
       });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/mixins/ViewModeMixin.js":
+/*!**********************************************!*\
+  !*** ./resources/js/mixins/ViewModeMixin.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/**
+ * Grid / list view switch for list pages.
+ *
+ * Provides `viewMode` ('grid' | 'list'), remembered per page (route path) in localStorage,
+ * and `pagedItems(items)`: the slice of `items` the b-table list view shows for the current
+ * page, so the grid view always shows the same records as the table.
+ *
+ * Usage: mixins: [ViewModeMixin]; markup: the shared `.view-toggle` buttons calling
+ * setViewMode('grid'|'list'), and an `.item-grid` of `.item-card`s rendered from
+ * pagedItems(sameArrayAsTheTable). Set `serverPagination: true` in data() when the API
+ * already returns one page (then pagedItems returns the array as is).
+ */
+var STORAGE_KEY = 'list_view_mode';
+function readModes() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    var saved = readModes()[this.$route ? this.$route.path : ''];
+    return {
+      viewMode: ['list', 'tree'].includes(saved) ? saved : 'grid'
+    };
+  },
+  methods: {
+    setViewMode: function setViewMode(mode) {
+      this.viewMode = mode;
+      try {
+        var modes = readModes();
+        modes[this.$route.path] = mode;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(modes));
+      } catch (e) {
+        // Storage blocked: the choice just isn't remembered.
+      }
+    },
+    // Same client-side search the b-table `:filter` prop applies: case-insensitive match of the
+    // page's `filter` text across all fields (or only `includeFields`), keys starting with "_" skipped.
+    gridFilter: function gridFilter(items, includeFields) {
+      var list = Array.isArray(items) ? items : [];
+      var text = this.filter === null || this.filter === undefined ? '' : String(this.filter).trim();
+      if (!text) return list;
+      var re = new RegExp(text.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, '\\s+'), 'i');
+      var stringify = function stringify(value) {
+        if (value === null || value === undefined) return '';
+        if (_typeof(value) === 'object') return Object.keys(value).filter(function (k) {
+          return k.charAt(0) !== '_';
+        }).map(function (k) {
+          return stringify(value[k]);
+        }).join(' ');
+        return String(value);
+      };
+      return list.filter(function (item) {
+        var keys = includeFields && includeFields.length ? includeFields : Object.keys(item).filter(function (k) {
+          return k.charAt(0) !== '_';
+        });
+        return re.test(keys.map(function (k) {
+          return stringify(item[k]);
+        }).join(' '));
+      });
+    },
+    // Same order as the b-table's synced `sortBy` / `sortDesc` (dotted keys supported).
+    gridSort: function gridSort(items) {
+      var _this = this;
+      var list = Array.isArray(items) ? items.slice() : [];
+      if (!this.sortBy) return list;
+      var dir = this.sortDesc ? -1 : 1;
+      var val = function val(o) {
+        return String(_this.sortBy).split('.').reduce(function (a, k) {
+          return a == null ? a : a[k];
+        }, o);
+      };
+      return list.sort(function (a, b) {
+        var x = val(a);
+        var y = val(b);
+        if (x === y) return 0;
+        if (x === null || x === undefined) return -dir;
+        if (y === null || y === undefined) return dir;
+        var nx = Number(x);
+        var ny = Number(y);
+        if (x !== '' && y !== '' && !isNaN(nx) && !isNaN(ny)) return (nx - ny) * dir;
+        return String(x).localeCompare(String(y), undefined, {
+          numeric: true
+        }) * dir;
+      });
+    },
+    gridFilterSort: function gridFilterSort(items, includeFields) {
+      return this.gridSort(this.gridFilter(items, includeFields));
+    },
+    // First letter of a name for avatar placeholders.
+    initial: function initial(name) {
+      return ((name || '?').toString().trim().charAt(0) || '?').toUpperCase();
+    },
+    pagedItems: function pagedItems(items) {
+      var list = Array.isArray(items) ? items : [];
+      if (this.serverPagination) return list;
+      var perPage = Number(this.perPage) || list.length || 1;
+      var page = Number(this.currentPage) || 1;
+      return list.slice((page - 1) * perPage, page * perPage);
     }
   }
 });
@@ -553,7 +736,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.description-text[data-v-719ff36a] {\n    word-wrap: break-word;\n    word-break: break-word;\n    overflow-wrap: break-word;\n    white-space: pre-wrap;\n    max-width: 100%;\n    overflow: hidden;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.description-text[data-v-719ff36a] {\n    word-wrap: break-word;\n    word-break: break-word;\n    overflow-wrap: break-word;\n    white-space: pre-wrap;\n    max-width: 100%;\n    overflow: hidden;\n}\n.requests-search[data-v-719ff36a] {\n    min-width: 250px;\n    flex: 1 1 250px;\n}\n.requests-status-select[data-v-719ff36a] {\n    width: auto;\n    min-width: 160px;\n    height: 38px;\n    min-height: 38px;\n    padding-top: 0;\n    padding-bottom: 0;\n    line-height: 36px;\n    color: var(--ui-text);\n    font-size: 13px !important;\n}\n.product-requests-page[data-v-719ff36a]  .requests-desc {\n    max-width: 220px;\n}\n.product-requests-page[data-v-719ff36a]  .requests-thumb {\n    width: 40px;\n    height: 40px;\n    -o-object-fit: cover;\n       object-fit: cover;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n    background: var(--ui-surface-muted);\n    cursor: pointer;\n}\n\n/* !important: legacy global .figma-action-btn forces 40px with !important */\n.product-requests-page[data-v-719ff36a]  .requests-row-actions .figma-action-btn {\n    width: 32px !important;\n    height: 32px !important;\n    min-width: 32px;\n    padding: 0 !important;\n    font-size: 14px;\n}\n.product-requests-page[data-v-719ff36a]  .requests-row-actions {\n    flex-wrap: nowrap;\n}\n.product-requests-page .requests-card-img[data-v-719ff36a] {\n    cursor: zoom-in;\n}\n.product-requests-page .item-card-actions[data-v-719ff36a] {\n    margin-left: auto;\n}\n.requests-detail-image[data-v-719ff36a] {\n    max-width: 300px;\n    border-radius: var(--ui-radius);\n    border: 1px solid var(--ui-border);\n}\n@media (max-width: 767.98px) {\n.product-requests-page[data-v-719ff36a]  .requests-row-actions {\n        flex-wrap: wrap;\n}\n}\n@media (max-width: 575.98px) {\n.requests-search[data-v-719ff36a],\n    .requests-status-select[data-v-719ff36a] {\n        min-width: 0;\n        width: 100%;\n        flex: 1 1 100%;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -719,46 +902,50 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "product-requests-page" },
     [
       _c("div", { staticClass: "page-heading" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-12 col-md-6 order-md-1 order-last" }, [
-            _c("h3", [_vm._v(_vm._s(_vm.__("product_requests")))]),
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-12 col-md-6 order-md-2 order-first" }, [
-            _c(
-              "nav",
-              {
-                staticClass: "breadcrumb-header float-start float-lg-end",
-                attrs: { "aria-label": "breadcrumb" },
-              },
-              [
-                _c("ol", { staticClass: "breadcrumb" }, [
-                  _c(
-                    "li",
-                    { staticClass: "breadcrumb-item" },
-                    [
-                      _c("router-link", { attrs: { to: "/dashboard" } }, [
-                        _vm._v(_vm._s(_vm.__("dashboard"))),
-                      ]),
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "li",
-                    {
-                      staticClass: "breadcrumb-item active",
-                      attrs: { "aria-current": "page" },
-                    },
-                    [_vm._v(_vm._s(_vm.__("product_requests")))]
-                  ),
-                ]),
-              ]
-            ),
-          ]),
-        ]),
+        _c(
+          "div",
+          {
+            staticClass:
+              "page-title d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3",
+          },
+          [
+            _c("h3", { staticClass: "modern-page-title mb-0" }, [
+              _vm._v(_vm._s(_vm.__("product_requests"))),
+            ]),
+            _vm._v(" "),
+            _c("nav", { attrs: { "aria-label": "breadcrumb" } }, [
+              _c("ol", { staticClass: "breadcrumb mb-0" }, [
+                _c(
+                  "li",
+                  { staticClass: "breadcrumb-item" },
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "text-muted",
+                        attrs: { to: "/dashboard" },
+                      },
+                      [_vm._v(_vm._s(_vm.__("dashboard")))]
+                    ),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  {
+                    staticClass: "breadcrumb-item active text-primary",
+                    attrs: { "aria-current": "page" },
+                  },
+                  [_vm._v(_vm._s(_vm.__("product_requests")))]
+                ),
+              ]),
+            ]),
+          ]
+        ),
         _vm._v(" "),
         _c("div", { staticClass: "row" }, [
           _c("div", { staticClass: "col-12 col-md-12 order-md-1 order-last" }, [
@@ -768,7 +955,7 @@ var render = function () {
                   "div",
                   {
                     staticClass:
-                      "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row",
+                      "d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row p-3",
                   },
                   [
                     _c(
@@ -781,8 +968,8 @@ var render = function () {
                         _c(
                           "div",
                           {
-                            staticClass: "figma-search-container",
-                            staticStyle: { "min-width": "250px" },
+                            staticClass:
+                              "figma-search-container requests-search",
                           },
                           [
                             _c("i", { staticClass: "fa fa-search text-muted" }),
@@ -825,15 +1012,7 @@ var render = function () {
                                 expression: "statusFilter",
                               },
                             ],
-                            staticClass: "form-select figma-search-input",
-                            staticStyle: {
-                              "min-width": "160px",
-                              height: "40px",
-                              border: "1px solid #EDEDED",
-                              "border-radius": "8px",
-                              background: "#F5F5F5",
-                              "font-size": "14px",
-                            },
+                            staticClass: "form-select requests-status-select",
                             on: {
                               change: [
                                 function ($event) {
@@ -885,6 +1064,72 @@ var render = function () {
                       },
                       [
                         _c(
+                          "div",
+                          {
+                            staticClass: "view-toggle",
+                            attrs: {
+                              role: "group",
+                              "aria-label": _vm.__("view"),
+                            },
+                          },
+                          [
+                            _c(
+                              "button",
+                              {
+                                directives: [
+                                  {
+                                    name: "b-tooltip",
+                                    rawName: "v-b-tooltip.hover",
+                                    modifiers: { hover: true },
+                                  },
+                                ],
+                                staticClass: "view-toggle-btn",
+                                class: { active: _vm.viewMode === "grid" },
+                                attrs: {
+                                  type: "button",
+                                  title: _vm.__("grid_view"),
+                                },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.setViewMode("grid")
+                                  },
+                                },
+                              },
+                              [
+                                _c("i", {
+                                  staticClass: "bi bi-grid-3x3-gap-fill",
+                                }),
+                              ]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "button",
+                              {
+                                directives: [
+                                  {
+                                    name: "b-tooltip",
+                                    rawName: "v-b-tooltip.hover",
+                                    modifiers: { hover: true },
+                                  },
+                                ],
+                                staticClass: "view-toggle-btn",
+                                class: { active: _vm.viewMode === "list" },
+                                attrs: {
+                                  type: "button",
+                                  title: _vm.__("list_view"),
+                                },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.setViewMode("list")
+                                  },
+                                },
+                              },
+                              [_c("i", { staticClass: "bi bi-list-ul" })]
+                            ),
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
                           "button",
                           {
                             directives: [
@@ -914,256 +1159,650 @@ var render = function () {
                   ]
                 ),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "table-responsive" },
-                  [
-                    _c("b-table", {
-                      staticClass: "figma-table mb-0",
-                      attrs: {
-                        items: _vm.filteredRequests,
-                        fields: _vm.fields,
-                        "current-page": _vm.currentPage,
-                        "per-page": _vm.perPage,
-                        filter: _vm.filter,
-                        "filter-included-fields": _vm.filterOn,
-                        "sort-by": _vm.sortBy,
-                        "sort-desc": _vm.sortDesc,
-                        "sort-direction": _vm.sortDirection,
-                        bordered: false,
-                        busy: _vm.isLoading,
-                        stacked: "md",
-                        "show-empty": "",
-                        small: "",
-                        "tbody-tr-class": function () {
-                          return "figma-tr align-middle"
-                        },
-                      },
-                      on: {
-                        "update:sortBy": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sort-by": function ($event) {
-                          _vm.sortBy = $event
-                        },
-                        "update:sortDesc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                        "update:sort-desc": function ($event) {
-                          _vm.sortDesc = $event
-                        },
-                      },
-                      scopedSlots: _vm._u([
-                        {
-                          key: "table-busy",
-                          fn: function () {
-                            return [
-                              _c(
+                _vm.viewMode === "grid"
+                  ? _c("div", [
+                      _vm.isLoading
+                        ? _c("div", { staticClass: "item-grid-state" }, [
+                            _c("i", { staticClass: "fa fa-spinner fa-spin" }),
+                            _vm._v(
+                              _vm._s(_vm.__("loading")) +
+                                "...\n                            "
+                            ),
+                          ])
+                        : _vm.gridRequests.length === 0
+                        ? _c("div", { staticClass: "item-grid-state" }, [
+                            _c("i", {
+                              staticClass: "fa",
+                              class: _vm.filter ? "fa-search" : "fa-inbox",
+                            }),
+                            _vm._v(
+                              "\n                                " +
+                                _vm._s(
+                                  _vm.filter
+                                    ? _vm.__("no_records_matching_your_request")
+                                    : _vm.__("no_records_to_show")
+                                ) +
+                                "\n                            "
+                            ),
+                          ])
+                        : _c(
+                            "div",
+                            { staticClass: "item-grid item-grid--single-xs" },
+                            _vm._l(_vm.gridRequests, function (item) {
+                              return _c(
                                 "div",
-                                { staticClass: "text-center text-black my-2" },
+                                { key: item.id, staticClass: "item-card" },
                                 [
-                                  _c("b-spinner", {
-                                    staticClass: "align-middle",
-                                  }),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-media" },
+                                    [
+                                      _c("img", {
+                                        staticClass: "requests-card-img",
+                                        attrs: {
+                                          src:
+                                            item.image_url ||
+                                            _vm.$placeholderImage,
+                                          alt: "",
+                                        },
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.openImageModal(
+                                              item.image_url ||
+                                                _vm.$placeholderImage
+                                            )
+                                          },
+                                        },
+                                      }),
+                                      _vm._v(" "),
+                                      _c(
+                                        "div",
+                                        { staticClass: "item-card-badges" },
+                                        [
+                                          _c(
+                                            "span",
+                                            {
+                                              staticClass: "badge",
+                                              class: _vm.getStatusVariant(
+                                                item.status
+                                              ),
+                                            },
+                                            [
+                                              _vm._v(
+                                                "\n                                                " +
+                                                  _vm._s(
+                                                    _vm.getStatusText(
+                                                      item.status
+                                                    )
+                                                  ) +
+                                                  "\n                                            "
+                                              ),
+                                            ]
+                                          ),
+                                        ]
+                                      ),
+                                    ]
+                                  ),
                                   _vm._v(" "),
-                                  _c("strong", [
-                                    _vm._v(_vm._s(_vm.__("loading")) + "..."),
+                                  _c("div", { staticClass: "item-card-body" }, [
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass: "item-card-title",
+                                        attrs: { title: item.description },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                                            " +
+                                            _vm._s(item.description || "-") +
+                                            "\n                                        "
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass: "item-card-meta",
+                                        attrs: {
+                                          title: _vm.__("customer_name"),
+                                        },
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass: "bi bi-person",
+                                        }),
+                                        _vm._v(
+                                          "\n                                            " +
+                                            _vm._s(
+                                              item.customer
+                                                ? item.customer.name
+                                                : "-"
+                                            ) +
+                                            "\n                                        "
+                                        ),
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    item.product
+                                      ? _c(
+                                          "div",
+                                          {
+                                            staticClass: "item-card-meta",
+                                            attrs: {
+                                              title:
+                                                _vm.__("requested_product"),
+                                            },
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "bi bi-box-seam",
+                                            }),
+                                            _vm._v(
+                                              " " +
+                                                _vm._s(item.product.name) +
+                                                "\n                                        "
+                                            ),
+                                          ]
+                                        )
+                                      : _vm._e(),
                                   ]),
-                                ],
-                                1
-                              ),
-                            ]
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    { staticClass: "item-card-footer" },
+                                    [
+                                      _c(
+                                        "div",
+                                        { staticClass: "item-card-actions" },
+                                        [
+                                          _c(
+                                            "button",
+                                            {
+                                              directives: [
+                                                {
+                                                  name: "b-tooltip",
+                                                  rawName: "v-b-tooltip.hover",
+                                                  modifiers: { hover: true },
+                                                },
+                                              ],
+                                              staticClass: "figma-action-btn",
+                                              attrs: { title: _vm.__("view") },
+                                              on: {
+                                                click: function ($event) {
+                                                  return _vm.viewRequestDetails(
+                                                    item
+                                                  )
+                                                },
+                                              },
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "bi bi-eye",
+                                              }),
+                                            ]
+                                          ),
+                                          _vm._v(" "),
+                                          _vm.$can("product_request_update")
+                                            ? [
+                                                item.status === "pending"
+                                                  ? _c(
+                                                      "button",
+                                                      {
+                                                        directives: [
+                                                          {
+                                                            name: "b-tooltip",
+                                                            rawName:
+                                                              "v-b-tooltip.hover",
+                                                            modifiers: {
+                                                              hover: true,
+                                                            },
+                                                          },
+                                                        ],
+                                                        staticClass:
+                                                          "figma-action-btn",
+                                                        attrs: {
+                                                          title:
+                                                            _vm.__("approve"),
+                                                        },
+                                                        on: {
+                                                          click: function (
+                                                            $event
+                                                          ) {
+                                                            return _vm.acceptRequest(
+                                                              item
+                                                            )
+                                                          },
+                                                        },
+                                                      },
+                                                      [
+                                                        _c("i", {
+                                                          staticClass:
+                                                            "bi bi-check-circle",
+                                                        }),
+                                                      ]
+                                                    )
+                                                  : _vm._e(),
+                                                _vm._v(" "),
+                                                item.status === "pending"
+                                                  ? _c(
+                                                      "button",
+                                                      {
+                                                        directives: [
+                                                          {
+                                                            name: "b-tooltip",
+                                                            rawName:
+                                                              "v-b-tooltip.hover",
+                                                            modifiers: {
+                                                              hover: true,
+                                                            },
+                                                          },
+                                                        ],
+                                                        staticClass:
+                                                          "figma-action-btn figma-delete-btn",
+                                                        attrs: {
+                                                          title:
+                                                            _vm.__("reject"),
+                                                        },
+                                                        on: {
+                                                          click: function (
+                                                            $event
+                                                          ) {
+                                                            return _vm.rejectRequest(
+                                                              item
+                                                            )
+                                                          },
+                                                        },
+                                                      },
+                                                      [
+                                                        _c("i", {
+                                                          staticClass:
+                                                            "bi bi-x-circle",
+                                                        }),
+                                                      ]
+                                                    )
+                                                  : _vm._e(),
+                                              ]
+                                            : _vm._e(),
+                                          _vm._v(" "),
+                                          _vm.$can("product_request_delete")
+                                            ? [
+                                                _c(
+                                                  "button",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "b-tooltip",
+                                                        rawName:
+                                                          "v-b-tooltip.hover",
+                                                        modifiers: {
+                                                          hover: true,
+                                                        },
+                                                      },
+                                                    ],
+                                                    staticClass:
+                                                      "figma-action-btn figma-delete-btn",
+                                                    attrs: {
+                                                      title: _vm.__("delete"),
+                                                    },
+                                                    on: {
+                                                      click: function ($event) {
+                                                        return _vm.deleteRequest(
+                                                          item
+                                                        )
+                                                      },
+                                                    },
+                                                  },
+                                                  [
+                                                    _c("i", {
+                                                      staticClass:
+                                                        "bi bi-trash",
+                                                    }),
+                                                  ]
+                                                ),
+                                              ]
+                                            : _vm._e(),
+                                        ],
+                                        2
+                                      ),
+                                    ]
+                                  ),
+                                ]
+                              )
+                            }),
+                            0
+                          ),
+                    ])
+                  : _c(
+                      "div",
+                      { staticClass: "table-responsive" },
+                      [
+                        _c("b-table", {
+                          staticClass: "figma-table requests-table mb-0",
+                          attrs: {
+                            items: _vm.filteredRequests,
+                            fields: _vm.fields,
+                            "current-page": _vm.currentPage,
+                            "per-page": _vm.perPage,
+                            filter: _vm.filter,
+                            "filter-included-fields": _vm.filterOn,
+                            "sort-by": _vm.sortBy,
+                            "sort-desc": _vm.sortDesc,
+                            "sort-direction": _vm.sortDirection,
+                            bordered: false,
+                            busy: _vm.isLoading,
+                            stacked: "md",
+                            "show-empty": "",
+                            small: "",
+                            "tbody-tr-class": function () {
+                              return "figma-tr align-middle"
+                            },
                           },
-                          proxy: true,
-                        },
-                        {
-                          key: "cell(customer_name)",
-                          fn: function (row) {
-                            return [
-                              row.item.customer
-                                ? _c("span", [
-                                    _vm._v(_vm._s(row.item.customer.name)),
-                                  ])
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
+                          on: {
+                            "update:sortBy": function ($event) {
+                              _vm.sortBy = $event
+                            },
+                            "update:sort-by": function ($event) {
+                              _vm.sortBy = $event
+                            },
+                            "update:sortDesc": function ($event) {
+                              _vm.sortDesc = $event
+                            },
+                            "update:sort-desc": function ($event) {
+                              _vm.sortDesc = $event
+                            },
                           },
-                        },
-                        {
-                          key: "cell(description)",
-                          fn: function (row) {
-                            return [
-                              row.item.description
-                                ? _c(
+                          scopedSlots: _vm._u([
+                            {
+                              key: "empty",
+                              fn: function (scope) {
+                                return [
+                                  _c(
                                     "div",
                                     {
-                                      staticClass: "text-truncate",
-                                      staticStyle: { "max-width": "200px" },
+                                      staticClass:
+                                        "text-center text-muted py-4",
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass:
+                                          "fa fa-inbox fa-2x d-block mb-2",
+                                      }),
+                                      _vm._v(_vm._s(scope.emptyText)),
+                                    ]
+                                  ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "emptyfiltered",
+                              fn: function (scope) {
+                                return [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass:
+                                        "text-center text-muted py-4",
+                                    },
+                                    [
+                                      _c("i", {
+                                        staticClass:
+                                          "fa fa-search fa-2x d-block mb-2",
+                                      }),
+                                      _vm._v(_vm._s(scope.emptyFilteredText)),
+                                    ]
+                                  ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "table-busy",
+                              fn: function () {
+                                return [
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass:
+                                        "text-center text-muted my-3",
+                                    },
+                                    [
+                                      _c("b-spinner", {
+                                        staticClass: "align-middle",
+                                      }),
+                                      _vm._v(" "),
+                                      _c("strong", [
+                                        _vm._v(
+                                          _vm._s(_vm.__("loading")) + "..."
+                                        ),
+                                      ]),
+                                    ],
+                                    1
+                                  ),
+                                ]
+                              },
+                              proxy: true,
+                            },
+                            {
+                              key: "cell(customer_name)",
+                              fn: function (row) {
+                                return [
+                                  row.item.customer
+                                    ? _c("span", [
+                                        _vm._v(_vm._s(row.item.customer.name)),
+                                      ])
+                                    : _c(
+                                        "span",
+                                        { staticClass: "text-muted" },
+                                        [_vm._v("-")]
+                                      ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "cell(description)",
+                              fn: function (row) {
+                                return [
+                                  row.item.description
+                                    ? _c(
+                                        "div",
+                                        {
+                                          staticClass:
+                                            "text-truncate requests-desc",
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                        " +
+                                              _vm._s(row.item.description) +
+                                              "\n                                    "
+                                          ),
+                                        ]
+                                      )
+                                    : _c(
+                                        "span",
+                                        { staticClass: "text-muted" },
+                                        [_vm._v("-")]
+                                      ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "cell(image)",
+                              fn: function (row) {
+                                return [
+                                  _c("img", {
+                                    staticClass: "requests-thumb",
+                                    attrs: {
+                                      src:
+                                        row.item.image_url ||
+                                        _vm.$placeholderImage,
+                                      alt: "",
+                                    },
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.openImageModal(
+                                          row.item.image_url ||
+                                            _vm.$placeholderImage
+                                        )
+                                      },
+                                    },
+                                  }),
+                                ]
+                              },
+                            },
+                            {
+                              key: "cell(status)",
+                              fn: function (row) {
+                                return [
+                                  _c(
+                                    "span",
+                                    {
+                                      staticClass: "badge",
+                                      class: _vm.getStatusVariant(
+                                        row.item.status
+                                      ),
                                     },
                                     [
                                       _vm._v(
                                         "\n                                        " +
-                                          _vm._s(row.item.description) +
+                                          _vm._s(
+                                            _vm.getStatusText(row.item.status)
+                                          ) +
                                           "\n                                    "
                                       ),
                                     ]
-                                  )
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(image)",
-                          fn: function (row) {
-                            return [
-                              row.item.image_url
-                                ? _c("img", {
-                                    staticClass: "img-thumbnail",
-                                    staticStyle: {
-                                      width: "50px",
-                                      height: "50px",
-                                      "object-fit": "cover",
-                                    },
-                                    attrs: { src: row.item.image_url },
-                                    on: {
-                                      click: function ($event) {
-                                        return _vm.openImageModal(
-                                          row.item.image_url
-                                        )
-                                      },
-                                    },
-                                  })
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(status)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "span",
-                                {
-                                  staticClass: "badge",
-                                  class: _vm.getStatusVariant(row.item.status),
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                        " +
-                                      _vm._s(
-                                        _vm.getStatusText(row.item.status)
-                                      ) +
-                                      "\n                                    "
                                   ),
                                 ]
-                              ),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(product)",
-                          fn: function (row) {
-                            return [
-                              row.item.product
-                                ? _c("span", [
-                                    _vm._v(_vm._s(row.item.product.name)),
-                                  ])
-                                : _c("span", { staticClass: "text-muted" }, [
-                                    _vm._v("-"),
-                                  ]),
-                            ]
-                          },
-                        },
-                        {
-                          key: "cell(action)",
-                          fn: function (row) {
-                            return [
-                              _c(
-                                "div",
-                                {
-                                  staticClass:
-                                    "d-flex gap-2 justify-content-center",
-                                },
-                                [
+                              },
+                            },
+                            {
+                              key: "cell(product)",
+                              fn: function (row) {
+                                return [
+                                  row.item.product
+                                    ? _c("span", [
+                                        _vm._v(_vm._s(row.item.product.name)),
+                                      ])
+                                    : _c(
+                                        "span",
+                                        { staticClass: "text-muted" },
+                                        [_vm._v("-")]
+                                      ),
+                                ]
+                              },
+                            },
+                            {
+                              key: "cell(action)",
+                              fn: function (row) {
+                                return [
                                   _c(
-                                    "button",
+                                    "div",
                                     {
-                                      directives: [
-                                        {
-                                          name: "b-tooltip",
-                                          rawName: "v-b-tooltip.hover",
-                                          modifiers: { hover: true },
-                                        },
-                                      ],
-                                      staticClass: "figma-action-btn",
-                                      attrs: { title: _vm.__("view") },
-                                      on: {
-                                        click: function ($event) {
-                                          return _vm.viewRequestDetails(
-                                            row.item
-                                          )
-                                        },
-                                      },
+                                      staticClass:
+                                        "d-flex gap-1 requests-row-actions",
                                     },
                                     [
-                                      _c("base-icon", {
-                                        attrs: {
-                                          name: "Eye",
-                                          hoverName: "Type=Hover (1)",
-                                          width: "24",
-                                          height: "24",
+                                      _c(
+                                        "button",
+                                        {
+                                          directives: [
+                                            {
+                                              name: "b-tooltip",
+                                              rawName: "v-b-tooltip.hover",
+                                              modifiers: { hover: true },
+                                            },
+                                          ],
+                                          staticClass: "figma-action-btn",
+                                          attrs: { title: _vm.__("view") },
+                                          on: {
+                                            click: function ($event) {
+                                              return _vm.viewRequestDetails(
+                                                row.item
+                                              )
+                                            },
+                                          },
                                         },
-                                      }),
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _vm.$can("product_request_update")
-                                    ? [
-                                        row.item.status === "pending"
-                                          ? _c(
-                                              "button",
-                                              {
-                                                directives: [
+                                        [_c("i", { staticClass: "bi bi-eye" })]
+                                      ),
+                                      _vm._v(" "),
+                                      _vm.$can("product_request_update")
+                                        ? [
+                                            row.item.status === "pending"
+                                              ? _c(
+                                                  "button",
                                                   {
-                                                    name: "b-tooltip",
-                                                    rawName:
-                                                      "v-b-tooltip.hover",
-                                                    modifiers: { hover: true },
+                                                    directives: [
+                                                      {
+                                                        name: "b-tooltip",
+                                                        rawName:
+                                                          "v-b-tooltip.hover",
+                                                        modifiers: {
+                                                          hover: true,
+                                                        },
+                                                      },
+                                                    ],
+                                                    staticClass:
+                                                      "figma-action-btn",
+                                                    attrs: {
+                                                      title: _vm.__("approve"),
+                                                    },
+                                                    on: {
+                                                      click: function ($event) {
+                                                        return _vm.acceptRequest(
+                                                          row.item
+                                                        )
+                                                      },
+                                                    },
                                                   },
-                                                ],
-                                                staticClass: "figma-action-btn",
-                                                attrs: {
-                                                  title: _vm.__("approve"),
-                                                },
-                                                on: {
-                                                  click: function ($event) {
-                                                    return _vm.acceptRequest(
-                                                      row.item
-                                                    )
+                                                  [
+                                                    _c("i", {
+                                                      staticClass:
+                                                        "bi bi-check-circle",
+                                                    }),
+                                                  ]
+                                                )
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            row.item.status === "pending"
+                                              ? _c(
+                                                  "button",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "b-tooltip",
+                                                        rawName:
+                                                          "v-b-tooltip.hover",
+                                                        modifiers: {
+                                                          hover: true,
+                                                        },
+                                                      },
+                                                    ],
+                                                    staticClass:
+                                                      "figma-action-btn figma-delete-btn",
+                                                    attrs: {
+                                                      title: _vm.__("reject"),
+                                                    },
+                                                    on: {
+                                                      click: function ($event) {
+                                                        return _vm.rejectRequest(
+                                                          row.item
+                                                        )
+                                                      },
+                                                    },
                                                   },
-                                                },
-                                              },
-                                              [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "CheckCircle",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
-                                                }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                        _vm._v(" "),
-                                        row.item.status === "pending"
-                                          ? _c(
+                                                  [
+                                                    _c("i", {
+                                                      staticClass:
+                                                        "bi bi-x-circle",
+                                                    }),
+                                                  ]
+                                                )
+                                              : _vm._e(),
+                                          ]
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _vm.$can("product_request_delete")
+                                        ? [
+                                            _c(
                                               "button",
                                               {
                                                 directives: [
@@ -1177,98 +1816,47 @@ var render = function () {
                                                 staticClass:
                                                   "figma-action-btn figma-delete-btn",
                                                 attrs: {
-                                                  title: _vm.__("reject"),
+                                                  title: _vm.__("delete"),
                                                 },
                                                 on: {
                                                   click: function ($event) {
-                                                    return _vm.rejectRequest(
+                                                    return _vm.deleteRequest(
                                                       row.item
                                                     )
                                                   },
                                                 },
                                               },
                                               [
-                                                _c("base-icon", {
-                                                  attrs: {
-                                                    name: "XCircle",
-                                                    width: "24",
-                                                    height: "24",
-                                                  },
+                                                _c("i", {
+                                                  staticClass: "bi bi-trash",
                                                 }),
-                                              ],
-                                              1
-                                            )
-                                          : _vm._e(),
-                                      ]
-                                    : _vm._e(),
-                                  _vm._v(" "),
-                                  _vm.$can("product_request_delete")
-                                    ? [
-                                        _c(
-                                          "button",
-                                          {
-                                            directives: [
-                                              {
-                                                name: "b-tooltip",
-                                                rawName: "v-b-tooltip.hover",
-                                                modifiers: { hover: true },
-                                              },
-                                            ],
-                                            staticClass:
-                                              "figma-action-btn figma-delete-btn",
-                                            attrs: { title: _vm.__("delete") },
-                                            on: {
-                                              click: function ($event) {
-                                                return _vm.deleteRequest(
-                                                  row.item
-                                                )
-                                              },
-                                            },
-                                          },
-                                          [
-                                            _c("base-icon", {
-                                              attrs: {
-                                                name: "Type=Default",
-                                                hoverName: "Type=Hover",
-                                                width: "24",
-                                                height: "24",
-                                              },
-                                            }),
-                                          ],
-                                          1
-                                        ),
-                                      ]
-                                    : _vm._e(),
-                                ],
-                                2
-                              ),
-                            ]
-                          },
-                        },
-                      ]),
-                    }),
-                  ],
-                  1
-                ),
+                                              ]
+                                            ),
+                                          ]
+                                        : _vm._e(),
+                                    ],
+                                    2
+                                  ),
+                                ]
+                              },
+                            },
+                          ]),
+                        }),
+                      ],
+                      1
+                    ),
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "figma-table-footer flex-wrap gap-3 mt-4" },
+                  { staticClass: "figma-table-footer flex-wrap gap-3" },
                   [
-                    _c("div", { staticClass: "showing-results-text small" }, [
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(_vm.__("Showing Result")) +
-                          " : "
-                      ),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.pageEnd)),
-                      ]),
-                      _vm._v(" " + _vm._s(_vm.__("of")) + " "),
-                      _c("span", { staticClass: "showing-bold" }, [
-                        _vm._v(_vm._s(_vm.totalRows)),
-                      ]),
-                    ]),
+                    _c("table-count", {
+                      attrs: {
+                        "current-page": _vm.currentPage,
+                        "per-page": _vm.perPage,
+                        "total-rows": _vm.totalRows,
+                      },
+                    }),
                     _vm._v(" "),
                     _c(
                       "div",
@@ -1296,7 +1884,8 @@ var render = function () {
                       ],
                       1
                     ),
-                  ]
+                  ],
+                  1
                 ),
               ]),
             ]),
@@ -1387,9 +1976,11 @@ var render = function () {
                         ]),
                         _vm._v(" "),
                         _c("img", {
-                          staticClass: "img-fluid",
-                          staticStyle: { "max-width": "300px" },
-                          attrs: { src: _vm.selectedRequest.image_url },
+                          staticClass: "img-fluid requests-detail-image",
+                          attrs: {
+                            src: _vm.selectedRequest.image_url,
+                            alt: "",
+                          },
                         }),
                       ]),
                     ])
@@ -1426,7 +2017,7 @@ var render = function () {
                   _c(
                     "b-button",
                     {
-                      attrs: { variant: "secondary" },
+                      attrs: { variant: "outline-secondary" },
                       on: {
                         click: function ($event) {
                           _vm.showAcceptModal = false
@@ -1440,7 +2031,7 @@ var render = function () {
                     "b-button",
                     {
                       attrs: {
-                        variant: "success",
+                        variant: "primary",
                         disabled: !_vm.selectedProduct,
                       },
                       on: { click: _vm.confirmAcceptRequest },
@@ -1467,7 +2058,7 @@ var render = function () {
           },
         },
         [
-          _c("span", { staticClass: "text-danger" }, [
+          _c("div", { staticClass: "alert alert-warning mb-3" }, [
             _vm._v(_vm._s(_vm.__("add_product_before_accepting_request"))),
           ]),
           _vm._v(" "),
@@ -1549,7 +2140,7 @@ var render = function () {
                   _c(
                     "b-button",
                     {
-                      attrs: { variant: "secondary" },
+                      attrs: { variant: "outline-secondary" },
                       on: {
                         click: function ($event) {
                           _vm.showRejectModal = false

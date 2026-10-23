@@ -1,25 +1,19 @@
 <template>
     <div>
         <div>
-            <div class="page-heading">
-                <div class="row">
-                    <div class="col-12 col-md-6 order-md-1 order-last">
-                        <h3>{{ __('frequently_asked_questions') }}</h3>
-                    </div>
-                    <div class="col-12 col-md-6 order-md-2 order-first">
-                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><router-link to="/dashboard">{{ __('dashboard')
-                                        }}</router-link></li>
-                                <li class="breadcrumb-item active" aria-current="page">{{
-                                    __('frequently_asked_questions') }}</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+            <div class="page-heading d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="modern-page-title mb-0">{{ __('frequently_asked_questions') }}</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><router-link to="/dashboard" class="text-muted">{{ __('dashboard')
+                                }}</router-link></li>
+                        <li class="breadcrumb-item active text-primary" aria-current="page">{{
+                            __('frequently_asked_questions') }}</li>
+                    </ol>
+                </nav>
             </div>
             <section class="section">
-                <div class="figma-main-section-card">
+                <div class="card figma-main-section-card">
                     <div class="card-body p-0">
                         <div
                             class="d-flex justify-content-between align-items-center flex-wrap gap-2 figma-action-bar-row">
@@ -31,15 +25,15 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-figma-columns d-flex align-items-center gap-2"
-                                    @click="create_new = true" v-if="$can('faq_create')">
-                                    <i class="fa fa-plus"></i>
-                                    <span>{{ __('add') }}</span>
-                                </button>
-                                <button class="btn btn-figma-filter d-flex align-items-center gap-2" @click="getFaqs()"
+                                <button class="btn btn-figma-columns d-flex align-items-center gap-2" @click="getFaqs()"
                                     v-b-tooltip.hover :title="__('refresh')">
                                     <i class="fa fa-refresh"></i>
                                     <span>{{ __('refresh') }}</span>
+                                </button>
+                                <button class="btn btn-figma-filter d-flex align-items-center gap-2"
+                                    @click="create_new = true" v-if="$can('faq_create')">
+                                    <i class="fa fa-plus"></i>
+                                    <span>{{ __('add') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -59,8 +53,14 @@
                                         <strong>{{ __('loading') }}...</strong>
                                     </div>
                                 </template>
+                                <template #empty="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>{{ scope.emptyText }}</div>
+                                </template>
+                                <template #emptyfiltered="scope">
+                                    <div class="text-center text-muted py-4"><i class="fa fa-search fa-2x d-block mb-2"></i>{{ scope.emptyFilteredText }}</div>
+                                </template>
                                 <template #cell(faqs)="row">
-                                    <a href="javascript:void(0)" style="color:#435ebe;">{{ row.item.question }}</a>
+                                    <a href="javascript:void(0)" class="faq-question">{{ row.item.question }}</a>
                                     <div class="faq-answer">
                                         <p class="mb-0"
                                             v-if="!shouldTruncate(row.item.answer) || expandedFaqs[row.item.id]">
@@ -72,7 +72,7 @@
                                         <!-- View More/Less Link -->
                                         <a v-if="shouldTruncate(row.item.answer)"
                                             @click="toggleFaqExpansion(row.item.id)" href="javascript:void(0)"
-                                            style="color: #007bff; font-size: 12px; cursor: pointer;">
+                                            class="faq-toggle">
                                             {{ expandedFaqs[row.item.id] ? __('view_less') : __('view_more') }}
                                         </a>
                                     </div>
@@ -93,11 +93,8 @@
                                 </template>
                             </b-table>
                         </div>
-                        <div class="figma-table-footer">
-                            <div class="showing-results-text">
-                                {{ __('Showing Result') }} : <span class="showing-bold">{{ pageEnd }}</span> {{ __('of')
-                                }} <span class="showing-bold">{{ totalRows }}</span>
-                            </div>
+                        <div class="figma-table-footer flex-wrap gap-3">
+                            <table-count :current-page="currentPage" :per-page="perPage" :total-rows="totalRows"></table-count>
                             <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
                                 align="right" class="figma-pagination mb-0" hide-goto-end-buttons hide-ellipsis
                                 prev-text="<" next-text=">"></b-pagination>
@@ -268,8 +265,8 @@ export default {
                 cancelButtonText: __('cancel'),
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#37a279',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: 'var(--theme-primary-500)',
+                cancelButtonColor: 'var(--theme-error-500)',
             }).then(result => {
 
                 if (result.value) {
@@ -307,3 +304,27 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+/* #main prefix: global table link colours use an id selector */
+#main .table tbody td .faq-question {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 700 !important;
+    color: var(--ui-heading) !important;
+}
+
+.faq-answer p {
+    color: var(--ui-text-muted);
+    line-height: 1.5;
+}
+
+#main .table tbody td .faq-toggle {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 12px !important;
+    cursor: pointer;
+    color: var(--theme-primary-600) !important;
+}
+</style>

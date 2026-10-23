@@ -1,17 +1,17 @@
 <template>
     <b-modal ref="my-modal" :title="modal_title" @hidden="$emit('modalClose')" size="lg" scrollable no-close-on-backdrop
         no-fade static>
-        <div slot="modal-footer">
+        <div slot="modal-footer" class="d-flex justify-content-end gap-2 w-100">
+            <b-button variant="outline-secondary" @click="hideModal">{{ __('cancel') }}</b-button>
             <b-button variant="primary" @click="$refs['dummy_submit'].click()" :disabled="isLoading">{{ __('save') }}
                 <b-spinner v-if="isLoading" small label="Spinning"></b-spinner>
             </b-button>
-            <b-button variant="secondary" @click="hideModal">{{ __('cancel') }}</b-button>
         </div>
         <form ref="my-form" @submit.prevent="saveRecord">
 
             <div class="row">
                 <!-- System Type - Only show when editing (id exists) -->
-                <div class="form-group" v-if="id">
+                <div class="form-group col-12" v-if="id">
                     <label for="seller">{{ __('system_type') }}</label>
                     <select name="seller" id="seller" v-model="system_type" class="form-control form-select" disabled>
                         <option value="">{{ __('select_system_type') }}</option>
@@ -19,10 +19,9 @@
                     </select>
                     <small class="text-muted">{{ __('system_type_cannot_be_changed_when_editing') }}</small>
                 </div>
-                <div class="row">
-                    <div class="form-group col-12 col-lg-6">
-                        <label for="supported_language">{{ __('supported_language') }}</label><span
-                            class="text-danger">*</span>
+                    <div class="form-group col-12 col-md-6">
+                        <label for="supported_language">{{ __('supported_language') }} <span
+                            class="text-danger">*</span></label>
                         <select name="supported_language" id="supported_language" v-model="supported_language"
                             class="form-control form-select" :disabled="id">
                             <option value="">{{ __('select_supported_language') }}</option>
@@ -32,18 +31,17 @@
                             }}</small>
                     </div>
 
-                    <div class="form-group col-12 col-lg-6">
+                    <div class="form-group col-12 col-md-6">
                         <label for="display_name">{{ __('display_name') }}<span class="text-danger">*</span></label>
                         <input name="display_name" id="display_name" v-model="display_name" class="form-control" :placeholder="__('display_name')">
                     </div>
-                </div>
                 <!-- When creating (no id), show JSON file inputs for all system types -->
                 <template v-if="!id">
 
-                    <div class="form-group col-12 col-lg-6" v-for="systemType in system_types" :key="systemType.id">
+                    <div class="form-group col-12 col-md-6" v-for="systemType in system_types" :key="systemType.id">
                         <label :for="'json_file_' + systemType.id">{{ __('json_file') }} - {{ systemType.name }} <span
                                 class="text-danger">*</span></label>
-                        <span v-if="getError('json_data_' + systemType.id)" class="text-danger d-block mb-1">{{
+                        <span v-if="getError('json_data_' + systemType.id)" class="text-danger small d-block mb-1">{{
                             getError('json_data_' + systemType.id) }}</span>
 
                         <!-- Theme's drag-and-drop file upload -->
@@ -76,9 +74,9 @@
 
                 <!-- When editing (id exists), show single JSON file input with theme's drag-and-drop -->
                 <template v-else>
-                    <div class="form-group">
+                    <div class="form-group col-12">
                         <label for="json_file">{{ __('json_file') }}</label>
-                        <span v-if="error" class="text-danger d-block mb-1">{{ error }}</span>
+                        <span v-if="error" class="text-danger small d-block mb-1">{{ error }}</span>
 
                         <input type="file" name="json_file" id="json_file" accept="application/json"
                             v-on:change="handleFileUpload($event)" ref="json_file" class="file-input">
@@ -96,19 +94,20 @@
                         <div class="form-group mt-2" v-if="json_data">
                             <label for="json_data">{{ __('json_data') }}</label>
                             <textarea readonly class="form-control" rows="10" v-model="json_data" name="json_data"
-                                id="json_data">{{ json_data
-                                }}</textarea>
+                                id="json_data"></textarea>
                         </div>
                     </div>
                 </template>
-                <div class="form-group">
-                    <input name="is_default" id="is_default" v-model="is_default" true-value="1" false-value="0"
-                        :checked="is_default" type="checkbox" class="form-check-input">
-                    <label for="is_default">{{ __('set_as_a_default_language') }}</label>
+                <div class="form-group col-12 col-md-6 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input name="is_default" id="is_default" v-model="is_default" true-value="1" false-value="0"
+                            :checked="is_default" type="checkbox" class="form-check-input">
+                        <label for="is_default" class="form-check-label">{{ __('set_as_a_default_language') }}</label>
+                    </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-12 col-md-6">
                     <label>{{ __('status') }}</label>
-                    <div class="col-md-9 text-left mt-1">
+                    <div class="text-left mt-1">
                         <b-form-radio-group v-model="status" :options="[
                             { text: __('deactivate'), 'value': 0 },
                             { text: __('activate'), 'value': 1 },
@@ -116,7 +115,7 @@
                     </div>
                 </div>
             </div>
-            <button ref="dummy_submit" style="display:none;"></button>
+            <button ref="dummy_submit" class="d-none"></button>
         </form>
     </b-modal>
 </template>
